@@ -1,0 +1,77 @@
+{
+  "project": "recap-for-everyone",
+  "release": "0.1.0-public-framework",
+  "date": "2026-11-02",
+  "private_history_imported": false,
+  "actual_corpora_included": false,
+  "synthetic_examples_only": true,
+  "license_status": "NOT_SELECTED",
+  "file_count": 13,
+  "files": [
+    {
+      "path": ".gitignore",
+      "bytes": 155,
+      "sha256": "9582424c530015ffed444c118b0a8f46e9b4a4f64989775c4d534e1049ffdd32"
+    },
+    {
+      "path": "PUBLICATION.md",
+      "bytes": 1042,
+      "sha256": "d0eb77be8d3f46f7c954cb4108270e72c6ca1208a8410e3ae42393afe83c5308"
+    },
+    {
+      "path": "README.md",
+      "bytes": 2891,
+      "sha256": "f0681fdb9c34207951f180eed0d176e7be52a8012df69fc396a786a646c0b8d8"
+    },
+    {
+      "path": "RIGHTS.md",
+      "bytes": 952,
+      "sha256": "7b403cfda5978399a0a9aac7b2af267234d6ff3e6baad234883a972e9767068a"
+    },
+    {
+      "path": "SECURITY.md",
+      "bytes": 1324,
+      "sha256": "9bcf7ee3f4b484ed2af153569946f72fadcf6d8a06a599433e4d80e8525d8f36"
+    },
+    {
+      "path": "SKILL.md",
+      "bytes": 1396,
+      "sha256": "09f4ee60031d6e3c098a7ac62f74ab47364b513bc189ed4b3bd060c08f8be10a"
+    },
+    {
+      "path": "VALIDATION.md",
+      "bytes": 920,
+      "sha256": "44b30b149dd1f2861c1f7693796796e70f3a2dfa53622f707f9fcd55d837a79e"
+    },
+    {
+      "path": "audit_publication.py",
+      "bytes": 1969,
+      "sha256": "349bfe9f189da2beaee4d655ba05b8f080f79b5fe7518097eafb6beea5459d08"
+    },
+    {
+      "path": "docs/ARCHITECTURE.md",
+      "bytes": 2895,
+      "sha256": "4c36ed56a12118c62606e43ad130359fad053a4d22f542f8ec41610913d87b2a"
+    },
+    {
+      "path": "examples/conversations.jsonl",
+      "bytes": 443,
+      "sha256": "7b3ad06b959ecea9d39ed485ecd571838e8a1217e8cbf51dc89e3d6de9121dc9"
+    },
+    {
+      "path": "local_parser.py",
+      "bytes": 15995,
+      "sha256": "45c414a6731586ff8e1f67e307af94cfbda5124bad7d152e1cf8f2057abae734"
+    },
+    {
+      "path": "recap.py",
+      "bytes": 5232,
+      "sha256": "9ba9dc27aad2eeb3d27eb2e2f31387f95d90a2f89189bc641c2f47fca27d1528"
+    },
+    {
+      "path": "test_recap.py",
+      "bytes": 3127,
+      "sha256": "28cdd3cd60f48d3b72c4f6b8869eb1ffa1864fd393a3392584efab69360df6d1"
+    }
+  ]
+}

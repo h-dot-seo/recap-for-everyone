@@ -1,0 +1,2 @@
+{"conversation_id": "demo-conversation", "message_id": "demo-user", "role": "user", "timestamp": "2026-01-01T00:00:00Z", "title": "Synthetic orchard example", "text": "How should a synthetic orchard be organized?"}
+{"conversation_id": "demo-conversation", "message_id": "demo-assistant", "role": "assistant", "timestamp": "2026-01-01T00:01:00Z", "title": "Synthetic orchard example", "text": "This is synthetic sample text for local search."}
