@@ -68,14 +68,15 @@ def conversation(db, source, conversation_id):
             'source_sha256,source_line FROM messages WHERE source_id=? AND conversation_id=? '
             'ORDER BY message_pk', (source, conversation_id))]
         provenance = {}
-        exists = connection.execute(
-            "SELECT 1 FROM sqlite_master WHERE type='table' AND name='export_provenance'"
-        ).fetchone()
-        if exists:
+        tables = [name for name in ('export_provenance', 'export_occurrences') if connection.execute(
+            "SELECT 1 FROM sqlite_master WHERE type='table' AND name=?", (name,)).fetchone()]
+        if tables:
+            # Union preserves legacy-only archives and deduplicates backfilled rows.
+            query = ' UNION '.join('SELECT message,original_hash,locator,parent FROM ' + name +
+                                   ' WHERE source=? AND conversation=?' for name in tables)
             for row in connection.execute(
-                'SELECT message,original_hash,locator,parent FROM export_provenance '
-                'WHERE source=? AND conversation=? ORDER BY message,original_hash,locator,parent',
-                (source, conversation_id)):
+                query + ' ORDER BY message,original_hash,locator,parent',
+                (source, conversation_id) * len(tables)):
                 provenance.setdefault(row['message'], []).append(dict(
                     original_sha256=row['original_hash'], locator=row['locator'], parent_id=row['parent']))
         for message in messages:

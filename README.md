@@ -309,3 +309,20 @@ handoff bundles, private test output and other unlisted working files must remai
 outside that candidate. Do not add private files to the manifest just to make a
 check pass. This inventory check supplements the limited secret/type scanner and
 human content review; it does not establish anonymity or legal clearance.
+
+## Preserve repeated original occurrences
+
+Identical explicit message IDs are still deduplicated into one message, but every
+accepted original line/node locator is now retained in the additive
+`export_occurrences` ledger. The legacy `export_provenance` table remains unchanged
+for compatibility and can hold only one locator per message/original-file hash.
+Structured `show` views union and deduplicate both ledgers, so older archives and
+legacy-only records remain readable.
+
+On the next export import, the new occurrence table is created and existing legacy
+rows are copied into it in the same write transaction as the import. No legacy table,
+trigger, index or message is replaced. A failed import rolls back the new ledger and
+its rows. Reimporting retained original exports can recover repeated locations that
+older versions collapsed; missing locations cannot be reconstructed without those
+exports. Direct SQL consumers needing complete occurrences should use the new ledger
+plus legacy-only rows, or the structured view, rather than only the old table.

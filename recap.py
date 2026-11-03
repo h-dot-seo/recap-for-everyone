@@ -53,8 +53,14 @@ def ingest(db, source, path, provenance=None):
         conn.executescript(SCHEMA)
         inserted = 0
         with conn:
+            conn.execute('BEGIN IMMEDIATE')
             if provenance is not None:
                 conn.execute('CREATE TABLE IF NOT EXISTS export_provenance (source TEXT, conversation TEXT, message TEXT, original_hash TEXT, locator TEXT, parent TEXT, PRIMARY KEY(source,conversation,message,original_hash))')
+                occurrence_table = conn.execute("SELECT 1 FROM sqlite_master WHERE type='table' AND name='export_occurrences'").fetchone()
+                conn.execute('CREATE TABLE IF NOT EXISTS export_occurrences (source TEXT, conversation TEXT, message TEXT, original_hash TEXT, locator TEXT, parent TEXT, PRIMARY KEY(source,conversation,message,original_hash,locator))')
+                if occurrence_table is None:
+                    # Additive upgrade: preserve the legacy table and its schema.
+                    conn.execute('INSERT OR IGNORE INTO export_occurrences SELECT source,conversation,message,original_hash,locator,parent FROM export_provenance')
             conn.execute('INSERT OR IGNORE INTO artifacts VALUES(?,?,?,?)',
                          (source, digest, len(raw), len(records)))
             for row, title, line_no in records:
@@ -70,8 +76,10 @@ def ingest(db, source, path, provenance=None):
                              'VALUES(?,?,?,?,?,?,?,?,?)', (*key, *values, digest, line_no))
                 inserted += 1
             if provenance is not None:
+                occurrences = [(source, r['conversation_id'], r['message_id'], r['origin_sha256'], r['origin_locator'], r.get('parent_id')) for r in provenance]
                 conn.executemany('INSERT OR IGNORE INTO export_provenance VALUES(?,?,?,?,?,?)',
-                    [(source, r['conversation_id'], r['message_id'], r['origin_sha256'], r['origin_locator'], r.get('parent_id')) for r in provenance])
+                                 occurrences)
+                conn.executemany('INSERT OR IGNORE INTO export_occurrences VALUES(?,?,?,?,?,?)', occurrences)
         return {'source_sha256': digest, 'records': len(records), 'inserted': inserted}
     finally:
         conn.close()

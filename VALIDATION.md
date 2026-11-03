@@ -108,3 +108,9 @@ Unified CLI increment: 79 synthetic tests passed. Subprocess workflows cover
 inspection without DB, export import, list/show/find, title suggestion and checked
 title updates through recap.py. Standalone command equivalence and existing
 normalized ingest/message-level FTS behavior remain covered.
+
+Occurrence-ledger increment: 84 synthetic tests passed. Duplicate local message IDs
+on different lines preserve both locators while message insertion stays idempotent.
+Legacy-only reads, retained-export recovery, other-source backfill, trigger-induced
+full rollback and rollback of the additive schema upgrade are covered. Existing
+message/title data and legacy provenance rows are preserved.

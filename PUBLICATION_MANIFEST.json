@@ -1,12 +1,12 @@
 {
   "project": "recap-for-everyone",
-  "release": "0.15.0-unified-archive-cli",
+  "release": "0.16.0-complete-export-occurrences",
   "date": "2026-11-03",
   "private_history_imported": false,
   "actual_corpora_included": false,
   "synthetic_examples_only": true,
   "license_status": "NOT_SELECTED",
-  "file_count": 39,
+  "file_count": 40,
   "files": [
     {
       "path": ".gitattributes",
@@ -30,8 +30,8 @@
     },
     {
       "path": "README.md",
-      "bytes": 18163,
-      "sha256": "b43ef2ca33b0e0cb23a5671279426956a126ef2ed93a3a3ac5e02a8a22b8870b"
+      "bytes": 19225,
+      "sha256": "d465b7c9592ee148f2b6cdb3f822703e3b6d5daa14b52796162485e7d38341b3"
     },
     {
       "path": "RIGHTS.md",
@@ -50,8 +50,8 @@
     },
     {
       "path": "VALIDATION.md",
-      "bytes": 7074,
-      "sha256": "5eac98e9e9b522f37fcdb55860290dc6319dc77dd5e01ebffc9833d25d1c687d"
+      "bytes": 7468,
+      "sha256": "0e03e2635c8e39fcec505d25e2fae4733b909fec2fe82fcbc02d7f3b064da36e"
     },
     {
       "path": "audit_publication.py",
@@ -65,8 +65,8 @@
     },
     {
       "path": "conversation_view.py",
-      "bytes": 5381,
-      "sha256": "a575ab0ed619fd929d0dfe90e89fc4068e56e25df102ec622be1766bf49eec00"
+      "bytes": 5605,
+      "sha256": "32645ffd262441d4b47e1afdf39820df6d35513e0198b9568c4971637eeecad7"
     },
     {
       "path": "docs/ARCHITECTURE.md",
@@ -95,8 +95,8 @@
     },
     {
       "path": "recap.py",
-      "bytes": 8698,
-      "sha256": "eaaa5c1e4c027bc6e4be051cae25e1d4fbec2dc09a900c4b3a8d821908d84ad1"
+      "bytes": 9573,
+      "sha256": "3bfa39113e3f17984dcd0dc1705f7a27e3e412c1e58a81b1c7d661fd7e1014bc"
     },
     {
       "path": "session_workflow.py",
@@ -132,6 +132,11 @@
       "path": "test_conversation_view.py",
       "bytes": 5297,
       "sha256": "ceb3d20eba16df0a155562b8f5789080a2a5c01c95715df3b38ebde66feb7189"
+    },
+    {
+      "path": "test_export_occurrences.py",
+      "bytes": 4811,
+      "sha256": "ba5418a70cc3920c57c9dca2a76d66409b823231372456faa5547d117f833ea9"
     },
     {
       "path": "test_import_inspection.py",
