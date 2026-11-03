@@ -23,3 +23,5 @@ On restricted Windows hosts, set TEMP and TMP to an authorized writable director
 No real corpus, account data, or scientific fidelity evaluation was used.
 
 Second increment: 8 tests passed; failure boundaries and deterministic repeated results covered.
+
+Third increment: 10 tests passed, including supplied-evidence rejection and deterministic output. No external model/search integration tested.

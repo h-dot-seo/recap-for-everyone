@@ -1,12 +1,12 @@
 {
   "project": "recap-for-everyone",
-  "release": "0.3.0-linked-workflows",
+  "release": "0.4.0-evidence-contracts",
   "date": "2026-11-03",
   "private_history_imported": false,
   "actual_corpora_included": false,
   "synthetic_examples_only": true,
   "license_status": "NOT_SELECTED",
-  "file_count": 17,
+  "file_count": 19,
   "files": [
     {
       "path": ".gitignore",
@@ -50,8 +50,8 @@
     },
     {
       "path": "README.md",
-      "bytes": 4921,
-      "sha256": "c868b2bd841f1e6dacab8b3af24ae6cb7824da2f30013639dfe9074b8642270d"
+      "bytes": 6030,
+      "sha256": "eb10188ee25f8ebc2a4bc7451e56fd412be893a531757564a08396c716c841e0"
     },
     {
       "path": "recap.py",
@@ -70,8 +70,8 @@
     },
     {
       "path": "session_workflow.py",
-      "bytes": 5526,
-      "sha256": "211dacbc766b75edbbc6a07bd22fad00634e7dbf97e46aa5ffc2f706c9de2c9f"
+      "bytes": 6083,
+      "sha256": "baec64b42f4661efa868f41c9c7ce58585117885a0d9a8b5de3f259dd9ea678d"
     },
     {
       "path": "SKILL.md",
@@ -89,9 +89,19 @@
       "sha256": "8a80495bcda4249328727c9966a86405b7ef23e9d9a14d0b613ae9f05899d84b"
     },
     {
+      "path": "test_title_proposal.py",
+      "bytes": 1670,
+      "sha256": "531c37151b22230091a8cf349311d4e1b495586e49d2a85cd78240e36a8bcf1e"
+    },
+    {
+      "path": "title_proposal.py",
+      "bytes": 3375,
+      "sha256": "2418758779ff8c2365e211ec00391c3e2e869b0a00ae670e1d2e81cf61574f84"
+    },
+    {
       "path": "VALIDATION.md",
-      "bytes": 1377,
-      "sha256": "e18255ba0610ca1a7882a9cfe3ea4bf1c2e8fb3a3b8b786d37ba9fe3387d699f"
+      "bytes": 1523,
+      "sha256": "ae44af5e7cc61128bdcc3fccceae49201cfd6e3189eec60368e132ad66689fbe"
     }
   ]
 }

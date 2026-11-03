@@ -85,3 +85,23 @@ A failed provenance insertion rolls back the whole import. Title previews return
 revision comparison and history insertion, so a stale preview cannot overwrite a
 newer title. The Python API retains optional revision checking for compatibility;
 callers should always supply it. Reversal is another checked title change.
+
+## External title proposal contract
+
+`title_proposal.py` supplies a local contract for an operator or future semantic
+model adapter. **No semantic model is connected or called.**
+
+```sh
+python title_proposal.py --db ../demo.sqlite snapshot --source demo --conversation synthetic-chat
+python title_proposal.py --db ../demo.sqlite preview proposal.json
+python title_proposal.py --db ../demo.sqlite apply reviewed-preview.json
+```
+
+Save the preview JSON to `reviewed-preview.json` outside the repository. A proposal
+requires `source`, `conversation`, `content_sha256` from snapshot, a single-line
+`title`, `evidence_message_ids` referencing user messages, and `provider` equal to
+`operator`, `external-adapter`, or `synthetic-mock`. Preview is read-only and returns
+the expected title revision. Apply checks content under the same write lock as the
+revision and title history insertion. The snapshot contains private messages; this
+tool performs no external transmission. References and hashes do not establish
+semantic title accuracy. Synthetic tests use a mock proposal, not model output.

@@ -57,11 +57,17 @@ def import_export(db, source, path, kind):
     return result
 
 
-def titles(db, source, conversation, title=None, expected_revision=None):
+def titles(db, source, conversation, title=None, expected_revision=None, expected_content_sha256=None):
     c = readonly(db) if title is None else sqlite3.connect(db)
     try:
         if title is not None:
             c.execute('BEGIN IMMEDIATE')
+        if expected_content_sha256 is not None:
+            content = [dict(zip(('message_id','role','text'), r)) for r in c.execute(
+                'SELECT message_id,role,text FROM messages WHERE source_id=? AND conversation_id=? ORDER BY message_pk', (source, conversation))]
+            digest = hashlib.sha256(json.dumps(content, sort_keys=True, ensure_ascii=False).encode()).hexdigest()
+            if digest != expected_content_sha256:
+                raise ValueError('conversation changed after proposal generation')
         messages = c.execute('SELECT role,text,title FROM messages WHERE source_id=? AND conversation_id=? ORDER BY message_pk', (source, conversation)).fetchall()
         if not messages:
             raise ValueError('unknown conversation')
