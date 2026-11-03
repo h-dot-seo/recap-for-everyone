@@ -95,3 +95,11 @@ and Git metadata exclusions are tested explicitly. Exact selected candidate pass
 both publication scan and complete manifest verification.
 Windows-reserved path components, manifest symlinks and duplicate metadata keys
 are also rejected. Concurrent hostile filesystem replacement is outside this check.
+
+Concurrency regression increment: 75 synthetic tests passed. Two simultaneous title
+writers sharing one revision produce exactly one change and one stale-preview
+rejection. WAL tests commit a title change during inventory/search reads and verify
+the current result retains its snapshot while the next read sees the new title.
+These are local SQLite guarantees under the tested flows, not distributed locking.
+The search snapshot test is sensitive to removing the explicit read transaction.
+Concurrent-writer coverage is a smoke test, not exhaustive scheduling proof.

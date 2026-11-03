@@ -1,12 +1,12 @@
 {
   "project": "recap-for-everyone",
-  "release": "0.14.0-complete-publication-inventory",
+  "release": "0.14.1-concurrency-regressions",
   "date": "2026-11-03",
   "private_history_imported": false,
   "actual_corpora_included": false,
   "synthetic_examples_only": true,
   "license_status": "NOT_SELECTED",
-  "file_count": 37,
+  "file_count": 38,
   "files": [
     {
       "path": ".gitattributes",
@@ -50,8 +50,8 @@
     },
     {
       "path": "VALIDATION.md",
-      "bytes": 6208,
-      "sha256": "1e6967597fa20da6c844a3eb47aa113ad6f69e825e7b7aaec44058d7997396be"
+      "bytes": 6776,
+      "sha256": "87a991b24357cb1ce4ea023d2fe81d8736040a0da8e5c58e5b61386916756095"
     },
     {
       "path": "audit_publication.py",
@@ -117,6 +117,11 @@
       "path": "test_cli_e2e.py",
       "bytes": 2532,
       "sha256": "eff1c4da5b9df771723537714dbdfb747ca717226e3d4a9864556854401c670b"
+    },
+    {
+      "path": "test_concurrent_titles.py",
+      "bytes": 3326,
+      "sha256": "8fc5ee92ce9c97afdcc6197ebe38a2b580ad4c05660d99bdf4c7190294c35177"
     },
     {
       "path": "test_conversation_search.py",
