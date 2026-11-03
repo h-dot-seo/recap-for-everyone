@@ -14,7 +14,14 @@ Portable, local-first conversation archives with provenance and read-only search
 | Existing generic local session parser and synthetic tests | Authentication bundles, browser profiles, cookies, credentials |
 | Collection/index/publication separation and recovery design | Private service endpoints, account automation, SSH and scheduler setup |
 
-## Quick start
+## Start with your export
+
+New to this tool? Follow [Start here: ZIP/local file to a findable title](docs/START_HERE.md).
+It chooses the right input path and walks through 24 invented conversations, explicit
+review, defer/revisit, one local title change and search. The commands are tested
+end-to-end. No model, account or remote rename is involved.
+
+## Quick start for already-normalized JSONL
 
 Python 3.10+ with SQLite FTS5. No external Python dependencies, account or API key.
 Run from the repository root:
