@@ -9,15 +9,7 @@ from contextlib import closing
 from pathlib import Path
 from local_parser import parse_artifact
 from recap import ingest, readonly
-
-
-def _unique_object(pairs):
-    result = {}
-    for key, value in pairs:
-        if key in result:
-            raise ValueError('web export contains a duplicate JSON object key')
-        result[key] = value
-    return result
+from strict_json import loads
 
 
 def _validate_mapping(mapping):
@@ -56,7 +48,7 @@ def normalize(path, kind):
                              role=m.role, timestamp=m.timestamp_utc or 'unknown', text=m.text,
                              origin_locator=f'line:{m.line_number}'))
     elif kind == 'web':
-        data = json.loads(raw.decode('utf-8'), object_pairs_hook=_unique_object)
+        data = loads(raw.decode('utf-8'))
         if not isinstance(data, list):
             raise ValueError('web export must be an array of conversations with mapping nodes')
         for conv in data:

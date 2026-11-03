@@ -6,6 +6,7 @@ import sqlite3
 from pathlib import Path
 from recap import readonly
 from session_workflow import titles
+from strict_json import loads
 
 
 def snapshot(db, source, conversation):
@@ -64,7 +65,7 @@ def main():
             result = dict(source=a.source, conversation=a.conversation, content_sha256=digest, messages=rows,
                           warning='Private local content; no external transmission is performed')
         else:
-            value = json.loads(a.input.read_text(encoding='utf-8'))
+            value = loads(a.input.read_text(encoding='utf-8'))
             result = preview(a.db, value) if a.command == 'preview' else apply_preview(a.db, value)
     except (ValueError, OSError, KeyError, TypeError, sqlite3.Error) as e:
         p.exit(1, str(e) + '\n')

@@ -70,3 +70,8 @@ Korean greeting skip, explicit greeting fallback, control removal, truncation,
 user-only evidence, deterministic/no-write generation, CLI output, and stale-content
 rejection. Existing preview/apply handles the proposal; semantic title quality and
 external model integration are not tested or claimed.
+
+Eleventh increment: 50 synthetic tests passed. Shared duplicate-key decoding covers
+nested/escaped keys, valid Unicode values, local CRLF physical line numbers,
+no-create/no-change archive failure boundaries and clean proposal CLI errors.
+No real conversation files or private folders were read.

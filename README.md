@@ -220,3 +220,17 @@ semantic summary, intent classifier or model adapter. It can miss the main topic
 select low-value text, so review remains necessary. No API key, paid service, model
 call, automatic rename or external data transmission is involved. Proposal files may
 contain private excerpts and must stay outside the public repository.
+
+## Unambiguous JSON inputs
+
+Web exports, local session JSONL, normalized JSONL and title-proposal JSON files now
+share duplicate-object-key rejection. This includes nested objects and equivalent
+escaped key spellings, while the same key in separate objects remains valid. An
+ambiguous record fails before database access rather than silently selecting the
+last value. Local/normalized JSONL errors identify the physical line; duplicate-key
+diagnostics do not echo the key or value. Original bytes/hashes and line provenance
+remain unchanged for accepted inputs. Previously accepted ambiguous files must be
+corrected by their owner or re-exported; they are not automatically repaired.
+Duplicate keys are rejected even when their values match or occur in unused
+metadata. This decoder is duplicate-safe, not a full RFC-strict or resource-limited
+JSON parser; ordinary Python JSON depth/size behavior still applies.

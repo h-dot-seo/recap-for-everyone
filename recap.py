@@ -5,6 +5,7 @@ import hashlib
 import json
 import sqlite3
 from pathlib import Path
+from strict_json import loads
 
 SCHEMA = '''
 CREATE TABLE IF NOT EXISTS artifacts (
@@ -33,7 +34,10 @@ def ingest(db, source, path, provenance=None):
     for line_no, line in enumerate(raw.decode('utf-8').split('\n'), 1):
         if not line.strip():
             continue
-        row = json.loads(line)
+        try:
+            row = loads(line)
+        except ValueError as error:
+            raise ValueError(f'invalid JSON record at line {line_no}') from error
         required = ('conversation_id', 'message_id', 'role', 'timestamp', 'text')
         if not isinstance(row, dict) or any(not isinstance(row.get(k), str) or not row[k] for k in required):
             raise ValueError(f'invalid record at line {line_no}')

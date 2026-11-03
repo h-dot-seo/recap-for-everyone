@@ -8,6 +8,7 @@ import sqlite3
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
+from strict_json import loads
 
 
 class LocalImportError(ValueError):
@@ -109,8 +110,8 @@ def _records(path: Path) -> list[tuple[int, dict[str, Any]]]:
         if not line.strip():
             continue
         try:
-            value = json.loads(line)
-        except json.JSONDecodeError as error:
+            value = loads(line)
+        except ValueError as error:
             raise LocalImportError(f"invalid JSONL record: {path}:{line_number}") from error
         if not isinstance(value, dict):
             raise LocalImportError(f"JSONL record is not an object: {path}:{line_number}")
