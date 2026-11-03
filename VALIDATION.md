@@ -181,3 +181,12 @@ provenance, unknown record/unsupported-role categorization, basename fallback wa
 import/inspection parity, idempotence and read-only version-2 plan checks. Old plan
 versions fail closed. These tests intentionally do not reconstruct effective replay
 history or follow parent references.
+
+### Restricted completed-turn projection
+
+Ten synthetic cases cover media/unknown-field allowlists, session/causal-root boundaries, task/turn aliases, matched explicit boundaries and user
+events, rollback then new turns, zero/repeated/all-turn rollback, out-of-range/bool/
+float counts, unresolved history/compaction/unknown event rejection, incomplete or
+nested turns, ID reuse and mismatches, nontext rejection, no partial text on failure,
+original line/hash provenance, standalone/unified CLI equivalence and no database
+creation. Full model replay and general Codex rollout compatibility are not established.

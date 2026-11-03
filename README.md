@@ -559,3 +559,50 @@ need no migration. Ordinary archive title suggestions still use stored raw text 
 cannot diagnose an unavailable original export. Inspect the retained export and review
 its warnings before transferring a title, especially for forks, compaction or rollback.
 No warning authorizes automatic title changes or external transmission.
+
+## Opt-in completed-turn text projection
+
+```sh
+python recap.py replay-local ../explicit-rollout.jsonl
+# Equivalent: python replay_local.py ../explicit-rollout.jsonl
+```
+
+This is a separate, read-only, **narrow text projection**, not full Codex replay.
+It accepts exactly one initial session_meta without history/fork/parent references,
+with absent/cli/vscode/exec source and matching session/thread identity when supplied,
+then nonoverlapping completed turns with unique explicit turn/message IDs. Start and
+completion events must match (`task_started`/`task_complete`, or their `turn_` aliases).
+Session metadata and user_message fields use explicit allowlists; unknown fields
+are rejected rather than assumed harmless. Nonempty image/audio/file metadata is
+rejected even if the event also has text. Each turn must contain one matching user_message event and exactly one first user
+response, followed only by assistant text responses. All content parts must be typed
+input_text/output_text. Optional message turn IDs must match the active turn.
+
+Only rollback events **between completed turns** are replayed. An integer num_turns
+must fit the number of retained turns and the public u32 range. The projection removes
+that many complete turns from its in-memory result; it never deletes archived data.
+Zero rollback and later new turns are supported. Surviving messages retain original
+line locators, and the output includes the original whole-file hash. Rolled-back text
+is not emitted. Every input record is still validated, including later-removed turns.
+
+Compaction (even with replacement_history), inherited/paginated history, subagents,
+turn attribution, turn_context records, tools/media, failed/aborted/open/nested turns,
+unknown events and ambiguous user boundaries are **unsupported**. There is no fallback
+or guessed recovery. On rejection, JSON contains a fixed reason code and line number,
+no partial text/turns, and the CLI exits 1. A line number of 0 denotes a whole-file or
+input boundary. Source read failures use SOURCE_ERROR. Many normal Codex rollouts will
+therefore be rejected; use ordinary inspect/import for raw archival diagnostics.
+
+The grammar is based on the official
+[event definitions](https://github.com/openai/codex/blob/main/codex-rs/protocol/src/protocol.rs)
+and [reconstruction implementation](https://github.com/openai/codex/blob/main/codex-rs/core/src/session/rollout_reconstruction.rs),
+observed on 2026-11-03. The event model describes rollback in units of user turns and
+the task/turn wire aliases. No Rust code is executed here and parity beyond this
+restricted grammar is not established. Success still reports
+`full_model_history_reconstructed: false`: instructions, tool state, hidden context,
+truncation, UI visibility and full model inputs are not reconstructed.
+
+Output includes private text and IDs. The whole explicit input is loaded into memory.
+The command does not open a database, follow references, alter import/title workflows,
+produce an applicable title proposal, or contact a service. Keep the original export;
+the projection is not a replacement export or an authenticated record.

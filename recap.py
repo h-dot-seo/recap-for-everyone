@@ -114,6 +114,8 @@ def main():
     sub.add_parser('stats')
     check = sub.add_parser('inspect', help='inspect export coverage without a database')
     check.add_argument('input'); check.add_argument('--format', choices=['web', 'local', 'local-codex'], required=True)
+    replay = sub.add_parser('replay-local', help='validate and project a narrow completed-turn text grammar')
+    replay.add_argument('input')
     branch = sub.add_parser('web-branch', help='read one path from an explicit web export without a database')
     branch.add_argument('input'); branch.add_argument('--conversation', required=True); branch.add_argument('--node')
     branch_title = sub.add_parser('suggest-branch-title', help='suggest a local title from an archived export branch')
@@ -136,10 +138,17 @@ def main():
         if name == 'title':
             command.add_argument('--set'); command.add_argument('--expected-revision', type=int)
     args = p.parse_args()
-    if args.command not in ('inspect', 'web-branch') and not args.db:
-        p.error('--db is required except for inspect and web-branch')
+    if args.command not in ('inspect', 'web-branch', 'replay-local') and not args.db:
+        p.error('--db is required except for inspect, web-branch and replay-local')
     try:
-        if args.command == 'export-title-plan':
+        if args.command == 'replay-local':
+            from replay_local import reconstruct
+            result = reconstruct(args.input)
+            print(json.dumps(result, ensure_ascii=True, indent=2))
+            if not result['supported']:
+                raise SystemExit(1)
+            return
+        elif args.command == 'export-title-plan':
             from title_plan import make_plan
             result = make_plan(args.db, args.source, args.conversation, args.input, args.format)
         elif args.command == 'check-title-plan':
