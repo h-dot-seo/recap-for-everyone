@@ -115,3 +115,43 @@ with Python 3.10 and 3.12. Actions are commit-pinned; token permissions are read
 checkout does not persist credentials, no secrets or deployment steps are used.
 The manifest describes LF-normalized published files, enforced by .gitattributes.
 External model/search behavior and scientific meaning are not evaluated by CI.
+
+## Find conversations by their current title
+
+```sh
+python conversation_search.py --db ../demo.sqlite "orchard plan" --source demo
+```
+
+This read-only search uses case-insensitive literal substring terms, AND-connected
+across the current display title and all messages of each conversation. Renaming
+immediately changes title matches; reverting removes matches for the former title.
+Results include source/conversation identity, original and current title, revision,
+message count, up to three message snippets with provenance, total matches and
+truncation. Title matches rank first; remaining ordering is deterministic. Source
+filters keep identically named conversations distinct. This small local implementation
+scans the selected archive in memory; it is not a large-corpus semantic index.
+`recap.py search` retains its original message-level FTS behavior.
+
+## Read-only conversation views
+
+Use the structured view to browse imported conversations and see reviewed local
+names without replacing source evidence:
+
+```sh
+python conversation_view.py --db ../demo.sqlite list --source demo --limit 50 --offset 0
+python conversation_view.py --db ../demo.sqlite show --source demo --conversation synthetic-chat
+```
+
+The inventory returns the original title, current display title, title revision and
+message count. Sources remain separate even when conversation IDs match. Listing
+uses binary source/conversation ordering and explicit offset pagination, with a
+maximum page size of 1000. Each command reads one consistent database snapshot;
+separate pages can change if imports occur between requests.
+
+Details retain original message titles, normalized artifact hashes/line numbers,
+and every recorded original-export hash, locator and parent node. Plain normalized
+imports have an empty export-provenance list. Messages appear in archive insertion
+order, not timestamp or active web-branch order. All imported text branches remain
+visible; skipped nontext nodes are not reconstructed. These commands neither change
+titles nor create a missing database, and perform no network access. JSON output can
+contain private message text: keep it outside the public repository.

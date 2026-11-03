@@ -27,3 +27,16 @@ Second increment: 8 tests passed; failure boundaries and deterministic repeated 
 Third increment: 10 tests passed, including supplied-evidence rejection and deterministic output. No external model/search integration tested.
 
 Fourth increment: CLI end-to-end scenarios and failure recovery added. Local tests: 12 passed. Remote CI status is recorded separately in the private development log.
+
+Fifth increment: 14 local tests passed. New CLI paths, source boundaries, deterministic output and tamper/no-overwrite checks are covered. See private development log for remote matrix CI.
+
+Sixth increment: read-only conversation inventory and detail views added. Local
+Python standard-library suite: 20 synthetic tests passed, including CLI list/show,
+missing database rejection, title override visibility without evidence mutation,
+source isolation, pagination, byte-for-byte no-write checks, local/web provenance,
+multiple export hashes, and compatibility without optional tables. No real corpus,
+online collection, semantic title quality or active-branch reconstruction tested.
+
+Integrated fifth/sixth increment: 22 synthetic tests passed in the cloud workspace.
+Both conversation title search and structured read-only list/detail views preserved.
+Publication scanning and manifest verification passed for the exact selected files.
