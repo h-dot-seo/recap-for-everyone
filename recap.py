@@ -131,6 +131,11 @@ def main():
         if name == 'preview-title':
             command.add_argument('--conversation', help='select exactly one READY item from a title review queue')
             command.add_argument('--title', help='explicit replacement title; reclassified as operator wording')
+    state = sub.add_parser('review-state', help='read or explicitly record a local open/skipped/deferred review decision')
+    state.add_argument('--source', required=True); state.add_argument('--conversation', required=True)
+    state.add_argument('--set', choices=['open', 'skipped', 'deferred'])
+    state.add_argument('--expected-state-revision', type=int); state.add_argument('--expected-title-revision', type=int)
+    state.add_argument('--expected-content-sha256')
     batch = sub.add_parser('review-titles', help='build a read-only page of local title proposals and collision warnings')
     batch.add_argument('--source', required=True); batch.add_argument('--limit', type=int, default=20); batch.add_argument('--offset', type=int, default=0)
     batch.add_argument('--unrenamed-only', action='store_true', help='exclude conversations with any existing local title history')
@@ -166,6 +171,9 @@ def main():
             if not result['supported']:
                 raise SystemExit(1)
             return
+        elif args.command == 'review-state':
+            from title_review_state import review_state
+            result = review_state(args.db, args.source, args.conversation, args.set, args.expected_state_revision, args.expected_title_revision, args.expected_content_sha256)
         elif args.command == 'review-titles':
             from title_batch import review_queue
             result = review_queue(args.db, args.source, args.limit, args.offset, args.unrenamed_only)
@@ -239,7 +247,7 @@ def main():
             result = suggest(args.db, args.source, args.conversation)
     except (OSError, ValueError, KeyError, TypeError, sqlite3.Error) as exc:
         p.exit(1, str(exc) + '\n')
-    print(json.dumps(result, ensure_ascii=args.command in ('inspect', 'import', 'web-branch', 'suggest-branch-title', 'suggest-replay-title', 'preview-title', 'apply-title', 'review-titles', 'title-adapter-dry-run', 'title-adapter-simulate', 'export-title-plan', 'check-title-plan'), indent=2))
+    print(json.dumps(result, ensure_ascii=args.command in ('inspect', 'import', 'web-branch', 'suggest-branch-title', 'suggest-replay-title', 'preview-title', 'apply-title', 'review-titles', 'review-state', 'title-adapter-dry-run', 'title-adapter-simulate', 'export-title-plan', 'check-title-plan'), indent=2))
 
 
 if __name__ == '__main__':

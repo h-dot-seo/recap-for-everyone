@@ -789,3 +789,12 @@ When organizing many sessions, add `review-titles --unrenamed-only` to omit any
 conversation with existing local title history before pagination. Counts explain
 the eligible/source totals. Refresh at offset 0 after applying a title; this is a
 read-only history filter, not a durable review/skip ledger or a title quality test.
+
+## Explicit skip and defer state
+
+`review-state` reads or explicitly records `open`, `skipped` or `deferred` for one
+conversation, separately from title changes. A write requires the current state
+revision, title revision and raw-content hash. Queue items show the decision;
+changed content/title makes old decisions stale rather than silently carrying
+them forward. No title change, hiding, reminder or remote action is automatic.
+See [review state, concurrency and storage limits](docs/TITLE_REVIEW_STATE.md).

@@ -7,6 +7,7 @@ from title_proposal import content_fingerprint
 from title_suggestion import excerpt
 from title_rules import validate_title
 from title_review import assess_title
+from title_review_state import state_snapshot
 
 SCHEMA = 'recap.title-review-queue.v1'
 
@@ -39,7 +40,9 @@ def review_queue(db, source, limit=20, offset=0, unrenamed_only=False):
             rows = [dict(row) for row in connection.execute(
                 'SELECT message_id,role,text FROM messages WHERE source_id=? AND conversation_id=? ORDER BY message_pk',
                 (source, identity))]
-            item = dict(conversation=identity, current_title=record['display_title'],
+            digest = content_fingerprint(rows)
+            item = dict(conversation=identity, review_state=state_snapshot(connection, source, identity, digest, record['revision']),
+                        current_title=record['display_title'],
                         current_revision=record['revision'], previously_renamed=record['revision'] > 0)
             try:
                 proposed = excerpt(rows)
@@ -48,7 +51,7 @@ def review_queue(db, source, limit=20, offset=0, unrenamed_only=False):
                 item.update(status='UNAVAILABLE', reason_code='NO_VALID_LOCAL_EXCERPT')
             else:
                 item.update(status='READY', action='no_change' if proposed['title'] == record['display_title'] else 'review_rename',
-                            proposal=dict(source=source, conversation=identity, content_sha256=content_fingerprint(rows),
+                            proposal=dict(source=source, conversation=identity, content_sha256=digest,
                                           provider='local-extractive', **proposed))
             if item['status'] == 'READY':
                 item['title_advisory'] = assess_title(item['proposal'])
