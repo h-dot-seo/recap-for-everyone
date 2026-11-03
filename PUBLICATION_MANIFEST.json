@@ -1,12 +1,12 @@
 {
   "project": "recap-for-everyone",
-  "release": "0.25.0-projection-coverage",
+  "release": "0.26.0-scoped-token-metadata",
   "date": "2026-11-03",
   "private_history_imported": false,
   "actual_corpora_included": false,
   "synthetic_examples_only": true,
   "license_status": "NOT_SELECTED",
-  "file_count": 55,
+  "file_count": 56,
   "files": [
     {
       "path": ".gitattributes",
@@ -30,8 +30,8 @@
     },
     {
       "path": "README.md",
-      "bytes": 39504,
-      "sha256": "74227658cd754a8d0cd36fd29963839a29f25998fe2093555d65dc1a4255fe8d"
+      "bytes": 41274,
+      "sha256": "eb3c72745c80204401ebad17795e39ec2d24a58dd8f4b8871f98372b37bfc9b7"
     },
     {
       "path": "RIGHTS.md",
@@ -50,8 +50,8 @@
     },
     {
       "path": "VALIDATION.md",
-      "bytes": 12442,
-      "sha256": "2cc977993d5d97e06e4072cec1061c72e34c6cb013903b4bf70a31d440a7ce86"
+      "bytes": 12957,
+      "sha256": "5ab146b988f74baf56b60c51e4120507ebaaa1db19c2dd8032c3c18ff4c97afc"
     },
     {
       "path": "audit_publication.py",
@@ -110,8 +110,8 @@
     },
     {
       "path": "replay_local.py",
-      "bytes": 10686,
-      "sha256": "d69517deed16dc4fb3840c401438c5fddf0e149a52cef1ae6977daa5f5b5d937"
+      "bytes": 13347,
+      "sha256": "f1bb0137bf896076b5ac7511ebc5082bb0db17f8f4c7accac426746e6da698d2"
     },
     {
       "path": "session_workflow.py",
@@ -180,13 +180,18 @@
     },
     {
       "path": "test_replay_coverage.py",
-      "bytes": 6242,
-      "sha256": "5f6fe3c12df1d1893e5f39e81b6de78f2e9f49b4597595eede1e0db8b90514a5"
+      "bytes": 6246,
+      "sha256": "e09f0f01e3163b64565c169a9fb686410e697ef49d0370999407d965e0cbdc6a"
     },
     {
       "path": "test_replay_local.py",
-      "bytes": 8127,
-      "sha256": "2ca8a04bb89dcb98996e752aa3e663c6c6d8c7e54d8eca566d7edd9612d5ee27"
+      "bytes": 8130,
+      "sha256": "2345362e1d6384c9f9b840c6ebfd8bbcd024d5260f1176d017a54c524abdf99e"
+    },
+    {
+      "path": "test_replay_tokens.py",
+      "bytes": 3963,
+      "sha256": "47d0798a63f780af8923d8f57b9eb58cd7b87b7e0f29008f1ea999d0da1c6bfe"
     },
     {
       "path": "test_rollout_context.py",

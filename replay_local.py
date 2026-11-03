@@ -16,6 +16,40 @@ def _require(condition, code, line):
         raise Unsupported(code, line)
 
 
+
+def _token_metadata(payload, line):
+    _require(set(payload) <= {'type', 'info', 'rate_limits'}, 'TOKEN_FIELDS_UNSUPPORTED', line)
+    info, limits = payload.get('info'), payload.get('rate_limits')
+    _require(info is None or isinstance(info, dict), 'INVALID_TOKEN_METADATA', line)
+    _require(limits is None or isinstance(limits, dict), 'INVALID_TOKEN_METADATA', line)
+    if info is not None:
+        _require(set(info) <= {'total_token_usage', 'last_token_usage', 'model_context_window',
+                               'last_usage_includes_reasoning'}, 'TOKEN_FIELDS_UNSUPPORTED', line)
+        required = {'input_tokens', 'cached_input_tokens', 'output_tokens', 'reasoning_output_tokens', 'total_tokens'}
+        for key in ('total_token_usage', 'last_token_usage'):
+            usage = info.get(key)
+            _require(isinstance(usage, dict), 'INVALID_TOKEN_METADATA', line)
+            _require(required <= set(usage) <= required | {'cache_write_input_tokens'},
+                     'TOKEN_FIELDS_UNSUPPORTED', line)
+            _require(all(type(value) is int and -(2**63) <= value < 2**63 for value in usage.values()),
+                     'INVALID_TOKEN_METADATA', line)
+        window = info.get('model_context_window')
+        _require(window is None or type(window) is int and -(2**63) <= window < 2**63,
+                 'INVALID_TOKEN_METADATA', line)
+        reasoning = info.get('last_usage_includes_reasoning')
+        _require(reasoning is None or type(reasoning) is bool, 'INVALID_TOKEN_METADATA', line)
+    if limits is not None:
+        strings = {'limit_id', 'limit_name', 'normal_model_slug', 'plan_type', 'rate_limit_reached_type'}
+        objects = {'primary', 'secondary', 'credits', 'individual_limit'}
+        _require(set(limits) <= strings | objects | {'spend_control_reached'}, 'TOKEN_FIELDS_UNSUPPORTED', line)
+        _require(all(limits.get(key) is None or isinstance(limits[key], str) for key in strings),
+                 'INVALID_TOKEN_METADATA', line)
+        _require(all(limits.get(key) is None or isinstance(limits[key], dict) for key in objects),
+                 'INVALID_TOKEN_METADATA', line)
+        _require(limits.get('spend_control_reached') is None or type(limits['spend_control_reached']) is bool,
+                 'INVALID_TOKEN_METADATA', line)
+
+
 def _project(raw):
     try:
         text = raw.decode('utf-8')
@@ -27,6 +61,7 @@ def _project(raw):
     turn_ids, message_ids = set(), set()
     removed_turns = 0
     ignored_contexts = 0
+    ignored_tokens = 0
     records = 0
     for line_number, line in enumerate(text.split('\n'), 1):
         if not line.strip():
@@ -70,7 +105,7 @@ def _project(raw):
                 _require(payload.get('turn_attribution') is None, 'TURN_ATTRIBUTION_UNSUPPORTED', line_number)
                 _require(payload.get('root_turn_id') in (None, identity), 'UNRESOLVED_HISTORY', line_number)
                 turn_ids.add(identity)
-                active = dict(turn_id=identity, start_line=line_number, messages=[], user_event=None, turn_context_records=0)
+                active = dict(turn_id=identity, start_line=line_number, messages=[], user_event=None, turn_context_records=0, token_count_records=0)
             elif event in ('task_complete', 'turn_complete'):
                 _require(active is not None and payload.get('turn_id') == active['turn_id'],
                          'UNMATCHED_TURN_COMPLETION', line_number)
@@ -95,6 +130,11 @@ def _project(raw):
                 _require(all(payload.get(key) is None or payload.get(key) == [] for key in media_fields),
                          'NON_TEXT_UNSUPPORTED', line_number)
                 active['user_event'] = payload['message']
+            elif event == 'token_count':
+                _require(active is not None, 'UNSCOPED_TOKEN_COUNT', line_number)
+                _token_metadata(payload, line_number)
+                active['token_count_records'] += 1
+                ignored_tokens += 1
             elif event == 'thread_rolled_back':
                 count = payload.get('num_turns')
                 _require(active is None, 'ROLLBACK_INSIDE_TURN', line_number)
@@ -148,7 +188,7 @@ def _project(raw):
     _require(bool(turn_ids), 'NO_COMPLETE_TURNS', 0)
     return dict(conversation=session, turns=turns, retained_turns=len(turns),
                 rolled_back_turns=removed_turns, observed_records=records,
-                turn_context_records_ignored=ignored_contexts)
+                turn_context_records_ignored=ignored_contexts, token_count_records_ignored=ignored_tokens)
 
 
 def reconstruct(path):
@@ -164,7 +204,7 @@ def reconstruct(path):
                     partial_output=False)
     except (ValueError, TypeError, RecursionError):
         return dict(supported=False, reason_code='INVALID_RECORD', line=0, original_sha256=digest, partial_output=False)
-    return dict(supported=True, contract='completed-turn-text-projection.v2', original_sha256=digest,
+    return dict(supported=True, contract='completed-turn-text-projection.v3', original_sha256=digest,
                 **result, full_model_history_reconstructed=False,
                 scope='read-only text projection; no database, title or remote mutation',
                 warning='PRIVATE TEXT: only the supported grammar is projected; model context, tools, hidden state and UI visibility are not reconstructed')

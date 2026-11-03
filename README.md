@@ -611,13 +611,13 @@ the projection is not a replacement export or an authenticated record.
 ## Representative projection coverage and scoped turn context
 
 A deterministic matrix in `test_replay_coverage.py` exercises 13 chosen schema
-scenarios. The previous contract supported 2 and rejected 11; the current contract
-supports 3 and rejects 10. **This is a hand-selected synthetic matrix, not a sample of
+scenarios. Contract v1 supported 2 and rejected 11; contract v2
+supported 3 and rejected 10. **This is a hand-selected synthetic matrix, not a sample of
 user sessions or a measured real-world success rate.** Cases are individual variants,
 so a session combining supported and unsupported features still fails closed.
 
-Supported cases: plain completed text, completed text with one matching turn_context,
-and completed-turn rollback. Rejected cases: token accounting events, absent explicit
+The v2 supported cases were plain completed text, completed text with one matching
+turn_context, and completed-turn rollback. The v2 rejected cases were: token accounting events, absent explicit
 message IDs, tool invocation, file/image references, compaction, inherited history,
 modern turn attribution, missing user event, ongoing turn and mismatched turn context.
 Thus even common present-day sessions can still be unsupported. Raw import remains a
@@ -638,3 +638,29 @@ requires a real user boundary to count a user turn. This implementation still re
 the matching user event and first user message; context alone cannot create a turn.
 Full context restoration, policy enforcement, model replay and any external operation
 remain out of scope. Existing raw archives and title workflows are unchanged.
+
+
+## Scoped token-accounting events in text projection
+
+Contract `completed-turn-text-projection.v3` additionally accepts `token_count` events
+inside an active turn. The public TokenCountEvent contains optional usage and rate-limit
+metadata; official text reconstruction does not turn it into conversation content.
+The event cannot start or complete a turn. Its data is never summed, interpreted as a
+price/balance, applied to settings or emitted. Counts include accepted events in later
+rolled-back turns, and retained turns also show their own event counts.
+
+Only type/info/rate_limits event keys are allowed. When usage info is present, both
+usage objects and the public integer counter fields are checked, with signed 64-bit
+bounds and no bool/float coercion. Optional context-window and reasoning flags are
+shape-checked. Rate-limit outer keys and basic string/object/bool shapes are checked;
+nested window/credit objects and enum values are deliberately not fully validated
+because they are ignored. A passed projection does not validate accounting accuracy,
+available credits, pricing or policy. Unknown outer fields, malformed checked fields
+and unscoped accounting events fail closed. Other unsupported records remain unsupported.
+
+Using the same 13 scenario categories (with a public-schema-valid nullable accounting
+payload), the prior v2 code supports 3/rejects 10, while v3 supports 4/rejects 9. The only
+newly accepted category is token accounting. This remains a chosen synthetic matrix,
+not evidence of real usage prevalence or a general Codex success rate. Tools, media,
+compaction, inherited history, attribution and unfinished/ambiguous turns remain outside
+the supported text grammar. Source and database preservation boundaries are unchanged.

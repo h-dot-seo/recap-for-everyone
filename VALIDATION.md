@@ -194,7 +194,16 @@ creation. Full model replay and general Codex rollout compatibility are not esta
 
 ### Representative projection coverage
 
-A fixed 13-case synthetic schema matrix records 3 supported and 10 rejected cases,
-without estimating usage prevalence. Additional cases check that scoped context
+A fixed 13-case synthetic schema matrix originally recorded 3 supported and 10 rejected cases in v2,
+without estimating usage prevalence. The v3 accounting increment changes that matrix to 4/9. Additional cases check that scoped context
 metadata is not emitted or counted as a user turn, rollback counts remain turn-based,
 and missing/repeated/unscoped/mismatched/unknown or malformed context fails closed.
+
+
+### Token accounting metadata
+
+Four synthetic cases cover repeated scoped events without extra user turns, private
+rate-limit metadata not emitted, unscoped/unknown fields, malformed shapes and integer
+counter boundaries, and unsupported tool/abort/compaction mixtures. The 13-category
+matrix uses a schema-valid nullable accounting payload and verifies 4 supported/9
+rejected cases. Nested accounting semantics are not validated or used.

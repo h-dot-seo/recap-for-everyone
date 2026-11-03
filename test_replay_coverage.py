@@ -14,7 +14,7 @@ def scenarios():
     context = copy.deepcopy(plain)
     context.insert(2, dict(type='turn_context', payload=dict(turn_id='a', cwd='PRIVATE_CWD',
                     model='PRIVATE_MODEL', approval_policy='on-request', sandbox_policy=dict(type='read-only'))))
-    token = copy.deepcopy(plain); token.insert(-1, event('token_count', info={}))
+    token = copy.deepcopy(plain); token.insert(-1, event('token_count', info=None, rate_limits=None))
     no_id = copy.deepcopy(plain); no_id[3]['payload'].pop('id')
     tool = copy.deepcopy(plain); tool.insert(-1, dict(type='response_item', payload=dict(type='function_call', arguments='PRIVATE_ARGS')))
     media = copy.deepcopy(plain); media[2]['payload']['file_ids'] = ['PRIVATE_FILE']
@@ -28,7 +28,7 @@ def scenarios():
     return [
         ('plain completed text', plain, None),
         ('matching turn context', context, None),
-        ('token accounting event', token, 'EVENT_UNSUPPORTED'),
+        ('token accounting event', token, None),
         ('missing explicit message ID', no_id, 'INVALID_OR_REUSED_MESSAGE_ID'),
         ('tool invocation', tool, 'RESPONSE_UNSUPPORTED'),
         ('user image/file reference', media, 'NON_TEXT_UNSUPPORTED'),
@@ -67,7 +67,7 @@ class ReplayCoverageTests(unittest.TestCase):
                     self.assertFalse(result['full_model_history_reconstructed'])
                     counts['supported'] += 1
                 self.assertNotIn('PRIVATE_', json.dumps(result))
-        self.assertEqual(counts, dict(supported=3, unsupported=10))
+        self.assertEqual(counts, dict(supported=4, unsupported=9))
 
     def test_context_is_not_a_user_turn_and_payload_is_not_emitted(self):
         records = scenarios()[1][1]
