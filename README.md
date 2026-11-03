@@ -798,3 +798,9 @@ revision, title revision and raw-content hash. Queue items show the decision;
 changed content/title makes old decisions stale rather than silently carrying
 them forward. No title change, hiding, reminder or remote action is automatic.
 See [review state, concurrency and storage limits](docs/TITLE_REVIEW_STATE.md).
+
+
+Use `review-titles --state deferred` (or `open` / `skipped`) to revisit one explicit
+effective state. Stale decisions return to open; no state changes merely by viewing.
+The opt-in filter hashes all eligible source conversations before pagination, so
+it can cost more than the default page. It can be combined with `--unrenamed-only`.

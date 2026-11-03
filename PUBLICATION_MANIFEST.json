@@ -1,12 +1,12 @@
 {
   "project": "recap-for-everyone",
-  "release": "0.35.0-explicit-review-state",
+  "release": "0.36.0-review-state-views",
   "date": "2026-11-03",
   "private_history_imported": false,
   "actual_corpora_included": false,
   "synthetic_examples_only": true,
   "license_status": "NOT_SELECTED",
-  "file_count": 77,
+  "file_count": 78,
   "files": [
     {
       "path": ".gitattributes",
@@ -30,8 +30,8 @@
     },
     {
       "path": "README.md",
-      "bytes": 49837,
-      "sha256": "8baa90cdbe5d6e16dc65f32268406cf065b96eeda5e80f5d2dcb5761b4f05a04"
+      "bytes": 50174,
+      "sha256": "638fffa78eb3d1dff302d9f2843e65daf5e96d8b12b6502dc6c888b83a17e298"
     },
     {
       "path": "RIGHTS.md",
@@ -95,13 +95,13 @@
     },
     {
       "path": "docs/TITLE_REVIEW_QUEUE.md",
-      "bytes": 9161,
-      "sha256": "450a3c68a2f58ac87ed2e89547ceeaa9cc2bfeb2cd7e2d84476fbc73904fba00"
+      "bytes": 9621,
+      "sha256": "68f7e278238754ea5bcf350775a3ccdc14322936e038557ed58d89b58632a015"
     },
     {
       "path": "docs/TITLE_REVIEW_STATE.md",
-      "bytes": 5322,
-      "sha256": "3decebb9c3c8b56b4a9af5f7a5d28f6b8bedb95f150a68e7fabc11fe2a76bd7e"
+      "bytes": 8872,
+      "sha256": "3750485635da1cff145881af073e9c3e7f85154c2ef67b32c9fc65974d8c876a"
     },
     {
       "path": "docs/TITLE_TRANSFER.md",
@@ -140,8 +140,8 @@
     },
     {
       "path": "recap.py",
-      "bytes": 16548,
-      "sha256": "7bb4ceeb6de13b3d5cc4a53a13c973e8b5533fc779e6b351e72192aed9281ccd"
+      "bytes": 16720,
+      "sha256": "cae77f2334f6c0aa1203a500d7aecdb7a4f573235051fddbff1723eb60874f3b"
     },
     {
       "path": "replay_local.py",
@@ -242,6 +242,11 @@
       "path": "test_replay_tokens.py",
       "bytes": 3963,
       "sha256": "47d0798a63f780af8923d8f57b9eb58cd7b87b7e0f29008f1ea999d0da1c6bfe"
+    },
+    {
+      "path": "test_review_state_filter.py",
+      "bytes": 7447,
+      "sha256": "d2435575f80e7fcd47f379e0059d44c56c1e946c7672e1db0aed8692ef4b6b11"
     },
     {
       "path": "test_rollout_context.py",
@@ -345,8 +350,8 @@
     },
     {
       "path": "title_batch.py",
-      "bytes": 7323,
-      "sha256": "a1f477af40396f06caddb524b248705106376ed71d384214cdd1e4736617dc20"
+      "bytes": 9138,
+      "sha256": "8671b3eb17f16c3f2a0e9511f42fca8edb0374923760b882809aa570e09d9e65"
     },
     {
       "path": "title_plan.py",

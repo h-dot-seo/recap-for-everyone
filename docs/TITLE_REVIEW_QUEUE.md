@@ -160,3 +160,11 @@ Filtering changes only the read-only queue. It does not delete conversations,
 remove raw private text, reset titles or modify source files. The existing rename
 and content-search history remain available. Excerpts/duplicate warnings/possible
 private-detail hints retain all their semantic and privacy limitations.
+
+
+To revisit explicit decisions, use `--state open`, `--state skipped` or
+`--state deferred`. The filter uses current content/title-bound state, so stale
+skip/defer events return to open. It scans and hashes all conversations eligible
+after the optional unrenamed filter before paginating; this is an opt-in full
+content scan, not a metadata-only shortcut. See [state-view counts, concurrency
+and cost](TITLE_REVIEW_STATE.md#revisit-a-chosen-effective-state).

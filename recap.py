@@ -138,6 +138,7 @@ def main():
     state.add_argument('--expected-content-sha256')
     batch = sub.add_parser('review-titles', help='build a read-only page of local title proposals and collision warnings')
     batch.add_argument('--source', required=True); batch.add_argument('--limit', type=int, default=20); batch.add_argument('--offset', type=int, default=0)
+    batch.add_argument('--state', choices=['open', 'skipped', 'deferred'], help='filter by current snapshot-bound review state; scans eligible source content')
     batch.add_argument('--unrenamed-only', action='store_true', help='exclude conversations with any existing local title history')
     transfer = sub.add_parser('title-adapter-dry-run', help='validate a mock-only transfer request without executing')
     transfer.add_argument('input'); transfer.add_argument('plan'); transfer.add_argument('target')
@@ -176,7 +177,7 @@ def main():
             result = review_state(args.db, args.source, args.conversation, args.set, args.expected_state_revision, args.expected_title_revision, args.expected_content_sha256)
         elif args.command == 'review-titles':
             from title_batch import review_queue
-            result = review_queue(args.db, args.source, args.limit, args.offset, args.unrenamed_only)
+            result = review_queue(args.db, args.source, args.limit, args.offset, args.unrenamed_only, args.state)
         elif args.command in ('title-adapter-dry-run', 'title-adapter-simulate'):
             from title_transfer import dry_run, simulate, MockTitleAdapter
             from strict_json import loads

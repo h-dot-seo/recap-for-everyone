@@ -16,17 +16,42 @@ def _key(title):
     return ' '.join(unicodedata.normalize('NFKC', title).casefold().split())
 
 
-def review_queue(db, source, limit=20, offset=0, unrenamed_only=False):
+def _state_filtered_inventory(connection, source, unrenamed_only, state, limit, offset):
+    # Effective state cannot safely be filtered by stored label alone: content
+    # may have changed. Scan one conversation at a time in the same read snapshot,
+    # retaining only this page's metadata, never all source message bodies.
+    page = []
+    matched = 0
+    scan_offset = 0
+    while True:
+        chunk = _inventory(connection, source, limit=100, offset=scan_offset, unrenamed_only=unrenamed_only)
+        for record in chunk:
+            rows = [dict(row) for row in connection.execute(
+                'SELECT message_id,role,text FROM messages WHERE source_id=? AND conversation_id=? ORDER BY message_pk',
+                (source, record['conversation']))]
+            digest = content_fingerprint(rows)
+            current = state_snapshot(connection, source, record['conversation'], digest, record['revision'])
+            if current['state'] == state:
+                if offset <= matched < offset + limit:
+                    page.append(record)
+                matched += 1
+        if len(chunk) < 100:
+            return page, matched
+        scan_offset += len(chunk)
+
+
+def review_queue(db, source, limit=20, offset=0, unrenamed_only=False, review_state_filter=None):
     if not isinstance(source, str) or not source.strip():
         raise ValueError('explicit nonempty source required')
     if type(limit) is not int or not 1 <= limit <= 100 or type(offset) is not int or not 0 <= offset <= 2**63-1:
         raise ValueError('limit must be 1..100 and offset must be an integer in 0..9223372036854775807')
     if type(unrenamed_only) is not bool:
         raise ValueError('unrenamed_only must be boolean')
+    if review_state_filter is not None and (not isinstance(review_state_filter, str) or review_state_filter not in ('open', 'skipped', 'deferred')):
+        raise ValueError('state filter must be open, skipped or deferred')
     connection = readonly(db)
     try:
         connection.execute('BEGIN')
-        inventory = _inventory(connection, source, limit=limit, offset=offset, unrenamed_only=unrenamed_only)
         source_total = connection.execute('SELECT count(DISTINCT conversation_id) FROM messages WHERE source_id=?', (source,)).fetchone()[0]
         has_history = connection.execute("SELECT 1 FROM sqlite_master WHERE type='table' AND name='title_history'").fetchone()
         if unrenamed_only and has_history:
@@ -34,6 +59,11 @@ def review_queue(db, source, limit=20, offset=0, unrenamed_only=False):
                 'AND NOT EXISTS (SELECT 1 FROM title_history h WHERE h.source=m.source_id AND h.conversation=m.conversation_id)', (source,)).fetchone()[0]
         else:
             total = source_total
+        before_state_filter = total
+        if review_state_filter is None:
+            inventory = _inventory(connection, source, limit=limit, offset=offset, unrenamed_only=unrenamed_only)
+        else:
+            inventory, total = _state_filtered_inventory(connection, source, unrenamed_only, review_state_filter, limit, offset)
         items = []
         for record in inventory:
             identity = record['conversation']
@@ -87,7 +117,9 @@ def review_queue(db, source, limit=20, offset=0, unrenamed_only=False):
                                       existing_title_count=count, existing_title_conversations=current,
                                       samples_limited_to=10, normalization='NFKC + casefold + whitespace collapse')
         return dict(schema=SCHEMA, source=source, limit=limit, offset=offset, total_conversations=total,
-                    source_total_conversations=source_total, excluded_renamed_conversations=source_total-total,
+                    source_total_conversations=source_total, excluded_renamed_conversations=source_total-before_state_filter,
+                    excluded_review_state_conversations=before_state_filter-total,
+                    review_state_filter=review_state_filter,
                     filter='no local title history' if unrenamed_only else 'all conversations',
                     next_offset=offset+len(items) if offset+len(items) < total else None,
                     items=items, ready_count=sum(item['status'] == 'READY' for item in items),

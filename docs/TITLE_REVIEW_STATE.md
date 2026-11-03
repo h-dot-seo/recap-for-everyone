@@ -68,8 +68,8 @@ The explicit setter always checks again inside its write transaction.
 Decisions do **not** automatically hide items. `--unrenamed-only` still means no
 local title-history entry, not “open review state”; skipped/deferred items with no
 title change remain visible. Omit that filter to revisit a renamed conversation's
-decision. This avoids silently treating a skip as a completed rename. There is no
-skip-state filter or automatic reminder in this increment.
+decision. This avoids silently treating a skip as a completed rename. Use the explicit `review-titles --state open|skipped|deferred` filter described
+below when you want one state. There is no automatic reminder.
 
 ## Storage and failure boundaries
 
@@ -90,3 +90,61 @@ The ledger is local and unsigned. Anyone who can edit the database can alter it;
 it is not a tamper-proof audit log or security permission store. A changed source
 file not reimported into the archive is not checked here. Original export-backed
 title commands retain their separate provenance validation.
+
+
+## Revisit a chosen effective state
+
+After recording decisions, explicitly choose the queue view you want:
+
+```sh
+python recap.py --db ../recap-demo/archive.sqlite review-titles --source web-demo --state open
+python recap.py --db ../recap-demo/archive.sqlite review-titles --source web-demo --state deferred
+python recap.py --db ../recap-demo/archive.sqlite review-titles --source web-demo --state skipped
+```
+
+Omitting `--state` still shows all states. This is a **read-only view**, not a new
+state change. Selecting a deferred item does not reopen it or apply a title. Use
+its current lease in an explicit `review-state --set open` command if you decide
+to resume. Alternatively, deliberately preview and apply a title; that new title
+revision makes the prior decision stale under the existing rules.
+
+Filtering uses each conversation's **effective current state**, not only the
+stored event label. A skipped/deferred event whose content hash or title revision
+is stale appears in `--state open`, not in skipped/deferred. The recorded old
+decision and `stale_decision` remain visible. Missing decision history is open.
+An open item is not proof of poor title quality or an instruction to change it.
+
+`--state` can be combined with `--unrenamed-only`: the conditions intersect. A
+renamed conversation with a stale decision is open, but still excluded by the
+unrenamed filter. If revisiting all deferred/skipped decisions is your goal,
+consider omitting `--unrenamed-only` so title history does not narrow the scope.
+
+Counts are exact for the single read snapshot:
+
+- `source_total_conversations`: all conversations in the explicit source.
+- `excluded_renamed_conversations`: removed first by the optional history filter.
+- `excluded_review_state_conversations`: removed next by effective-state filtering.
+- `total_conversations`: remaining eligible conversations, before page selection.
+
+These three latter counts sum to the source total. `review_state_filter` records
+the selected state or null. Page offsets and `next_offset` address only that final
+eligible set. After a decision, import or title change, refresh at offset 0 instead
+of advancing a saved offset; membership may have moved between state views.
+
+**Cost and privacy scope:** a stale decision cannot safely be detected by SQL
+label filtering alone. With `--state`, the tool reads and hashes full raw message
+identity/role/text for **every conversation left after the optional unrenamed
+filter**, even when the requested page is small or empty. It scans inventory in
+100-conversation chunks and handles one conversation's messages at a time. Only
+page metadata is retained; page conversations are read again for proposals inside
+the same database snapshot. This is not constant-memory processing for a very
+large individual conversation, nor a cheap metadata-only filter. No streaming or
+performance claim is made for large archives. Without `--state`, only the selected
+page's message contents are loaded for proposals as before.
+
+Existing-title collision checks still cover current titles throughout the chosen
+source, including conversations excluded by either filter. Candidate-proposal
+collisions remain page-only. All scans, counts, state checks and page proposals
+share one SQLite read transaction; later changes can still make the result stale.
+No source files, messages, titles or decisions are written by filtering. Content
+search remains complete for the imported raw archive regardless of the view.
