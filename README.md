@@ -695,3 +695,48 @@ On the same 13 synthetic categories, prior v3 supports 4/rejects 9 and v4 suppor
 hardening additionally rejects previously unchecked encrypted/incomplete/mismatched
 or unknown message metadata. These counts do not estimate actual usage frequency.
 No archive migration, source rewrite, remote operation or title application is added.
+
+## Propose a title from verified retained local turns
+
+```sh
+# Preserve the complete raw export in the archive first:
+python recap.py --db ../demo.sqlite import ../rollout.jsonl --format local-codex --source local-demo
+python recap.py --db ../demo.sqlite suggest-replay-title ../rollout.jsonl --source local-demo --conversation synthetic > ../proposal.json
+python title_proposal.py --db ../demo.sqlite preview ../proposal.json > ../reviewed.json
+# Review the retained-turn excerpt and evidence mapping before applying:
+python title_proposal.py --db ../demo.sqlite apply ../reviewed.json
+```
+
+`replay_title.py` is the standalone equivalent. This connects parsing, archival data
+and a human-readable local title without replacing raw history with a projection.
+The source is read once. The same immutable bytes feed the restricted projection and
+typed normalization. Unsupported replay inputs fail before a proposal is produced;
+a fully rolled-back history with no usable user text yields no invented title.
+
+Every normalized raw message, including later-rolled-back text, must match exactly one
+archive message occurrence by original file hash and line locator, then role, text and
+timestamp and supplied explicit source IDs, including discarded-turn IDs. Both
+provenance ledgers are supported. Retained projected messages are
+matched to those verified occurrences; an explicit source ID must also match the
+archive ID. The proposal uses the **actual archive evidence ID**, not projection_id.
+A missing source ID remains null in the descriptive evidence mapping.
+
+Identical bytes under a renamed filename can therefore match an existing archive via
+provenance even when fallback archive IDs contain the old basename. If both filenames
+were imported into the same source and produced multiple archive identities for one
+occurrence, generation rejects that ambiguity rather than merging or choosing one.
+Inspect the source/identities or rebuild a separate archive from explicit originals;
+this command never deletes, deduplicates or repairs the archive automatically.
+
+The excerpt uses retained user text only. Its fingerprint still covers the **whole raw
+archived conversation**, so changes even to removed-turn content invalidate it. Existing
+preview/apply revision checks remain in force. The result changes one conversation-wide
+local display title, not source files, remote titles or branch-specific title records.
+Raw discarded messages remain searchable and auditable. Manual title-plan export/check
+continues to carry the raw export warnings and NOT_EXECUTED status.
+
+Projection context in a saved proposal is descriptive, unsigned and pinned to those
+source bytes. Apply rechecks the archive fingerprint/user evidence and reviewed title
+revision; it does not reread the export or verify live platform state. Regenerate and
+review after changing the source you intend to use. All existing restricted-projection
+limitations remain, including no general compaction/model-history reconstruction.

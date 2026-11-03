@@ -121,6 +121,9 @@ def main():
     branch_title = sub.add_parser('suggest-branch-title', help='suggest a local title from an archived export branch')
     branch_title.add_argument('input'); branch_title.add_argument('--source', required=True)
     branch_title.add_argument('--conversation', required=True); branch_title.add_argument('--node')
+    replay_title = sub.add_parser('suggest-replay-title', help='suggest a checked local title from retained projected turns')
+    replay_title.add_argument('input'); replay_title.add_argument('--source', required=True)
+    replay_title.add_argument('--conversation', required=True)
     plan = sub.add_parser('export-title-plan', help='export metadata for a manual title change')
     plan.add_argument('input'); plan.add_argument('--format', choices=['web', 'local', 'local-codex'], required=True)
     plan.add_argument('--source', required=True); plan.add_argument('--conversation', required=True)
@@ -148,6 +151,9 @@ def main():
             if not result['supported']:
                 raise SystemExit(1)
             return
+        elif args.command == 'suggest-replay-title':
+            from replay_title import suggest_replay
+            result = suggest_replay(args.db, args.source, args.conversation, args.input)
         elif args.command == 'export-title-plan':
             from title_plan import make_plan
             result = make_plan(args.db, args.source, args.conversation, args.input, args.format)
@@ -197,7 +203,7 @@ def main():
             result = suggest(args.db, args.source, args.conversation)
     except (OSError, ValueError, KeyError, TypeError, sqlite3.Error) as exc:
         p.exit(1, str(exc) + '\n')
-    print(json.dumps(result, ensure_ascii=args.command in ('web-branch', 'suggest-branch-title', 'export-title-plan', 'check-title-plan'), indent=2))
+    print(json.dumps(result, ensure_ascii=args.command in ('web-branch', 'suggest-branch-title', 'suggest-replay-title', 'export-title-plan', 'check-title-plan'), indent=2))
 
 
 if __name__ == '__main__':

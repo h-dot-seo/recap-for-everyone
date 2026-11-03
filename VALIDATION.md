@@ -216,3 +216,14 @@ rename stability versus byte changes, explicit-ID namespace and invalid/duplicat
 rejection, identical text retained without merging, rollback preservation, and strict
 encryption/status/nested-turn/unknown metadata rejection. Matrix v4 supports 5 of 13
 chosen categories; it is not a real-world usage measurement.
+
+### Retained-turn title bridge
+
+Eight synthetic cases, including discarded explicit-ID consistency, connect typed raw import to retained-turn title suggestion,
+preview/apply, title search and manual plan export/check. They verify real archive
+IDs rather than projection IDs, whole-raw-content fingerprints, original/DB byte
+preservation during generation, one source read, renamed-byte provenance matching,
+ambiguous double-import rejection, missing evidence including discarded turns,
+unsupported/empty projections, legacy ledger compatibility, stale revision/content
+rejection and continued raw discarded-text search. No real rollout or remote title
+operation is exercised.

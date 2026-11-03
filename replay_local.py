@@ -216,6 +216,12 @@ def reconstruct(path):
         raw = Path(path).read_bytes()
     except OSError:
         return dict(supported=False, reason_code='SOURCE_ERROR', line=0)
+    return reconstruct_bytes(raw)
+
+
+def reconstruct_bytes(raw):
+    if not isinstance(raw, bytes):
+        raise TypeError('projection requires an immutable byte snapshot')
     digest = hashlib.sha256(raw).hexdigest()
     try:
         result = _project(raw, digest)

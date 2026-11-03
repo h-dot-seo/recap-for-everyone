@@ -1,12 +1,12 @@
 {
   "project": "recap-for-everyone",
-  "release": "0.27.0-source-projection-identities",
+  "release": "0.28.0-verified-retained-titles",
   "date": "2026-11-03",
   "private_history_imported": false,
   "actual_corpora_included": false,
   "synthetic_examples_only": true,
   "license_status": "NOT_SELECTED",
-  "file_count": 57,
+  "file_count": 59,
   "files": [
     {
       "path": ".gitattributes",
@@ -30,8 +30,8 @@
     },
     {
       "path": "README.md",
-      "bytes": 43345,
-      "sha256": "f95664bca0b71dd7a7f3cfeeee3258d2648935f26d4ea00e1c9596389816e03b"
+      "bytes": 46344,
+      "sha256": "113aaeb39a18fe778adf1c658e17706aa57883a54ca56b429c8fe34235db9582"
     },
     {
       "path": "RIGHTS.md",
@@ -50,8 +50,8 @@
     },
     {
       "path": "VALIDATION.md",
-      "bytes": 13389,
-      "sha256": "b3368bc5151c91ee44d80dacb15eba7e59b9ed05ade1d8e2f087c6afa6ab5fba"
+      "bytes": 14066,
+      "sha256": "12e6937cf5c90bea143dc07ec5767e57d60b927e5c67d6337fee3c166ba9ed3b"
     },
     {
       "path": "audit_publication.py",
@@ -105,13 +105,18 @@
     },
     {
       "path": "recap.py",
-      "bytes": 12042,
-      "sha256": "b682ba5f1a9635bd99139a308c6c1d15b41898f7b93818c2e00564c9aa338018"
+      "bytes": 12542,
+      "sha256": "81ad138ad8aa104547339446a71579a3f7fe7b4cd4ffc4d9ef7a1fd554c8c825"
     },
     {
       "path": "replay_local.py",
-      "bytes": 15107,
-      "sha256": "f3225bc577c78227f8f2d264af50446923a7b5e5eb1efdb15adaf9c34ad4ab8d"
+      "bytes": 15280,
+      "sha256": "22639a5f2d5f9562915f793b45e46099d85128a1018ffd5afbd2b04fd01decd2"
+    },
+    {
+      "path": "replay_title.py",
+      "bytes": 4987,
+      "sha256": "b3bb500f98f6d2aa5a52817b257706da967657a8482d5c7aef6887b4e23f5774"
     },
     {
       "path": "session_workflow.py",
@@ -192,6 +197,11 @@
       "path": "test_replay_local.py",
       "bytes": 8130,
       "sha256": "2345362e1d6384c9f9b840c6ebfd8bbcd024d5260f1176d017a54c524abdf99e"
+    },
+    {
+      "path": "test_replay_title.py",
+      "bytes": 7210,
+      "sha256": "8f63724277539fbb5469abe00441e41c2723352a42f30d9cbdc4de19c90d3e22"
     },
     {
       "path": "test_replay_tokens.py",
