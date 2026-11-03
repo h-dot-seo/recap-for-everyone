@@ -6,45 +6,72 @@ from recap import readonly
 
 
 def find(db, query, source=None, limit=20):
-    terms=query.casefold().split()
-    if not terms or len(terms)>20 or not 1 <= limit <= 1000:
+    if not isinstance(query, str) or type(limit) is not int:
+        raise ValueError('query must be text and limit must be an integer')
+    terms = query.casefold().split()
+    if not terms or len(terms) > 20 or not 1 <= limit <= 1000:
         raise ValueError('provide 1..20 search terms and limit 1..1000')
-    c=readonly(db)
+    c = readonly(db)
     try:
-        # One read transaction keeps title history and message rows consistent.
         c.execute('BEGIN')
-        history={}
-        if c.execute("SELECT 1 FROM sqlite_master WHERE name='title_history'").fetchone():
-            for row in c.execute('SELECT source,conversation,title,id FROM title_history ORDER BY id'):
-                history[(row['source'],row['conversation'])]=(row['title'],row['id'])
-        grouped={}
-        sql='SELECT * FROM messages'
-        params=()
+        history_exists = c.execute(
+            "SELECT 1 FROM sqlite_master WHERE type='table' AND name='title_history'"
+        ).fetchone()
+        history_sql = (
+            'SELECT h.source,h.conversation,h.title,h.id FROM title_history h JOIN '
+            '(SELECT source,conversation,MAX(id) id FROM title_history '
+            + ('WHERE source=? ' if source is not None else '') +
+            'GROUP BY source,conversation) latest ON h.id=latest.id '
+            'ORDER BY h.source COLLATE BINARY,h.conversation COLLATE BINARY')
+        history_rows = iter(c.execute(history_sql, (source,) if source is not None else ())) if history_exists else iter(())
+        current_title = next(history_rows, None)
+        sql = 'SELECT * FROM messages' 
+        params = ()
         if source is not None:
-            sql+=' WHERE source_id=?'; params=(source,)
-        sql+=' ORDER BY source_id,conversation_id,message_pk'
-        for row in c.execute(sql,params):
-            key=(row['source_id'],row['conversation_id'])
-            item=grouped.setdefault(key,dict(source_id=key[0],conversation_id=key[1],
-                original_title=row['title'],display_title=history.get(key,(row['title'],0))[0],
-                title_revision=history.get(key,('',0))[1],message_count=0,_texts=[],_rows=[]))
-            item['message_count']+=1
-            item['_texts'].append(row['text'].casefold())
-            item['_rows'].append(row)
-        results=[]
-        for item in grouped.values():
-            title=item['display_title'].casefold()
-            text='\n'.join(item['_texts'])
-            if not all(term in title or term in text for term in terms):
-                continue
-            item['matched_title']=any(term in title for term in terms)
-            item['message_matches']=[dict(message_id=r['message_id'],role=r['role'],
-                snippet=r['text'][:240],source_sha256=r['source_sha256'],source_line=r['source_line'])
-                for r in item['_rows'] if any(term in r['text'].casefold() for term in terms)][:3]
-            del item['_texts']; del item['_rows']
-            results.append(item)
-        results.sort(key=lambda r:(not r['matched_title'],r['source_id'],r['conversation_id']))
-        return dict(matches=results[:limit],total_matches=len(results),truncated=len(results)>limit,
+            sql += ' WHERE source_id=?'; params = (source,)
+        sql += ' ORDER BY source_id COLLATE BINARY,conversation_id COLLATE BINARY,message_pk'
+        # Keep only the current conversation's term flags and first three hits.
+        # Two bounded buckets preserve title-first ranking without storing all hits.
+        title_hits, text_hits = [], []
+        total = 0
+        item, key, found = None, None, None
+
+        def finish():
+            nonlocal total
+            if item is None or not all(found):
+                return
+            total += 1
+            bucket = title_hits if item['matched_title'] else text_hits
+            if len(bucket) < limit:
+                bucket.append(item)
+
+        for row in c.execute(sql, params):
+            next_key = (row['source_id'], row['conversation_id'])
+            if next_key != key:
+                finish()
+                key = next_key
+                # Merge two ordered cursors rather than scanning title history
+                # once per conversation or retaining all overrides in Python.
+                while current_title is not None and (current_title['source'], current_title['conversation']) < key:
+                    current_title = next(history_rows, None)
+                if current_title is not None and (current_title['source'], current_title['conversation']) == key:
+                    title, revision = current_title['title'], current_title['id']
+                else:
+                    title, revision = row['title'], 0
+                folded_title = title.casefold()
+                found = [term in folded_title for term in terms]
+                item = dict(source_id=key[0], conversation_id=key[1], original_title=row['title'],
+                            display_title=title, title_revision=revision, message_count=0,
+                            matched_title=any(found), message_matches=[])
+            item['message_count'] += 1
+            text = row['text'].casefold()
+            matches = [term in text for term in terms]
+            found = [previous or matched for previous, matched in zip(found, matches)]
+            if any(matches) and len(item['message_matches']) < 3:
+                item['message_matches'].append(dict(message_id=row['message_id'], role=row['role'],
+                    snippet=row['text'][:240], source_sha256=row['source_sha256'], source_line=row['source_line']))
+        finish()
+        return dict(matches=(title_hits + text_hits)[:limit], total_matches=total, truncated=total > limit,
                     semantics='case-insensitive literal substrings; AND across current title and conversation messages')
     finally:
         c.close()

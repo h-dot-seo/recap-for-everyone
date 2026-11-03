@@ -1,12 +1,12 @@
 {
   "project": "recap-for-everyone",
-  "release": "0.6.0-conversation-search-and-views",
+  "release": "0.7.0-bounded-archive-queries",
   "date": "2026-11-03",
   "private_history_imported": false,
   "actual_corpora_included": false,
   "synthetic_examples_only": true,
   "license_status": "NOT_SELECTED",
-  "file_count": 27,
+  "file_count": 28,
   "files": [
     {
       "path": ".gitattributes",
@@ -30,8 +30,8 @@
     },
     {
       "path": "README.md",
-      "bytes": 8702,
-      "sha256": "258e9e63cf4a1f4bea9ce02741947b70f32003d785c3351ad0d5ef4d3d9dee7e"
+      "bytes": 9865,
+      "sha256": "288875ecb4e4f99e45b9c6bda046a7310c96527c818fac5c984b165fe2842704"
     },
     {
       "path": "RIGHTS.md",
@@ -50,8 +50,8 @@
     },
     {
       "path": "VALIDATION.md",
-      "bytes": 2601,
-      "sha256": "beab94e936e2fbdf49a20bddcc4be3284b8278fd72d1bd5117089fd889de366b"
+      "bytes": 3222,
+      "sha256": "62aff1f1b0ba00348c5ecc01869b5b5aa770cb3e568399dd997dac6a782b2045"
     },
     {
       "path": "audit_publication.py",
@@ -60,13 +60,13 @@
     },
     {
       "path": "conversation_search.py",
-      "bytes": 3021,
-      "sha256": "4c0104427cd50e8d7a3caa4de49c593dd3676a33d1898c07869aa37fdf611582"
+      "bytes": 4486,
+      "sha256": "9167fc675ae3e4ff973d231e8dd291ae9165971557f130f1be34c8215e93125d"
     },
     {
       "path": "conversation_view.py",
-      "bytes": 4960,
-      "sha256": "110e61ba2d2ce5b4a4b9780a3e7f207b0836581123b94b3fd7c1930833baa027"
+      "bytes": 5381,
+      "sha256": "a575ab0ed619fd929d0dfe90e89fc4068e56e25df102ec622be1766bf49eec00"
     },
     {
       "path": "docs/ARCHITECTURE.md",
@@ -102,6 +102,11 @@
       "path": "session_workflow.py",
       "bytes": 7119,
       "sha256": "af6d44b6b591a8ef9a0cdb3c2bd4b54ab8e58f00cd19df4d4bd8b3b65c29c2b1"
+    },
+    {
+      "path": "test_archive_scaling.py",
+      "bytes": 5237,
+      "sha256": "1157c9b2fcc3aa6a226a4660bf04de882973876ca5eb875bdce108a9d2f722e0"
     },
     {
       "path": "test_cli_e2e.py",

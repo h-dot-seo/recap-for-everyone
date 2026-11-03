@@ -5,31 +5,31 @@ import sqlite3
 from recap import readonly
 
 
-def _titles(connection):
-    exists = connection.execute(
-        "SELECT 1 FROM sqlite_master WHERE type='table' AND name='title_history'"
-    ).fetchone()
-    if not exists:
-        return {}
-    return {(r['source'], r['conversation']): (r['title'], r['id']) for r in
-            connection.execute('SELECT h.* FROM title_history h JOIN '
-                               '(SELECT source,conversation,MAX(id) id FROM title_history '
-                               'GROUP BY source,conversation) latest ON h.id=latest.id')}
-
-
-def _inventory(connection, source=None):
-    overrides = _titles(connection)
-    where = 'WHERE source_id=?' if source is not None else ''
-    params = (source,) if source is not None else ()
+def _inventory(connection, source=None, conversation_id=None, limit=50, offset=0):
+    filters, params = [], []
+    if source is not None:
+        filters.append('source_id=?'); params.append(source)
+    if conversation_id is not None:
+        filters.append('conversation_id=?'); params.append(conversation_id)
+    where = 'WHERE ' + ' AND '.join(filters) if filters else ''
+    # Paginate in SQLite before constructing Python rows or looking up titles.
     rows = connection.execute(
         'SELECT source_id,conversation_id,MIN(message_pk) first_pk,COUNT(*) message_count '
         f'FROM messages {where} GROUP BY source_id,conversation_id '
-        'ORDER BY source_id COLLATE BINARY,conversation_id COLLATE BINARY', params)
+        'ORDER BY source_id COLLATE BINARY,conversation_id COLLATE BINARY LIMIT ? OFFSET ?',
+        (*params, limit, offset))
+    history_exists = connection.execute(
+        "SELECT 1 FROM sqlite_master WHERE type='table' AND name='title_history'"
+    ).fetchone()
     result = []
     for row in rows:
         original = connection.execute('SELECT title FROM messages WHERE message_pk=?',
                                       (row['first_pk'],)).fetchone()[0]
-        display, revision = overrides.get((row['source_id'], row['conversation_id']), (original, 0))
+        override = connection.execute(
+            'SELECT title,id FROM title_history WHERE source=? AND conversation=? '
+            'ORDER BY id DESC LIMIT 1', (row['source_id'], row['conversation_id'])
+        ).fetchone() if history_exists else None
+        display, revision = override if override is not None else (original, 0)
         result.append(dict(source=row['source_id'], conversation=row['conversation_id'],
                            original_title=original, display_title=display, revision=revision,
                            message_count=row['message_count']))
@@ -42,8 +42,13 @@ def conversations(db, source=None, limit=50, offset=0):
     connection = readonly(db)
     try:
         connection.execute('BEGIN')
-        rows = _inventory(connection, source)
-        return dict(conversations=rows[offset:offset + limit], total=len(rows),
+        rows = _inventory(connection, source, limit=limit, offset=offset)
+        where = 'WHERE source_id=?' if source is not None else ''
+        total = connection.execute(
+            'SELECT COUNT(*) FROM (SELECT 1 FROM messages ' + where +
+            ' GROUP BY source_id,conversation_id)', (source,) if source is not None else ()
+        ).fetchone()[0]
+        return dict(conversations=rows, total=total,
                     limit=limit, offset=offset, scope='local archive only')
     finally:
         connection.close()
@@ -54,8 +59,8 @@ def conversation(db, source, conversation_id):
     try:
         # Metadata, overrides and messages must describe one SQLite read snapshot.
         connection.execute('BEGIN')
-        summary = next((r for r in _inventory(connection, source)
-                        if r['conversation'] == conversation_id), None)
+        rows = _inventory(connection, source, conversation_id, limit=1)
+        summary = rows[0] if rows else None
         if summary is None:
             raise ValueError('unknown conversation')
         messages = [dict(row) for row in connection.execute(

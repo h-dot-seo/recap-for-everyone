@@ -128,8 +128,8 @@ immediately changes title matches; reverting removes matches for the former titl
 Results include source/conversation identity, original and current title, revision,
 message count, up to three message snippets with provenance, total matches and
 truncation. Title matches rank first; remaining ordering is deterministic. Source
-filters keep identically named conversations distinct. This small local implementation
-scans the selected archive in memory; it is not a large-corpus semantic index.
+filters keep identically named conversations distinct. The implementation scans the selected archive row by row, retaining only bounded
+result candidates and per-conversation term flags; it is not a semantic index.
 `recap.py search` retains its original message-level FTS behavior.
 
 ## Read-only conversation views
@@ -155,3 +155,20 @@ order, not timestamp or active web-branch order. All imported text branches rema
 visible; skipped nontext nodes are not reconstructed. These commands neither change
 titles nor create a missing database, and perform no network access. JSON output can
 contain private message text: keep it outside the public repository.
+
+## Bounded search and SQL pagination
+
+Conversation search keeps at most two result buckets of `limit` conversations,
+three snippets per result, and the current message while scanning. AND terms may
+match across different messages, and current-title hits still rank first. Search
+still reads every selected message; runtime scales with archive size and SQLite title-history aggregation.
+Latest-title and message cursors are merged in source/conversation order, avoiding
+a separate full title-history scan for every searched conversation. SQLite native caches and the largest individual message are not
+covered by the Python buffering bound.
+
+Conversation list pagination happens in SQLite before Python result construction
+or title lookups. Detail queries filter to the exact source/conversation. Counts
+and offset pagination can still scan many rows, and a detail view intentionally
+returns the whole selected conversation. These are memory improvements, not a
+claim of constant-time queries, a full-text index replacement, or a benchmark on
+private archives. No schema migration or database writes are required.

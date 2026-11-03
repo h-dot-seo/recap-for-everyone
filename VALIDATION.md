@@ -40,3 +40,12 @@ online collection, semantic title quality or active-branch reconstruction tested
 Integrated fifth/sixth increment: 22 synthetic tests passed in the cloud workspace.
 Both conversation title search and structured read-only list/detail views preserved.
 Publication scanning and manifest verification passed for the exact selected files.
+
+Seventh increment: 27 synthetic tests passed. Search regression checks preserve
+cross-message AND semantics, title-first ranking, exact match totals, truncation,
+and three-snippet caps. An archive with over 8 MB of synthetic message text stays
+below 2 MB of traced Python search allocations at limit=2; this excludes SQLite
+native memory. SQL trace tests verify page-only title fetches and exact detail
+filtering. Empty archives and noninteger search limits are covered.
+Latest-title cursor tests cover repeated revisions, source filters, orphan history
+entries and a single history query across multiple conversations.
