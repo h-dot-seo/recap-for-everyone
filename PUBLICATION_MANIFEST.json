@@ -1,12 +1,12 @@
 {
   "project": "recap-for-everyone",
-  "release": "0.37.0-saved-queue-decisions",
+  "release": "0.38.0-historical-title-search",
   "date": "2026-11-03",
   "private_history_imported": false,
   "actual_corpora_included": false,
   "synthetic_examples_only": true,
   "license_status": "NOT_SELECTED",
-  "file_count": 79,
+  "file_count": 81,
   "files": [
     {
       "path": ".gitattributes",
@@ -30,8 +30,8 @@
     },
     {
       "path": "README.md",
-      "bytes": 50496,
-      "sha256": "0deb9b9a8e8b6c9e5295a768ce4554bde3fe68bf37b680d8e9daecb499980ea8"
+      "bytes": 50960,
+      "sha256": "66e89c4f7d452a9c036d1db0e6dbcc3586aced9473005af36c65646b4d953656"
     },
     {
       "path": "RIGHTS.md",
@@ -65,8 +65,8 @@
     },
     {
       "path": "conversation_search.py",
-      "bytes": 4486,
-      "sha256": "9167fc675ae3e4ff973d231e8dd291ae9165971557f130f1be34c8215e93125d"
+      "bytes": 7475,
+      "sha256": "4b73ccf612c6cfdf9c490bfeac6db29b1f1fda395f7b9d57d6469e73454bd5ac"
     },
     {
       "path": "conversation_view.py",
@@ -87,6 +87,11 @@
       "path": "docs/TITLE_ADAPTER.md",
       "bytes": 5291,
       "sha256": "2d93841079f3ff9db853debcf06905d7e3c5035d025c003a3ac82a128af2f1f5"
+    },
+    {
+      "path": "docs/TITLE_HISTORY_SEARCH.md",
+      "bytes": 4677,
+      "sha256": "770a9819d93778934e83be6bcdbb327b708f115bfc16bedcfdfe2b09850e9540"
     },
     {
       "path": "docs/TITLE_REVIEW_HINTS.md",
@@ -140,8 +145,8 @@
     },
     {
       "path": "recap.py",
-      "bytes": 17473,
-      "sha256": "3f483765ae74d9234bd1b644f1bfa7b5423991d8534e811a9f4777c1fa9987bc"
+      "bytes": 17657,
+      "sha256": "940da0e0d9838d7b64a885b53c035ef26dfba18cfd396d05c7384cbf963eddbc"
     },
     {
       "path": "replay_local.py",
@@ -197,6 +202,11 @@
       "path": "test_export_occurrences.py",
       "bytes": 4811,
       "sha256": "ba5418a70cc3920c57c9dca2a76d66409b823231372456faa5547d117f833ea9"
+    },
+    {
+      "path": "test_historical_title_search.py",
+      "bytes": 7581,
+      "sha256": "76dca80b4f7f759a020169613eafa4dfd0d35a23fb3656b32edde7e1b4ee33cd"
     },
     {
       "path": "test_import_inspection.py",

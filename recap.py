@@ -157,6 +157,7 @@ def main():
     listing.add_argument('--source'); listing.add_argument('--limit', type=int, default=50); listing.add_argument('--offset', type=int, default=0)
     find = sub.add_parser('find', help='search current titles and conversation text')
     find.add_argument('query'); find.add_argument('--source'); find.add_argument('--limit', type=int, default=20)
+    find.add_argument('--include-title-history', action='store_true', help='also search prior local display titles; may reveal old private labels')
     for name in ('show', 'suggest-title', 'title'):
         command = sub.add_parser(name)
         command.add_argument('--source', required=True); command.add_argument('--conversation', required=True)
@@ -250,13 +251,13 @@ def main():
             result = conversation(args.db, args.source, args.conversation)
         elif args.command == 'find':
             from conversation_search import find
-            result = find(args.db, args.query, args.source, args.limit)
+            result = find(args.db, args.query, args.source, args.limit, args.include_title_history)
         else:
             from title_suggestion import suggest
             result = suggest(args.db, args.source, args.conversation)
     except (OSError, ValueError, KeyError, TypeError, sqlite3.Error) as exc:
         p.exit(1, str(exc) + '\n')
-    print(json.dumps(result, ensure_ascii=args.command in ('inspect', 'import', 'web-branch', 'suggest-branch-title', 'suggest-replay-title', 'preview-title', 'apply-title', 'review-titles', 'review-state', 'title-adapter-dry-run', 'title-adapter-simulate', 'export-title-plan', 'check-title-plan'), indent=2))
+    print(json.dumps(result, ensure_ascii=args.command in ('find', 'inspect', 'import', 'web-branch', 'suggest-branch-title', 'suggest-replay-title', 'preview-title', 'apply-title', 'review-titles', 'review-state', 'title-adapter-dry-run', 'title-adapter-simulate', 'export-title-plan', 'check-title-plan'), indent=2))
 
 
 if __name__ == '__main__':

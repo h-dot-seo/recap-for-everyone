@@ -809,3 +809,11 @@ After reviewing a saved queue item, `review-state --source SOURCE --conversation
 --set deferred --from-queue queue.json` reuses that item's existing lease without
 manual hash/revision copying. It never silently refreshes a stale queue; the same
 atomic checks still apply. The decision and destination remain explicit.
+
+## Find a title you used before
+
+`find "old wording" --include-title-history` optionally searches prior local
+labels and the archived original title in addition to current titles/raw text.
+Results show the current title plus bounded matching historical records and their
+local revisions. This can expose private wording removed from a current label,
+so it is opt-in and read-only. See [historical title search semantics and limits](docs/TITLE_HISTORY_SEARCH.md).
