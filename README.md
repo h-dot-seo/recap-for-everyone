@@ -172,3 +172,20 @@ and offset pagination can still scan many rows, and a detail view intentionally
 returns the whole selected conversation. These are memory improvements, not a
 claim of constant-time queries, a full-text index replacement, or a benchmark on
 private archives. No schema migration or database writes are required.
+
+## Web-export validation boundaries
+
+Web import rejects duplicate JSON object keys, invalid parent references and parent
+cycles, including cycles through nodes without messages. Iterative validation
+supports deep parent chains without Python recursion. Valid forks retain their
+original mapping order and parent IDs; this does not select an active branch.
+Malformed message authors and timestamps produce clean input errors before any
+archive write. Supported roles remain user, assistant, system and tool. Numeric
+epoch zero is preserved as `"0"`; timestamps otherwise remain unnormalized source
+values. Nontext content is still not extracted, and no online account is accessed.
+
+Upgrade boundary: older versions stored numeric epoch zero as `unknown`. Reimport
+of those message identities now raises a conflict rather than rewriting existing
+evidence. Keep the old archive; use a separately selected new database for a clean
+rebuild from retained exports if epoch-zero correctness is needed. No automatic
+migration is performed. Empty-string timestamps are now rejected explicitly.

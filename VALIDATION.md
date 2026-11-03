@@ -53,3 +53,9 @@ entries and a single history query across multiple conversations.
 Windows CI exposed a test-fixture connection left open after a transaction. The
 fixture now closes it explicitly before temporary-directory cleanup. No production
 query logic was changed in this correction. All 27 local tests pass again.
+
+Eighth increment: 36 synthetic tests passed. New web checks cover self/disconnected
+cycles, invalid parent/node shapes, duplicate object keys, malformed authors and
+timestamps, clean CLI rejection, epoch-zero preservation, unchanged existing archive
+bytes on validation failure, a 4,000-node chain, and valid fork order/provenance.
+Legacy epoch-zero conflict regression confirms old archive bytes are preserved.

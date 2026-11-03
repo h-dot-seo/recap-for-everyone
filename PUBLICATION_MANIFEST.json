@@ -1,12 +1,12 @@
 {
   "project": "recap-for-everyone",
-  "release": "0.7.1-windows-fixture-cleanup",
+  "release": "0.8.0-web-export-validation",
   "date": "2026-11-03",
   "private_history_imported": false,
   "actual_corpora_included": false,
   "synthetic_examples_only": true,
   "license_status": "NOT_SELECTED",
-  "file_count": 28,
+  "file_count": 29,
   "files": [
     {
       "path": ".gitattributes",
@@ -30,8 +30,8 @@
     },
     {
       "path": "README.md",
-      "bytes": 9865,
-      "sha256": "288875ecb4e4f99e45b9c6bda046a7310c96527c818fac5c984b165fe2842704"
+      "bytes": 10950,
+      "sha256": "276d1c760119ea47b038e6df34618bb01501cb9d210d277f31b513aa618b70e0"
     },
     {
       "path": "RIGHTS.md",
@@ -50,8 +50,8 @@
     },
     {
       "path": "VALIDATION.md",
-      "bytes": 3461,
-      "sha256": "7c7daa7145cadc335d7fa6f8937caed71c719459007e55219bd5f428e5667be3"
+      "bytes": 3874,
+      "sha256": "a950c8847a25ef9813f26e8715e20bc10db974f7bda627ed2dde73904108eab1"
     },
     {
       "path": "audit_publication.py",
@@ -100,8 +100,8 @@
     },
     {
       "path": "session_workflow.py",
-      "bytes": 7119,
-      "sha256": "af6d44b6b591a8ef9a0cdb3c2bd4b54ab8e58f00cd19df4d4bd8b3b65c29c2b1"
+      "bytes": 8654,
+      "sha256": "56657d277b30b773024dcdc608da9caf16bd8b7455c1441ddc2797c3f19d117d"
     },
     {
       "path": "test_archive_scaling.py",
@@ -137,6 +137,11 @@
       "path": "test_title_proposal.py",
       "bytes": 1670,
       "sha256": "531c37151b22230091a8cf349311d4e1b495586e49d2a85cd78240e36a8bcf1e"
+    },
+    {
+      "path": "test_web_validation.py",
+      "bytes": 5227,
+      "sha256": "b58aec089618ad9f014a130e640f4c90ab1504143e10200df6bed60325fd97f9"
     },
     {
       "path": "title_proposal.py",

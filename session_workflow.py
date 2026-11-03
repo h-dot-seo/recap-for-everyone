@@ -2,12 +2,42 @@
 import argparse
 import hashlib
 import json
+import math
 import sqlite3
 import tempfile
 from contextlib import closing
 from pathlib import Path
 from local_parser import parse_artifact
 from recap import ingest, readonly
+
+
+def _unique_object(pairs):
+    result = {}
+    for key, value in pairs:
+        if key in result:
+            raise ValueError('web export contains a duplicate JSON object key')
+        result[key] = value
+    return result
+
+
+def _validate_mapping(mapping):
+    for node_id, node in mapping.items():
+        if not isinstance(node_id, str) or not node_id or not isinstance(node, dict):
+            raise ValueError('mapping nodes require nonempty IDs and object values')
+        parent = node.get('parent')
+        if parent is not None and (not isinstance(parent, str) or parent not in mapping):
+            raise ValueError('mapping parent must reference an existing node')
+    # Iterative parent walks avoid recursion limits on long, valid conversations.
+    complete = set()
+    for node_id in mapping:
+        path = set()
+        current = node_id
+        while current is not None and current not in complete:
+            if current in path:
+                raise ValueError('mapping parent graph must not contain cycles')
+            path.add(current)
+            current = mapping[current].get('parent')
+        complete.update(path)
 
 
 def normalize(path, kind):
@@ -26,7 +56,7 @@ def normalize(path, kind):
                              role=m.role, timestamp=m.timestamp_utc or 'unknown', text=m.text,
                              origin_locator=f'line:{m.line_number}'))
     elif kind == 'web':
-        data = json.loads(raw.decode('utf-8'))
+        data = json.loads(raw.decode('utf-8'), object_pairs_hook=_unique_object)
         if not isinstance(data, list):
             raise ValueError('web export must be an array of conversations with mapping nodes')
         for conv in data:
@@ -35,17 +65,21 @@ def normalize(path, kind):
             cid = conv.get('id') or conv.get('conversation_id')
             if not isinstance(cid, str) or not cid:
                 raise ValueError('conversation ID required')
+            _validate_mapping(conv['mapping'])
             for node_id, node in conv['mapping'].items():
-                if not isinstance(node, dict):
-                    raise ValueError('mapping node must be an object')
-                parent = node.get('parent')
-                if parent is not None and (not isinstance(parent, str) or parent not in conv['mapping']):
-                    raise ValueError('mapping parent must reference an existing node')
                 m = node.get('message')
-                if not m:
+                if m is None:
                     continue
                 if not isinstance(m, dict) or not isinstance(m.get('content'), dict):
                     raise ValueError('message content must be an object')
+                author = m.get('author')
+                if not isinstance(author, dict) or author.get('role') not in ('user', 'assistant', 'system', 'tool'):
+                    raise ValueError('message author must contain a supported role')
+                timestamp = m.get('create_time')
+                if timestamp is not None and (timestamp == '' or isinstance(timestamp, bool) or
+                        not isinstance(timestamp, (str, int, float)) or
+                        isinstance(timestamp, float) and not math.isfinite(timestamp)):
+                    raise ValueError('message create_time must be text or a finite number')
                 parts = m.get('content', {}).get('parts', [])
                 if not isinstance(parts, list):
                     raise ValueError('message content parts must be an array')
@@ -53,7 +87,7 @@ def normalize(path, kind):
                 if not text.strip():
                     continue
                 rows.append(dict(conversation_id=cid, message_id=node_id,
-                                 role=m['author']['role'], timestamp=str(m.get('create_time') or 'unknown'),
+                                 role=author['role'], timestamp='unknown' if timestamp is None else str(timestamp),
                                  text=text, title=conv.get('title') or '',
                                  parent_id=node.get('parent'), origin_locator=f'mapping:{node_id}'))
     else:
