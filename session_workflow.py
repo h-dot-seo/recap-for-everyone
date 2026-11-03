@@ -57,7 +57,10 @@ def _web_text(content, coverage):
 
 def normalize(path, kind, include_report=False):
     path = Path(path)
-    raw = path.read_bytes()
+    return _normalize_bytes(path.read_bytes(), path.name, kind, include_report)
+
+
+def _normalize_bytes(raw, source_name, kind, include_report=False):
     digest = hashlib.sha256(raw).hexdigest()
     rows = []
     report = dict(format=kind, original_sha256=digest, original_bytes=len(raw))
@@ -66,7 +69,7 @@ def normalize(path, kind, include_report=False):
         with tempfile.TemporaryDirectory() as tmp:
             frozen = Path(tmp) / 'session.jsonl'
             frozen.write_bytes(raw)
-            parsed = parse_artifact(frozen, path.name)
+            parsed = parse_artifact(frozen, source_name)
         report.update(observed_records=parsed.observed_record_count,
                       sessions_in_metadata=len({session.session_id for session in parsed.sessions}),
                       parser_admission_status=parsed.admission_status, reason_code=parsed.reason_code,

@@ -1,12 +1,12 @@
 {
   "project": "recap-for-everyone",
-  "release": "0.18.0-web-text-coverage",
+  "release": "0.19.0-readonly-web-branches",
   "date": "2026-11-03",
   "private_history_imported": false,
   "actual_corpora_included": false,
   "synthetic_examples_only": true,
   "license_status": "NOT_SELECTED",
-  "file_count": 44,
+  "file_count": 46,
   "files": [
     {
       "path": ".gitattributes",
@@ -30,8 +30,8 @@
     },
     {
       "path": "README.md",
-      "bytes": 22609,
-      "sha256": "9a4a76bfc69cd70000364afc56a3801d55b660cca1ee1d387b13a59bb7373772"
+      "bytes": 25198,
+      "sha256": "3d1c47e71e681af493b6d0fec8fba97062ff77818e700502dbfd73b001542dad"
     },
     {
       "path": "RIGHTS.md",
@@ -50,8 +50,8 @@
     },
     {
       "path": "VALIDATION.md",
-      "bytes": 8757,
-      "sha256": "0976740144333906a1e63356ea8a1d27c85881d72df59d9654c27a976ba9d4ea"
+      "bytes": 9226,
+      "sha256": "0c54c4663e257aa09aa496c8078f06614aa51635b9fcb8844b1e4a56f5c5fef6"
     },
     {
       "path": "audit_publication.py",
@@ -100,13 +100,13 @@
     },
     {
       "path": "recap.py",
-      "bytes": 9573,
-      "sha256": "3bfa39113e3f17984dcd0dc1705f7a27e3e412c1e58a81b1c7d661fd7e1014bc"
+      "bytes": 10025,
+      "sha256": "d18b2a41840ad255d89d3469467785644fe78e9b6b76cef23df61900c6820cb6"
     },
     {
       "path": "session_workflow.py",
-      "bytes": 12046,
-      "sha256": "c661d0f297b54f6403458973e217103e0324043f6b093a0d3ad4a73b341ad3f4"
+      "bytes": 12170,
+      "sha256": "c7310ec490486951392cf369bf201331e81c22fabee837ad73017d7f53716a81"
     },
     {
       "path": "strict_json.py",
@@ -194,6 +194,11 @@
       "sha256": "0a33d37d7ba88f49039321ea58b5521e55e51d49751c9325ac2c0c1c924fc71b"
     },
     {
+      "path": "test_web_branch.py",
+      "bytes": 5630,
+      "sha256": "5453d9f4ff938386087e8e99dd4af3545565c037157820cba19f5f31883e56d1"
+    },
+    {
       "path": "test_web_content.py",
       "bytes": 5856,
       "sha256": "83594ff9b43a2891c2e348810b95436c26246758520df8f6b8e0d1d72d1f4d21"
@@ -227,6 +232,11 @@
       "path": "verify_manifest.py",
       "bytes": 3623,
       "sha256": "7dee6f04acd592c2c459483b0d7e576eb17dfeb4eeecc39dabb8c5c9f72a7056"
+    },
+    {
+      "path": "web_branch.py",
+      "bytes": 3367,
+      "sha256": "3cab2933e9c21aec05c4cbeeed21579feee8df6ad73d711e096d81ea032acf66"
     }
   ]
 }

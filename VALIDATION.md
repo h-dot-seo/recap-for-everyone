@@ -133,3 +133,12 @@ coverage without content leakage. A subprocess CLI scenario exercises inspect,
 import, local-adapter generation, preview, checked apply, stale rejection, current-title
 search, detail and title restoration. Generation/preview preserve database bytes and
 the original export is unchanged. No external service or actual model quality is tested.
+
+
+### Read-only web branch selection
+
+Eight synthetic cases cover ASCII-stdout Unicode escaping and shuffled mapping order, current versus explicit alternate
+and interior nodes, null roots, parent-path order/provenance, invalid pointer rejection,
+ambiguous conversation records, off-path cycles, 4,000-node iterative traversal,
+unchanged all-branch normalization and standalone/unified CLI equivalence without
+creating a database. Original file bytes remain unchanged.

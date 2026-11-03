@@ -369,7 +369,8 @@ unsupported text fields and forked conversations, without exposing message text 
 IDs. Normalization and first import retain all mapping branches in original mapping order.
 `current_node` does not select a path. Fork warnings make clear that title proposals
 can mix alternate conversation paths; review the evidence before applying a title.
-Branch selection, binary attachments and remote title changes are not implemented.
+Archive branch filtering, binary attachments and remote title changes are not implemented.
+The separate read-only export branch viewer below supports branch selection.
 
 Reimporting an original export can add code/output messages skipped by older
 versions. Recovered messages are appended after existing archive messages, so their
@@ -379,3 +380,45 @@ messages invalidate earlier content-bound title proposals, which must be generat
 and reviewed again. A mixed text/parts shape previously accepted may now be rejected;
 keep the original export and use a separately normalized explicit representation
 rather than editing archived evidence. Checked titles affect only the local display.
+
+
+## Read one web conversation branch without importing it
+
+```sh
+python recap.py web-branch ../conversations.json --conversation synthetic
+python recap.py web-branch ../conversations.json --conversation synthetic --node alternate-tip
+# Equivalent standalone entry point:
+python web_branch.py ../conversations.json --conversation synthetic
+```
+
+The default endpoint is the selected conversation's `current_node`. An explicit
+`--node` selects an alternate or interior endpoint. Output follows `parent` links
+from root to endpoint, not timestamps or mapping insertion order. Null/nontext nodes
+remain in the node path and omission count; supported text messages retain their
+original hash and mapping locator. Leaf IDs, immediate continuations and forks along
+the path help select another endpoint. These are node IDs, which need not equal the
+embedded message IDs.
+
+The entire export is validated from one byte snapshot before selection. Missing or
+invalid current pointers are rejected without guessing a replacement. A named node
+can still be selected explicitly. Duplicate matching conversation records are
+rejected as ambiguous. Malformed graphs even outside the selected path are rejected.
+Parent links are authoritative; redundant `children` arrays are not used to select
+the path. Multiple roots remain permitted by the existing normalization contract.
+
+This command never opens a database, changes an export or contacts a service. Its
+JSON contains **private text and node IDs**; do not publish or transmit it. All
+supported roles on the path are included, including system/tool text when present;
+this is not reconstruction of the website's visibility rules. The full export is
+loaded in memory and parsed twice, so this is not a bounded-memory large-file viewer.
+
+The all-branch archive import and title-generation behavior are unchanged. Branch
+output is a review view, not a title proposal or replacement export, and cannot be
+applied as one. Branch-specific archive indexing and title proposals remain future
+work. Original exports are needed because the archive does not retain `current_node`.
+
+The structural contract is informed by the public converter's
+[data models](https://difegam.github.io/chatgpt-to-markdown/reference/data-models/),
+which describes mapping nodes, parent pointers and current_node. It is an independent
+implementation's observed format, not a stable official OpenAI schema. Only synthetic
+fixtures are shipped; no public or private conversation corpus was imported.
