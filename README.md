@@ -492,3 +492,40 @@ credential storage or paid API. To use the title elsewhere, identify the intende
 conversation in its own application, compare its actual current title and make the
 change yourself. A successful check does not establish that a remote change is needed
 or permitted. The original export and local database are never modified by these commands.
+
+## Opt-in typed Codex local text profile
+
+```sh
+python recap.py inspect ../explicit-session.jsonl --format local-codex
+python recap.py --db ../typed.sqlite import ../explicit-session.jsonl --format local-codex --source typed-demo
+# The same format is supported by manual title-plan export and recheck.
+```
+
+`local-codex` keeps the existing session_meta / response_item message envelope but
+extracts only content items explicitly typed `input_text` or `output_text`. This
+selection follows the public OpenAI Codex
+[ContentItem model](https://github.com/openai/codex/blob/main/codex-rs/protocol/src/models.rs)
+observed on 2026-11-03. It is a versioned parser behavior in this project, not a claim
+that all Codex rollout versions, event types or storage formats are supported.
+
+Known text items require string text. Content must be an array of objects. Malformed
+supported shapes fail before database writes. Nontext, unknown and untyped parts are
+skipped and counted, even if they contain a field named text. Nonblank extracted text
+retains leading/trailing whitespace; multiple text items are joined with one newline.
+Whitespace-only messages are omitted. This preserves indentation that the legacy
+profile trims, but is not byte-for-byte reconstruction of the original JSONL record.
+Original file hashes and line locators remain available independently.
+
+The existing `local` format is unchanged: it accepts generic text fields and trims
+outer whitespace for compatibility. **Do not switch an existing source blindly.**
+If the profile changes the text for an existing message ID, reimport rejects the
+conflict rather than rewriting evidence. Use a distinct source ID or a separate
+archive after inspecting coverage, and review new title proposals. A new source ID
+creates a separate archive identity; it does not migrate old title history or remove
+old data. Profiles that produce identical rows can deduplicate normally.
+
+Both profiles currently extract only user/assistant response_item messages. Tool
+calls, system/developer text, event-only messages, media and encrypted content are not
+reconstructed. Fallback IDs still use the source basename and line number when an
+explicit message ID is absent, so renaming or rearranging an export can change those
+IDs. No private directory scan or account access is performed.

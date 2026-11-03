@@ -80,6 +80,7 @@ class ParsedArtifact:
     observed_record_count: int | None
     sessions: tuple[SessionOccurrence, ...]
     messages: tuple[MessageOccurrence, ...]
+    skipped_content_parts: int = 0
 
 
 def _text(value: Any, field: str) -> str:
@@ -88,18 +89,27 @@ def _text(value: Any, field: str) -> str:
     return value
 
 
-def _message_text(payload: dict[str, Any]) -> str:
+def _message_text(payload: dict[str, Any], content_profile: str = "legacy") -> str:
     content = payload.get("content")
     if not isinstance(content, list):
+        if content_profile == "codex":
+            raise LocalImportError("typed message content must be an array")
         return ""
     text: list[str] = []
     for item in content:
         if not isinstance(item, dict):
+            if content_profile == "codex":
+                raise LocalImportError("typed content item must be an object")
+            continue
+        if content_profile == "codex" and item.get("type") not in ("input_text", "output_text"):
             continue
         value = item.get("text")
+        if content_profile == "codex" and not isinstance(value, str):
+            raise LocalImportError("typed text content requires a string")
         if isinstance(value, str):
             text.append(value)
-    return "\n".join(text).strip()
+    joined = "\n".join(text)
+    return joined if content_profile == "codex" and joined.strip() else joined.strip()
 
 
 def _records(path: Path) -> list[tuple[int, dict[str, Any]]]:
@@ -119,7 +129,10 @@ def _records(path: Path) -> list[tuple[int, dict[str, Any]]]:
     return records
 
 
-def parse_artifact(path: Path, source_relative_path: str, artifact_kind: str = "jsonl") -> ParsedArtifact:
+def parse_artifact(path: Path, source_relative_path: str, artifact_kind: str = "jsonl",
+                   content_profile: str = "legacy") -> ParsedArtifact:
+    if content_profile not in ("legacy", "codex"):
+        raise LocalImportError("unsupported local content profile")
     if artifact_kind == "sqlite":
         connection: sqlite3.Connection | None = None
         try:
@@ -150,6 +163,7 @@ def parse_artifact(path: Path, source_relative_path: str, artifact_kind: str = "
     sessions: list[SessionOccurrence] = []
     messages: list[MessageOccurrence] = []
     current_session = ""
+    skipped_content_parts = 0
     for line_number, value in records:
         record_type = value.get("type")
         payload = value.get("payload")
@@ -163,7 +177,10 @@ def parse_artifact(path: Path, source_relative_path: str, artifact_kind: str = "
         role = payload.get("role")
         if role not in {"user", "assistant"}:
             continue
-        text = _message_text(payload)
+        text = _message_text(payload, content_profile)
+        if content_profile == "codex":
+            skipped_content_parts += sum(item.get("type") not in ("input_text", "output_text")
+                                         for item in payload["content"])
         if not text:
             continue
         if not current_session:
@@ -184,7 +201,7 @@ def parse_artifact(path: Path, source_relative_path: str, artifact_kind: str = "
         raise LocalImportError(f"JSONL has no session metadata: {path}")
     status = "imported" if messages else "accepted_zero_message"
     reason = None if messages else "no_response_messages"
-    return ParsedArtifact("parsed", status, reason, len(records), tuple(sessions), tuple(messages))
+    return ParsedArtifact("parsed", status, reason, len(records), tuple(sessions), tuple(messages), skipped_content_parts)
 
 
 def message_decisions(

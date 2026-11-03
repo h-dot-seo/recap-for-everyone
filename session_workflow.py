@@ -64,13 +64,15 @@ def _normalize_bytes(raw, source_name, kind, include_report=False):
     digest = hashlib.sha256(raw).hexdigest()
     rows = []
     report = dict(format=kind, original_sha256=digest, original_bytes=len(raw))
-    if kind == 'local':
+    if kind in ('local', 'local-codex'):
         # Parse the same byte snapshot that was hashed, even if the source changes.
         with tempfile.TemporaryDirectory() as tmp:
             frozen = Path(tmp) / 'session.jsonl'
             frozen.write_bytes(raw)
-            parsed = parse_artifact(frozen, source_name)
-        report.update(observed_records=parsed.observed_record_count,
+            parsed = parse_artifact(frozen, source_name, content_profile='codex' if kind == 'local-codex' else 'legacy')
+        report.update(local_content_profile='codex' if kind == 'local-codex' else 'legacy',
+                      skipped_content_parts=parsed.skipped_content_parts,
+                      observed_records=parsed.observed_record_count,
                       sessions_in_metadata=len({session.session_id for session in parsed.sessions}),
                       parser_admission_status=parsed.admission_status, reason_code=parsed.reason_code,
                       records_without_extracted_message=parsed.observed_record_count - len(parsed.messages))
@@ -132,6 +134,8 @@ def _normalize_bytes(raw, source_name, kind, include_report=False):
     if kind == 'web':
         report['nodes_without_extracted_text'] = report['mapping_nodes'] - len(rows)
     report['warnings'] = ['No messages extracted; inspect the supported format and source before importing.'] if not rows else []
+    if kind == 'local-codex' and report['skipped_content_parts']:
+        report['warnings'].append('Nontext or unsupported local content parts were not extracted.')
     if kind == 'web':
         if report['forked_conversations']:
             report['warnings'].append('Forked conversations include all branches; title suggestions may mix alternate paths.')
@@ -193,8 +197,8 @@ def main():
     p = argparse.ArgumentParser(description=__doc__)
     p.add_argument('--db')
     sub = p.add_subparsers(dest='command', required=True)
-    imp = sub.add_parser('import'); imp.add_argument('path'); imp.add_argument('--format', choices=['web', 'local'], required=True); imp.add_argument('--source', required=True)
-    check = sub.add_parser('inspect'); check.add_argument('path'); check.add_argument('--format', choices=['web', 'local'], required=True)
+    imp = sub.add_parser('import'); imp.add_argument('path'); imp.add_argument('--format', choices=['web', 'local', 'local-codex'], required=True); imp.add_argument('--source', required=True)
+    check = sub.add_parser('inspect'); check.add_argument('path'); check.add_argument('--format', choices=['web', 'local', 'local-codex'], required=True)
     t = sub.add_parser('title'); t.add_argument('--source', required=True); t.add_argument('--conversation', required=True); t.add_argument('--set')
     t.add_argument('--expected-revision', type=int)
     a = p.parse_args()

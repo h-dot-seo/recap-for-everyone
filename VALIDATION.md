@@ -162,3 +162,13 @@ unchanged database/source bytes, same-title revision changes, reformatted export
 and after import, content additions, altered values/types/extra keys, restored-title
 no-change semantics and local-session CLI equivalence. Duplicate JSON plan keys are
 rejected. All execution statuses remain NOT_EXECUTED; no remote title state is tested.
+
+### Typed local text profile
+
+Seven synthetic cases cover typed text selection, exact nonblank whitespace, ignored
+nontext/untyped metadata and counts, malformed known shapes before DB creation,
+legacy compatibility, conflicting profile changes without rewriting evidence,
+idempotent reimport and inspection/receipt parity. A CLI workflow covers typed import,
+local title suggestion, preview/apply and manual plan export/recheck while preserving
+source bytes. Public Codex ContentItem definitions inform the profile; actual private
+sessions, encrypted records and full rollout reconstruction are not tested.

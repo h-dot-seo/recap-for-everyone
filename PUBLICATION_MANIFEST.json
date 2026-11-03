@@ -1,12 +1,12 @@
 {
   "project": "recap-for-everyone",
-  "release": "0.21.0-manual-title-plans",
+  "release": "0.22.0-typed-local-text",
   "date": "2026-11-03",
   "private_history_imported": false,
   "actual_corpora_included": false,
   "synthetic_examples_only": true,
   "license_status": "NOT_SELECTED",
-  "file_count": 50,
+  "file_count": 51,
   "files": [
     {
       "path": ".gitattributes",
@@ -30,8 +30,8 @@
     },
     {
       "path": "README.md",
-      "bytes": 29772,
-      "sha256": "b85ec6c5024280e430fab98d2d08f91f410d1b9b30b264009d87799b90c0e631"
+      "bytes": 32094,
+      "sha256": "ba038c1db27ae761ed32d8afcaa9c710ad90250c550acf2fdcbbbe628f4b5b3f"
     },
     {
       "path": "RIGHTS.md",
@@ -50,8 +50,8 @@
     },
     {
       "path": "VALIDATION.md",
-      "bytes": 10331,
-      "sha256": "0ac82fb597c15f74299b09449d9a9e024a7ca5e3e8b3ace70ada7909215b407f"
+      "bytes": 10940,
+      "sha256": "e6ad2782786dcdb5cda37f1407a97ab1972ee7bb66e20c820b944b6b05306071"
     },
     {
       "path": "audit_publication.py",
@@ -100,18 +100,18 @@
     },
     {
       "path": "local_parser.py",
-      "bytes": 16010,
-      "sha256": "ecd5b04b45f63377681ad6fa1a8ed53435e9ce57e185ea78e07559b32b319410"
+      "bytes": 17108,
+      "sha256": "e97051a776f5c1fd6eabb53e1bb4e9814b340088313db238df9ef4d4210c6f56"
     },
     {
       "path": "recap.py",
-      "bytes": 11523,
-      "sha256": "5efc2937d38a72073d251f4c5b6460dcc68d67c13a9847902f41cb5d6755ea3b"
+      "bytes": 11568,
+      "sha256": "ba7bd4c1b95e16b0141c76a369683294d21ec119f85cf9376ac13b132e82397b"
     },
     {
       "path": "session_workflow.py",
-      "bytes": 12170,
-      "sha256": "c7310ec490486951392cf369bf201331e81c22fabee837ad73017d7f53716a81"
+      "bytes": 12613,
+      "sha256": "e1989dde8e774f23eaa1079b4353c078dcf30b2571252a96f0a0abadc0eb6110"
     },
     {
       "path": "strict_json.py",
@@ -157,6 +157,11 @@
       "path": "test_import_inspection.py",
       "bytes": 4632,
       "sha256": "8c97382a3ccd46bd1afa5d8baeca047c7415d73c4125cbdd1b19e65b9e996baf"
+    },
+    {
+      "path": "test_local_codex.py",
+      "bytes": 5465,
+      "sha256": "30bf5e586839e57962d01ab59aabb12bfa21d1d3019873dd67b28b5a2bd035cb"
     },
     {
       "path": "test_manifest_verification.py",
@@ -230,8 +235,8 @@
     },
     {
       "path": "title_plan.py",
-      "bytes": 4261,
-      "sha256": "2e2d326782d8194a0a35eee66f46211fe219283a49fc9e41710e48070ceaf456"
+      "bytes": 4276,
+      "sha256": "81852bd0343038b3e452874f4b3bcd339ed0be11dea1d8447475188cfd5d7c47"
     },
     {
       "path": "title_proposal.py",

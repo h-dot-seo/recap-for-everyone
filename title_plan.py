@@ -60,7 +60,7 @@ def main():
     parser.add_argument('--db', required=True)
     commands = parser.add_subparsers(dest='command', required=True)
     export = commands.add_parser('export'); export.add_argument('input')
-    export.add_argument('--format', choices=['web', 'local'], required=True)
+    export.add_argument('--format', choices=['web', 'local', 'local-codex'], required=True)
     export.add_argument('--source', required=True); export.add_argument('--conversation', required=True)
     check = commands.add_parser('check'); check.add_argument('input'); check.add_argument('plan', type=Path)
     args = parser.parse_args()
