@@ -11,7 +11,7 @@ from title_proposal import content_fingerprint
 from title_rules import validate_title
 
 
-SCHEMA = 'recap.manual-title-plan.v1'
+SCHEMA = 'recap.manual-title-plan.v2'
 
 
 def make_plan(db, source, conversation, path, kind):
@@ -38,6 +38,8 @@ def make_plan(db, source, conversation, path, kind):
                 proposed_title=archive['display_title'],
                 action='no_change' if archive['display_title'] == archive['original_title'] else 'manual_rename',
                 execution_status='NOT_EXECUTED', remote_mutation=False, includes_message_records=False,
+                extraction_warnings=coverage['warnings'],
+                effective_history_reconstructed=False,
                 scope='manual transfer of a local display title; source/conversation IDs are archive identities, not verified remote targets',
                 warning='PRIVATE METADATA: titles and identifiers may be sensitive. Recheck before manual use. This plan grants no service access or execution permission.')
 

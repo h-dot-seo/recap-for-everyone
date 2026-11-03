@@ -81,6 +81,7 @@ class ParsedArtifact:
     sessions: tuple[SessionOccurrence, ...]
     messages: tuple[MessageOccurrence, ...]
     skipped_content_parts: int = 0
+    context_counts: tuple[tuple[str, int], ...] = ()
 
 
 def _text(value: Any, field: str) -> str:
@@ -127,6 +128,35 @@ def _records(path: Path) -> list[tuple[int, dict[str, Any]]]:
             raise LocalImportError(f"JSONL record is not an object: {path}:{line_number}")
         records.append((line_number, value))
     return records
+
+
+
+def _context_counts(records):
+    # Fixed keys only: arbitrary event/type values and metadata never enter reports.
+    known = ('session_meta', 'response_item', 'event_msg', 'compacted', 'turn_context')
+    counts = {key + '_records': 0 for key in known}
+    counts.update(other_records=0, nonmessage_response_items=0, skipped_role_messages=0,
+                  fork_metadata_records=0, referenced_history_records=0,
+                  parent_thread_records=0, paginated_history_records=0, rollback_events=0)
+    for _, value in records:
+        kind = value.get('type')
+        key = kind + '_records' if kind in known else 'other_records'
+        counts[key] += 1
+        payload = value.get('payload')
+        if not isinstance(payload, dict):
+            continue
+        if kind == 'session_meta':
+            counts['fork_metadata_records'] += int(payload.get('forked_from_id') is not None)
+            counts['referenced_history_records'] += int(payload.get('history_base') is not None)
+            counts['parent_thread_records'] += int(payload.get('parent_thread_id') is not None)
+            counts['paginated_history_records'] += int(payload.get('history_mode') == 'paginated')
+        elif kind == 'response_item':
+            counts['nonmessage_response_items'] += int(payload.get('type') != 'message')
+            if payload.get('type') == 'message':
+                counts['skipped_role_messages'] += int(payload.get('role') not in ('user', 'assistant'))
+        elif kind == 'event_msg':
+            counts['rollback_events'] += int(payload.get('type') == 'thread_rolled_back')
+    return tuple(sorted(counts.items()))
 
 
 def parse_artifact(path: Path, source_relative_path: str, artifact_kind: str = "jsonl",
@@ -201,7 +231,7 @@ def parse_artifact(path: Path, source_relative_path: str, artifact_kind: str = "
         raise LocalImportError(f"JSONL has no session metadata: {path}")
     status = "imported" if messages else "accepted_zero_message"
     reason = None if messages else "no_response_messages"
-    return ParsedArtifact("parsed", status, reason, len(records), tuple(sessions), tuple(messages), skipped_content_parts)
+    return ParsedArtifact("parsed", status, reason, len(records), tuple(sessions), tuple(messages), skipped_content_parts, _context_counts(records))
 
 
 def message_decisions(

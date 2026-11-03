@@ -529,3 +529,33 @@ calls, system/developer text, event-only messages, media and encrypted content a
 reconstructed. Fallback IDs still use the source basename and line number when an
 explicit message ID is absent, so renaming or rearranging an export can change those
 IDs. No private directory scan or account access is performed.
+
+## Local rollout context and incomplete-history warnings
+
+Local inspection/import now reports fixed-category record counts and detected
+compaction, rollback, fork, parent-thread, paginated-history and inherited-history
+markers. These counts disclose no marker values, paths, arbitrary event names or
+message text. Unknown record kinds are grouped under `other_records`. Fallback
+message IDs also trigger a basename/line-number stability warning.
+
+These are **presence diagnostics, not schema validation or effective-history replay**.
+Metadata values are not followed or fetched. Referenced parent files are never opened.
+Compaction summaries/replacement_history are not extracted as original messages, and
+rollback markers do not delete earlier archived messages. Extraction keeps supported
+response_item text in source line order. Both legacy and typed profiles report
+`effective_history_reconstructed: false`; absence of markers does not prove completeness.
+All warnings describe the supplied export file, not only a selected conversation.
+
+This boundary is informed by the official Codex
+[rollout reconstruction](https://github.com/openai/codex/blob/main/codex-rs/core/src/session/rollout_reconstruction.rs)
+and [thread history fields](https://github.com/openai/codex/blob/main/codex-rs/thread-store/src/types.rs)
+observed on 2026-11-03. Actual reconstruction is more complex than removing N messages
+or replacing text with a summary, and is intentionally not approximated here.
+
+Manual title plans now use `recap.manual-title-plan.v2` and carry export-wide extraction
+warnings plus the explicit effective-history flag. Version 1 plans must be regenerated
+and reviewed; recheck rejects them as unsupported. Database contents and title history
+need no migration. Ordinary archive title suggestions still use stored raw text and
+cannot diagnose an unavailable original export. Inspect the retained export and review
+its warnings before transferring a title, especially for forks, compaction or rollback.
+No warning authorizes automatic title changes or external transmission.

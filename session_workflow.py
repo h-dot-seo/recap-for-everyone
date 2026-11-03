@@ -72,6 +72,9 @@ def _normalize_bytes(raw, source_name, kind, include_report=False):
             parsed = parse_artifact(frozen, source_name, content_profile='codex' if kind == 'local-codex' else 'legacy')
         report.update(local_content_profile='codex' if kind == 'local-codex' else 'legacy',
                       skipped_content_parts=parsed.skipped_content_parts,
+                      rollout_context=dict(parsed.context_counts),
+                      messages_without_explicit_id=sum(not m.explicit_id for m in parsed.messages),
+                      effective_history_reconstructed=False,
                       observed_records=parsed.observed_record_count,
                       sessions_in_metadata=len({session.session_id for session in parsed.sessions}),
                       parser_admission_status=parsed.admission_status, reason_code=parsed.reason_code,
@@ -134,6 +137,16 @@ def _normalize_bytes(raw, source_name, kind, include_report=False):
     if kind == 'web':
         report['nodes_without_extracted_text'] = report['mapping_nodes'] - len(rows)
     report['warnings'] = ['No messages extracted; inspect the supported format and source before importing.'] if not rows else []
+    if kind in ('local', 'local-codex'):
+        context = report['rollout_context']
+        if context.get('compacted_records') or context.get('rollback_events'):
+            report['warnings'].append('Compaction or rollback markers are present; archived text is raw record order, not effective replay history.')
+        if any(context.get(key) for key in ('fork_metadata_records', 'referenced_history_records', 'parent_thread_records', 'paginated_history_records')):
+            report['warnings'].append('Fork, parent or paginated history metadata is present; inherited history is not resolved and may be incomplete.')
+        if any(context.get(key) for key in ('event_msg_records', 'nonmessage_response_items', 'skipped_role_messages', 'other_records')):
+            report['warnings'].append('Some event, nonmessage, unsupported-role or unknown records are not extracted as messages.')
+        if report['messages_without_explicit_id']:
+            report['warnings'].append('Some message IDs depend on source basename and line number; renaming or rearranging the export changes those identities.')
     if kind == 'local-codex' and report['skipped_content_parts']:
         report['warnings'].append('Nontext or unsupported local content parts were not extracted.')
     if kind == 'web':

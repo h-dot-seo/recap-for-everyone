@@ -172,3 +172,12 @@ idempotent reimport and inspection/receipt parity. A CLI workflow covers typed i
 local title suggestion, preview/apply and manual plan export/recheck while preserving
 source bytes. Public Codex ContentItem definitions inform the profile; actual private
 sessions, encrypted records and full rollout reconstruction are not tested.
+
+### Rollout context diagnostics and plan warnings
+
+Five synthetic cases cover fixed-key metadata counts without private marker leakage,
+compaction/rollback/inherited-history warnings, unchanged raw text and source-line
+provenance, unknown record/unsupported-role categorization, basename fallback warnings,
+import/inspection parity, idempotence and read-only version-2 plan checks. Old plan
+versions fail closed. These tests intentionally do not reconstruct effective replay
+history or follow parent references.
