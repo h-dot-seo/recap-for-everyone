@@ -12,27 +12,43 @@ from recap import ingest, readonly
 
 def normalize(path, kind):
     path = Path(path)
-    digest = hashlib.sha256(path.read_bytes()).hexdigest()
+    raw = path.read_bytes()
+    digest = hashlib.sha256(raw).hexdigest()
     rows = []
     if kind == 'local':
-        parsed = parse_artifact(path, path.name)
+        # Parse the same byte snapshot that was hashed, even if the source changes.
+        with tempfile.TemporaryDirectory() as tmp:
+            frozen = Path(tmp) / 'session.jsonl'
+            frozen.write_bytes(raw)
+            parsed = parse_artifact(frozen, path.name)
         for m in parsed.messages:
             rows.append(dict(conversation_id=m.session_id, message_id=m.message_key,
                              role=m.role, timestamp=m.timestamp_utc or 'unknown', text=m.text,
                              origin_locator=f'line:{m.line_number}'))
     elif kind == 'web':
-        data = json.loads(path.read_text(encoding='utf-8'))
+        data = json.loads(raw.decode('utf-8'))
         if not isinstance(data, list):
             raise ValueError('web export must be an array of conversations with mapping nodes')
         for conv in data:
+            if not isinstance(conv, dict) or not isinstance(conv.get('mapping'), dict):
+                raise ValueError('conversation must contain a mapping object')
             cid = conv.get('id') or conv.get('conversation_id')
             if not isinstance(cid, str) or not cid:
                 raise ValueError('conversation ID required')
             for node_id, node in conv['mapping'].items():
+                if not isinstance(node, dict):
+                    raise ValueError('mapping node must be an object')
+                parent = node.get('parent')
+                if parent is not None and (not isinstance(parent, str) or parent not in conv['mapping']):
+                    raise ValueError('mapping parent must reference an existing node')
                 m = node.get('message')
                 if not m:
                     continue
+                if not isinstance(m, dict) or not isinstance(m.get('content'), dict):
+                    raise ValueError('message content must be an object')
                 parts = m.get('content', {}).get('parts', [])
+                if not isinstance(parts, list):
+                    raise ValueError('message content parts must be an array')
                 text = '\n'.join(p for p in parts if isinstance(p, str))
                 if not text.strip():
                     continue

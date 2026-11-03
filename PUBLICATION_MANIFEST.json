@@ -1,87 +1,102 @@
 {
   "project": "recap-for-everyone",
-  "release": "0.4.0-evidence-contracts",
+  "release": "0.4.1-e2e-validation",
   "date": "2026-11-03",
   "private_history_imported": false,
   "actual_corpora_included": false,
   "synthetic_examples_only": true,
   "license_status": "NOT_SELECTED",
-  "file_count": 19,
+  "file_count": 23,
   "files": [
     {
+      "path": ".gitattributes",
+      "bytes": 19,
+      "sha256": "d60f352d0db1404c70afb4bb8b2ca3fd1c610572aa40720e8a0b7baa7885418c"
+    },
+    {
+      "path": ".github/workflows/tests.yml",
+      "bytes": 719,
+      "sha256": "c8b7f561edcb36a3bb1c58bd09f5dabf8c837042ddc12b8c76a95b397c6e342f"
+    },
+    {
       "path": ".gitignore",
-      "bytes": 174,
-      "sha256": "b06208a7be76971fb80572cc23fd8ec4c233d90e343dd836aee217d290170e9b"
+      "bytes": 155,
+      "sha256": "9582424c530015ffed444c118b0a8f46e9b4a4f64989775c4d534e1049ffdd32"
     },
     {
       "path": "audit_publication.py",
-      "bytes": 2015,
-      "sha256": "cb4c106c30f769dc5955cc96437e5431c9f7f6d80aa5619a924e3fb93757b866"
+      "bytes": 1969,
+      "sha256": "349bfe9f189da2beaee4d655ba05b8f080f79b5fe7518097eafb6beea5459d08"
     },
     {
       "path": "docs/ARCHITECTURE.md",
-      "bytes": 2950,
-      "sha256": "378878f5e434a06a32e05188201bca116c7506ba4b77200e1444cb0d770901e6"
+      "bytes": 2895,
+      "sha256": "4c36ed56a12118c62606e43ad130359fad053a4d22f542f8ec41610913d87b2a"
     },
     {
       "path": "examples/conversations.jsonl",
-      "bytes": 445,
-      "sha256": "8de47467ef628728743fc37f4ecf2c06ad55db53802cfb22ef1d9a47da50fa53"
+      "bytes": 443,
+      "sha256": "7b3ad06b959ecea9d39ed485ecd571838e8a1217e8cbf51dc89e3d6de9121dc9"
     },
     {
       "path": "examples/local-session.jsonl",
-      "bytes": 235,
-      "sha256": "f1110ca4b8b89706adb5f86cc5548403a56c576c8ee68e9133e12606c05cc9e4"
+      "bytes": 233,
+      "sha256": "6871774f2e373f6901ddf6be72a74979dddde786792b30321c5fe15fc0820460"
     },
     {
       "path": "examples/web-export.json",
-      "bytes": 710,
-      "sha256": "bec345fb6b33d1861093289aa85a3803c266193f8e6e62d413be169c67d41e44"
+      "bytes": 674,
+      "sha256": "207e4b25d6088c4cbc729deeb5aa9993077214dbeadc8e19eb099b762175e434"
     },
     {
       "path": "local_parser.py",
-      "bytes": 16319,
-      "sha256": "ac945793451c94a184543f8b86febe3770a1e535ac96a92f64d317231684cf82"
+      "bytes": 15995,
+      "sha256": "45c414a6731586ff8e1f67e307af94cfbda5124bad7d152e1cf8f2057abae734"
     },
     {
       "path": "PUBLICATION.md",
-      "bytes": 1060,
-      "sha256": "cb9d1023b8564db0ec031118ab4deabd20bc685d6eac106dcd36b93ab27e5bfb"
+      "bytes": 1042,
+      "sha256": "d0eb77be8d3f46f7c954cb4108270e72c6ca1208a8410e3ae42393afe83c5308"
     },
     {
       "path": "README.md",
-      "bytes": 6030,
-      "sha256": "eb10188ee25f8ebc2a4bc7451e56fd412be893a531757564a08396c716c841e0"
+      "bytes": 6532,
+      "sha256": "40e641f0d8a0cbff9adb20ab00089ee0015b2a0952825c1aec32c0df4c4ee1c7"
     },
     {
       "path": "recap.py",
-      "bytes": 5924,
-      "sha256": "7228903fb8994fad6e7c8e8b52605ea86e7bcfa03f9c599b86427c930f2981d8"
+      "bytes": 5802,
+      "sha256": "92a468ff1c4d0ff120c881b293ada5b28a838eaadc8b92ee6bec5c0cc8c03ea7"
     },
     {
       "path": "RIGHTS.md",
-      "bytes": 967,
-      "sha256": "3a62db96ace5df5eb023a586764f33bb3125a814809d6fad880c587176d8ba44"
+      "bytes": 952,
+      "sha256": "7b403cfda5978399a0a9aac7b2af267234d6ff3e6baad234883a972e9767068a"
     },
     {
       "path": "SECURITY.md",
-      "bytes": 1345,
-      "sha256": "3bb8bff293221d91d2c81368300df05a9c6019b1387b179306f9836161de2a8b"
+      "bytes": 1324,
+      "sha256": "9bcf7ee3f4b484ed2af153569946f72fadcf6d8a06a599433e4d80e8525d8f36"
     },
     {
       "path": "session_workflow.py",
-      "bytes": 6083,
-      "sha256": "baec64b42f4661efa868f41c9c7ce58585117885a0d9a8b5de3f259dd9ea678d"
+      "bytes": 7119,
+      "sha256": "af6d44b6b591a8ef9a0cdb3c2bd4b54ab8e58f00cd19df4d4bd8b3b65c29c2b1"
     },
     {
       "path": "SKILL.md",
-      "bytes": 1595,
-      "sha256": "36885e4c466e28730cc9ac8e03a8d139a0684fc212321071c8814908b6963bf1"
+      "bytes": 1571,
+      "sha256": "7d85ca140f8d1472421ee790812ccd242858217920a03bf2e4b44971b97a9905"
+    },
+    {
+      "path": "test_cli_e2e.py",
+      "bytes": 2532,
+      "sha256": "eff1c4da5b9df771723537714dbdfb747ca717226e3d4a9864556854401c670b"
     },
     {
       "path": "test_recap.py",
-      "bytes": 3195,
-      "sha256": "03d79408a1e865621606fa0c9156b11cdffd1ccfe15757489c8e7596e6c822b2"
+      "bytes": 3127,
+      "sha256": "28cdd3cd60f48d3b72c4f6b8869eb1ffa1864fd393a3392584efab69360df6d1"
     },
     {
       "path": "test_session_workflow.py",
@@ -100,8 +115,13 @@
     },
     {
       "path": "VALIDATION.md",
-      "bytes": 1523,
-      "sha256": "ae44af5e7cc61128bdcc3fccceae49201cfd6e3189eec60368e132ad66689fbe"
+      "bytes": 1664,
+      "sha256": "20ca8c2126bb42a39a7538698561d63959b9ae984210ea4e0857e9c63c5def63"
+    },
+    {
+      "path": "verify_manifest.py",
+      "bytes": 1141,
+      "sha256": "1e57854f4e6c88c31ed38a6d7d9481f8c5a57ceaba18de039251f7f66b471f05"
     }
   ]
 }

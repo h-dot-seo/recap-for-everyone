@@ -25,3 +25,5 @@ No real corpus, account data, or scientific fidelity evaluation was used.
 Second increment: 8 tests passed; failure boundaries and deterministic repeated results covered.
 
 Third increment: 10 tests passed, including supplied-evidence rejection and deterministic output. No external model/search integration tested.
+
+Fourth increment: CLI end-to-end scenarios and failure recovery added. Local tests: 12 passed. Remote CI status is recorded separately in the private development log.
