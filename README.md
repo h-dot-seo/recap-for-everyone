@@ -100,7 +100,7 @@ python title_proposal.py --db ../demo.sqlite apply reviewed-preview.json
 Save the preview JSON to `reviewed-preview.json` outside the repository. A proposal
 requires `source`, `conversation`, `content_sha256` from snapshot, a single-line
 `title`, `evidence_message_ids` referencing user messages, and `provider` equal to
-`operator`, `external-adapter`, or `synthetic-mock`. Preview is read-only and returns
+`operator`, `external-adapter`, `synthetic-mock`, or `local-extractive`. Preview is read-only and returns
 the expected title revision. Apply checks content under the same write lock as the
 revision and title history insertion. The snapshot contains private messages; this
 tool performs no external transmission. References and hashes do not establish
@@ -196,3 +196,27 @@ rejected rather than disabling the stale-preview guard. The lower-level `titles`
 Python API retains its documented optional revision argument for compatibility;
 external adapters should use the checked proposal workflow. Missing/unreadable
 SQLite databases produce clean CLI errors and are not created by preview/snapshot.
+
+## Generate a local title excerpt for review
+
+```sh
+python title_suggestion.py --db ../demo.sqlite --source demo --conversation synthetic-chat > ../proposal.json
+python title_proposal.py --db ../demo.sqlite preview ../proposal.json > ../reviewed-preview.json
+# Inspect the suggested title and evidence before applying:
+python title_proposal.py --db ../demo.sqlite apply ../reviewed-preview.json
+```
+
+The local generator selects the first usable user message that is not an exact
+match for a small built-in English/Korean greeting list. It normalizes whitespace,
+removes control/format characters from the proposed label only, and takes up to 80
+characters. If all usable user messages are greetings, the output explicitly marks
+that fallback. No usable user text produces an error rather than an assistant-based
+title. Source messages are never modified.
+
+Output is a `local-extractive` proposal with one user evidence ID and the conversation
+content fingerprint. Generating and previewing are read-only; applying still requires
+the reviewed revision and unchanged content. This is a deterministic excerpt, not a
+semantic summary, intent classifier or model adapter. It can miss the main topic or
+select low-value text, so review remains necessary. No API key, paid service, model
+call, automatic rename or external data transmission is involved. Proposal files may
+contain private excerpts and must stay outside the public repository.

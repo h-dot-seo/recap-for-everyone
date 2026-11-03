@@ -34,7 +34,7 @@ def preview(db, proposal):
     users = {r['message_id'] for r in rows if r['role'] == 'user'}
     if not isinstance(ids, list) or not ids or any(not isinstance(i, str) or i not in users for i in ids):
         raise ValueError('title evidence must reference user messages in this conversation')
-    if proposal.get('provider') not in ('operator', 'external-adapter', 'synthetic-mock'):
+    if proposal.get('provider') not in ('operator', 'external-adapter', 'synthetic-mock', 'local-extractive'):
         raise ValueError('explicit proposal provider required')
     current = titles(db, source, conversation)
     return dict(proposal=proposal, previous_title=current['display_title'], expected_revision=current['revision'],

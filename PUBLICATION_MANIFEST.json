@@ -1,12 +1,12 @@
 {
   "project": "recap-for-everyone",
-  "release": "0.9.0-required-proposal-revisions",
+  "release": "0.10.0-local-title-excerpts",
   "date": "2026-11-03",
   "private_history_imported": false,
   "actual_corpora_included": false,
   "synthetic_examples_only": true,
   "license_status": "NOT_SELECTED",
-  "file_count": 29,
+  "file_count": 31,
   "files": [
     {
       "path": ".gitattributes",
@@ -30,8 +30,8 @@
     },
     {
       "path": "README.md",
-      "bytes": 11431,
-      "sha256": "cc33e53403a60f6ad39627e57df7a0e8469442779328e683292eff4a83e2740a"
+      "bytes": 12888,
+      "sha256": "d4663652af95965d47be749780854637fcf1b2a8640dfb64d3cd4f1f64c0ec8f"
     },
     {
       "path": "RIGHTS.md",
@@ -50,8 +50,8 @@
     },
     {
       "path": "VALIDATION.md",
-      "bytes": 4204,
-      "sha256": "374ccf151575227dd0bb60c60709cb5bb37a1db00949a7836143c4615e33af10"
+      "bytes": 4589,
+      "sha256": "c1ea0fc89fa62e9628e898bb6c9586e046376afe6e0bc637b14c28421b1e402b"
     },
     {
       "path": "audit_publication.py",
@@ -139,14 +139,24 @@
       "sha256": "d2007233fb0bb6fde7432bf1e0593ec2c630e1346e60a7ca33d80c1be646d337"
     },
     {
+      "path": "test_title_suggestion.py",
+      "bytes": 3982,
+      "sha256": "4f5a4de0397293960520bb2d47c55439c96123f630b36148b56035c136f1123b"
+    },
+    {
       "path": "test_web_validation.py",
       "bytes": 5227,
       "sha256": "b58aec089618ad9f014a130e640f4c90ab1504143e10200df6bed60325fd97f9"
     },
     {
       "path": "title_proposal.py",
-      "bytes": 3629,
-      "sha256": "83fef303c5cdb8b91920fca5d891a9c170da94fb9bb401baec754da74e89a1c9"
+      "bytes": 3649,
+      "sha256": "833239ed3e3747da4d6cbb8efc3f3d207a87e068a0ceca5d7d8d3284b0cc8c76"
+    },
+    {
+      "path": "title_suggestion.py",
+      "bytes": 2222,
+      "sha256": "0ce4cc6c3c27a44f83be7da6ad22e629bb20ecf98b5849d89dd26befd08fa271"
     },
     {
       "path": "verify_manifest.py",

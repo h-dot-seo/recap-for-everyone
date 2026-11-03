@@ -64,3 +64,9 @@ Ninth increment: 38 synthetic tests passed. A regression reproduces the former
 null-revision stale-write bypass and now verifies rejection without changing title
 history or archive bytes. Missing, boolean, fractional, string and negative leases
 are rejected. CLI null-revision and missing-database failures contain no traceback.
+
+Tenth increment: 44 synthetic tests passed. Local excerpt proposals cover English/
+Korean greeting skip, explicit greeting fallback, control removal, truncation,
+user-only evidence, deterministic/no-write generation, CLI output, and stale-content
+rejection. Existing preview/apply handles the proposal; semantic title quality and
+external model integration are not tested or claimed.
