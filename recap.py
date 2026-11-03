@@ -130,6 +130,7 @@ def main():
         command.add_argument('input', help='proposal JSON for preview, reviewed preview JSON for apply')
         if name == 'preview-title':
             command.add_argument('--conversation', help='select exactly one READY item from a title review queue')
+            command.add_argument('--title', help='explicit replacement title; reclassified as operator wording')
     batch = sub.add_parser('review-titles', help='build a read-only page of local title proposals and collision warnings')
     batch.add_argument('--source', required=True); batch.add_argument('--limit', type=int, default=20); batch.add_argument('--offset', type=int, default=0)
     transfer = sub.add_parser('title-adapter-dry-run', help='validate a mock-only transfer request without executing')
@@ -184,7 +185,7 @@ def main():
             if args.command == 'preview-title' and args.conversation is not None:
                 from title_batch import select_proposal
                 value = select_proposal(value, args.conversation)
-            result = preview(args.db, value) if args.command == 'preview-title' else apply_preview(args.db, value)
+            result = preview(args.db, value, args.title) if args.command == 'preview-title' else apply_preview(args.db, value)
         elif args.command == 'suggest-replay-title':
             from replay_title import suggest_replay
             result = suggest_replay(args.db, args.source, args.conversation, args.input)

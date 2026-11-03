@@ -775,3 +775,12 @@ counts. It uses raw archive excerpts, not web active paths or retained Codex
 history. Select one item with `preview-title queue.json --conversation ID`, review
 the resulting preview, then use the existing single-title apply command. There is
 no bulk apply or remote mutation. See [title review queue limits and examples](docs/TITLE_REVIEW_QUEUE.md).
+
+## Review title length and possible private details
+
+Queue items and previews include local `title_advisory` hints for character count,
+reported truncation/greeting fallback and a few possible private-detail patterns.
+They report categories only and **never certify privacy or semantic quality**.
+Use `preview-title ... --title "Your chosen wording"` to create an explicitly
+operator-authored replacement while preserving the checked evidence/content
+binding, then inspect and apply the individual preview. See [review hints and limitations](docs/TITLE_REVIEW_HINTS.md).

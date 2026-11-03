@@ -1,12 +1,12 @@
 {
   "project": "recap-for-everyone",
-  "release": "0.32.0-title-review-queue",
+  "release": "0.33.0-title-review-hints",
   "date": "2026-11-03",
   "private_history_imported": false,
   "actual_corpora_included": false,
   "synthetic_examples_only": true,
   "license_status": "NOT_SELECTED",
-  "file_count": 70,
+  "file_count": 73,
   "files": [
     {
       "path": ".gitattributes",
@@ -30,8 +30,8 @@
     },
     {
       "path": "README.md",
-      "bytes": 48424,
-      "sha256": "26424d64c2cdf479c7b77800eda3b42432c13bebe5c659042738f3414560970e"
+      "bytes": 48996,
+      "sha256": "218b0490fb652893493813a9313bc727dbd32141966653d6233bdd96a8fb1ae7"
     },
     {
       "path": "RIGHTS.md",
@@ -89,6 +89,11 @@
       "sha256": "2d93841079f3ff9db853debcf06905d7e3c5035d025c003a3ac82a128af2f1f5"
     },
     {
+      "path": "docs/TITLE_REVIEW_HINTS.md",
+      "bytes": 4633,
+      "sha256": "9dd994366a552a02c58534d46e0ec797872e39f5256252344e9e81268f8756e0"
+    },
+    {
       "path": "docs/TITLE_REVIEW_QUEUE.md",
       "bytes": 6148,
       "sha256": "2e15ed559dfe11d9f0da1c820b673fef9751aa730405bb39757d5fd68e824547"
@@ -130,8 +135,8 @@
     },
     {
       "path": "recap.py",
-      "bytes": 15506,
-      "sha256": "ae14832ee9620d4f1cf16f9fca59782d8277f5c5c7cac2be455579650b161581"
+      "bytes": 15631,
+      "sha256": "c49b43e1c36b6c0fe758649f7535834264b12f474204b9d15142cb08a6ce6e5f"
     },
     {
       "path": "replay_local.py",
@@ -274,6 +279,11 @@
       "sha256": "d2007233fb0bb6fde7432bf1e0593ec2c630e1346e60a7ca33d80c1be646d337"
     },
     {
+      "path": "test_title_review.py",
+      "bytes": 6590,
+      "sha256": "b599f83c0fa848768339de4aa3748d5c452de94956966a4dfb10e6601acdfabb"
+    },
+    {
       "path": "test_title_rules.py",
       "bytes": 3213,
       "sha256": "bd7e1d7de8e432c401a4979cffde987105fcadcbd79f8ed229553557b0042770"
@@ -320,8 +330,8 @@
     },
     {
       "path": "title_batch.py",
-      "bytes": 6258,
-      "sha256": "4bb0d00f1060505edaa4380f1a1745276662fd2f61e1cb54cb6b229127962db7"
+      "bytes": 6410,
+      "sha256": "744b862ae81162ed8834aaebeb73468579a2f66c3eefec7735151b2b2ff38e2a"
     },
     {
       "path": "title_plan.py",
@@ -330,8 +340,13 @@
     },
     {
       "path": "title_proposal.py",
-      "bytes": 3708,
-      "sha256": "ab1eff28f315c9cc501bd45baf5fe40b5ca5a3f14fe6ed7c21a1edb4e39b2a46"
+      "bytes": 4471,
+      "sha256": "dbd7f43a1024f1661c5e40e4987aa03bb4cd0cfb8f9860bcbd8711fb42e8ddf0"
+    },
+    {
+      "path": "title_review.py",
+      "bytes": 1845,
+      "sha256": "5287dcb47ec5745f6832fb50f278ab53e1cc22daa28bd6619dae91b9f6bf7492"
     },
     {
       "path": "title_rules.py",

@@ -6,6 +6,7 @@ from conversation_view import _inventory
 from title_proposal import content_fingerprint
 from title_suggestion import excerpt
 from title_rules import validate_title
+from title_review import assess_title
 
 SCHEMA = 'recap.title-review-queue.v1'
 
@@ -41,6 +42,8 @@ def review_queue(db, source, limit=20, offset=0):
                 item.update(status='READY', action='no_change' if proposed['title'] == record['display_title'] else 'review_rename',
                             proposal=dict(source=source, conversation=identity, content_sha256=content_fingerprint(rows),
                                           provider='local-extractive', **proposed))
+            if item['status'] == 'READY':
+                item['title_advisory'] = assess_title(item['proposal'])
             items.append(item)
         # Candidate collision scope is only this page; do not pretend to generate
         # every other page's proposals. Existing-title checks scan metadata only.

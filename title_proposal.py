@@ -8,6 +8,7 @@ from recap import readonly
 from session_workflow import titles
 from strict_json import loads
 from title_rules import validate_title
+from title_review import assess_title
 
 
 def content_fingerprint(rows):
@@ -28,7 +29,7 @@ def snapshot(db, source, conversation):
     return rows, digest
 
 
-def preview(db, proposal):
+def preview(db, proposal, replacement_title=None):
     if not isinstance(proposal, dict):
         raise ValueError('title proposal must be a JSON object')
     source, conversation = proposal['source'], proposal['conversation']
@@ -43,8 +44,15 @@ def preview(db, proposal):
         raise ValueError('title evidence must reference user messages in this conversation')
     if proposal.get('provider') not in ('operator', 'external-adapter', 'synthetic-mock', 'local-extractive'):
         raise ValueError('explicit proposal provider required')
+    if replacement_title is not None:
+        validate_title(replacement_title)
+        # Explicit human wording is not an extractive/model-generated label.
+        # Preserve only the checked identity/evidence contract, not generation
+        # metadata that would misattribute the replacement to an algorithm.
+        proposal = dict(source=source, conversation=conversation, content_sha256=digest,
+                        title=replacement_title, evidence_message_ids=list(ids), provider='operator')
     current = titles(db, source, conversation)
-    return dict(proposal=proposal, previous_title=current['display_title'], expected_revision=current['revision'],
+    return dict(proposal=proposal, title_advisory=assess_title(proposal), previous_title=current['display_title'], expected_revision=current['revision'],
                 semantic_validation='NOT_PERFORMED', remote_mutation=False)
 
 
@@ -63,7 +71,8 @@ def main():
     s = p.add_subparsers(dest='command', required=True)
     export = s.add_parser('snapshot'); export.add_argument('--source', required=True); export.add_argument('--conversation', required=True)
     for name in ('preview', 'apply'):
-        s.add_parser(name).add_argument('input', type=Path)
+        command = s.add_parser(name); command.add_argument('input', type=Path)
+        if name == 'preview': command.add_argument('--title', help='explicit replacement title; reclassified as operator wording')
     a = p.parse_args()
     try:
         if a.command == 'snapshot':
@@ -72,7 +81,7 @@ def main():
                           warning='Private local content; no external transmission is performed')
         else:
             value = loads(a.input.read_text(encoding='utf-8'))
-            result = preview(a.db, value) if a.command == 'preview' else apply_preview(a.db, value)
+            result = preview(a.db, value, a.title) if a.command == 'preview' else apply_preview(a.db, value)
     except (ValueError, OSError, KeyError, TypeError, sqlite3.Error) as e:
         p.exit(1, str(e) + '\n')
     print(json.dumps(result, ensure_ascii=True, indent=2))

@@ -1,0 +1,83 @@
+# Title review hints and explicit wording changes
+
+A useful title must be readable, distinctive and appropriate to display in a
+sidebar or search result. Recap cannot certify those properties. It can provide
+small deterministic **advisory checks** while you decide what to keep.
+
+Every `READY` item from `review-titles` and every title `preview` now includes a
+`title_advisory` object. This is computed locally from the proposed title only.
+No model, external service, source-message scan or additional database write is
+performed by the assessment.
+
+## What the hints mean
+
+- `character_count`: Unicode code points, not visible width, words or grapheme
+  clusters. The validator's maximum is 200; the local excerpt generator uses 80.
+- `OVER_LOCAL_EXCERPT_LENGTH`: wording exceeds the local generator's 80-code-point
+  length. This is permitted up to 200, not an error or quality score.
+- `REPORTED_TRUNCATION` / `REPORTED_GREETING_FALLBACK`: the proposal's generation
+  metadata reports truncation or greeting fallback. This metadata is unverified
+  and caller-editable; the hints do not reconstruct how wording was generated.
+- `EMAIL_LIKE`, `URL_LIKE`, `LONG_DIGIT_SEQUENCE`, `LONG_IDENTIFIER_LIKE`: simple
+  patterns that may deserve a privacy review. A date, harmless URL, ordinary long
+  word or public identifier can trigger a false positive.
+- `FORMAT_CHARACTERS_PRESENT`: invisible Unicode formatting characters appear in
+  the proposed title. This does not identify their intent.
+
+For pattern detection only, Unicode NFKC normalization is applied and format
+characters are removed. Neither the proposal nor source text is rewritten.
+The assessment returns **categories, never matched substrings**. The surrounding
+proposal/queue still contains its original title and therefore may itself be
+private. Collision warnings remain separate and advisory as described in
+[the review queue guide](TITLE_REVIEW_QUEUE.md).
+
+**No flags does not mean safe.** These patterns do not comprehensively identify
+names, addresses, health/financial information, credentials or other private data.
+No sensitive attribute is inferred, no redaction is done, and no semantic quality
+score or privacy clearance is produced. Inspect the title yourself. Flags neither
+automatically block nor authorize applying it. This is not a DLP/security product.
+
+## Use your own title before applying
+
+If an otherwise valid proposal is too vague, duplicates another title, includes
+unwanted details or was truncated awkwardly, provide your own wording during the
+fresh preview step:
+
+```sh
+python recap.py --db ../recap-demo/archive.sqlite preview-title ../recap-demo/queue.json --conversation synthetic-chat --title "Synthetic orchard experiment plan" > ../recap-demo/reviewed.json
+```
+
+For a single proposal JSON, omit `--conversation`. The standalone equivalent is:
+
+```sh
+python title_proposal.py --db ../recap-demo/archive.sqlite preview ../recap-demo/proposal.json --title "Synthetic orchard experiment plan"
+```
+
+Use the private UTF-8 scratch-directory guidance from the walkthrough. Shell
+arguments can appear in shell history/process listings, so do not type secrets
+as replacement titles. The original proposal must still pass identity, provider,
+title, evidence and content-fingerprint validation; replacement cannot rescue a
+stale or invalid proposal by bypassing those checks.
+
+A replacement becomes a new **`operator` proposal**. It preserves only the checked
+source, conversation, full raw-content hash and copied evidence IDs, plus your
+replacement title. Old extraction/model/branch/projection metadata is omitted so
+human wording is not misattributed to a generator. The source excerpt and original
+proposal file are not modified. The new title receives its own advisory checks.
+
+Read the full preview, current title and expected revision before applying:
+
+```sh
+python recap.py --db ../recap-demo/archive.sqlite apply-title ../recap-demo/reviewed.json
+```
+
+The replacement is **not verified to summarize the evidence accurately**. Evidence
+IDs bind the selected conversation, not the meaning of arbitrary human wording.
+Current full-content and revision checks still apply. No bulk apply, automatic
+suffixing, remote rename, provider connection or transmission is added.
+
+Preview advisory fields are unsigned display information, not authorization or
+policy enforcement. Apply performs the existing proposal checks again but does
+not enforce advisory flags. Do not edit a reviewed document to work around a
+failure: generate a fresh preview and inspect it. Existing callers that do not
+supply `--title` keep the original proposal unchanged.
