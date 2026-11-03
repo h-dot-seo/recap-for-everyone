@@ -142,3 +142,14 @@ and interior nodes, null roots, parent-path order/provenance, invalid pointer re
 ambiguous conversation records, off-path cycles, 4,000-node iterative traversal,
 unchanged all-branch normalization and standalone/unified CLI equivalence without
 creating a database. Original file bytes remain unchanged.
+
+
+### Verified branch title proposals
+
+Seven synthetic cases cover current/alternate-path excerpts, unchanged source/database
+bytes during generation, whole-archive fingerprint equivalence, unimported byte-hash
+rejection, changed role/text/timestamp/parent or missing archived text, legacy ledger
+compatibility, missing provenance and missing database rejection, no-user paths,
+stale title revision and off-path content additions. Subprocess tests exercise both
+entry points through preview/apply, repeat-apply rejection, search, all-branch detail
+and title restoration. Real model quality and website mutation remain untested.

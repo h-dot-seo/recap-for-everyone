@@ -10,6 +10,10 @@ from strict_json import loads
 from title_rules import validate_title
 
 
+def content_fingerprint(rows):
+    return hashlib.sha256(json.dumps(rows, sort_keys=True, ensure_ascii=False).encode()).hexdigest()
+
+
 def snapshot(db, source, conversation):
     c = readonly(db)
     try:
@@ -20,7 +24,7 @@ def snapshot(db, source, conversation):
         c.close()
     if not rows:
         raise ValueError('unknown conversation')
-    digest = hashlib.sha256(json.dumps(rows, sort_keys=True, ensure_ascii=False).encode()).hexdigest()
+    digest = content_fingerprint(rows)
     return rows, digest
 
 

@@ -116,6 +116,9 @@ def main():
     check.add_argument('input'); check.add_argument('--format', choices=['web', 'local'], required=True)
     branch = sub.add_parser('web-branch', help='read one path from an explicit web export without a database')
     branch.add_argument('input'); branch.add_argument('--conversation', required=True); branch.add_argument('--node')
+    branch_title = sub.add_parser('suggest-branch-title', help='suggest a local title from an archived export branch')
+    branch_title.add_argument('input'); branch_title.add_argument('--source', required=True)
+    branch_title.add_argument('--conversation', required=True); branch_title.add_argument('--node')
     export = sub.add_parser('import', help='import an explicitly selected web/local export')
     export.add_argument('input'); export.add_argument('--format', choices=['web', 'local'], required=True); export.add_argument('--source', required=True)
     listing = sub.add_parser('list', help='list conversations and current display titles')
@@ -131,7 +134,10 @@ def main():
     if args.command not in ('inspect', 'web-branch') and not args.db:
         p.error('--db is required except for inspect and web-branch')
     try:
-        if args.command == 'web-branch':
+        if args.command == 'suggest-branch-title':
+            from branch_title import suggest_branch
+            result = suggest_branch(args.db, args.source, args.conversation, args.input, args.node)
+        elif args.command == 'web-branch':
             from web_branch import branch_view
             result = branch_view(args.input, args.conversation, args.node)
         elif args.command == 'ingest':
@@ -170,7 +176,7 @@ def main():
             result = suggest(args.db, args.source, args.conversation)
     except (OSError, ValueError, KeyError, TypeError, sqlite3.Error) as exc:
         p.exit(1, str(exc) + '\n')
-    print(json.dumps(result, ensure_ascii=args.command == 'web-branch', indent=2))
+    print(json.dumps(result, ensure_ascii=args.command in ('web-branch', 'suggest-branch-title'), indent=2))
 
 
 if __name__ == '__main__':

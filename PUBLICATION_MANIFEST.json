@@ -1,12 +1,12 @@
 {
   "project": "recap-for-everyone",
-  "release": "0.19.0-readonly-web-branches",
+  "release": "0.20.0-verified-branch-titles",
   "date": "2026-11-03",
   "private_history_imported": false,
   "actual_corpora_included": false,
   "synthetic_examples_only": true,
   "license_status": "NOT_SELECTED",
-  "file_count": 46,
+  "file_count": 48,
   "files": [
     {
       "path": ".gitattributes",
@@ -30,8 +30,8 @@
     },
     {
       "path": "README.md",
-      "bytes": 25198,
-      "sha256": "3d1c47e71e681af493b6d0fec8fba97062ff77818e700502dbfd73b001542dad"
+      "bytes": 27485,
+      "sha256": "1e0a54dcec91fe658b62f8f4e791e19564b991f583f7ce022dacd3fd729b84f2"
     },
     {
       "path": "RIGHTS.md",
@@ -50,13 +50,18 @@
     },
     {
       "path": "VALIDATION.md",
-      "bytes": 9226,
-      "sha256": "0c54c4663e257aa09aa496c8078f06614aa51635b9fcb8844b1e4a56f5c5fef6"
+      "bytes": 9854,
+      "sha256": "2f50321a31057156a9633468e3bece11b4db977562d3056ac5fdbccce115855a"
     },
     {
       "path": "audit_publication.py",
       "bytes": 1969,
       "sha256": "349bfe9f189da2beaee4d655ba05b8f080f79b5fe7518097eafb6beea5459d08"
+    },
+    {
+      "path": "branch_title.py",
+      "bytes": 3114,
+      "sha256": "0310168299d7267a798943d9655b67a9e951eb338f4bd44844a0b77efb92ef94"
     },
     {
       "path": "conversation_search.py",
@@ -100,8 +105,8 @@
     },
     {
       "path": "recap.py",
-      "bytes": 10025,
-      "sha256": "d18b2a41840ad255d89d3469467785644fe78e9b6b76cef23df61900c6820cb6"
+      "bytes": 10568,
+      "sha256": "83b4d6da8ede41c6c6122326a5a43aa8df9a84c0747dddc811aa4d2861a2eaef"
     },
     {
       "path": "session_workflow.py",
@@ -117,6 +122,11 @@
       "path": "test_archive_scaling.py",
       "bytes": 5280,
       "sha256": "bf2a05bbea971cfcdd67b3afb8e5b868dfe2c5fd477a2e8cc9377d9a5ad40a82"
+    },
+    {
+      "path": "test_branch_title.py",
+      "bytes": 6788,
+      "sha256": "e46492c5de2bf922934c66ac56283a7b0518310d39820a4dbd34f8e68d95f44e"
     },
     {
       "path": "test_cli_e2e.py",
@@ -215,8 +225,8 @@
     },
     {
       "path": "title_proposal.py",
-      "bytes": 3535,
-      "sha256": "7b599380e86f09772e250858ad768b7cf7641049604db2bc357b4510ec34b440"
+      "bytes": 3605,
+      "sha256": "ccb6c6ac29407946bd00a85ab5c221ce6d02cf0901c12d121ad429e341362a48"
     },
     {
       "path": "title_rules.py",

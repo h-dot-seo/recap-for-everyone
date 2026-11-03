@@ -414,11 +414,46 @@ loaded in memory and parsed twice, so this is not a bounded-memory large-file vi
 
 The all-branch archive import and title-generation behavior are unchanged. Branch
 output is a review view, not a title proposal or replacement export, and cannot be
-applied as one. Branch-specific archive indexing and title proposals remain future
-work. Original exports are needed because the archive does not retain `current_node`.
+applied as one. Branch-specific archive indexing remains future work; the verified branch title
+proposal command below connects this view to the existing archive. Original exports are needed because the archive does not retain `current_node`.
 
 The structural contract is informed by the public converter's
 [data models](https://difegam.github.io/chatgpt-to-markdown/reference/data-models/),
 which describes mapping nodes, parent pointers and current_node. It is an independent
 implementation's observed format, not a stable official OpenAI schema. Only synthetic
 fixtures are shipped; no public or private conversation corpus was imported.
+
+
+## Suggest a title from a verified archived branch
+
+```sh
+python recap.py --db ../demo.sqlite suggest-branch-title ../conversations.json --source demo --conversation synthetic > ../proposal.json
+# Optionally add --node alternate-tip to use another path.
+python title_proposal.py --db ../demo.sqlite preview ../proposal.json > ../reviewed.json
+# Review title, evidence and branch context before applying:
+python title_proposal.py --db ../demo.sqlite apply ../reviewed.json
+```
+
+`branch_title.py` is the standalone equivalent. Import the original web export into
+the intended source first. Generation checks every extracted message on the selected
+path against one archive read snapshot: node/message ID, role, text, timestamp and
+exact original-file hash, mapping locator and parent provenance must match. It reads
+both the current and legacy provenance ledgers, without migrating the database.
+A text-only archive without matching export provenance is rejected. Reformatting an
+export changes its byte hash; explicitly import those bytes before using them here.
+
+The local excerpt algorithm selects user text only from the verified path. The
+proposal fingerprint covers the **whole archived conversation**, so an addition on
+an alternate path also invalidates it. Existing preview/apply checks still reject
+changed contents or stale title revisions. Generation does not change messages,
+provenance or title history. All branches remain indexed and searchable.
+
+This selects the evidence for one **conversation-wide local display title**, not a
+separate persistent title per branch. It is still an extractive suggestion, not a
+semantic model. Branch metadata in the saved proposal is descriptive and unauthenticated,
+like the other operator-editable proposal fields; review it rather than treating it
+as proof. Apply validates user evidence membership, the whole content fingerprint and
+reviewed revision, not the original export file or a live website selection. Later
+changes to that file or its `current_node` alone do not invalidate a pinned proposal.
+Generate and review again if you want the newly selected branch. No external API,
+automatic import, credential handling or remote title update is involved.
