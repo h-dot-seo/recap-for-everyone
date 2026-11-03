@@ -15,16 +15,24 @@ def _key(title):
     return ' '.join(unicodedata.normalize('NFKC', title).casefold().split())
 
 
-def review_queue(db, source, limit=20, offset=0):
+def review_queue(db, source, limit=20, offset=0, unrenamed_only=False):
     if not isinstance(source, str) or not source.strip():
         raise ValueError('explicit nonempty source required')
     if type(limit) is not int or not 1 <= limit <= 100 or type(offset) is not int or not 0 <= offset <= 2**63-1:
         raise ValueError('limit must be 1..100 and offset must be an integer in 0..9223372036854775807')
+    if type(unrenamed_only) is not bool:
+        raise ValueError('unrenamed_only must be boolean')
     connection = readonly(db)
     try:
         connection.execute('BEGIN')
-        inventory = _inventory(connection, source, limit=limit, offset=offset)
-        total = connection.execute('SELECT count(DISTINCT conversation_id) FROM messages WHERE source_id=?', (source,)).fetchone()[0]
+        inventory = _inventory(connection, source, limit=limit, offset=offset, unrenamed_only=unrenamed_only)
+        source_total = connection.execute('SELECT count(DISTINCT conversation_id) FROM messages WHERE source_id=?', (source,)).fetchone()[0]
+        has_history = connection.execute("SELECT 1 FROM sqlite_master WHERE type='table' AND name='title_history'").fetchone()
+        if unrenamed_only and has_history:
+            total = connection.execute('SELECT count(DISTINCT conversation_id) FROM messages m WHERE source_id=? '
+                'AND NOT EXISTS (SELECT 1 FROM title_history h WHERE h.source=m.source_id AND h.conversation=m.conversation_id)', (source,)).fetchone()[0]
+        else:
+            total = source_total
         items = []
         for record in inventory:
             identity = record['conversation']
@@ -53,7 +61,6 @@ def review_queue(db, source, limit=20, offset=0):
                 by_key.setdefault(_key(item['proposal']['title']), []).append(item['conversation'])
         existing = {key: [] for key in by_key}
         counts = {key: 0 for key in by_key}
-        has_history = connection.execute("SELECT 1 FROM sqlite_master WHERE type='table' AND name='title_history'").fetchone()
         title = ('COALESCE((SELECT h.title FROM title_history h WHERE h.source=m.source_id AND h.conversation=m.conversation_id ORDER BY h.id DESC LIMIT 1),m.title)'
                  if has_history else 'm.title')
         query = ('SELECT m.conversation_id,' + title + ' AS display_title FROM messages m JOIN '
@@ -77,6 +84,8 @@ def review_queue(db, source, limit=20, offset=0):
                                       existing_title_count=count, existing_title_conversations=current,
                                       samples_limited_to=10, normalization='NFKC + casefold + whitespace collapse')
         return dict(schema=SCHEMA, source=source, limit=limit, offset=offset, total_conversations=total,
+                    source_total_conversations=source_total, excluded_renamed_conversations=source_total-total,
+                    filter='no local title history' if unrenamed_only else 'all conversations',
                     next_offset=offset+len(items) if offset+len(items) < total else None,
                     items=items, ready_count=sum(item['status'] == 'READY' for item in items),
                     unavailable_count=sum(item['status'] == 'UNAVAILABLE' for item in items),

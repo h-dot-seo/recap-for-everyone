@@ -109,3 +109,54 @@ branches and local records from rolled-back turns. It does not choose web
 `suggest-replay-title` individually when their explicit export-backed context is
 needed. Their narrower provenance checks and unsupported cases are unchanged.
 No raw history is deleted to make a title look cleaner.
+
+## Keep already renamed conversations out of a working page
+
+In the bundled synthetic workflow test, 12 invented web conversations and 12 local
+sessions share one archive source. The default 20-item page originally contains
+three previously renamed conversations. After two more explicit title changes,
+that same page still contains all five; its identity order does not change. This
+is correct for an inventory, but creates repeated manual scanning while organizing
+many titles. It is a synthetic workflow check, not a measurement of real usage or
+of title quality.
+
+Use the opt-in filter when you specifically want conversations with **no existing
+local title-history record**:
+
+```sh
+python recap.py --db ../recap-demo/archive.sqlite review-titles --source web-demo --unrenamed-only --limit 20 --offset 0 > ../recap-demo/queue.json
+```
+
+The condition is applied in SQL **before pagination**, not by hiding items after
+fetching a page. With the option:
+
+- `total_conversations` counts eligible conversations in this source.
+- `source_total_conversations` counts all conversations in the source.
+- `excluded_renamed_conversations` reports the difference.
+- `filter` describes the applied condition. Without the option, all conversations
+  remain eligible and the excluded count is zero.
+
+All eligibility, counts, current titles, evidence and duplicate checks still use
+one database read transaction. Existing-title collision checks continue to include
+renamed conversations from the selected source; they do not disappear just
+because their proposals are filtered out. Unknown/missing title-history tables in
+legacy archives mean no recorded local rename and leave all conversations eligible.
+
+Select one proposal, make any deliberate wording change, preview, review and apply
+as described above. Then **refresh at offset 0** to work from the remaining eligible
+set. Applying a local title creates history, so that conversation no longer appears
+in this filtered view. Continuing with an old offset after rows leave the eligible
+set can skip work; offsets are not stable cursors. `next_offset` is useful while
+browsing a snapshot's unchanged order, not as a durable completion checkpoint.
+
+The filter does **not** mean “needs review” or “safe title.” Any title-history entry
+counts, including a no-op write, an old override or an override later reverted to
+the original title. A conversation with a good original title but no local history
+still appears. `UNAVAILABLE` and `no_change` items also remain eligible: there is no
+persistent skip/accept decision ledger. Do not apply artificial no-op changes merely
+to dismiss these items. Omit the filter to revisit previously renamed titles.
+
+Filtering changes only the read-only queue. It does not delete conversations,
+remove raw private text, reset titles or modify source files. The existing rename
+and content-search history remain available. Excerpts/duplicate warnings/possible
+private-detail hints retain all their semantic and privacy limitations.

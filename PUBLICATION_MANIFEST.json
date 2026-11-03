@@ -1,12 +1,12 @@
 {
   "project": "recap-for-everyone",
-  "release": "0.33.0-title-review-hints",
+  "release": "0.34.0-unrenamed-title-queue",
   "date": "2026-11-03",
   "private_history_imported": false,
   "actual_corpora_included": false,
   "synthetic_examples_only": true,
   "license_status": "NOT_SELECTED",
-  "file_count": 73,
+  "file_count": 74,
   "files": [
     {
       "path": ".gitattributes",
@@ -30,8 +30,8 @@
     },
     {
       "path": "README.md",
-      "bytes": 48996,
-      "sha256": "218b0490fb652893493813a9313bc727dbd32141966653d6233bdd96a8fb1ae7"
+      "bytes": 49324,
+      "sha256": "4f11b5da162cbe8695ed166e45f152687bf98bcc67c3564bc0e9337aad726a5a"
     },
     {
       "path": "RIGHTS.md",
@@ -70,8 +70,8 @@
     },
     {
       "path": "conversation_view.py",
-      "bytes": 5637,
-      "sha256": "afdfddd22a1436997947a9253903fb38b918fb362d9e127d18cd8abdb1401c76"
+      "bytes": 5848,
+      "sha256": "d83afc9414c13a04f8dd0395cd32acb7336edaf361f6ad65fc66029c06ac4689"
     },
     {
       "path": "docs/ARCHITECTURE.md",
@@ -95,8 +95,8 @@
     },
     {
       "path": "docs/TITLE_REVIEW_QUEUE.md",
-      "bytes": 6148,
-      "sha256": "2e15ed559dfe11d9f0da1c820b673fef9751aa730405bb39757d5fd68e824547"
+      "bytes": 9161,
+      "sha256": "450a3c68a2f58ac87ed2e89547ceeaa9cc2bfeb2cd7e2d84476fbc73904fba00"
     },
     {
       "path": "docs/TITLE_TRANSFER.md",
@@ -135,8 +135,8 @@
     },
     {
       "path": "recap.py",
-      "bytes": 15631,
-      "sha256": "c49b43e1c36b6c0fe758649f7535834264b12f474204b9d15142cb08a6ce6e5f"
+      "bytes": 15784,
+      "sha256": "4540e44593ab3c300770db9dfa38b30f7a4d3542ca02a1deb4f36cb0cb8846e0"
     },
     {
       "path": "replay_local.py",
@@ -279,6 +279,11 @@
       "sha256": "d2007233fb0bb6fde7432bf1e0593ec2c630e1346e60a7ca33d80c1be646d337"
     },
     {
+      "path": "test_title_queue_workflow.py",
+      "bytes": 7469,
+      "sha256": "942ecf0c782335eba1100d8f6f80ac27ecf8ef5a0b504779bd9e1bc49cce6dc2"
+    },
+    {
       "path": "test_title_review.py",
       "bytes": 6590,
       "sha256": "b599f83c0fa848768339de4aa3748d5c452de94956966a4dfb10e6601acdfabb"
@@ -330,8 +335,8 @@
     },
     {
       "path": "title_batch.py",
-      "bytes": 6410,
-      "sha256": "744b862ae81162ed8834aaebeb73468579a2f66c3eefec7735151b2b2ff38e2a"
+      "bytes": 7138,
+      "sha256": "8d88b12cb9abbddf47d9f6ab19a766988c484d4a319d13f8c153810f70c34408"
     },
     {
       "path": "title_plan.py",

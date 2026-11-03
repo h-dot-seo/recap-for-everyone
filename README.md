@@ -784,3 +784,8 @@ They report categories only and **never certify privacy or semantic quality**.
 Use `preview-title ... --title "Your chosen wording"` to create an explicitly
 operator-authored replacement while preserving the checked evidence/content
 binding, then inspect and apply the individual preview. See [review hints and limitations](docs/TITLE_REVIEW_HINTS.md).
+
+When organizing many sessions, add `review-titles --unrenamed-only` to omit any
+conversation with existing local title history before pagination. Counts explain
+the eligible/source totals. Refresh at offset 0 after applying a title; this is a
+read-only history filter, not a durable review/skip ledger or a title quality test.

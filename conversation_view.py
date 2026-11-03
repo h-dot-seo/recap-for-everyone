@@ -5,8 +5,13 @@ import sqlite3
 from recap import readonly
 
 
-def _inventory(connection, source=None, conversation_id=None, limit=50, offset=0):
+def _inventory(connection, source=None, conversation_id=None, limit=50, offset=0, unrenamed_only=False):
+    history_exists = connection.execute(
+        "SELECT 1 FROM sqlite_master WHERE type='table' AND name='title_history'"
+    ).fetchone()
     filters, params = [], []
+    if unrenamed_only and history_exists:
+        filters.append('NOT EXISTS (SELECT 1 FROM title_history h WHERE h.source=messages.source_id AND h.conversation=messages.conversation_id)')
     if source is not None:
         filters.append('source_id=?'); params.append(source)
     if conversation_id is not None:
@@ -18,9 +23,6 @@ def _inventory(connection, source=None, conversation_id=None, limit=50, offset=0
         f'FROM messages {where} GROUP BY source_id,conversation_id '
         'ORDER BY source_id COLLATE BINARY,conversation_id COLLATE BINARY LIMIT ? OFFSET ?',
         (*params, limit, offset))
-    history_exists = connection.execute(
-        "SELECT 1 FROM sqlite_master WHERE type='table' AND name='title_history'"
-    ).fetchone()
     result = []
     for row in rows:
         original = connection.execute('SELECT title FROM messages WHERE message_pk=?',

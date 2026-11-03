@@ -133,6 +133,7 @@ def main():
             command.add_argument('--title', help='explicit replacement title; reclassified as operator wording')
     batch = sub.add_parser('review-titles', help='build a read-only page of local title proposals and collision warnings')
     batch.add_argument('--source', required=True); batch.add_argument('--limit', type=int, default=20); batch.add_argument('--offset', type=int, default=0)
+    batch.add_argument('--unrenamed-only', action='store_true', help='exclude conversations with any existing local title history')
     transfer = sub.add_parser('title-adapter-dry-run', help='validate a mock-only transfer request without executing')
     transfer.add_argument('input'); transfer.add_argument('plan'); transfer.add_argument('target')
     simulation = sub.add_parser('title-adapter-simulate', help='simulate an explicitly approved title transfer in memory only')
@@ -167,7 +168,7 @@ def main():
             return
         elif args.command == 'review-titles':
             from title_batch import review_queue
-            result = review_queue(args.db, args.source, args.limit, args.offset)
+            result = review_queue(args.db, args.source, args.limit, args.offset, args.unrenamed_only)
         elif args.command in ('title-adapter-dry-run', 'title-adapter-simulate'):
             from title_transfer import dry_run, simulate, MockTitleAdapter
             from strict_json import loads
