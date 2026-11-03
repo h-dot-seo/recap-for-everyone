@@ -43,6 +43,25 @@ utilities. It is a library module, not an automatic collector. Its original loca
 snapshot schema is separate from the simplified `recap.py` schema; an adapter is
 required to connect them. These are not interchangeable database formats.
 
+## One CLI for the common workflow
+
+```sh
+python recap.py inspect examples/web-export.json --format web
+python recap.py --db ../demo.sqlite import examples/web-export.json --format web --source demo
+python recap.py --db ../demo.sqlite list --source demo
+python recap.py --db ../demo.sqlite find orchard --source demo
+python recap.py --db ../demo.sqlite show --source demo --conversation synthetic-chat
+python recap.py --db ../demo.sqlite suggest-title --source demo --conversation synthetic-chat
+python recap.py --db ../demo.sqlite title --source demo --conversation synthetic-chat
+```
+
+`recap.py --help` lists the common commands. `find` searches current conversation
+titles and text; the original `search` command still performs message-level FTS.
+`title` without `--set` is read-only, and applying `--set` requires the preview's
+`--expected-revision`. `suggest-title` produces a proposal only; continue through
+`title_proposal.py preview/apply` for reviewed proposal application. The standalone
+scripts remain supported with equivalent behavior. Only `inspect` can omit `--db`.
+
 ## Design
 
 See [architecture](docs/ARCHITECTURE.md), [agent workflow](SKILL.md),

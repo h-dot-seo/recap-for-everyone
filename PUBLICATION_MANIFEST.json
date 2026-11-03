@@ -1,12 +1,12 @@
 {
   "project": "recap-for-everyone",
-  "release": "0.14.1-concurrency-regressions",
+  "release": "0.15.0-unified-archive-cli",
   "date": "2026-11-03",
   "private_history_imported": false,
   "actual_corpora_included": false,
   "synthetic_examples_only": true,
   "license_status": "NOT_SELECTED",
-  "file_count": 38,
+  "file_count": 39,
   "files": [
     {
       "path": ".gitattributes",
@@ -30,8 +30,8 @@
     },
     {
       "path": "README.md",
-      "bytes": 17081,
-      "sha256": "7dd9b5b79661692e2bc26b0ce3b8d746ab4085eed42c609b6080c440181c18e0"
+      "bytes": 18163,
+      "sha256": "b43ef2ca33b0e0cb23a5671279426956a126ef2ed93a3a3ac5e02a8a22b8870b"
     },
     {
       "path": "RIGHTS.md",
@@ -50,8 +50,8 @@
     },
     {
       "path": "VALIDATION.md",
-      "bytes": 6776,
-      "sha256": "87a991b24357cb1ce4ea023d2fe81d8736040a0da8e5c58e5b61386916756095"
+      "bytes": 7074,
+      "sha256": "5eac98e9e9b522f37fcdb55860290dc6319dc77dd5e01ebffc9833d25d1c687d"
     },
     {
       "path": "audit_publication.py",
@@ -95,8 +95,8 @@
     },
     {
       "path": "recap.py",
-      "bytes": 5962,
-      "sha256": "65c392b55709ddbf95bf296a4f4e8fd81037e1d6f3a0cbadde8913253061cf28"
+      "bytes": 8698,
+      "sha256": "eaaa5c1e4c027bc6e4be051cae25e1d4fbec2dc09a900c4b3a8d821908d84ad1"
     },
     {
       "path": "session_workflow.py",
@@ -172,6 +172,11 @@
       "path": "test_title_suggestion.py",
       "bytes": 3982,
       "sha256": "4f5a4de0397293960520bb2d47c55439c96123f630b36148b56035c136f1123b"
+    },
+    {
+      "path": "test_unified_cli.py",
+      "bytes": 4061,
+      "sha256": "0a33d37d7ba88f49039321ea58b5521e55e51d49751c9325ac2c0c1c924fc71b"
     },
     {
       "path": "test_web_validation.py",

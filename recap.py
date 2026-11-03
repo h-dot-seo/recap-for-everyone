@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Local-only normalized conversation ingestion and read-only search."""
+"""Local-only archive import, inspection, search and checked title workflows."""
 import argparse
 import hashlib
 import json
@@ -99,25 +99,63 @@ def search(db, query, limit=20):
 
 def main():
     p = argparse.ArgumentParser(description=__doc__)
-    p.add_argument('--db', required=True)
+    p.add_argument('--db')
     sub = p.add_subparsers(dest='command', required=True)
     imp = sub.add_parser('ingest'); imp.add_argument('input'); imp.add_argument('--source', required=True)
     find = sub.add_parser('search'); find.add_argument('query'); find.add_argument('--limit', type=int, default=20)
     sub.add_parser('stats')
+    check = sub.add_parser('inspect', help='inspect export coverage without a database')
+    check.add_argument('input'); check.add_argument('--format', choices=['web', 'local'], required=True)
+    export = sub.add_parser('import', help='import an explicitly selected web/local export')
+    export.add_argument('input'); export.add_argument('--format', choices=['web', 'local'], required=True); export.add_argument('--source', required=True)
+    listing = sub.add_parser('list', help='list conversations and current display titles')
+    listing.add_argument('--source'); listing.add_argument('--limit', type=int, default=50); listing.add_argument('--offset', type=int, default=0)
+    find = sub.add_parser('find', help='search current titles and conversation text')
+    find.add_argument('query'); find.add_argument('--source'); find.add_argument('--limit', type=int, default=20)
+    for name in ('show', 'suggest-title', 'title'):
+        command = sub.add_parser(name)
+        command.add_argument('--source', required=True); command.add_argument('--conversation', required=True)
+        if name == 'title':
+            command.add_argument('--set'); command.add_argument('--expected-revision', type=int)
     args = p.parse_args()
+    if args.command != 'inspect' and not args.db:
+        p.error('--db is required except for inspect')
     try:
         if args.command == 'ingest':
             result = ingest(args.db, args.source, args.input)
         elif args.command == 'search':
             result = search(args.db, args.query, args.limit)
-        else:
+        elif args.command == 'stats':
             c = readonly(args.db)
             try:
                 result = {'messages': c.execute('SELECT count(*) FROM messages').fetchone()[0],
                           'artifacts': c.execute('SELECT count(*) FROM artifacts').fetchone()[0]}
             finally:
                 c.close()
-    except (OSError, ValueError, sqlite3.Error) as exc:
+        elif args.command in ('inspect', 'import', 'title'):
+            # Lazy adapter imports keep the core library free of import cycles.
+            from session_workflow import inspect_export, import_export, titles
+            if args.command == 'inspect':
+                result = inspect_export(args.input, args.format)
+            elif args.command == 'import':
+                result = import_export(args.db, args.source, args.input, args.format)
+            else:
+                if args.set is not None and args.expected_revision is None:
+                    raise ValueError('--set requires --expected-revision from a title preview')
+                result = titles(args.db, args.source, args.conversation, args.set, args.expected_revision)
+        elif args.command == 'list':
+            from conversation_view import conversations
+            result = conversations(args.db, args.source, args.limit, args.offset)
+        elif args.command == 'show':
+            from conversation_view import conversation
+            result = conversation(args.db, args.source, args.conversation)
+        elif args.command == 'find':
+            from conversation_search import find
+            result = find(args.db, args.query, args.source, args.limit)
+        else:
+            from title_suggestion import suggest
+            result = suggest(args.db, args.source, args.conversation)
+    except (OSError, ValueError, KeyError, TypeError, sqlite3.Error) as exc:
         p.exit(1, str(exc) + '\n')
     print(json.dumps(result, ensure_ascii=False, indent=2))
 

@@ -103,3 +103,8 @@ the current result retains its snapshot while the next read sees the new title.
 These are local SQLite guarantees under the tested flows, not distributed locking.
 The search snapshot test is sensitive to removing the explicit read transaction.
 Concurrent-writer coverage is a smoke test, not exhaustive scheduling proof.
+
+Unified CLI increment: 79 synthetic tests passed. Subprocess workflows cover
+inspection without DB, export import, list/show/find, title suggestion and checked
+title updates through recap.py. Standalone command equivalence and existing
+normalized ingest/message-level FTS behavior remain covered.
