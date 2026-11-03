@@ -804,3 +804,8 @@ Use `review-titles --state deferred` (or `open` / `skipped`) to revisit one expl
 effective state. Stale decisions return to open; no state changes merely by viewing.
 The opt-in filter hashes all eligible source conversations before pagination, so
 it can cost more than the default page. It can be combined with `--unrenamed-only`.
+
+After reviewing a saved queue item, `review-state --source SOURCE --conversation ID
+--set deferred --from-queue queue.json` reuses that item's existing lease without
+manual hash/revision copying. It never silently refreshes a stale queue; the same
+atomic checks still apply. The decision and destination remain explicit.

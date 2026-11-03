@@ -73,3 +73,19 @@ def review_state(db, source, conversation, state=None, expected_state_revision=N
         raise
     finally:
         connection.close()
+
+
+def review_state_from_queue(db, source, conversation, state, queue):
+    """Use a saved queue lease, never silently refresh it before an explicit write."""
+    from title_batch import select_queue_item
+    if state is None:
+        raise ValueError('a queue-based decision requires an explicit state')
+    item = select_queue_item(queue, conversation)
+    if queue.get('source') != source:
+        raise ValueError('queue source does not match the explicitly selected source')
+    lease = item.get('review_state')
+    if not isinstance(lease, dict) or any(key not in lease for key in (
+            'state_revision', 'expected_title_revision', 'expected_content_sha256')):
+        raise ValueError('selected queue item lacks a complete review-state lease; regenerate the queue')
+    return review_state(db, source, conversation, state, lease['state_revision'],
+                        lease['expected_title_revision'], lease['expected_content_sha256'])

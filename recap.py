@@ -136,6 +136,7 @@ def main():
     state.add_argument('--set', choices=['open', 'skipped', 'deferred'])
     state.add_argument('--expected-state-revision', type=int); state.add_argument('--expected-title-revision', type=int)
     state.add_argument('--expected-content-sha256')
+    state.add_argument('--from-queue', help='use the selected saved queue item lease; requires --set and excludes explicit expected flags')
     batch = sub.add_parser('review-titles', help='build a read-only page of local title proposals and collision warnings')
     batch.add_argument('--source', required=True); batch.add_argument('--limit', type=int, default=20); batch.add_argument('--offset', type=int, default=0)
     batch.add_argument('--state', choices=['open', 'skipped', 'deferred'], help='filter by current snapshot-bound review state; scans eligible source content')
@@ -173,8 +174,15 @@ def main():
                 raise SystemExit(1)
             return
         elif args.command == 'review-state':
-            from title_review_state import review_state
-            result = review_state(args.db, args.source, args.conversation, args.set, args.expected_state_revision, args.expected_title_revision, args.expected_content_sha256)
+            from title_review_state import review_state, review_state_from_queue
+            if args.from_queue is not None:
+                if args.set is None or any(value is not None for value in (args.expected_state_revision, args.expected_title_revision, args.expected_content_sha256)):
+                    raise ValueError('--from-queue requires --set and cannot be combined with explicit expected values')
+                from strict_json import loads
+                queue = loads(Path(args.from_queue).read_text(encoding='utf-8'))
+                result = review_state_from_queue(args.db, args.source, args.conversation, args.set, queue)
+            else:
+                result = review_state(args.db, args.source, args.conversation, args.set, args.expected_state_revision, args.expected_title_revision, args.expected_content_sha256)
         elif args.command == 'review-titles':
             from title_batch import review_queue
             result = review_queue(args.db, args.source, args.limit, args.offset, args.unrenamed_only, args.state)

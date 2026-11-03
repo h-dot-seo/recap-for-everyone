@@ -148,3 +148,50 @@ collisions remain page-only. All scans, counts, state checks and page proposals
 share one SQLite read transaction; later changes can still make the result stale.
 No source files, messages, titles or decisions are written by filtering. Content
 search remains complete for the imported raw archive regardless of the view.
+
+## Use a saved queue without copying three lease values
+
+After inspecting a queue item, use its saved lease for one explicit decision:
+
+```sh
+python recap.py --db ../recap-demo/archive.sqlite review-titles --source web-demo --state open > ../recap-demo/queue.json
+python recap.py --db ../recap-demo/archive.sqlite review-state --source web-demo --conversation synthetic-chat --set deferred --from-queue ../recap-demo/queue.json
+```
+
+This replaces manual copying of the state revision, title revision and 64-character
+content hash. It **does not refresh those values silently**. The selected saved
+item's three values are passed to the same transactional state writer, which
+rechecks current content, title and decision revision. A stale saved queue fails;
+read a new queue and review the conversation again. Two writers using the same
+saved item still cannot both succeed.
+
+`--from-queue` requires an explicit `--set open|skipped|deferred`, the source and
+exact conversation ID. It cannot be mixed with the three explicit expected-value
+flags. The queue source must match the selected source and exactly one item must
+match the conversation. Missing items, duplicate items, absent/incomplete leases,
+invalid lease types and duplicate JSON keys are rejected. Old queues without
+review-state fields must be regenerated. An `UNAVAILABLE` title suggestion can
+still be deliberately skipped/deferred because the review decision does not
+require a generated title. No decision is copied from the item's displayed state:
+the command's explicit `--set` is the requested action.
+
+Revisit deferred work with `review-titles --state deferred`, save the resulting
+queue privately, and explicitly reopen one chosen item with `--set open
+--from-queue ...`. Alternatively, choose an operator title using `preview-title
+queue.json --conversation ID --title "Chosen wording"`, inspect the new preview,
+then explicitly apply that title. Applying the title changes its revision, so any
+previous deferred queue is stale for a subsequent decision. Refresh the queue
+before recording another decision. Viewing a queue alone changes nothing.
+
+Queue JSON is unsigned and can be edited. It is not proof of human review or an
+authentication token. The convenience path checks its selected identity and stored
+lease, not the accuracy of advisory labels or unrelated items. A lease is scoped
+by source/conversation/hash/revisions in the selected database, not by a permanent
+archive UUID: an identical copied database can have matching values. Verify your
+explicit `--db` destination. There is no bulk state command or default action.
+
+The queue file is read, never rewritten. Source exports, raw search content and
+local titles are unchanged by a state decision. No messages, titles or decisions
+are sent externally, and no live platform is contacted. The full 24-session CLI
+regression covers import, proposal queue, defer, revisit, operator wording preview,
+explicit title apply, stale saved-queue failure, refresh and explicit reopen.

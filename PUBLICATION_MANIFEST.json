@@ -1,12 +1,12 @@
 {
   "project": "recap-for-everyone",
-  "release": "0.36.0-review-state-views",
+  "release": "0.37.0-saved-queue-decisions",
   "date": "2026-11-03",
   "private_history_imported": false,
   "actual_corpora_included": false,
   "synthetic_examples_only": true,
   "license_status": "NOT_SELECTED",
-  "file_count": 78,
+  "file_count": 79,
   "files": [
     {
       "path": ".gitattributes",
@@ -30,8 +30,8 @@
     },
     {
       "path": "README.md",
-      "bytes": 50174,
-      "sha256": "638fffa78eb3d1dff302d9f2843e65daf5e96d8b12b6502dc6c888b83a17e298"
+      "bytes": 50496,
+      "sha256": "0deb9b9a8e8b6c9e5295a768ce4554bde3fe68bf37b680d8e9daecb499980ea8"
     },
     {
       "path": "RIGHTS.md",
@@ -100,8 +100,8 @@
     },
     {
       "path": "docs/TITLE_REVIEW_STATE.md",
-      "bytes": 8872,
-      "sha256": "3750485635da1cff145881af073e9c3e7f85154c2ef67b32c9fc65974d8c876a"
+      "bytes": 11883,
+      "sha256": "e16cdd693a3754280ac420d3a9f0809e81c596aae6ec4b361ddc370abf72f30d"
     },
     {
       "path": "docs/TITLE_TRANSFER.md",
@@ -140,8 +140,8 @@
     },
     {
       "path": "recap.py",
-      "bytes": 16720,
-      "sha256": "cae77f2334f6c0aa1203a500d7aecdb7a4f573235051fddbff1723eb60874f3b"
+      "bytes": 17473,
+      "sha256": "3f483765ae74d9234bd1b644f1bfa7b5423991d8534e811a9f4777c1fa9987bc"
     },
     {
       "path": "replay_local.py",
@@ -212,6 +212,11 @@
       "path": "test_manifest_verification.py",
       "bytes": 4433,
       "sha256": "a556cd2f86d064256a48eb1424611174ff8a0ee9e92a0552d926c83430b4d83e"
+    },
+    {
+      "path": "test_queue_decisions.py",
+      "bytes": 7346,
+      "sha256": "ab97459869f9196d65f261878bcbef2105cfb9d9130448a9e8a54e58ee6d2929"
     },
     {
       "path": "test_recap.py",
@@ -350,8 +355,8 @@
     },
     {
       "path": "title_batch.py",
-      "bytes": 9138,
-      "sha256": "8671b3eb17f16c3f2a0e9511f42fca8edb0374923760b882809aa570e09d9e65"
+      "bytes": 9421,
+      "sha256": "6d2246c063355b0a6b23d2c4fbe3bd4caa786258d2ec912f4cdf4c0d258f3d40"
     },
     {
       "path": "title_plan.py",
@@ -370,8 +375,8 @@
     },
     {
       "path": "title_review_state.py",
-      "bytes": 5171,
-      "sha256": "738707909703e83f745fd9f3730c3be2be91167bf96aae592ecebdbd9535abd6"
+      "bytes": 6125,
+      "sha256": "88acee3b2d7f130c2c269d2513babc0831e280234433cd1117f62402c203ed6f"
     },
     {
       "path": "title_rules.py",

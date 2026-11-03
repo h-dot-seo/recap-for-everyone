@@ -132,14 +132,22 @@ def review_queue(db, source, limit=20, offset=0, unrenamed_only=False, review_st
         connection.close()
 
 
-def select_proposal(queue, conversation):
-    """Select a single untrusted proposal; caller must use normal preview validation."""
+def select_queue_item(queue, conversation):
+    """Select exactly one untrusted item, including an unavailable suggestion."""
     if not isinstance(queue, dict) or queue.get('schema') != SCHEMA or not isinstance(queue.get('items'), list):
         raise ValueError('unsupported title review queue')
     matches = [item for item in queue['items'] if isinstance(item, dict) and item.get('conversation') == conversation]
-    if len(matches) != 1 or matches[0].get('status') != 'READY':
+    if len(matches) != 1:
+        raise ValueError('select exactly one conversation from the queue')
+    return copy.deepcopy(matches[0])
+
+
+def select_proposal(queue, conversation):
+    """Select a single untrusted proposal; caller must use normal preview validation."""
+    item = select_queue_item(queue, conversation)
+    if item.get('status') != 'READY':
         raise ValueError('select exactly one READY conversation from the queue')
-    proposal = matches[0].get('proposal')
+    proposal = item.get('proposal')
     if not isinstance(proposal, dict) or proposal.get('source') != queue.get('source') or proposal.get('conversation') != conversation:
         raise ValueError('queue and proposal identities do not match')
     return copy.deepcopy(proposal)
