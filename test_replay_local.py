@@ -69,7 +69,7 @@ class ReplayTests(unittest.TestCase):
             meta = dict(type='session_meta', payload=dict(id='synthetic', **{field: 'PRIVATE_VALUE'}))
             self.reject([meta, *turn('a')], 'UNRESOLVED_HISTORY')
         self.reject([self.meta, *turn('a'), event('token_count')], 'EVENT_UNSUPPORTED')
-        self.reject([self.meta, *turn('a'), dict(type='turn_context', payload={})], 'RECORD_UNSUPPORTED')
+        self.reject([self.meta, *turn('a'), dict(type='turn_context', payload={})], 'UNSCOPED_TURN_CONTEXT')
 
     def test_incomplete_overlapping_reused_and_mismatched_turns(self):
         self.reject([self.meta, *turn('a')[:-1]], 'INCOMPLETE_TURN')

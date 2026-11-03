@@ -586,7 +586,7 @@ line locators, and the output includes the original whole-file hash. Rolled-back
 is not emitted. Every input record is still validated, including later-removed turns.
 
 Compaction (even with replacement_history), inherited/paginated history, subagents,
-turn attribution, turn_context records, tools/media, failed/aborted/open/nested turns,
+turn attribution, unsupported turn_context forms, tools/media, failed/aborted/open/nested turns,
 unknown events and ambiguous user boundaries are **unsupported**. There is no fallback
 or guessed recovery. On rejection, JSON contains a fixed reason code and line number,
 no partial text/turns, and the CLI exits 1. A line number of 0 denotes a whole-file or
@@ -606,3 +606,35 @@ Output includes private text and IDs. The whole explicit input is loaded into me
 The command does not open a database, follow references, alter import/title workflows,
 produce an applicable title proposal, or contact a service. Keep the original export;
 the projection is not a replacement export or an authenticated record.
+
+
+## Representative projection coverage and scoped turn context
+
+A deterministic matrix in `test_replay_coverage.py` exercises 13 chosen schema
+scenarios. The previous contract supported 2 and rejected 11; the current contract
+supports 3 and rejects 10. **This is a hand-selected synthetic matrix, not a sample of
+user sessions or a measured real-world success rate.** Cases are individual variants,
+so a session combining supported and unsupported features still fails closed.
+
+Supported cases: plain completed text, completed text with one matching turn_context,
+and completed-turn rollback. Rejected cases: token accounting events, absent explicit
+message IDs, tool invocation, file/image references, compaction, inherited history,
+modern turn attribution, missing user event, ongoing turn and mismatched turn context.
+Thus even common present-day sessions can still be unsupported. Raw import remains a
+separate archival option and does not gain effective replay semantics from this feature.
+
+Contract `completed-turn-text-projection.v2` allows at most one turn_context record
+inside an active turn with the same explicit turn_id and matching root ID if supplied.
+It accepts only turn_id/root_turn_id plus cwd, model, approval_policy, sandbox_policy,
+effort, summary and comp_hash metadata. Unknown context fields, invalid basic value
+shapes, repeated/unscoped context and mismatched IDs are rejected. This is a deliberate
+subset of the public TurnContextItem, not full validation of policy/model values.
+
+The metadata is ignored for this **text-only** projection, never applied as settings,
+executed or included in the output. Counts show accepted context records, including
+those in later-rolled-back turns; each retained turn also carries its own count.
+The official reconstruction code treats turn context as baseline/settings state and
+requires a real user boundary to count a user turn. This implementation still requires
+the matching user event and first user message; context alone cannot create a turn.
+Full context restoration, policy enforcement, model replay and any external operation
+remain out of scope. Existing raw archives and title workflows are unchanged.

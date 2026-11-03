@@ -190,3 +190,11 @@ float counts, unresolved history/compaction/unknown event rejection, incomplete 
 nested turns, ID reuse and mismatches, nontext rejection, no partial text on failure,
 original line/hash provenance, standalone/unified CLI equivalence and no database
 creation. Full model replay and general Codex rollout compatibility are not established.
+
+
+### Representative projection coverage
+
+A fixed 13-case synthetic schema matrix records 3 supported and 10 rejected cases,
+without estimating usage prevalence. Additional cases check that scoped context
+metadata is not emitted or counted as a user turn, rollback counts remain turn-based,
+and missing/repeated/unscoped/mismatched/unknown or malformed context fails closed.

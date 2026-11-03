@@ -26,6 +26,7 @@ def _project(raw):
     turns = []
     turn_ids, message_ids = set(), set()
     removed_turns = 0
+    ignored_contexts = 0
     records = 0
     for line_number, line in enumerate(text.split('\n'), 1):
         if not line.strip():
@@ -69,7 +70,7 @@ def _project(raw):
                 _require(payload.get('turn_attribution') is None, 'TURN_ATTRIBUTION_UNSUPPORTED', line_number)
                 _require(payload.get('root_turn_id') in (None, identity), 'UNRESOLVED_HISTORY', line_number)
                 turn_ids.add(identity)
-                active = dict(turn_id=identity, start_line=line_number, messages=[], user_event=None)
+                active = dict(turn_id=identity, start_line=line_number, messages=[], user_event=None, turn_context_records=0)
             elif event in ('task_complete', 'turn_complete'):
                 _require(active is not None and payload.get('turn_id') == active['turn_id'],
                          'UNMATCHED_TURN_COMPLETION', line_number)
@@ -104,6 +105,22 @@ def _project(raw):
                     removed_turns += count
             else:
                 raise Unsupported('EVENT_UNSUPPORTED', line_number)
+        elif kind == 'turn_context':
+            _require(active is not None, 'UNSCOPED_TURN_CONTEXT', line_number)
+            _require(payload.get('turn_id') == active['turn_id'] and
+                     payload.get('root_turn_id') in (None, active['turn_id']),
+                     'CONTEXT_TURN_MISMATCH', line_number)
+            allowed_context = {'turn_id', 'root_turn_id', 'cwd', 'model', 'approval_policy',
+                               'sandbox_policy', 'effort', 'summary', 'comp_hash'}
+            _require(set(payload) <= allowed_context, 'CONTEXT_FIELDS_UNSUPPORTED', line_number)
+            _require(all(payload.get(key) is None or isinstance(payload[key], str)
+                         for key in ('cwd', 'model', 'approval_policy', 'effort', 'summary', 'comp_hash')),
+                     'INVALID_CONTEXT_METADATA', line_number)
+            _require(payload.get('sandbox_policy') is None or isinstance(payload['sandbox_policy'], dict),
+                     'INVALID_CONTEXT_METADATA', line_number)
+            _require(active['turn_context_records'] == 0, 'REPEATED_TURN_CONTEXT', line_number)
+            active['turn_context_records'] = 1
+            ignored_contexts += 1
         elif kind == 'response_item':
             _require(active is not None, 'MESSAGE_OUTSIDE_TURN', line_number)
             _require(payload.get('type') == 'message' and payload.get('role') in ('user', 'assistant'),
@@ -130,7 +147,8 @@ def _project(raw):
     _require(active is None, 'INCOMPLETE_TURN', active['start_line'] if active else 0)
     _require(bool(turn_ids), 'NO_COMPLETE_TURNS', 0)
     return dict(conversation=session, turns=turns, retained_turns=len(turns),
-                rolled_back_turns=removed_turns, observed_records=records)
+                rolled_back_turns=removed_turns, observed_records=records,
+                turn_context_records_ignored=ignored_contexts)
 
 
 def reconstruct(path):
@@ -146,7 +164,7 @@ def reconstruct(path):
                     partial_output=False)
     except (ValueError, TypeError, RecursionError):
         return dict(supported=False, reason_code='INVALID_RECORD', line=0, original_sha256=digest, partial_output=False)
-    return dict(supported=True, contract='completed-turn-text-projection.v1', original_sha256=digest,
+    return dict(supported=True, contract='completed-turn-text-projection.v2', original_sha256=digest,
                 **result, full_model_history_reconstructed=False,
                 scope='read-only text projection; no database, title or remote mutation',
                 warning='PRIVATE TEXT: only the supported grammar is projected; model context, tools, hidden state and UI visibility are not reconstructed')
