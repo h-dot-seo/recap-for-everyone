@@ -1,12 +1,12 @@
 {
   "project": "recap-for-everyone",
-  "release": "0.12.0-import-coverage-inspection",
+  "release": "0.13.0-consistent-title-validation",
   "date": "2026-11-03",
   "private_history_imported": false,
   "actual_corpora_included": false,
   "synthetic_examples_only": true,
   "license_status": "NOT_SELECTED",
-  "file_count": 34,
+  "file_count": 36,
   "files": [
     {
       "path": ".gitattributes",
@@ -30,8 +30,8 @@
     },
     {
       "path": "README.md",
-      "bytes": 15394,
-      "sha256": "de5f027007545cb762ecb2976fa9c64371bf2588dd2bf6efb6511cf29bbc27c1"
+      "bytes": 16268,
+      "sha256": "eef43ad685a47e1b9ca1d61f60a3d8a2b2852fea03ff8760584810409c2343e7"
     },
     {
       "path": "RIGHTS.md",
@@ -50,8 +50,8 @@
     },
     {
       "path": "VALIDATION.md",
-      "bytes": 5275,
-      "sha256": "6c327c573b0ccbdaddd18fb73d961e31745469082e96e87e5df87612f109be13"
+      "bytes": 5654,
+      "sha256": "70dca92729b9bbb61a3d8dceb23a64694c3fd62f106d19f568f5b281e29bca1d"
     },
     {
       "path": "audit_publication.py",
@@ -100,8 +100,8 @@
     },
     {
       "path": "session_workflow.py",
-      "bytes": 10513,
-      "sha256": "894c447ab8469903674db76e39841fd6a292769970b660769612095b5d6cd847"
+      "bytes": 10529,
+      "sha256": "8726835c188757d2d366f98a07e3132051db7c507066e3478c5ef9692ca18c6a"
     },
     {
       "path": "strict_json.py",
@@ -154,6 +154,11 @@
       "sha256": "d2007233fb0bb6fde7432bf1e0593ec2c630e1346e60a7ca33d80c1be646d337"
     },
     {
+      "path": "test_title_rules.py",
+      "bytes": 3213,
+      "sha256": "bd7e1d7de8e432c401a4979cffde987105fcadcbd79f8ed229553557b0042770"
+    },
+    {
       "path": "test_title_suggestion.py",
       "bytes": 3982,
       "sha256": "4f5a4de0397293960520bb2d47c55439c96123f630b36148b56035c136f1123b"
@@ -165,8 +170,13 @@
     },
     {
       "path": "title_proposal.py",
-      "bytes": 3674,
-      "sha256": "f77ba3f7e8b717f6216d9db30831f15856cc9ab80ca8de9333deda660243f37d"
+      "bytes": 3535,
+      "sha256": "7b599380e86f09772e250858ad768b7cf7641049604db2bc357b4510ec34b440"
+    },
+    {
+      "path": "title_rules.py",
+      "bytes": 440,
+      "sha256": "19d65d712884a81432a74e1828efbe041c340a984fe3b0f4c5cbef7baaf2dd8b"
     },
     {
       "path": "title_suggestion.py",

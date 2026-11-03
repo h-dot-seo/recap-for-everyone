@@ -261,3 +261,18 @@ Inspection reports extracted occurrences, not newly inserted unique messages.
 `parser_admission_status` describes parsing only, never database persistence. A
 successful inspection cannot predict conflicts with an existing archive or later
 filesystem/database failures.
+
+## Consistent local title validation
+
+Manual title changes and proposal previews share the same validation: nonempty
+single-line text up to 200 Unicode code points, with no control characters (Unicode Cc), Unicode
+line/paragraph separators or surrogate code points. Valid Unicode and emoji joiners
+are retained, as are intentional leading/trailing spaces. Existing original titles
+and history are not rewritten; newly applying a formerly accepted multiline/control
+title now fails. Reversal must also use a valid single-line title.
+
+Title writes open an existing database only. A mistyped/missing database path fails
+cleanly instead of creating an empty file. Import remains the explicit operation
+that may create a new archive.
+Unicode format characters (Cf), including emoji joiners and bidi controls, remain
+permitted. This validation is not visual-spoofing protection.

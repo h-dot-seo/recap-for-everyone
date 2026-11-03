@@ -11,6 +11,7 @@ from pathlib import Path
 from local_parser import parse_artifact
 from recap import ingest, readonly
 from strict_json import loads
+from title_rules import validate_title
 
 
 def _validate_mapping(mapping):
@@ -124,7 +125,9 @@ def import_export(db, source, path, kind):
 
 
 def titles(db, source, conversation, title=None, expected_revision=None, expected_content_sha256=None):
-    c = readonly(db) if title is None else sqlite3.connect(db)
+    if title is not None:
+        validate_title(title)
+    c = readonly(db) if title is None else sqlite3.connect(Path(db).resolve().as_uri() + '?mode=rw', uri=True)
     try:
         if title is not None:
             c.execute('BEGIN IMMEDIATE')
@@ -145,8 +148,6 @@ def titles(db, source, conversation, title=None, expected_revision=None, expecte
         if title is not None:
             if expected_revision is not None and expected_revision != revision:
                 raise ValueError('stale title preview; preview again before applying')
-            if not title.strip() or len(title) > 200:
-                raise ValueError('title must contain 1..200 characters')
             with c:
                 c.execute('CREATE TABLE IF NOT EXISTS title_history (id INTEGER PRIMARY KEY, source TEXT, conversation TEXT, previous TEXT, title TEXT, changed_at TEXT DEFAULT CURRENT_TIMESTAMP)')
                 revision = c.execute('INSERT INTO title_history(source,conversation,previous,title) VALUES(?,?,?,?)', (source, conversation, current, title)).lastrowid

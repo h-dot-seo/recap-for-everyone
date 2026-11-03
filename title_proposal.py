@@ -7,6 +7,7 @@ from pathlib import Path
 from recap import readonly
 from session_workflow import titles
 from strict_json import loads
+from title_rules import validate_title
 
 
 def snapshot(db, source, conversation):
@@ -29,8 +30,7 @@ def preview(db, proposal):
     if proposal.get('content_sha256') != digest:
         raise ValueError('proposal refers to a different conversation snapshot')
     title = proposal['title']
-    if not isinstance(title, str) or not title.strip() or len(title) > 200 or any(ord(ch) < 32 for ch in title):
-        raise ValueError('title must be a nonempty single line of at most 200 characters')
+    validate_title(title)
     ids = proposal.get('evidence_message_ids')
     users = {r['message_id'] for r in rows if r['role'] == 'user'}
     if not isinstance(ids, list) or not ids or any(not isinstance(i, str) or i not in users for i in ids):

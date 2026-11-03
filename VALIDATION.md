@@ -81,3 +81,9 @@ original hashes, omitted message text/identities, empty/nontext warnings, covera
 receipt equivalence, CLI operation without database access and required DB arguments
 for mutations. Counts describe parser extraction only, not corpus completeness.
 Malformed web title types are rejected during inspection.
+
+Thirteenth increment: 63 synthetic tests passed. Shared title validation covers
+control/Unicode line separators, surrogate code points, valid Korean/emoji, length
+boundaries and no-history-change rejection across manual/proposal paths. API and
+CLI title updates leave nonexistent database paths uncreated.
+Existing database paths containing percent/hash characters are covered.
