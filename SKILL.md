@@ -17,3 +17,8 @@ description: Import explicitly authorized local conversation exports, search the
 The CLI implements local import/search/stats only. Online collection, title mutation,
 remote backup, semantic summarization and scheduling require separately authorized
 integrations; do not claim those capabilities are supplied by this repository.
+
+## Executable increment
+
+See the README workflow section for the new local CLI and explicit limitations.
+Use only authorized inputs; shipped examples are entirely synthetic.

@@ -1,0 +1,36 @@
+[
+  {
+    "id": "synthetic-chat",
+    "title": "New chat",
+    "mapping": {
+      "m1": {
+        "parent": null,
+        "message": {
+          "author": {
+            "role": "user"
+          },
+          "create_time": 1,
+          "content": {
+            "parts": [
+              "Design a synthetic orchard experiment"
+            ]
+          }
+        }
+      },
+      "m2": {
+        "parent": "m1",
+        "message": {
+          "author": {
+            "role": "assistant"
+          },
+          "create_time": 2,
+          "content": {
+            "parts": [
+              "Compare shaded and sunny plots."
+            ]
+          }
+        }
+      }
+    }
+  }
+]

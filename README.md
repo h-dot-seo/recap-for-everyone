@@ -54,3 +54,25 @@ Only synthetic examples are distributed. Do not commit your resulting database.
 No third-party code, book text, article corpus or private database was deliberately
 bundled in this extraction. No license has been selected by the owner yet;
 public visibility is not an open-source license. See [rights](RIGHTS.md).
+
+## Export and title workflow
+
+`session_workflow.py` connects explicit local session JSONL and ChatGPT-style web
+JSON exports (`id`, `mapping` nodes) to the existing index. Text nodes from all
+branches are imported; original byte hashes, node/line locators and web parent IDs
+are retained in `export_provenance`. Nontext content is not extracted. Keep original
+exports for recovery. This is not online collection or a universal export parser.
+
+```sh
+python session_workflow.py --db ../demo.sqlite import examples/web-export.json --format web --source demo
+python session_workflow.py --db ../demo.sqlite import examples/local-session.jsonl --format local --source local-demo
+python session_workflow.py --db ../demo.sqlite title --source demo --conversation synthetic-chat
+python session_workflow.py --db ../demo.sqlite title --source demo --conversation synthetic-chat --set "Orchard experiment plan"
+```
+
+Title preview is read-only. Suggestions are the first user request, whitespace
+normalized and truncated to 80 characters; they are not semantic summaries.
+Local display overrides retain previous titles without changing source messages.
+Restore a prior title with `--set` to append an auditable reversal. The original
+`recap.py search` still returns original message titles. Online rename, attachment
+extraction, bulk rename and semantic title generation remain future work.

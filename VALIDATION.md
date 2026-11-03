@@ -14,3 +14,10 @@ Framework-level code/tests and general methods were selected; private source DBs
 and third-party source materials were excluded rather than redacted and republished.
 Remote publication is verified separately after committing; this file does not
 claim an upload has succeeded merely because local tests passed.
+
+## 2026-11-03 increment
+
+Run `python -m unittest discover -v` and `python audit_publication.py`.
+New tests exercise the documented synthetic workflow and rejection boundaries.
+On restricted Windows hosts, set TEMP and TMP to an authorized writable directory.
+No real corpus, account data, or scientific fidelity evaluation was used.
