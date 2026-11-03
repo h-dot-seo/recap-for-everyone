@@ -59,8 +59,14 @@ python recap.py --db ../demo.sqlite title --source demo --conversation synthetic
 titles and text; the original `search` command still performs message-level FTS.
 `title` without `--set` is read-only, and applying `--set` requires the preview's
 `--expected-revision`. `suggest-title` produces a proposal only; continue through
-`title_proposal.py preview/apply` for reviewed proposal application. The standalone
-scripts remain supported with equivalent behavior. Only `inspect` can omit `--db`.
+`recap.py --db ... preview-title proposal.json` then
+`recap.py --db ... apply-title reviewed.json` for reviewed proposal application.
+The standalone scripts remain supported with equivalent behavior. `inspect`,
+`web-branch` and `replay-local` can omit `--db`.
+
+Start with the [two-format title walkthrough](docs/TITLE_WALKTHROUGH.md) for
+copyable synthetic web and Codex local examples, expected results and recovery
+steps. No account, API key or network connection is needed.
 
 ## Design
 

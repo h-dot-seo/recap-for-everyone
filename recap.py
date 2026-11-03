@@ -124,6 +124,9 @@ def main():
     replay_title = sub.add_parser('suggest-replay-title', help='suggest a checked local title from retained projected turns')
     replay_title.add_argument('input'); replay_title.add_argument('--source', required=True)
     replay_title.add_argument('--conversation', required=True)
+    for name in ('preview-title', 'apply-title'):
+        command = sub.add_parser(name, help='review a proposal' if name == 'preview-title' else 'apply a reviewed local display title')
+        command.add_argument('input', help='proposal JSON for preview, reviewed preview JSON for apply')
     plan = sub.add_parser('export-title-plan', help='export metadata for a manual title change')
     plan.add_argument('input'); plan.add_argument('--format', choices=['web', 'local', 'local-codex'], required=True)
     plan.add_argument('--source', required=True); plan.add_argument('--conversation', required=True)
@@ -151,6 +154,11 @@ def main():
             if not result['supported']:
                 raise SystemExit(1)
             return
+        elif args.command in ('preview-title', 'apply-title'):
+            from title_proposal import preview, apply_preview
+            from strict_json import loads
+            value = loads(Path(args.input).read_text(encoding='utf-8'))
+            result = preview(args.db, value) if args.command == 'preview-title' else apply_preview(args.db, value)
         elif args.command == 'suggest-replay-title':
             from replay_title import suggest_replay
             result = suggest_replay(args.db, args.source, args.conversation, args.input)
@@ -203,7 +211,7 @@ def main():
             result = suggest(args.db, args.source, args.conversation)
     except (OSError, ValueError, KeyError, TypeError, sqlite3.Error) as exc:
         p.exit(1, str(exc) + '\n')
-    print(json.dumps(result, ensure_ascii=args.command in ('web-branch', 'suggest-branch-title', 'suggest-replay-title', 'export-title-plan', 'check-title-plan'), indent=2))
+    print(json.dumps(result, ensure_ascii=args.command in ('web-branch', 'suggest-branch-title', 'suggest-replay-title', 'preview-title', 'apply-title', 'export-title-plan', 'check-title-plan'), indent=2))
 
 
 if __name__ == '__main__':

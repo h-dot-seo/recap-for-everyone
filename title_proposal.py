@@ -29,6 +29,8 @@ def snapshot(db, source, conversation):
 
 
 def preview(db, proposal):
+    if not isinstance(proposal, dict):
+        raise ValueError('title proposal must be a JSON object')
     source, conversation = proposal['source'], proposal['conversation']
     rows, digest = snapshot(db, source, conversation)
     if proposal.get('content_sha256') != digest:
@@ -73,7 +75,7 @@ def main():
             result = preview(a.db, value) if a.command == 'preview' else apply_preview(a.db, value)
     except (ValueError, OSError, KeyError, TypeError, sqlite3.Error) as e:
         p.exit(1, str(e) + '\n')
-    print(json.dumps(result, ensure_ascii=False, indent=2))
+    print(json.dumps(result, ensure_ascii=True, indent=2))
 
 
 if __name__ == '__main__':
