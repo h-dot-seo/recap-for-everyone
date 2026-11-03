@@ -53,32 +53,33 @@ def import_export(db, source, path, kind):
     with tempfile.TemporaryDirectory() as tmp:
         normalized = Path(tmp) / 'normalized.jsonl'
         normalized.write_text(''.join(json.dumps(r, ensure_ascii=False) + '\n' for r in rows), encoding='utf-8')
-        result = ingest(db, source, normalized)
-    with closing(sqlite3.connect(db)) as c, c:
-        c.execute('CREATE TABLE IF NOT EXISTS export_provenance (source TEXT, conversation TEXT, message TEXT, original_hash TEXT, locator TEXT, parent TEXT, PRIMARY KEY(source,conversation,message,original_hash))')
-        c.executemany('INSERT OR IGNORE INTO export_provenance VALUES(?,?,?,?,?,?)',
-                      [(source, r['conversation_id'], r['message_id'], r['origin_sha256'], r['origin_locator'], r.get('parent_id')) for r in rows])
+        result = ingest(db, source, normalized, provenance=rows)
     return result
 
 
-def titles(db, source, conversation, title=None):
+def titles(db, source, conversation, title=None, expected_revision=None):
     c = readonly(db) if title is None else sqlite3.connect(db)
     try:
+        if title is not None:
+            c.execute('BEGIN IMMEDIATE')
         messages = c.execute('SELECT role,text,title FROM messages WHERE source_id=? AND conversation_id=? ORDER BY message_pk', (source, conversation)).fetchall()
         if not messages:
             raise ValueError('unknown conversation')
         suggestion = next((' '.join(m[1].split())[:80] for m in messages if m[0] == 'user'), 'Untitled conversation')
         exists = c.execute("SELECT 1 FROM sqlite_master WHERE name='title_history'").fetchone()
-        history = c.execute('SELECT title FROM title_history WHERE source=? AND conversation=? ORDER BY id', (source, conversation)).fetchall() if exists else []
+        history = c.execute('SELECT title,id FROM title_history WHERE source=? AND conversation=? ORDER BY id', (source, conversation)).fetchall() if exists else []
+        revision = history[-1][1] if history else 0
         current = history[-1][0] if history else messages[0][2]
         if title is not None:
+            if expected_revision is not None and expected_revision != revision:
+                raise ValueError('stale title preview; preview again before applying')
             if not title.strip() or len(title) > 200:
                 raise ValueError('title must contain 1..200 characters')
             with c:
                 c.execute('CREATE TABLE IF NOT EXISTS title_history (id INTEGER PRIMARY KEY, source TEXT, conversation TEXT, previous TEXT, title TEXT, changed_at TEXT DEFAULT CURRENT_TIMESTAMP)')
-                c.execute('INSERT INTO title_history(source,conversation,previous,title) VALUES(?,?,?,?)', (source, conversation, current, title))
+                revision = c.execute('INSERT INTO title_history(source,conversation,previous,title) VALUES(?,?,?,?)', (source, conversation, current, title)).lastrowid
             current = title
-        return dict(display_title=current, suggested_title=suggestion, original_title=messages[0][2], prior_titles=[m[0] for m in history], scope='local display only')
+        return dict(display_title=current, suggested_title=suggestion, revision=revision, original_title=messages[0][2], prior_titles=[m[0] for m in history], scope='local display only')
     finally:
         c.close()
 
@@ -89,9 +90,12 @@ def main():
     sub = p.add_subparsers(dest='command', required=True)
     imp = sub.add_parser('import'); imp.add_argument('path'); imp.add_argument('--format', choices=['web', 'local'], required=True); imp.add_argument('--source', required=True)
     t = sub.add_parser('title'); t.add_argument('--source', required=True); t.add_argument('--conversation', required=True); t.add_argument('--set')
+    t.add_argument('--expected-revision', type=int)
     a = p.parse_args()
     try:
-        result = import_export(a.db, a.source, a.path, a.format) if a.command == 'import' else titles(a.db, a.source, a.conversation, a.set)
+        if a.command == 'title' and a.set is not None and a.expected_revision is None:
+            raise ValueError('--set requires --expected-revision from a title preview')
+        result = import_export(a.db, a.source, a.path, a.format) if a.command == 'import' else titles(a.db, a.source, a.conversation, a.set, a.expected_revision)
     except (ValueError, OSError, KeyError, TypeError, sqlite3.Error) as e:
         p.exit(1, str(e) + '\n')
     print(json.dumps(result, ensure_ascii=False, indent=2))

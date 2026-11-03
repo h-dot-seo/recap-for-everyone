@@ -67,7 +67,7 @@ exports for recovery. This is not online collection or a universal export parser
 python session_workflow.py --db ../demo.sqlite import examples/web-export.json --format web --source demo
 python session_workflow.py --db ../demo.sqlite import examples/local-session.jsonl --format local --source local-demo
 python session_workflow.py --db ../demo.sqlite title --source demo --conversation synthetic-chat
-python session_workflow.py --db ../demo.sqlite title --source demo --conversation synthetic-chat --set "Orchard experiment plan"
+python session_workflow.py --db ../demo.sqlite title --source demo --conversation synthetic-chat --set "Orchard experiment plan" --expected-revision 0
 ```
 
 Title preview is read-only. Suggestions are the first user request, whitespace
@@ -76,3 +76,12 @@ Local display overrides retain previous titles without changing source messages.
 Restore a prior title with `--set` to append an auditable reversal. The original
 `recap.py search` still returns original message titles. Online rename, attachment
 extraction, bulk rename and semantic title generation remain future work.
+
+### Transactional imports and title preview leases
+
+Adapter provenance now commits in the same SQLite transaction as messages and FTS.
+A failed provenance insertion rolls back the whole import. Title previews return a
+`revision`; CLI `--set` requires `--expected-revision REVISION`. A write lock covers
+revision comparison and history insertion, so a stale preview cannot overwrite a
+newer title. The Python API retains optional revision checking for compatibility;
+callers should always supply it. Reversal is another checked title change.

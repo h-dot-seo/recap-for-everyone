@@ -1,6 +1,6 @@
 {
   "project": "recap-for-everyone",
-  "release": "0.2.0-local-workflows",
+  "release": "0.3.0-linked-workflows",
   "date": "2026-11-03",
   "private_history_imported": false,
   "actual_corpora_included": false,
@@ -50,13 +50,13 @@
     },
     {
       "path": "README.md",
-      "bytes": 4348,
-      "sha256": "8c4a17debd5d92e97675bef40cfd3ef6cdd85d74c0ac6c217e1f0c4fd4b29b35"
+      "bytes": 4921,
+      "sha256": "c868b2bd841f1e6dacab8b3af24ae6cb7824da2f30013639dfe9074b8642270d"
     },
     {
       "path": "recap.py",
-      "bytes": 5349,
-      "sha256": "0ac05dba6df1d8949f8ceafc5b8853038f0747ea98bf98091985f0c6478e3506"
+      "bytes": 5924,
+      "sha256": "7228903fb8994fad6e7c8e8b52605ea86e7bcfa03f9c599b86427c930f2981d8"
     },
     {
       "path": "RIGHTS.md",
@@ -70,8 +70,8 @@
     },
     {
       "path": "session_workflow.py",
-      "bytes": 5400,
-      "sha256": "e4d7838b99760d2313332ad7f9bba312714d88e1025ce01defb63940a36746e5"
+      "bytes": 5526,
+      "sha256": "211dacbc766b75edbbc6a07bd22fad00634e7dbf97e46aa5ffc2f706c9de2c9f"
     },
     {
       "path": "SKILL.md",
@@ -85,13 +85,13 @@
     },
     {
       "path": "test_session_workflow.py",
-      "bytes": 1788,
-      "sha256": "80e25107f1dbf69fb96ae52643ad745949350dde9dbcc65ab5cbef1694d75d52"
+      "bytes": 3012,
+      "sha256": "8a80495bcda4249328727c9966a86405b7ef23e9d9a14d0b613ae9f05899d84b"
     },
     {
       "path": "VALIDATION.md",
-      "bytes": 1277,
-      "sha256": "66c2bbe39b28ebb43a2c5fb170d4858dfae569e41371017131c4f5f847b88295"
+      "bytes": 1377,
+      "sha256": "e18255ba0610ca1a7882a9cfe3ea4bf1c2e8fb3a3b8b786d37ba9fe3387d699f"
     }
   ]
 }

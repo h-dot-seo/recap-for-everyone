@@ -28,3 +28,20 @@ class WorkflowTests(unittest.TestCase):
 
     def test_unsupported_format(self):
         with self.assertRaises(ValueError): normalize('examples/web-export.json','unknown')
+
+    def test_stale_preview_and_atomic_provenance(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            db = str(Path(tmp)/'test.sqlite')
+            import_export(db,'web','examples/web-export.json','web')
+            preview = titles(db,'web','synthetic-chat')
+            changed = titles(db,'web','synthetic-chat','Reviewed plan',preview['revision'])
+            with self.assertRaises(ValueError):
+                titles(db,'web','synthetic-chat','Stale plan',preview['revision'])
+            self.assertEqual(titles(db,'web','synthetic-chat')['revision'],changed['revision'])
+            with closing(sqlite3.connect(db)) as c, c:
+                c.execute("CREATE TRIGGER reject_provenance BEFORE INSERT ON export_provenance BEGIN SELECT RAISE(ABORT, 'synthetic failure'); END")
+            with self.assertRaises(sqlite3.IntegrityError):
+                import_export(db,'other','examples/web-export.json','web')
+            with closing(sqlite3.connect(db)) as c:
+                self.assertEqual(c.execute("SELECT count(*) FROM messages WHERE source_id='other'").fetchone()[0],0)
+                self.assertEqual(c.execute("SELECT count(*) FROM artifacts WHERE source_id='other'").fetchone()[0],0)

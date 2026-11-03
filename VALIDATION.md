@@ -21,3 +21,5 @@ Run `python -m unittest discover -v` and `python audit_publication.py`.
 New tests exercise the documented synthetic workflow and rejection boundaries.
 On restricted Windows hosts, set TEMP and TMP to an authorized writable directory.
 No real corpus, account data, or scientific fidelity evaluation was used.
+
+Second increment: 8 tests passed; failure boundaries and deterministic repeated results covered.

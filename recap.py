@@ -24,7 +24,7 @@ CREATE TRIGGER IF NOT EXISTS messages_ai AFTER INSERT ON messages BEGIN
 '''
 
 
-def ingest(db, source, path):
+def ingest(db, source, path, provenance=None):
     if not source or not source.strip():
         raise ValueError('source must not be empty')
     raw = Path(path).read_bytes()
@@ -49,6 +49,8 @@ def ingest(db, source, path):
         conn.executescript(SCHEMA)
         inserted = 0
         with conn:
+            if provenance is not None:
+                conn.execute('CREATE TABLE IF NOT EXISTS export_provenance (source TEXT, conversation TEXT, message TEXT, original_hash TEXT, locator TEXT, parent TEXT, PRIMARY KEY(source,conversation,message,original_hash))')
             conn.execute('INSERT OR IGNORE INTO artifacts VALUES(?,?,?,?)',
                          (source, digest, len(raw), len(records)))
             for row, title, line_no in records:
@@ -63,6 +65,9 @@ def ingest(db, source, path):
                 conn.execute('INSERT INTO messages(source_id,conversation_id,message_id,role,timestamp,title,text,source_sha256,source_line) '
                              'VALUES(?,?,?,?,?,?,?,?,?)', (*key, *values, digest, line_no))
                 inserted += 1
+            if provenance is not None:
+                conn.executemany('INSERT OR IGNORE INTO export_provenance VALUES(?,?,?,?,?,?)',
+                    [(source, r['conversation_id'], r['message_id'], r['origin_sha256'], r['origin_locator'], r.get('parent_id')) for r in provenance])
         return {'source_sha256': digest, 'records': len(records), 'inserted': inserted}
     finally:
         conn.close()
