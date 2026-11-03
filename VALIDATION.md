@@ -207,3 +207,12 @@ rate-limit metadata not emitted, unscoped/unknown fields, malformed shapes and i
 counter boundaries, and unsupported tool/abort/compaction mixtures. The 13-category
 matrix uses a schema-valid nullable accounting payload and verifies 4 supported/9
 rejected cases. Nested accounting semantics are not validated or used.
+
+
+### Optional source message IDs
+
+Six synthetic cases cover absent/null IDs, distinct hash/line projection identity,
+rename stability versus byte changes, explicit-ID namespace and invalid/duplicate
+rejection, identical text retained without merging, rollback preservation, and strict
+encryption/status/nested-turn/unknown metadata rejection. Matrix v4 supports 5 of 13
+chosen categories; it is not a real-world usage measurement.

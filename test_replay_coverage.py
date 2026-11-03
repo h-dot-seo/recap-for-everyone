@@ -29,7 +29,7 @@ def scenarios():
         ('plain completed text', plain, None),
         ('matching turn context', context, None),
         ('token accounting event', token, None),
-        ('missing explicit message ID', no_id, 'INVALID_OR_REUSED_MESSAGE_ID'),
+        ('missing explicit message ID', no_id, None),
         ('tool invocation', tool, 'RESPONSE_UNSUPPORTED'),
         ('user image/file reference', media, 'NON_TEXT_UNSUPPORTED'),
         ('compacted history', compact, 'COMPACTION_UNSUPPORTED'),
@@ -67,7 +67,7 @@ class ReplayCoverageTests(unittest.TestCase):
                     self.assertFalse(result['full_model_history_reconstructed'])
                     counts['supported'] += 1
                 self.assertNotIn('PRIVATE_', json.dumps(result))
-        self.assertEqual(counts, dict(supported=4, unsupported=9))
+        self.assertEqual(counts, dict(supported=5, unsupported=8))
 
     def test_context_is_not_a_user_turn_and_payload_is_not_emitted(self):
         records = scenarios()[1][1]

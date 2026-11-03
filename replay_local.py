@@ -2,6 +2,7 @@
 import argparse
 import hashlib
 import json
+import math
 from pathlib import Path
 from strict_json import loads
 
@@ -50,7 +51,7 @@ def _token_metadata(payload, line):
                  'INVALID_TOKEN_METADATA', line)
 
 
-def _project(raw):
+def _project(raw, original_sha256):
     try:
         text = raw.decode('utf-8')
     except UnicodeError:
@@ -165,10 +166,25 @@ def _project(raw):
             _require(active is not None, 'MESSAGE_OUTSIDE_TURN', line_number)
             _require(payload.get('type') == 'message' and payload.get('role') in ('user', 'assistant'),
                      'RESPONSE_UNSUPPORTED', line_number)
+            allowed_message = {'type', 'id', 'role', 'content', 'turn_id', 'encrypted_content',
+                               'status', 'phase', 'internal_chat_message_metadata_passthrough'}
+            _require(set(payload) <= allowed_message, 'MESSAGE_FIELDS_UNSUPPORTED', line_number)
+            _require(payload.get('encrypted_content') is None, 'ENCRYPTED_MESSAGE_UNSUPPORTED', line_number)
+            _require(payload.get('status') in (None, 'completed'), 'INCOMPLETE_MESSAGE', line_number)
+            _require(payload.get('phase') in (None, 'commentary', 'partial_answer', 'final_answer'),
+                     'MESSAGE_PHASE_UNSUPPORTED', line_number)
+            metadata = payload.get('internal_chat_message_metadata_passthrough')
+            _require(metadata is None or isinstance(metadata, dict), 'INVALID_MESSAGE_METADATA', line_number)
+            if metadata is not None:
+                _require(set(metadata) <= {'turn_id', 'create_time'}, 'MESSAGE_METADATA_UNSUPPORTED', line_number)
+                _require(metadata.get('turn_id') in (None, active['turn_id']), 'MESSAGE_TURN_MISMATCH', line_number)
+                created = metadata.get('create_time')
+                _require(created is None or type(created) in (int, float) and
+                         (type(created) is int or math.isfinite(created)), 'INVALID_MESSAGE_METADATA', line_number)
             for owner in (record, payload):
                 _require(owner.get('turn_id') in (None, active['turn_id']), 'MESSAGE_TURN_MISMATCH', line_number)
             identity = payload.get('id')
-            _require(isinstance(identity, str) and bool(identity) and identity not in message_ids,
+            _require(identity is None or isinstance(identity, str) and bool(identity) and identity not in message_ids,
                      'INVALID_OR_REUSED_MESSAGE_ID', line_number)
             role = payload['role']
             _require((role == 'user') == (not active['messages']), 'AMBIGUOUS_USER_BOUNDARY', line_number)
@@ -178,8 +194,12 @@ def _project(raw):
                          and isinstance(part.get('text'), str) for part in parts), 'NON_TEXT_UNSUPPORTED', line_number)
             body = '\n'.join(part['text'] for part in parts)
             _require(bool(body.strip()), 'EMPTY_TEXT_UNSUPPORTED', line_number)
-            message_ids.add(identity)
-            active['messages'].append(dict(message_id=identity, role=role, text=body,
+            if identity is not None:
+                message_ids.add(identity)
+            active['messages'].append(dict(message_id=identity,
+                                           projection_id=f'sha256:{original_sha256}:line:{line_number}',
+                                           identity_basis='explicit source ID' if identity is not None else 'source byte hash and line only',
+                                           role=role, text=body,
                                            origin_locator=f'line:{line_number}'))
         else:
             raise Unsupported('RECORD_UNSUPPORTED', line_number)
@@ -198,13 +218,13 @@ def reconstruct(path):
         return dict(supported=False, reason_code='SOURCE_ERROR', line=0)
     digest = hashlib.sha256(raw).hexdigest()
     try:
-        result = _project(raw)
+        result = _project(raw, digest)
     except Unsupported as error:
         return dict(supported=False, reason_code=error.code, line=error.line, original_sha256=digest,
                     partial_output=False)
     except (ValueError, TypeError, RecursionError):
         return dict(supported=False, reason_code='INVALID_RECORD', line=0, original_sha256=digest, partial_output=False)
-    return dict(supported=True, contract='completed-turn-text-projection.v3', original_sha256=digest,
+    return dict(supported=True, contract='completed-turn-text-projection.v4', original_sha256=digest,
                 **result, full_model_history_reconstructed=False,
                 scope='read-only text projection; no database, title or remote mutation',
                 warning='PRIVATE TEXT: only the supported grammar is projected; model context, tools, hidden state and UI visibility are not reconstructed')

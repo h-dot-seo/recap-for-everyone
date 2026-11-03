@@ -570,7 +570,8 @@ python recap.py replay-local ../explicit-rollout.jsonl
 This is a separate, read-only, **narrow text projection**, not full Codex replay.
 It accepts exactly one initial session_meta without history/fork/parent references,
 with absent/cli/vscode/exec source and matching session/thread identity when supplied,
-then nonoverlapping completed turns with unique explicit turn/message IDs. Start and
+then nonoverlapping completed turns with unique explicit turn IDs. Supplied message
+IDs must be unique; v4 also handles absent/null message IDs as described below. Start and
 completion events must match (`task_started`/`task_complete`, or their `turn_` aliases).
 Session metadata and user_message fields use explicit allowlists; unknown fields
 are rejected rather than assumed harmless. Nonempty image/audio/file metadata is
@@ -664,3 +665,33 @@ newly accepted category is token accounting. This remains a chosen synthetic mat
 not evidence of real usage prevalence or a general Codex success rate. Tools, media,
 compaction, inherited history, attribution and unfinished/ambiguous turns remain outside
 the supported text grammar. Source and database preservation boundaries are unchanged.
+
+
+## Source message IDs and projection identities
+
+The public [ResponseItem::Message model](https://github.com/openai/codex/blob/main/codex-rs/protocol/src/models.rs)
+permits absent/null message IDs. Contract `completed-turn-text-projection.v4` now
+accepts that case without inventing a source or remote ID. `message_id` remains null.
+Every output message, including those with explicit IDs, gets a separate projection_id
+formed from the original whole-file SHA256 and its physical source line number.
+`identity_basis` distinguishes a supplied source ID from a hash/line-only identity.
+
+Projection identities refer only to one exact byte snapshot. Renaming an unchanged
+file preserves them; reformatting, appending or otherwise changing its bytes changes
+them. They are not stable cross-export message identifiers, signatures or service IDs.
+Equal message text is never merged. Supplied nonempty string IDs remain unchanged,
+and invalid/empty/reused supplied IDs still fail closed, even across rolled-back turns.
+Explicit turn IDs and matching user boundaries remain mandatory.
+
+The same schema check exposed additional boundaries: encrypted message content and
+noncompleted status now fail closed. A supplied phase must be a recognized text phase.
+The supported nested message metadata is limited to turn_id (which must match) and
+finite numeric create_time. Other message/passthrough fields are rejected rather than
+assumed harmless. Status, phase and nested metadata are not emitted as new content;
+this is still a text projection, not full item or model replay.
+
+On the same 13 synthetic categories, prior v3 supports 4/rejects 9 and v4 supports
+5/rejects 8. The only newly supported category is missing message IDs. Boundary
+hardening additionally rejects previously unchecked encrypted/incomplete/mismatched
+or unknown message metadata. These counts do not estimate actual usage frequency.
+No archive migration, source rewrite, remote operation or title application is added.
