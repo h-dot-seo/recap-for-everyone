@@ -746,3 +746,14 @@ source bytes. Apply rechecks the archive fingerprint/user evidence and reviewed 
 revision; it does not reread the export or verify live platform state. Regenerate and
 review after changing the source you intend to use. All existing restricted-projection
 limitations remain, including no general compaction/model-history reconstruction.
+
+## Mock-only title transfer boundary
+
+`title-adapter-dry-run` and `title-adapter-simulate` rehearse a separately supplied
+provider/account/target/revision contract after checking a manual title plan.
+An explicit approval document binds the whole request; an in-memory mock checks
+its target snapshot atomically. **No real provider is configured and no remote
+rename or transmission occurs.** The CLI does not persist simulated state.
+See [the mock contract and synthetic example](docs/TITLE_TRANSFER.md), including
+unsigned approval and cross-system transaction limits. This is separate from the
+local title-text generation adapter and does not enable an external model API.

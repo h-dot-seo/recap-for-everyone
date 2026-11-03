@@ -127,6 +127,10 @@ def main():
     for name in ('preview-title', 'apply-title'):
         command = sub.add_parser(name, help='review a proposal' if name == 'preview-title' else 'apply a reviewed local display title')
         command.add_argument('input', help='proposal JSON for preview, reviewed preview JSON for apply')
+    transfer = sub.add_parser('title-adapter-dry-run', help='validate a mock-only transfer request without executing')
+    transfer.add_argument('input'); transfer.add_argument('plan'); transfer.add_argument('target')
+    simulation = sub.add_parser('title-adapter-simulate', help='simulate an explicitly approved title transfer in memory only')
+    simulation.add_argument('input'); simulation.add_argument('request'); simulation.add_argument('approval'); simulation.add_argument('target')
     plan = sub.add_parser('export-title-plan', help='export metadata for a manual title change')
     plan.add_argument('input'); plan.add_argument('--format', choices=['web', 'local', 'local-codex'], required=True)
     plan.add_argument('--source', required=True); plan.add_argument('--conversation', required=True)
@@ -154,6 +158,16 @@ def main():
             if not result['supported']:
                 raise SystemExit(1)
             return
+        elif args.command in ('title-adapter-dry-run', 'title-adapter-simulate'):
+            from title_transfer import dry_run, simulate, MockTitleAdapter
+            from strict_json import loads
+            def document(path):
+                return loads(Path(path).read_text(encoding='utf-8'))
+            target = document(args.target)
+            if args.command == 'title-adapter-dry-run':
+                result = dry_run(args.db, args.input, document(args.plan), target)
+            else:
+                result = simulate(args.db, args.input, document(args.request), document(args.approval), MockTitleAdapter(target))
         elif args.command in ('preview-title', 'apply-title'):
             from title_proposal import preview, apply_preview
             from strict_json import loads
@@ -211,7 +225,7 @@ def main():
             result = suggest(args.db, args.source, args.conversation)
     except (OSError, ValueError, KeyError, TypeError, sqlite3.Error) as exc:
         p.exit(1, str(exc) + '\n')
-    print(json.dumps(result, ensure_ascii=args.command in ('web-branch', 'suggest-branch-title', 'suggest-replay-title', 'preview-title', 'apply-title', 'export-title-plan', 'check-title-plan'), indent=2))
+    print(json.dumps(result, ensure_ascii=args.command in ('web-branch', 'suggest-branch-title', 'suggest-replay-title', 'preview-title', 'apply-title', 'title-adapter-dry-run', 'title-adapter-simulate', 'export-title-plan', 'check-title-plan'), indent=2))
 
 
 if __name__ == '__main__':

@@ -1,12 +1,12 @@
 {
   "project": "recap-for-everyone",
-  "release": "0.29.0-unified-title-review",
+  "release": "0.30.0-mock-title-transfer",
   "date": "2026-11-03",
   "private_history_imported": false,
   "actual_corpora_included": false,
   "synthetic_examples_only": true,
   "license_status": "NOT_SELECTED",
-  "file_count": 62,
+  "file_count": 65,
   "files": [
     {
       "path": ".gitattributes",
@@ -30,8 +30,8 @@
     },
     {
       "path": "README.md",
-      "bytes": 46654,
-      "sha256": "73a2013a92fccc6ee37baebf5cf06c7d1c85953c13c1b3d63a060783e7e09fbf"
+      "bytes": 47330,
+      "sha256": "5d3cc9de4376799d3ce9debc895b75619373c44a32ec84cdbeaf372e917e13ba"
     },
     {
       "path": "RIGHTS.md",
@@ -84,6 +84,11 @@
       "sha256": "2d93841079f3ff9db853debcf06905d7e3c5035d025c003a3ac82a128af2f1f5"
     },
     {
+      "path": "docs/TITLE_TRANSFER.md",
+      "bytes": 6084,
+      "sha256": "2d8b895e040cc3eb2486c6ddb437ebf1d1d008636f2cab30cb76a9a9e3839962"
+    },
+    {
       "path": "docs/TITLE_WALKTHROUGH.md",
       "bytes": 6842,
       "sha256": "9e85e02003724f383983d429e0a1a0df134f63111461af12a4439f0185d964a6"
@@ -115,8 +120,8 @@
     },
     {
       "path": "recap.py",
-      "bytes": 13219,
-      "sha256": "677d8ef955d077d38fb33e68c473d20bd1de0a5da8bcb6a0f379067d88374da6"
+      "bytes": 14391,
+      "sha256": "e924947312d21d31755c1779e8b1b5c69fd885dc74b74ef59f837271abcb7151"
     },
     {
       "path": "replay_local.py",
@@ -259,6 +264,11 @@
       "sha256": "4f5a4de0397293960520bb2d47c55439c96123f630b36148b56035c136f1123b"
     },
     {
+      "path": "test_title_transfer.py",
+      "bytes": 9176,
+      "sha256": "be4e3c3cb184a77d6c6059577af7a224165b2c6fd122f9a8249b9c6082114907"
+    },
+    {
       "path": "test_title_walkthrough.py",
       "bytes": 5312,
       "sha256": "a95bba432960cf926d85ca032e1deb2835956001e00c8f74fdfab0fe36ebc2df"
@@ -307,6 +317,11 @@
       "path": "title_suggestion.py",
       "bytes": 2260,
       "sha256": "08a4ec133e87d54aff6a27f5c4fb4c1e0c282bf8d69c0b9fdcd897a99d3545c4"
+    },
+    {
+      "path": "title_transfer.py",
+      "bytes": 4952,
+      "sha256": "b4b33c6bb852c4620c8f78b263cdfd77499beed3c72a4be2252557e0644cb78d"
     },
     {
       "path": "verify_manifest.py",
