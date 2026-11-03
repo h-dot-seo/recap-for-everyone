@@ -1,12 +1,12 @@
 {
   "project": "recap-for-everyone",
-  "release": "0.40.0-bounded-web-zip-preparation",
+  "release": "0.41.0-web-zip-candidate-inventory",
   "date": "2026-11-03",
   "private_history_imported": false,
   "actual_corpora_included": false,
   "synthetic_examples_only": true,
   "license_status": "NOT_SELECTED",
-  "file_count": 86,
+  "file_count": 89,
   "files": [
     {
       "path": ".gitattributes",
@@ -30,8 +30,8 @@
     },
     {
       "path": "README.md",
-      "bytes": 51877,
-      "sha256": "5ac125ed8a519f07bca35a356933f496dff15e5a3c7bdd412931ec21b9d9fc8b"
+      "bytes": 52336,
+      "sha256": "1293ef8e941aa5295414e5b6faa1c7c9e8eaba21838a7702b9b21be8c57685b4"
     },
     {
       "path": "RIGHTS.md",
@@ -90,8 +90,8 @@
     },
     {
       "path": "docs/PREPARE_WEB_EXPORT.md",
-      "bytes": 6330,
-      "sha256": "a431a1d257d975b1f04b7a7e3536c171286bd343278f34326a028fd3b0e855cc"
+      "bytes": 6609,
+      "sha256": "289dd71e0fb2c91be67f817c4d507a761e24f6dbdddf01fd79aee5a78d54f22b"
     },
     {
       "path": "docs/TITLE_ADAPTER.md",
@@ -129,6 +129,11 @@
       "sha256": "9e85e02003724f383983d429e0a1a0df134f63111461af12a4439f0185d964a6"
     },
     {
+      "path": "docs/WEB_ZIP_INVENTORY.md",
+      "bytes": 4798,
+      "sha256": "5a039142304e8568cf72be7ad929fcd2b9eeebe97b76f46e04a62adfd02ebf55"
+    },
+    {
       "path": "examples/conversations.jsonl",
       "bytes": 443,
       "sha256": "7b3ad06b959ecea9d39ed485ecd571838e8a1217e8cbf51dc89e3d6de9121dc9"
@@ -149,19 +154,24 @@
       "sha256": "207e4b25d6088c4cbc729deeb5aa9993077214dbeadc8e19eb099b762175e434"
     },
     {
+      "path": "inspect_web_zip.py",
+      "bytes": 3027,
+      "sha256": "ecf1c629555bfcccfe13c28ab126f039a9c800c5638d361cc1a9e8d66180fe25"
+    },
+    {
       "path": "local_parser.py",
       "bytes": 18824,
       "sha256": "f6c4615bf261fcfce22faaa34c87eeeb85a563567687c6a3f34d49217f0b7050"
     },
     {
       "path": "prepare_web_export.py",
-      "bytes": 5334,
-      "sha256": "baaa0482bba1bc5a504de2e3c46a9a626c6f906c634b1f8d756096c93fda6348"
+      "bytes": 6360,
+      "sha256": "19a69410a58ecb32d2c45565dd02cf1552addd96f8a4755cc0e700f157720a0d"
     },
     {
       "path": "recap.py",
-      "bytes": 18315,
-      "sha256": "68d4010e37eb22e65c21999d6911dc215c3a72afa3a8a7b2bf4480687b602c1b"
+      "bytes": 18977,
+      "sha256": "8a4750d53edddb19849b7ce28ac1c26619e88843b9f1374b13c3b07560b27a70"
     },
     {
       "path": "replay_local.py",
@@ -232,6 +242,11 @@
       "path": "test_import_inspection.py",
       "bytes": 4632,
       "sha256": "8c97382a3ccd46bd1afa5d8baeca047c7415d73c4125cbdd1b19e65b9e996baf"
+    },
+    {
+      "path": "test_inspect_web_zip.py",
+      "bytes": 8708,
+      "sha256": "9df886f4176b0d649251df69be725b08bfea59079ed0ddc420f0757437a23095"
     },
     {
       "path": "test_local_codex.py",

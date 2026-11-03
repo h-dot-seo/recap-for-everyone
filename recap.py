@@ -115,8 +115,11 @@ def main():
     check = sub.add_parser('inspect', help='inspect export coverage without a database')
     check.add_argument('input'); check.add_argument('--format', choices=['web', 'local', 'local-codex'], required=True)
     check.add_argument('--conversation', help='inspect an explicit conversation selection without writing')
+    zip_info = sub.add_parser('inspect-web-zip', help='list conventional conversation JSON member metadata without decompression')
+    zip_info.add_argument('input'); zip_info.add_argument('--limit', type=int, default=50); zip_info.add_argument('--offset', type=int, default=0)
     prepare = sub.add_parser('prepare-web-export', help='validate one explicit ZIP JSON member and publish a new no-overwrite local file')
     prepare.add_argument('input'); prepare.add_argument('--member', required=True); prepare.add_argument('--output', required=True)
+    prepare.add_argument('--expected-archive-sha256', help='reject a ZIP whose bytes changed since metadata inspection')
     replay = sub.add_parser('replay-local', help='validate and project a narrow completed-turn text grammar')
     replay.add_argument('input')
     branch = sub.add_parser('web-branch', help='read one path from an explicit web export without a database')
@@ -167,12 +170,15 @@ def main():
         if name == 'title':
             command.add_argument('--set'); command.add_argument('--expected-revision', type=int)
     args = p.parse_args()
-    if args.command not in ('inspect', 'web-branch', 'replay-local', 'prepare-web-export') and not args.db:
-        p.error('--db is required except for inspect, web-branch, replay-local and prepare-web-export')
+    if args.command not in ('inspect', 'web-branch', 'replay-local', 'prepare-web-export', 'inspect-web-zip') and not args.db:
+        p.error('--db is required except for inspect, web-branch, replay-local, prepare-web-export and inspect-web-zip')
     try:
-        if args.command == 'prepare-web-export':
+        if args.command == 'inspect-web-zip':
+            from inspect_web_zip import inspect_web_zip
+            result = inspect_web_zip(args.input, args.limit, args.offset)
+        elif args.command == 'prepare-web-export':
             from prepare_web_export import prepare_web_export
-            result = prepare_web_export(args.input, args.member, args.output)
+            result = prepare_web_export(args.input, args.member, args.output, args.expected_archive_sha256)
         elif args.command == 'replay-local':
             from replay_local import reconstruct
             result = reconstruct(args.input)
@@ -263,7 +269,7 @@ def main():
             result = suggest(args.db, args.source, args.conversation)
     except (OSError, ValueError, KeyError, TypeError, sqlite3.Error) as exc:
         p.exit(1, str(exc) + '\n')
-    print(json.dumps(result, ensure_ascii=args.command in ('prepare-web-export', 'find', 'inspect', 'import', 'web-branch', 'suggest-branch-title', 'suggest-replay-title', 'preview-title', 'apply-title', 'review-titles', 'review-state', 'title-adapter-dry-run', 'title-adapter-simulate', 'export-title-plan', 'check-title-plan'), indent=2))
+    print(json.dumps(result, ensure_ascii=args.command in ('inspect-web-zip', 'prepare-web-export', 'find', 'inspect', 'import', 'web-branch', 'suggest-branch-title', 'suggest-replay-title', 'preview-title', 'apply-title', 'review-titles', 'review-state', 'title-adapter-dry-run', 'title-adapter-simulate', 'export-title-plan', 'check-title-plan'), indent=2))
 
 
 if __name__ == '__main__':

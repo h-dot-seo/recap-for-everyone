@@ -15,8 +15,10 @@ existing direct `local`/`local-codex` import path, not this web ZIP adapter.
 ## Explicit input, member and new destination
 
 Use an export you are authorized to read and a private existing directory outside
-the repository. Choose the exact member name using your normal ZIP viewer; the
-command does not guess, auto-select a part or list account metadata. For example:
+the repository. Choose the exact member name using the [metadata-only candidate inventory](WEB_ZIP_INVENTORY.md)
+or your normal ZIP viewer. Preparation does not guess or auto-select a part.
+The inventory shows only conventional conversation-file candidates, not unrelated
+account-metadata filenames. For example:
 
 ```sh
 python recap.py prepare-web-export ../private-data/export.zip --member conversations.json --output ../private-data/prepared-conversations.json
@@ -27,7 +29,8 @@ python recap.py --db ../private-data/archive.sqlite import ../private-data/prepa
 For a numbered part, pass its exact name, such as `--member conversations-001.json`.
 A safe nested member name is accepted; it is copied to the **explicit output file**,
 not to an automatically created directory tree. No other member is extracted.
-The source ZIP is unchanged and no database is accessed by preparation, even if
+Optionally add `--expected-archive-sha256` from the inventory receipt to reject
+changed ZIP bytes before decompression/output. The source ZIP is unchanged and no database is accessed by preparation, even if
 `--db` is supplied. No private files are bundled with this project; tests generate
 invented ZIPs in temporary directories.
 

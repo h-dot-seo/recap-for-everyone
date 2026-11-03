@@ -62,7 +62,7 @@ titles and text; the original `search` command still performs message-level FTS.
 `recap.py --db ... preview-title proposal.json` then
 `recap.py --db ... apply-title reviewed.json` for reviewed proposal application.
 The standalone scripts remain supported with equivalent behavior. `inspect`,
-`web-branch`, `replay-local` and `prepare-web-export` can omit `--db`.
+`web-branch`, `replay-local`, `prepare-web-export` and `inspect-web-zip` can omit `--db`.
 
 Start with the [two-format title walkthrough](docs/TITLE_WALKTHROUGH.md) for
 copyable synthetic web and Codex local examples, expected results and recovery
@@ -834,3 +834,10 @@ one explicitly selected ZIP JSON member and copies its bytes to a new local file
 without overwriting anything. It has strict size/compression limits, never imports
 or uploads automatically, and separates outer ZIP and prepared JSON hashes.
 See [official format references and preparation limits](docs/PREPARE_WEB_EXPORT.md).
+
+
+Use `inspect-web-zip ZIP` first to list conventionally named conversation JSON parts
+without decompression. It shows exact names and metadata-only rejection reasons,
+never certifies JSON validity or part completeness, and does not list unrelated
+account-file names. Pass its hash to preparation with `--expected-archive-sha256`
+when you want to reject a ZIP changed since inspection. See [candidate selection](docs/WEB_ZIP_INVENTORY.md).
