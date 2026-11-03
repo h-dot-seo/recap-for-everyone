@@ -1,12 +1,12 @@
 {
   "project": "recap-for-everyone",
-  "release": "0.38.0-historical-title-search",
+  "release": "0.39.0-export-scoped-search",
   "date": "2026-11-03",
   "private_history_imported": false,
   "actual_corpora_included": false,
   "synthetic_examples_only": true,
   "license_status": "NOT_SELECTED",
-  "file_count": 81,
+  "file_count": 83,
   "files": [
     {
       "path": ".gitattributes",
@@ -30,8 +30,8 @@
     },
     {
       "path": "README.md",
-      "bytes": 50960,
-      "sha256": "66e89c4f7d452a9c036d1db0e6dbcc3586aced9473005af36c65646b4d953656"
+      "bytes": 51411,
+      "sha256": "6d693a554d745cc89db3dbabacc83195070e32aaa51dfb5871fc40d381bc069b"
     },
     {
       "path": "RIGHTS.md",
@@ -65,8 +65,8 @@
     },
     {
       "path": "conversation_search.py",
-      "bytes": 7475,
-      "sha256": "4b73ccf612c6cfdf9c490bfeac6db29b1f1fda395f7b9d57d6469e73454bd5ac"
+      "bytes": 10408,
+      "sha256": "13df9aefff591b0177c4259130f793e98dd021ef187197921da6c34f78374c17"
     },
     {
       "path": "conversation_view.py",
@@ -77,6 +77,11 @@
       "path": "docs/ARCHITECTURE.md",
       "bytes": 2895,
       "sha256": "4c36ed56a12118c62606e43ad130359fad053a4d22f542f8ec41610913d87b2a"
+    },
+    {
+      "path": "docs/EXPORT_SCOPED_SEARCH.md",
+      "bytes": 5721,
+      "sha256": "3d9e0b4988b5b4a393fdd30996e0b0ef7f701a15f58ca57ae2f612377a4960af"
     },
     {
       "path": "docs/INPUT_SCOPE.md",
@@ -145,8 +150,8 @@
     },
     {
       "path": "recap.py",
-      "bytes": 17657,
-      "sha256": "940da0e0d9838d7b64a885b53c035ef26dfba18cfd396d05c7384cbf963eddbc"
+      "bytes": 17789,
+      "sha256": "7537da47c06387ca6b69373366e917873a007fc34af0a64ff7b5a48e74601068"
     },
     {
       "path": "replay_local.py",
@@ -202,6 +207,11 @@
       "path": "test_export_occurrences.py",
       "bytes": 4811,
       "sha256": "ba5418a70cc3920c57c9dca2a76d66409b823231372456faa5547d117f833ea9"
+    },
+    {
+      "path": "test_export_scoped_search.py",
+      "bytes": 8522,
+      "sha256": "102c411e17ff4bc60682a88e34c88decf458d935cbcb35a20666c627158e26c4"
     },
     {
       "path": "test_historical_title_search.py",

@@ -817,3 +817,11 @@ labels and the archived original title in addition to current titles/raw text.
 Results show the current title plus bounded matching historical records and their
 local revisions. This can expose private wording removed from a current label,
 so it is opt-in and read-only. See [historical title search semantics and limits](docs/TITLE_HISTORY_SEARCH.md).
+
+## Search one original export's message bodies
+
+`find "query" --export-sha256 ORIGINAL_SHA256` restricts body matches and snippets
+to messages linked to that exact original file hash in the export provenance ledger.
+Current/optional past titles remain conversation-wide local metadata. Original
+node/line evidence is shown separately from normalized artifact provenance.
+See [export-scoped search and trust boundaries](docs/EXPORT_SCOPED_SEARCH.md).

@@ -157,6 +157,7 @@ def main():
     listing.add_argument('--source'); listing.add_argument('--limit', type=int, default=50); listing.add_argument('--offset', type=int, default=0)
     find = sub.add_parser('find', help='search current titles and conversation text')
     find.add_argument('query'); find.add_argument('--source'); find.add_argument('--limit', type=int, default=20)
+    find.add_argument('--export-sha256', help='restrict message bodies to one original export provenance hash')
     find.add_argument('--include-title-history', action='store_true', help='also search prior local display titles; may reveal old private labels')
     for name in ('show', 'suggest-title', 'title'):
         command = sub.add_parser(name)
@@ -251,7 +252,7 @@ def main():
             result = conversation(args.db, args.source, args.conversation)
         elif args.command == 'find':
             from conversation_search import find
-            result = find(args.db, args.query, args.source, args.limit, args.include_title_history)
+            result = find(args.db, args.query, args.source, args.limit, args.include_title_history, args.export_sha256)
         else:
             from title_suggestion import suggest
             result = suggest(args.db, args.source, args.conversation)
