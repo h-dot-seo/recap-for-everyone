@@ -5,6 +5,7 @@ import tempfile
 import tracemalloc
 import unittest
 from pathlib import Path
+from contextlib import closing
 from unittest.mock import patch
 from conversation_search import find
 from conversation_view import conversations, conversation
@@ -91,7 +92,7 @@ class ArchiveScalingTests(unittest.TestCase):
         for number in range(30):
             first = titles(self.db, 'synthetic', f'c{number:05}', 'Old label', 0)
             titles(self.db, 'synthetic', f'c{number:05}', 'Reviewed label', first['revision'])
-        with sqlite3.connect(self.db) as c:
+        with closing(sqlite3.connect(self.db)) as c, c:
             c.execute("INSERT INTO title_history(source,conversation,title) VALUES('aaa','orphan','Ignored')")
             c.execute("INSERT INTO title_history(source,conversation,title) VALUES('synthetic','c00000-extra','Ignored')")
         queries = []

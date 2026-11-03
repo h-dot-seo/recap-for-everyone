@@ -1,6 +1,6 @@
 {
   "project": "recap-for-everyone",
-  "release": "0.7.0-bounded-archive-queries",
+  "release": "0.7.1-windows-fixture-cleanup",
   "date": "2026-11-03",
   "private_history_imported": false,
   "actual_corpora_included": false,
@@ -50,8 +50,8 @@
     },
     {
       "path": "VALIDATION.md",
-      "bytes": 3222,
-      "sha256": "62aff1f1b0ba00348c5ecc01869b5b5aa770cb3e568399dd997dac6a782b2045"
+      "bytes": 3461,
+      "sha256": "7c7daa7145cadc335d7fa6f8937caed71c719459007e55219bd5f428e5667be3"
     },
     {
       "path": "audit_publication.py",
@@ -105,8 +105,8 @@
     },
     {
       "path": "test_archive_scaling.py",
-      "bytes": 5237,
-      "sha256": "1157c9b2fcc3aa6a226a4660bf04de882973876ca5eb875bdce108a9d2f722e0"
+      "bytes": 5280,
+      "sha256": "bf2a05bbea971cfcdd67b3afb8e5b868dfe2c5fd477a2e8cc9377d9a5ad40a82"
     },
     {
       "path": "test_cli_e2e.py",

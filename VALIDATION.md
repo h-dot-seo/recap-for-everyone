@@ -49,3 +49,7 @@ native memory. SQL trace tests verify page-only title fetches and exact detail
 filtering. Empty archives and noninteger search limits are covered.
 Latest-title cursor tests cover repeated revisions, source filters, orphan history
 entries and a single history query across multiple conversations.
+
+Windows CI exposed a test-fixture connection left open after a transaction. The
+fixture now closes it explicitly before temporary-directory cleanup. No production
+query logic was changed in this correction. All 27 local tests pass again.
