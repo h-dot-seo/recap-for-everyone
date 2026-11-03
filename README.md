@@ -326,3 +326,31 @@ its rows. Reimporting retained original exports can recover repeated locations t
 older versions collapsed; missing locations cannot be reconstructed without those
 exports. Direct SQL consumers needing complete occurrences should use the new ledger
 plus legacy-only rows, or the structured view, rather than only the old table.
+
+## Provider-neutral title generation contract
+
+```sh
+python title_adapter.py --db ../demo.sqlite --source demo --conversation synthetic-chat generate > ../proposal.json
+python title_proposal.py --db ../demo.sqlite preview ../proposal.json > ../reviewed-preview.json
+# Inspect the proposed title and evidence before applying:
+python title_proposal.py --db ../demo.sqlite apply ../reviewed-preview.json
+```
+
+The default adapter is local extraction. A deterministic mock can validate response
+contracts; **no semantic model or external transport is connected**. Generation is
+read-only and separate from preview/apply. The adapter freezes a bounded recent-user
+payload and validates that returned evidence IDs were actually included. Unlike the
+standalone full-conversation excerpt command, local adapter selection uses only that
+bounded payload. Semantic title quality has not been evaluated.
+
+The declared external path requires both an explicit enabled setting and consent
+bound to provider, normalized HTTPS endpoint, model and the exact outbound payload
+hash. Even with both, this release returns `EXTERNAL_NOT_CONFIGURED` without sending
+anything. There is no credential creation/storage, paid API call or automatic retry.
+`prepare` prints private user text for local review only; keep request, response and
+proposal files outside the public repository.
+
+See [adapter contract and limits](docs/TITLE_ADAPTER.md) for payload limits,
+consent semantics, subprocess deadlines, fixed error codes and future transport
+requirements. Local/mock tests do not establish actual model quality or external
+service reliability.

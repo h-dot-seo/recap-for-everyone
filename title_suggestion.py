@@ -17,8 +17,7 @@ def _clean(text):
                            for ch in text).split())
 
 
-def suggest(db, source, conversation):
-    rows, digest = snapshot(db, source, conversation)
+def excerpt(rows):
     fallback = None
     selected = None
     for row in rows:
@@ -34,11 +33,15 @@ def suggest(db, source, conversation):
     if fallback is None:
         raise ValueError('no usable user text for a local title excerpt')
     row, text = selected or fallback
-    return dict(source=source, conversation=conversation, content_sha256=digest,
-                title=text[:80].rstrip(), evidence_message_ids=[row['message_id']],
-                provider='local-extractive',
+    return dict(title=text[:80].rstrip(), evidence_message_ids=[row['message_id']],
                 selection_method='first_non_greeting_user_excerpt' if selected else 'first_user_greeting_fallback',
                 truncated=len(text) > 80, semantic_validation='NOT_PERFORMED')
+
+
+def suggest(db, source, conversation):
+    rows, digest = snapshot(db, source, conversation)
+    return dict(source=source, conversation=conversation, content_sha256=digest,
+                provider='local-extractive', **excerpt(rows))
 
 
 def main():

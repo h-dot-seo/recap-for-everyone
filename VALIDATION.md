@@ -114,3 +114,13 @@ on different lines preserve both locators while message insertion stays idempote
 Legacy-only reads, retained-export recovery, other-source backfill, trigger-induced
 full rollback and rollback of the additive schema upgrade are covered. Existing
 message/title data and legacy provenance rows are preserved.
+
+Provider-neutral adapter increment: 99 synthetic tests passed. Local/mock generation
+is separate from preview/apply; exact-payload consent mismatches and disabled external
+configuration fail closed, and no external transport exists. Tests cover bounded
+user-only payloads, response whitelisting/evidence subsets, content/revision guards,
+fixed-code errors, malformed Unicode/JSON, response-size expansion, endpoint/timeout
+edges, subprocess stderr capture and termination/reaping after timeout or worker exit.
+Actual external provider behavior, cost, cancellation and semantic quality remain
+unverified. No credentials or private conversations were used.
+Adapter CLI Unicode proposals also work under an ASCII stdout encoding.

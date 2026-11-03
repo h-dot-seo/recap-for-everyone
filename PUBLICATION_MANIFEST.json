@@ -1,12 +1,12 @@
 {
   "project": "recap-for-everyone",
-  "release": "0.16.0-complete-export-occurrences",
+  "release": "0.17.0-provider-neutral-title-contract",
   "date": "2026-11-03",
   "private_history_imported": false,
   "actual_corpora_included": false,
   "synthetic_examples_only": true,
   "license_status": "NOT_SELECTED",
-  "file_count": 40,
+  "file_count": 43,
   "files": [
     {
       "path": ".gitattributes",
@@ -30,8 +30,8 @@
     },
     {
       "path": "README.md",
-      "bytes": 19225,
-      "sha256": "d465b7c9592ee148f2b6cdb3f822703e3b6d5daa14b52796162485e7d38341b3"
+      "bytes": 20843,
+      "sha256": "11c042e0521acdec4905343f13463f06d56680518445173c252fe183beb792da"
     },
     {
       "path": "RIGHTS.md",
@@ -50,8 +50,8 @@
     },
     {
       "path": "VALIDATION.md",
-      "bytes": 7468,
-      "sha256": "0e03e2635c8e39fcec505d25e2fae4733b909fec2fe82fcbc02d7f3b064da36e"
+      "bytes": 8196,
+      "sha256": "9483ab99e77bba1a8127070a0ae067c7a0b4c2828672cf5a36782263172d690a"
     },
     {
       "path": "audit_publication.py",
@@ -72,6 +72,11 @@
       "path": "docs/ARCHITECTURE.md",
       "bytes": 2895,
       "sha256": "4c36ed56a12118c62606e43ad130359fad053a4d22f542f8ec41610913d87b2a"
+    },
+    {
+      "path": "docs/TITLE_ADAPTER.md",
+      "bytes": 5291,
+      "sha256": "2d93841079f3ff9db853debcf06905d7e3c5035d025c003a3ac82a128af2f1f5"
     },
     {
       "path": "examples/conversations.jsonl",
@@ -164,6 +169,11 @@
       "sha256": "bd3972729f90758ea84f68b1df8e533151efd69522f3864a3f9a9699cb2a60b2"
     },
     {
+      "path": "test_title_adapter.py",
+      "bytes": 12930,
+      "sha256": "e922c17d41095d477828025fa7d9ab01b07ac0c2cdf333ab29cd73f9020fb614"
+    },
+    {
       "path": "test_title_proposal.py",
       "bytes": 3790,
       "sha256": "d2007233fb0bb6fde7432bf1e0593ec2c630e1346e60a7ca33d80c1be646d337"
@@ -189,6 +199,11 @@
       "sha256": "b58aec089618ad9f014a130e640f4c90ab1504143e10200df6bed60325fd97f9"
     },
     {
+      "path": "title_adapter.py",
+      "bytes": 13901,
+      "sha256": "b3a7e17f720f42fec2638d2dd2d1a59254095a5e0326051e3faae35529ab17da"
+    },
+    {
       "path": "title_proposal.py",
       "bytes": 3535,
       "sha256": "7b599380e86f09772e250858ad768b7cf7641049604db2bc357b4510ec34b440"
@@ -200,8 +215,8 @@
     },
     {
       "path": "title_suggestion.py",
-      "bytes": 2222,
-      "sha256": "0ce4cc6c3c27a44f83be7da6ad22e629bb20ecf98b5849d89dd26befd08fa271"
+      "bytes": 2260,
+      "sha256": "08a4ec133e87d54aff6a27f5c4fb4c1e0c282bf8d69c0b9fdcd897a99d3545c4"
     },
     {
       "path": "verify_manifest.py",
