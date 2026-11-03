@@ -276,3 +276,17 @@ cleanly instead of creating an empty file. Import remains the explicit operation
 that may create a new archive.
 Unicode format characters (Cf), including emoji joiners and bidi controls, remain
 permitted. This validation is not visual-spoofing protection.
+
+## Verify the complete publication inventory
+
+`python verify_manifest.py` now rejects files outside the publication allowlist,
+not only changed/missing listed bytes. It also rejects malformed metadata, unsafe
+paths, case-insensitive path aliases and symlinks. Only `.git` metadata and generated
+`__pycache__/*.pyc` files are ignored. Unexpected text/hidden files and non-bytecode
+cache contents fail verification.
+
+Run publication checks on the exact clean code candidate to be published. Local
+handoff bundles, private test output and other unlisted working files must remain
+outside that candidate. Do not add private files to the manifest just to make a
+check pass. This inventory check supplements the limited secret/type scanner and
+human content review; it does not establish anonymity or legal clearance.

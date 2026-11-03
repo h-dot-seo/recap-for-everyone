@@ -1,12 +1,12 @@
 {
   "project": "recap-for-everyone",
-  "release": "0.13.0-consistent-title-validation",
+  "release": "0.14.0-complete-publication-inventory",
   "date": "2026-11-03",
   "private_history_imported": false,
   "actual_corpora_included": false,
   "synthetic_examples_only": true,
   "license_status": "NOT_SELECTED",
-  "file_count": 36,
+  "file_count": 37,
   "files": [
     {
       "path": ".gitattributes",
@@ -30,8 +30,8 @@
     },
     {
       "path": "README.md",
-      "bytes": 16268,
-      "sha256": "eef43ad685a47e1b9ca1d61f60a3d8a2b2852fea03ff8760584810409c2343e7"
+      "bytes": 17081,
+      "sha256": "7dd9b5b79661692e2bc26b0ce3b8d746ab4085eed42c609b6080c440181c18e0"
     },
     {
       "path": "RIGHTS.md",
@@ -50,8 +50,8 @@
     },
     {
       "path": "VALIDATION.md",
-      "bytes": 5654,
-      "sha256": "70dca92729b9bbb61a3d8dceb23a64694c3fd62f106d19f568f5b281e29bca1d"
+      "bytes": 6208,
+      "sha256": "1e6967597fa20da6c844a3eb47aa113ad6f69e825e7b7aaec44058d7997396be"
     },
     {
       "path": "audit_publication.py",
@@ -134,6 +134,11 @@
       "sha256": "8c97382a3ccd46bd1afa5d8baeca047c7415d73c4125cbdd1b19e65b9e996baf"
     },
     {
+      "path": "test_manifest_verification.py",
+      "bytes": 4433,
+      "sha256": "a556cd2f86d064256a48eb1424611174ff8a0ee9e92a0552d926c83430b4d83e"
+    },
+    {
       "path": "test_recap.py",
       "bytes": 3127,
       "sha256": "28cdd3cd60f48d3b72c4f6b8869eb1ffa1864fd393a3392584efab69360df6d1"
@@ -185,8 +190,8 @@
     },
     {
       "path": "verify_manifest.py",
-      "bytes": 1141,
-      "sha256": "1e57854f4e6c88c31ed38a6d7d9481f8c5a57ceaba18de039251f7f66b471f05"
+      "bytes": 3623,
+      "sha256": "7dee6f04acd592c2c459483b0d7e576eb17dfeb4eeecc39dabb8c5c9f72a7056"
     }
   ]
 }
