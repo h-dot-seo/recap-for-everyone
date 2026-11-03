@@ -34,6 +34,27 @@ def _validate_mapping(mapping):
         complete.update(path)
 
 
+
+def _web_text(content, coverage):
+    """Explicit text-bearing shapes only; never stringify attachment metadata."""
+    kind = content.get('content_type')
+    if kind in ('code', 'execution_output'):
+        text = content.get('text')
+        if not isinstance(text, str):
+            raise ValueError('code and execution_output content require text')
+        if 'parts' in content:
+            raise ValueError('text-field content must not also contain parts')
+        coverage['text_field_messages'] += 1
+        return text
+    parts = content.get('parts', [])
+    if not isinstance(parts, list):
+        raise ValueError('message content parts must be an array')
+    coverage['nontext_parts_skipped'] += sum(not isinstance(part, str) for part in parts)
+    if 'text' in content:
+        coverage['unsupported_text_fields'] += 1
+    return '\n'.join(part for part in parts if isinstance(part, str))
+
+
 def normalize(path, kind, include_report=False):
     path = Path(path)
     raw = path.read_bytes()
@@ -58,7 +79,10 @@ def normalize(path, kind, include_report=False):
         data = loads(raw.decode('utf-8'))
         if not isinstance(data, list):
             raise ValueError('web export must be an array of conversations with mapping nodes')
-        report.update(conversations_in_export=len(data), mapping_nodes=0)
+        report.update(conversations_in_export=len(data), mapping_nodes=0,
+                      text_field_messages=0, nontext_parts_skipped=0,
+                      unsupported_text_fields=0, forked_conversations=0,
+                      branch_policy='all mapping nodes in export order; current_node is not selected')
         for conv in data:
             if not isinstance(conv, dict) or not isinstance(conv.get('mapping'), dict):
                 raise ValueError('conversation must contain a mapping object')
@@ -69,6 +93,9 @@ def normalize(path, kind, include_report=False):
                 raise ValueError('conversation title must be text or null')
             _validate_mapping(conv['mapping'])
             report['mapping_nodes'] += len(conv['mapping'])
+            children = Counter(node.get('parent') for node in conv['mapping'].values()
+                               if node.get('parent') is not None)
+            report['forked_conversations'] += int(any(count > 1 for count in children.values()))
             for node_id, node in conv['mapping'].items():
                 m = node.get('message')
                 if m is None:
@@ -83,10 +110,7 @@ def normalize(path, kind, include_report=False):
                         not isinstance(timestamp, (str, int, float)) or
                         isinstance(timestamp, float) and not math.isfinite(timestamp)):
                     raise ValueError('message create_time must be text or a finite number')
-                parts = m.get('content', {}).get('parts', [])
-                if not isinstance(parts, list):
-                    raise ValueError('message content parts must be an array')
-                text = '\n'.join(p for p in parts if isinstance(p, str))
+                text = _web_text(m['content'], report)
                 if not text.strip():
                     continue
                 rows.append(dict(conversation_id=cid, message_id=node_id,
@@ -105,6 +129,11 @@ def normalize(path, kind, include_report=False):
     if kind == 'web':
         report['nodes_without_extracted_text'] = report['mapping_nodes'] - len(rows)
     report['warnings'] = ['No messages extracted; inspect the supported format and source before importing.'] if not rows else []
+    if kind == 'web':
+        if report['forked_conversations']:
+            report['warnings'].append('Forked conversations include all branches; title suggestions may mix alternate paths.')
+        if report['unsupported_text_fields']:
+            report['warnings'].append('Unsupported text fields were not extracted.')
     return (rows, report) if include_report else rows
 
 

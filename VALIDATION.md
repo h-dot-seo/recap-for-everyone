@@ -124,3 +124,12 @@ edges, subprocess stderr capture and termination/reaping after timeout or worker
 Actual external provider behavior, cost, cancellation and semantic quality remain
 unverified. No credentials or private conversations were used.
 Adapter CLI Unicode proposals also work under an ASCII stdout encoding.
+
+### Web text variants and offline title round trip
+
+Synthetic tests cover exact code/output text, unsupported fields, skipped attachment
+metadata, ambiguous/malformed shapes rejected before database creation, and fork
+coverage without content leakage. A subprocess CLI scenario exercises inspect,
+import, local-adapter generation, preview, checked apply, stale rejection, current-title
+search, detail and title restoration. Generation/preview preserve database bytes and
+the original export is unchanged. No external service or actual model quality is tested.

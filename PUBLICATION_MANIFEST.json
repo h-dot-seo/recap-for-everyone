@@ -1,12 +1,12 @@
 {
   "project": "recap-for-everyone",
-  "release": "0.17.0-provider-neutral-title-contract",
+  "release": "0.18.0-web-text-coverage",
   "date": "2026-11-03",
   "private_history_imported": false,
   "actual_corpora_included": false,
   "synthetic_examples_only": true,
   "license_status": "NOT_SELECTED",
-  "file_count": 43,
+  "file_count": 44,
   "files": [
     {
       "path": ".gitattributes",
@@ -30,8 +30,8 @@
     },
     {
       "path": "README.md",
-      "bytes": 20843,
-      "sha256": "11c042e0521acdec4905343f13463f06d56680518445173c252fe183beb792da"
+      "bytes": 22609,
+      "sha256": "9a4a76bfc69cd70000364afc56a3801d55b660cca1ee1d387b13a59bb7373772"
     },
     {
       "path": "RIGHTS.md",
@@ -50,8 +50,8 @@
     },
     {
       "path": "VALIDATION.md",
-      "bytes": 8196,
-      "sha256": "9483ab99e77bba1a8127070a0ae067c7a0b4c2828672cf5a36782263172d690a"
+      "bytes": 8757,
+      "sha256": "0976740144333906a1e63356ea8a1d27c85881d72df59d9654c27a976ba9d4ea"
     },
     {
       "path": "audit_publication.py",
@@ -105,8 +105,8 @@
     },
     {
       "path": "session_workflow.py",
-      "bytes": 10529,
-      "sha256": "8726835c188757d2d366f98a07e3132051db7c507066e3478c5ef9692ca18c6a"
+      "bytes": 12046,
+      "sha256": "c661d0f297b54f6403458973e217103e0324043f6b093a0d3ad4a73b341ad3f4"
     },
     {
       "path": "strict_json.py",
@@ -192,6 +192,11 @@
       "path": "test_unified_cli.py",
       "bytes": 4061,
       "sha256": "0a33d37d7ba88f49039321ea58b5521e55e51d49751c9325ac2c0c1c924fc71b"
+    },
+    {
+      "path": "test_web_content.py",
+      "bytes": 5856,
+      "sha256": "83594ff9b43a2891c2e348810b95436c26246758520df8f6b8e0d1d72d1f4d21"
     },
     {
       "path": "test_web_validation.py",

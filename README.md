@@ -354,3 +354,28 @@ See [adapter contract and limits](docs/TITLE_ADAPTER.md) for payload limits,
 consent semantics, subprocess deadlines, fixed error codes and future transport
 requirements. Local/mock tests do not establish actual model quality or external
 service reliability.
+
+## Explicit web text shapes and branch coverage
+
+The web adapter extracts string entries from `content.parts` and now also supports
+`content_type: code` and `content_type: execution_output` with a string `text`
+field. These two text-field shapes must not also contain `parts`, so ambiguous
+representations fail before import. Nonblank text and its whitespace are preserved verbatim; whitespace-only messages
+are omitted. Attachment objects are never stringified. Other `text` fields are not guessed.
+This is a tested offline format contract, not a claim to cover every export version.
+
+Inspection and import receipts count text-field messages, skipped nontext parts,
+unsupported text fields and forked conversations, without exposing message text or
+IDs. Normalization and first import retain all mapping branches in original mapping order.
+`current_node` does not select a path. Fork warnings make clear that title proposals
+can mix alternate conversation paths; review the evidence before applying a title.
+Branch selection, binary attachments and remote title changes are not implemented.
+
+Reimporting an original export can add code/output messages skipped by older
+versions. Recovered messages are appended after existing archive messages, so their
+archive order can differ from the original mapping order; existing message positions
+are not rewritten. Existing message identities retain conflict protection. Newly recovered
+messages invalidate earlier content-bound title proposals, which must be generated
+and reviewed again. A mixed text/parts shape previously accepted may now be rejected;
+keep the original export and use a separately normalized explicit representation
+rather than editing archived evidence. Checked titles affect only the local display.
