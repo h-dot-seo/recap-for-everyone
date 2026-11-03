@@ -1,12 +1,12 @@
 {
   "project": "recap-for-everyone",
-  "release": "0.30.0-mock-title-transfer",
+  "release": "0.31.0-selected-conversation-import",
   "date": "2026-11-03",
   "private_history_imported": false,
   "actual_corpora_included": false,
   "synthetic_examples_only": true,
   "license_status": "NOT_SELECTED",
-  "file_count": 65,
+  "file_count": 67,
   "files": [
     {
       "path": ".gitattributes",
@@ -30,8 +30,8 @@
     },
     {
       "path": "README.md",
-      "bytes": 47330,
-      "sha256": "5d3cc9de4376799d3ce9debc895b75619373c44a32ec84cdbeaf372e917e13ba"
+      "bytes": 47866,
+      "sha256": "bb9bdc080f651b99d5c483b10d538561cfde804409762a5ebcff228b4139a224"
     },
     {
       "path": "RIGHTS.md",
@@ -79,6 +79,11 @@
       "sha256": "4c36ed56a12118c62606e43ad130359fad053a4d22f542f8ec41610913d87b2a"
     },
     {
+      "path": "docs/INPUT_SCOPE.md",
+      "bytes": 5624,
+      "sha256": "49ba8bf5e7275a100f67e67535b57ac471be1a5063be80c619a9db4fc1ae0b25"
+    },
+    {
       "path": "docs/TITLE_ADAPTER.md",
       "bytes": 5291,
       "sha256": "2d93841079f3ff9db853debcf06905d7e3c5035d025c003a3ac82a128af2f1f5"
@@ -120,8 +125,8 @@
     },
     {
       "path": "recap.py",
-      "bytes": 14391,
-      "sha256": "e924947312d21d31755c1779e8b1b5c69fd885dc74b74ef59f837271abcb7151"
+      "bytes": 14679,
+      "sha256": "ef575b4b8dd81b5b6aab05c20632183dc9a9679f5401f781b81f79ae3eb59a9e"
     },
     {
       "path": "replay_local.py",
@@ -135,8 +140,8 @@
     },
     {
       "path": "session_workflow.py",
-      "bytes": 13946,
-      "sha256": "ddd9265457f019b18a6bb38f83556031b85cbdccbd5a290c1575eac7d9357327"
+      "bytes": 15860,
+      "sha256": "081cb5ab9f3482582f73621d4f138da2b7741772d9074944b457ae0d27551294"
     },
     {
       "path": "strict_json.py",
@@ -227,6 +232,11 @@
       "path": "test_rollout_context.py",
       "bytes": 5182,
       "sha256": "e8fcd9a6fb78afd390ac8f6a10afe214d39940200a8be5b520dd8774f93b7d06"
+    },
+    {
+      "path": "test_selected_import.py",
+      "bytes": 8229,
+      "sha256": "6249583a9b79d21fba849e17735a02b09bf99757a0713911abe6a8cb08be2f2d"
     },
     {
       "path": "test_session_workflow.py",

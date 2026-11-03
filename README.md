@@ -757,3 +757,12 @@ rename or transmission occurs.** The CLI does not persist simulated state.
 See [the mock contract and synthetic example](docs/TITLE_TRANSFER.md), including
 unsigned approval and cross-system transaction limits. This is separate from the
 local title-text generation adapter and does not enable an external model API.
+
+## Import only an explicit conversation
+
+`inspect` and `import` accept `--conversation ID` for `web`, `local` and
+`local-codex`. Only selected extracted messages enter the database; the original
+whole-file hash, node/line locators and all selected branches/raw history remain
+intact. The file is still fully read and validated. Existing coverage is file-wide;
+`selection` separately reports selected/excluded message counts. This does not
+remove anything already indexed. See [input scope and failure boundaries](docs/INPUT_SCOPE.md).

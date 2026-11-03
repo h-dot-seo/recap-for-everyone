@@ -55,9 +55,30 @@ def _web_text(content, coverage):
     return '\n'.join(part for part in parts if isinstance(part, str))
 
 
-def normalize(path, kind, include_report=False):
+def normalize(path, kind, include_report=False, conversation=None):
     path = Path(path)
-    return _normalize_bytes(path.read_bytes(), path.name, kind, include_report)
+    raw = path.read_bytes()
+    rows, report = _normalize_bytes(raw, path.name, kind, include_report=True)
+    if conversation is not None:
+        if not isinstance(conversation, str) or not conversation:
+            raise ValueError('selected conversation must be a nonempty string')
+        if kind == 'web':
+            # Reuse the immutable byte snapshot, not a second file read. Selecting
+            # one identity must not silently combine duplicate export records.
+            records = loads(raw.decode('utf-8'))
+            matches = sum((record.get('id') or record.get('conversation_id')) == conversation for record in records)
+            if matches != 1:
+                raise ValueError('selected conversation must identify exactly one web export record')
+        selected = [row for row in rows if row['conversation_id'] == conversation]
+        if not selected:
+            raise ValueError('no extracted messages for selected conversation; inspect the full export')
+        report['selection'] = dict(conversation=conversation, selected_messages=len(selected),
+                                  excluded_messages=len(rows)-len(selected),
+                                  selected_role_counts=dict(sorted(Counter(row['role'] for row in selected).items())),
+                                  coverage_scope='all other coverage counts and warnings describe the entire input file',
+                                  policy='only this conversation; preserve all extracted branches or raw local records')
+        rows = selected
+    return (rows, report) if include_report else rows
 
 
 def _normalize_bytes(raw, source_name, kind, include_report=False):
@@ -157,13 +178,13 @@ def _normalize_bytes(raw, source_name, kind, include_report=False):
     return (rows, report) if include_report else rows
 
 
-def inspect_export(path, kind):
-    _, report = normalize(path, kind, include_report=True)
+def inspect_export(path, kind, conversation=None):
+    _, report = normalize(path, kind, include_report=True, conversation=conversation)
     return dict(report, mode='inspection only; no database access')
 
 
-def import_export(db, source, path, kind):
-    rows, report = normalize(path, kind, include_report=True)
+def import_export(db, source, path, kind, conversation=None):
+    rows, report = normalize(path, kind, include_report=True, conversation=conversation)
     # Keep original hash/locator/branch metadata in a companion provenance table.
     with tempfile.TemporaryDirectory() as tmp:
         normalized = Path(tmp) / 'normalized.jsonl'
@@ -212,6 +233,8 @@ def main():
     sub = p.add_subparsers(dest='command', required=True)
     imp = sub.add_parser('import'); imp.add_argument('path'); imp.add_argument('--format', choices=['web', 'local', 'local-codex'], required=True); imp.add_argument('--source', required=True)
     check = sub.add_parser('inspect'); check.add_argument('path'); check.add_argument('--format', choices=['web', 'local', 'local-codex'], required=True)
+    imp.add_argument('--conversation', help='import only this explicit conversation after validating the whole file')
+    check.add_argument('--conversation', help='inspect an explicit conversation selection without writing')
     t = sub.add_parser('title'); t.add_argument('--source', required=True); t.add_argument('--conversation', required=True); t.add_argument('--set')
     t.add_argument('--expected-revision', type=int)
     a = p.parse_args()
@@ -221,14 +244,14 @@ def main():
         if a.command == 'title' and a.set is not None and a.expected_revision is None:
             raise ValueError('--set requires --expected-revision from a title preview')
         if a.command == 'inspect':
-            result = inspect_export(a.path, a.format)
+            result = inspect_export(a.path, a.format, a.conversation)
         elif a.command == 'import':
-            result = import_export(a.db, a.source, a.path, a.format)
+            result = import_export(a.db, a.source, a.path, a.format, a.conversation)
         else:
             result = titles(a.db, a.source, a.conversation, a.set, a.expected_revision)
     except (ValueError, OSError, KeyError, TypeError, sqlite3.Error) as e:
         p.exit(1, str(e) + '\n')
-    print(json.dumps(result, ensure_ascii=False, indent=2))
+    print(json.dumps(result, ensure_ascii=a.command in ('inspect', 'import'), indent=2))
 
 
 if __name__ == '__main__':
