@@ -128,6 +128,10 @@ def main():
     for name in ('preview-title', 'apply-title'):
         command = sub.add_parser(name, help='review a proposal' if name == 'preview-title' else 'apply a reviewed local display title')
         command.add_argument('input', help='proposal JSON for preview, reviewed preview JSON for apply')
+        if name == 'preview-title':
+            command.add_argument('--conversation', help='select exactly one READY item from a title review queue')
+    batch = sub.add_parser('review-titles', help='build a read-only page of local title proposals and collision warnings')
+    batch.add_argument('--source', required=True); batch.add_argument('--limit', type=int, default=20); batch.add_argument('--offset', type=int, default=0)
     transfer = sub.add_parser('title-adapter-dry-run', help='validate a mock-only transfer request without executing')
     transfer.add_argument('input'); transfer.add_argument('plan'); transfer.add_argument('target')
     simulation = sub.add_parser('title-adapter-simulate', help='simulate an explicitly approved title transfer in memory only')
@@ -160,6 +164,9 @@ def main():
             if not result['supported']:
                 raise SystemExit(1)
             return
+        elif args.command == 'review-titles':
+            from title_batch import review_queue
+            result = review_queue(args.db, args.source, args.limit, args.offset)
         elif args.command in ('title-adapter-dry-run', 'title-adapter-simulate'):
             from title_transfer import dry_run, simulate, MockTitleAdapter
             from strict_json import loads
@@ -174,6 +181,9 @@ def main():
             from title_proposal import preview, apply_preview
             from strict_json import loads
             value = loads(Path(args.input).read_text(encoding='utf-8'))
+            if args.command == 'preview-title' and args.conversation is not None:
+                from title_batch import select_proposal
+                value = select_proposal(value, args.conversation)
             result = preview(args.db, value) if args.command == 'preview-title' else apply_preview(args.db, value)
         elif args.command == 'suggest-replay-title':
             from replay_title import suggest_replay
@@ -227,7 +237,7 @@ def main():
             result = suggest(args.db, args.source, args.conversation)
     except (OSError, ValueError, KeyError, TypeError, sqlite3.Error) as exc:
         p.exit(1, str(exc) + '\n')
-    print(json.dumps(result, ensure_ascii=args.command in ('inspect', 'import', 'web-branch', 'suggest-branch-title', 'suggest-replay-title', 'preview-title', 'apply-title', 'title-adapter-dry-run', 'title-adapter-simulate', 'export-title-plan', 'check-title-plan'), indent=2))
+    print(json.dumps(result, ensure_ascii=args.command in ('inspect', 'import', 'web-branch', 'suggest-branch-title', 'suggest-replay-title', 'preview-title', 'apply-title', 'review-titles', 'title-adapter-dry-run', 'title-adapter-simulate', 'export-title-plan', 'check-title-plan'), indent=2))
 
 
 if __name__ == '__main__':

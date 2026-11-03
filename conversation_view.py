@@ -37,8 +37,8 @@ def _inventory(connection, source=None, conversation_id=None, limit=50, offset=0
 
 
 def conversations(db, source=None, limit=50, offset=0):
-    if type(limit) is not int or not 1 <= limit <= 1000 or type(offset) is not int or offset < 0:
-        raise ValueError('limit must be 1..1000 and offset must be nonnegative integers')
+    if type(limit) is not int or not 1 <= limit <= 1000 or type(offset) is not int or not 0 <= offset <= 2**63-1:
+        raise ValueError('limit must be 1..1000 and offset must be an integer in 0..9223372036854775807')
     connection = readonly(db)
     try:
         connection.execute('BEGIN')

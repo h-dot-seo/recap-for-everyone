@@ -766,3 +766,12 @@ whole-file hash, node/line locators and all selected branches/raw history remain
 intact. The file is still fully read and validated. Existing coverage is file-wide;
 `selection` separately reports selected/excluded message counts. This does not
 remove anything already indexed. See [input scope and failure boundaries](docs/INPUT_SCOPE.md).
+
+## Review multiple local title suggestions
+
+`review-titles --source SOURCE --limit 20 --offset 0` creates a read-only proposal
+page with current titles, unavailable-item reasons and advisory duplicate-title
+counts. It uses raw archive excerpts, not web active paths or retained Codex
+history. Select one item with `preview-title queue.json --conversation ID`, review
+the resulting preview, then use the existing single-title apply command. There is
+no bulk apply or remote mutation. See [title review queue limits and examples](docs/TITLE_REVIEW_QUEUE.md).

@@ -76,7 +76,7 @@ class ConversationViewTests(unittest.TestCase):
         self.assertEqual(len(result['messages'][0]['export_provenance']), 2)
 
     def test_invalid_requests_and_missing_database(self):
-        for options in ({'limit': 0}, {'limit': 1001}, {'offset': -1}, {'limit': True}):
+        for options in ({'limit': 0}, {'limit': 1001}, {'offset': -1}, {'offset': 2**63}, {'limit': True}):
             with self.assertRaises(ValueError):
                 conversations(self.db, **options)
         with self.assertRaises(ValueError):
@@ -94,3 +94,12 @@ class ConversationViewTests(unittest.TestCase):
                                     capture_output=True, text=True, timeout=20)
             self.assertEqual(result.returncode, 0, result.stderr)
             self.assertEqual(json.loads(result.stdout)['scope'], 'local archive only')
+
+    def test_oversized_offset_cli_is_a_clean_failure(self):
+        before = self.db.read_bytes()
+        for script in ('recap.py', 'conversation_view.py'):
+            result = subprocess.run([sys.executable, script, '--db', str(self.db), 'list', '--offset', str(2**63)],
+                                    capture_output=True, text=True, timeout=20)
+            self.assertEqual(result.returncode, 1); self.assertNotIn('Traceback', result.stderr)
+            self.assertEqual(result.stdout, '')
+        self.assertEqual(self.db.read_bytes(), before)
