@@ -119,6 +119,11 @@ def main():
     branch_title = sub.add_parser('suggest-branch-title', help='suggest a local title from an archived export branch')
     branch_title.add_argument('input'); branch_title.add_argument('--source', required=True)
     branch_title.add_argument('--conversation', required=True); branch_title.add_argument('--node')
+    plan = sub.add_parser('export-title-plan', help='export metadata for a manual title change')
+    plan.add_argument('input'); plan.add_argument('--format', choices=['web', 'local'], required=True)
+    plan.add_argument('--source', required=True); plan.add_argument('--conversation', required=True)
+    check_plan = sub.add_parser('check-title-plan', help='recheck a manual title plan without executing it')
+    check_plan.add_argument('input'); check_plan.add_argument('plan')
     export = sub.add_parser('import', help='import an explicitly selected web/local export')
     export.add_argument('input'); export.add_argument('--format', choices=['web', 'local'], required=True); export.add_argument('--source', required=True)
     listing = sub.add_parser('list', help='list conversations and current display titles')
@@ -134,7 +139,14 @@ def main():
     if args.command not in ('inspect', 'web-branch') and not args.db:
         p.error('--db is required except for inspect and web-branch')
     try:
-        if args.command == 'suggest-branch-title':
+        if args.command == 'export-title-plan':
+            from title_plan import make_plan
+            result = make_plan(args.db, args.source, args.conversation, args.input, args.format)
+        elif args.command == 'check-title-plan':
+            from title_plan import check_plan
+            from strict_json import loads
+            result = check_plan(args.db, args.input, loads(Path(args.plan).read_text(encoding='utf-8')))
+        elif args.command == 'suggest-branch-title':
             from branch_title import suggest_branch
             result = suggest_branch(args.db, args.source, args.conversation, args.input, args.node)
         elif args.command == 'web-branch':
@@ -176,7 +188,7 @@ def main():
             result = suggest(args.db, args.source, args.conversation)
     except (OSError, ValueError, KeyError, TypeError, sqlite3.Error) as exc:
         p.exit(1, str(exc) + '\n')
-    print(json.dumps(result, ensure_ascii=args.command in ('web-branch', 'suggest-branch-title'), indent=2))
+    print(json.dumps(result, ensure_ascii=args.command in ('web-branch', 'suggest-branch-title', 'export-title-plan', 'check-title-plan'), indent=2))
 
 
 if __name__ == '__main__':

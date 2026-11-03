@@ -9,19 +9,23 @@ from title_rules import validate_title
 from web_branch import branch_view
 
 
+def verify_export_messages(messages, archive):
+    by_id = {message['message_id']: message for message in archive['messages']}
+    for message in messages:
+        stored = by_id.get(message['message_id'])
+        if stored is None or any(stored[key] != message[key] for key in ('role', 'text', 'timestamp')):
+            raise ValueError('export text does not match the archived conversation')
+        expected = dict(original_sha256=message['origin_sha256'],
+                        locator=message['origin_locator'], parent_id=message.get('parent_id'))
+        if expected not in stored['export_provenance']:
+            raise ValueError('export lacks matching archived export provenance; import the original export first')
+
+
 def suggest_branch(db, source, conversation, path, node=None):
     branch = branch_view(path, conversation, node)
     # One archive read transaction covers message contents and both provenance ledgers.
     archive = archive_conversation(db, source, conversation)
-    by_id = {message['message_id']: message for message in archive['messages']}
-    for message in branch['messages']:
-        stored = by_id.get(message['message_id'])
-        if stored is None or any(stored[key] != message[key] for key in ('role', 'text', 'timestamp')):
-            raise ValueError('selected branch text does not match the archived conversation')
-        expected = dict(original_sha256=branch['original_sha256'],
-                        locator=message['origin_locator'], parent_id=message['parent_id'])
-        if expected not in stored['export_provenance']:
-            raise ValueError('selected branch lacks matching archived export provenance; import the original export first')
+    verify_export_messages(branch['messages'], archive)
     proposal = excerpt(branch['messages'])
     validate_title(proposal['title'])
     rows = [dict(message_id=m['message_id'], role=m['role'], text=m['text']) for m in archive['messages']]

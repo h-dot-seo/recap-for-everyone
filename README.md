@@ -457,3 +457,38 @@ reviewed revision, not the original export file or a live website selection. Lat
 changes to that file or its `current_node` alone do not invalidate a pinned proposal.
 Generate and review again if you want the newly selected branch. No external API,
 automatic import, credential handling or remote title update is involved.
+
+
+## Export a manual title-change plan for web or local sessions
+
+```sh
+# First review and set a local display title using the checked title workflow.
+python recap.py --db ../demo.sqlite export-title-plan ../conversations.json --format web --source demo --conversation synthetic > ../title-plan.json
+python recap.py --db ../demo.sqlite check-title-plan ../conversations.json ../title-plan.json
+# For local session exports use --format local with the explicit JSONL path.
+```
+
+Standalone equivalents are `title_plan.py --db ... export` and `... check`.
+This read-only interface exports versioned JSON after at least one explicit local
+title revision. It contains the source/conversation identity, archive original and
+proposed titles, revision and content/original-file hashes. It does not include message
+records or local file paths. **Titles may themselves quote private message text**, and
+IDs/hashes can be sensitive, so the plan is not safe to publish or send automatically.
+
+All text from the selected export conversation must match archived content and exact
+provenance. Web duplicates are rejected as ambiguous; repeated local occurrences are
+verified individually. Other archived branches or later imports remain intact. The
+check recreates the plan from one current archive snapshot and requires an exact
+field/type match, rejecting changed export bytes, conversation contents, title
+revisions, extra fields and altered values. JSON field order does not matter. Checks
+are point-in-time, not a lock against subsequent changes. The plan is not signed or
+authenticated and cannot authorize execution.
+
+`manual_rename` and `no_change` compare against the **archive's original title**, not
+a live platform title. Archive identifiers are not verified service targets, even if
+they resemble service IDs. Both export and check always report `NOT_EXECUTED` and
+`remote_mutation: false`. There is no apply-to-platform command, login, transport,
+credential storage or paid API. To use the title elsewhere, identify the intended
+conversation in its own application, compare its actual current title and make the
+change yourself. A successful check does not establish that a remote change is needed
+or permitted. The original export and local database are never modified by these commands.

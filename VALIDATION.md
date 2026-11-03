@@ -153,3 +153,12 @@ compatibility, missing provenance and missing database rejection, no-user paths,
 stale title revision and off-path content additions. Subprocess tests exercise both
 entry points through preview/apply, repeat-apply rejection, search, all-branch detail
 and title restoration. Real model quality and website mutation remain untested.
+
+
+### Manual title plan export and recheck
+
+Seven synthetic cases cover the explicit-title prerequisite, metadata-only plan fields,
+unchanged database/source bytes, same-title revision changes, reformatted exports before
+and after import, content additions, altered values/types/extra keys, restored-title
+no-change semantics and local-session CLI equivalence. Duplicate JSON plan keys are
+rejected. All execution statuses remain NOT_EXECUTED; no remote title state is tested.

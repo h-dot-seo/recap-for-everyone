@@ -1,12 +1,12 @@
 {
   "project": "recap-for-everyone",
-  "release": "0.20.0-verified-branch-titles",
+  "release": "0.21.0-manual-title-plans",
   "date": "2026-11-03",
   "private_history_imported": false,
   "actual_corpora_included": false,
   "synthetic_examples_only": true,
   "license_status": "NOT_SELECTED",
-  "file_count": 48,
+  "file_count": 50,
   "files": [
     {
       "path": ".gitattributes",
@@ -30,8 +30,8 @@
     },
     {
       "path": "README.md",
-      "bytes": 27485,
-      "sha256": "1e0a54dcec91fe658b62f8f4e791e19564b991f583f7ce022dacd3fd729b84f2"
+      "bytes": 29772,
+      "sha256": "b85ec6c5024280e430fab98d2d08f91f410d1b9b30b264009d87799b90c0e631"
     },
     {
       "path": "RIGHTS.md",
@@ -50,8 +50,8 @@
     },
     {
       "path": "VALIDATION.md",
-      "bytes": 9854,
-      "sha256": "2f50321a31057156a9633468e3bece11b4db977562d3056ac5fdbccce115855a"
+      "bytes": 10331,
+      "sha256": "0ac82fb597c15f74299b09449d9a9e024a7ca5e3e8b3ace70ada7909215b407f"
     },
     {
       "path": "audit_publication.py",
@@ -60,8 +60,8 @@
     },
     {
       "path": "branch_title.py",
-      "bytes": 3114,
-      "sha256": "0310168299d7267a798943d9655b67a9e951eb338f4bd44844a0b77efb92ef94"
+      "bytes": 3194,
+      "sha256": "8d2f4794d436dc2cc86b784d1515dac1cd3c59600338cc38eadc173a6e873616"
     },
     {
       "path": "conversation_search.py",
@@ -105,8 +105,8 @@
     },
     {
       "path": "recap.py",
-      "bytes": 10568,
-      "sha256": "83b4d6da8ede41c6c6122326a5a43aa8df9a84c0747dddc811aa4d2861a2eaef"
+      "bytes": 11523,
+      "sha256": "5efc2937d38a72073d251f4c5b6460dcc68d67c13a9847902f41cb5d6755ea3b"
     },
     {
       "path": "session_workflow.py",
@@ -184,6 +184,11 @@
       "sha256": "e922c17d41095d477828025fa7d9ab01b07ac0c2cdf333ab29cd73f9020fb614"
     },
     {
+      "path": "test_title_plan.py",
+      "bytes": 5165,
+      "sha256": "ba13b05202ca8d257887c0deaaefd7c2d569cd13d77a2e448003291d3f37364b"
+    },
+    {
       "path": "test_title_proposal.py",
       "bytes": 3790,
       "sha256": "d2007233fb0bb6fde7432bf1e0593ec2c630e1346e60a7ca33d80c1be646d337"
@@ -222,6 +227,11 @@
       "path": "title_adapter.py",
       "bytes": 13901,
       "sha256": "b3a7e17f720f42fec2638d2dd2d1a59254095a5e0326051e3faae35529ab17da"
+    },
+    {
+      "path": "title_plan.py",
+      "bytes": 4261,
+      "sha256": "2e2d326782d8194a0a35eee66f46211fe219283a49fc9e41710e48070ceaf456"
     },
     {
       "path": "title_proposal.py",
