@@ -1,12 +1,14 @@
 # Select the input and indexing scope
 
-Recap processes an explicitly named **local UTF-8 text file**. It is not a web
+The import parsers process an explicitly named **local UTF-8 text file**.
+The separate [bounded ZIP preparation command](PREPARE_WEB_EXPORT.md) can create
+a new web JSON input from one explicitly selected archive member. It is not a web
 account collector or installed Codex session discovery tool. Use only exports you
 are authorized to read. Current formats are deliberately limited:
 
 | Format flag | Input and extraction | Important exclusions |
 | --- | --- | --- |
-| `web` | JSON array of conversation objects with `id`/`conversation_id` and `mapping` parent graph; string parts plus explicit code/execution-output text | No ZIP, HTML, browser database, attachment downloads, universal/stable vendor schema or active-branch selection on import |
+| `web` | JSON array of conversation objects with `id`/`conversation_id` and `mapping` parent graph; string parts plus explicit code/execution-output text | No direct ZIP parsing at import, HTML, browser database, attachment downloads, universal/stable vendor schema or active-branch selection on import |
 | `local` | Legacy local session JSONL metadata and supported user/assistant response records | Not a replay engine; legacy text normalization differs from typed Codex mode |
 | `local-codex` | Local JSONL, explicitly typed input/output text items from supported response messages | No tools/media, inherited-history resolution or complete model-context recovery; context markers are warnings |
 

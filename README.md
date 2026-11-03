@@ -62,7 +62,7 @@ titles and text; the original `search` command still performs message-level FTS.
 `recap.py --db ... preview-title proposal.json` then
 `recap.py --db ... apply-title reviewed.json` for reviewed proposal application.
 The standalone scripts remain supported with equivalent behavior. `inspect`,
-`web-branch` and `replay-local` can omit `--db`.
+`web-branch`, `replay-local` and `prepare-web-export` can omit `--db`.
 
 Start with the [two-format title walkthrough](docs/TITLE_WALKTHROUGH.md) for
 copyable synthetic web and Codex local examples, expected results and recovery
@@ -825,3 +825,12 @@ to messages linked to that exact original file hash in the export provenance led
 Current/optional past titles remain conversation-wide local metadata. Original
 node/line evidence is shown separately from normalized artifact provenance.
 See [export-scoped search and trust boundaries](docs/EXPORT_SCOPED_SEARCH.md).
+
+
+## Prepare a downloaded web export
+
+`prepare-web-export ZIP --member conversations.json --output NEW_FILE` validates
+one explicitly selected ZIP JSON member and copies its bytes to a new local file
+without overwriting anything. It has strict size/compression limits, never imports
+or uploads automatically, and separates outer ZIP and prepared JSON hashes.
+See [official format references and preparation limits](docs/PREPARE_WEB_EXPORT.md).
