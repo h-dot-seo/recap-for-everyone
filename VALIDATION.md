@@ -75,3 +75,9 @@ Eleventh increment: 50 synthetic tests passed. Shared duplicate-key decoding cov
 nested/escaped keys, valid Unicode values, local CRLF physical line numbers,
 no-create/no-change archive failure boundaries and clean proposal CLI errors.
 No real conversation files or private folders were read.
+
+Twelfth increment: 58 synthetic tests passed. Inspection checks web/local counts,
+original hashes, omitted message text/identities, empty/nontext warnings, coverage
+receipt equivalence, CLI operation without database access and required DB arguments
+for mutations. Counts describe parser extraction only, not corpus completeness.
+Malformed web title types are rejected during inspection.

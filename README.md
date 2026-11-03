@@ -234,3 +234,30 @@ corrected by their owner or re-exported; they are not automatically repaired.
 Duplicate keys are rejected even when their values match or occur in unused
 metadata. This decoder is duplicate-safe, not a full RFC-strict or resource-limited
 JSON parser; ordinary Python JSON depth/size behavior still applies.
+
+## Inspect an export before importing
+
+```sh
+python session_workflow.py inspect examples/web-export.json --format web
+python session_workflow.py inspect examples/local-session.jsonl --format local
+```
+
+Inspection validates and extracts in memory without opening or creating a database,
+even if `--db` is supplied. It reports the original byte hash/size, extracted message
+and conversation counts, and role counts without outputting message text, titles or
+conversation IDs. Web coverage reports mapping nodes without extracted text; local
+coverage reports observed records, session metadata counts, and records that did
+not produce a message. These counts include legitimate metadata/nontext records,
+not just errors, and do not prove complete capture. Zero extraction produces a
+warning so an unsupported/empty source is not mistaken for a populated archive.
+
+Import receipts include the same `coverage` object alongside existing record and
+insert counts. Both are calculated from the same frozen source bytes. Inspection
+has the same parsing/memory limits as import and does not reserve an input file;
+if the original changes afterward, compare the import receipt's original hash.
+Import/title commands still require an explicit `--db` path. No new source scanning,
+account access or external transmission is performed.
+Inspection reports extracted occurrences, not newly inserted unique messages.
+`parser_admission_status` describes parsing only, never database persistence. A
+successful inspection cannot predict conflicts with an existing archive or later
+filesystem/database failures.

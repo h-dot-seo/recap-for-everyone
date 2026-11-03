@@ -6,6 +6,7 @@ import math
 import sqlite3
 import tempfile
 from contextlib import closing
+from collections import Counter
 from pathlib import Path
 from local_parser import parse_artifact
 from recap import ingest, readonly
@@ -32,17 +33,22 @@ def _validate_mapping(mapping):
         complete.update(path)
 
 
-def normalize(path, kind):
+def normalize(path, kind, include_report=False):
     path = Path(path)
     raw = path.read_bytes()
     digest = hashlib.sha256(raw).hexdigest()
     rows = []
+    report = dict(format=kind, original_sha256=digest, original_bytes=len(raw))
     if kind == 'local':
         # Parse the same byte snapshot that was hashed, even if the source changes.
         with tempfile.TemporaryDirectory() as tmp:
             frozen = Path(tmp) / 'session.jsonl'
             frozen.write_bytes(raw)
             parsed = parse_artifact(frozen, path.name)
+        report.update(observed_records=parsed.observed_record_count,
+                      sessions_in_metadata=len({session.session_id for session in parsed.sessions}),
+                      parser_admission_status=parsed.admission_status, reason_code=parsed.reason_code,
+                      records_without_extracted_message=parsed.observed_record_count - len(parsed.messages))
         for m in parsed.messages:
             rows.append(dict(conversation_id=m.session_id, message_id=m.message_key,
                              role=m.role, timestamp=m.timestamp_utc or 'unknown', text=m.text,
@@ -51,13 +57,17 @@ def normalize(path, kind):
         data = loads(raw.decode('utf-8'))
         if not isinstance(data, list):
             raise ValueError('web export must be an array of conversations with mapping nodes')
+        report.update(conversations_in_export=len(data), mapping_nodes=0)
         for conv in data:
             if not isinstance(conv, dict) or not isinstance(conv.get('mapping'), dict):
                 raise ValueError('conversation must contain a mapping object')
             cid = conv.get('id') or conv.get('conversation_id')
             if not isinstance(cid, str) or not cid:
                 raise ValueError('conversation ID required')
+            if conv.get('title') is not None and not isinstance(conv['title'], str):
+                raise ValueError('conversation title must be text or null')
             _validate_mapping(conv['mapping'])
+            report['mapping_nodes'] += len(conv['mapping'])
             for node_id, node in conv['mapping'].items():
                 m = node.get('message')
                 if m is None:
@@ -86,16 +96,30 @@ def normalize(path, kind):
         raise ValueError('unsupported format')
     for row in rows:
         row['origin_sha256'] = digest
-    return rows
+    report.update(extracted_messages=len(rows),
+                  conversations_with_text=len({row['conversation_id'] for row in rows}),
+                  role_counts=dict(sorted(Counter(row['role'] for row in rows).items())),
+                  contains_message_text=False,
+                  limitations='Text extraction only; nontext content is not extracted. Counts do not establish completeness.')
+    if kind == 'web':
+        report['nodes_without_extracted_text'] = report['mapping_nodes'] - len(rows)
+    report['warnings'] = ['No messages extracted; inspect the supported format and source before importing.'] if not rows else []
+    return (rows, report) if include_report else rows
+
+
+def inspect_export(path, kind):
+    _, report = normalize(path, kind, include_report=True)
+    return dict(report, mode='inspection only; no database access')
 
 
 def import_export(db, source, path, kind):
-    rows = normalize(path, kind)
+    rows, report = normalize(path, kind, include_report=True)
     # Keep original hash/locator/branch metadata in a companion provenance table.
     with tempfile.TemporaryDirectory() as tmp:
         normalized = Path(tmp) / 'normalized.jsonl'
         normalized.write_text(''.join(json.dumps(r, ensure_ascii=False) + '\n' for r in rows), encoding='utf-8')
         result = ingest(db, source, normalized, provenance=rows)
+    result['coverage'] = report
     return result
 
 
@@ -134,16 +158,24 @@ def titles(db, source, conversation, title=None, expected_revision=None, expecte
 
 def main():
     p = argparse.ArgumentParser(description=__doc__)
-    p.add_argument('--db', required=True)
+    p.add_argument('--db')
     sub = p.add_subparsers(dest='command', required=True)
     imp = sub.add_parser('import'); imp.add_argument('path'); imp.add_argument('--format', choices=['web', 'local'], required=True); imp.add_argument('--source', required=True)
+    check = sub.add_parser('inspect'); check.add_argument('path'); check.add_argument('--format', choices=['web', 'local'], required=True)
     t = sub.add_parser('title'); t.add_argument('--source', required=True); t.add_argument('--conversation', required=True); t.add_argument('--set')
     t.add_argument('--expected-revision', type=int)
     a = p.parse_args()
     try:
+        if a.command != 'inspect' and not a.db:
+            raise ValueError('--db is required for import and title commands')
         if a.command == 'title' and a.set is not None and a.expected_revision is None:
             raise ValueError('--set requires --expected-revision from a title preview')
-        result = import_export(a.db, a.source, a.path, a.format) if a.command == 'import' else titles(a.db, a.source, a.conversation, a.set, a.expected_revision)
+        if a.command == 'inspect':
+            result = inspect_export(a.path, a.format)
+        elif a.command == 'import':
+            result = import_export(a.db, a.source, a.path, a.format)
+        else:
+            result = titles(a.db, a.source, a.conversation, a.set, a.expected_revision)
     except (ValueError, OSError, KeyError, TypeError, sqlite3.Error) as e:
         p.exit(1, str(e) + '\n')
     print(json.dumps(result, ensure_ascii=False, indent=2))

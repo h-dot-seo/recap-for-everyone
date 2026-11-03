@@ -14,9 +14,12 @@ description: Import explicitly authorized local conversation exports, search the
 7. For incremental organization, require a supplied cutoff or a verified checkpoint. Advance checkpoints only after scoped verification.
 8. Never upload conversations, credentials, profiles, logs or databases to the public code repository.
 
-The CLI implements local import/search/stats only. Online collection, title mutation,
-remote backup, semantic summarization and scheduling require separately authorized
-integrations; do not claim those capabilities are supplied by this repository.
+The CLIs implement local import/search/stats, export inspection, structured views,
+checked local display-title changes and reviewable user-text title excerpts. Online
+collection, remote title mutation/backup, semantic summarization and scheduling
+require separately authorized integrations; do not claim those capabilities are
+supplied by this repository. Inspect extraction coverage before import when useful,
+and review title proposals before applying them.
 
 ## Executable increment
 
