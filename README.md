@@ -189,3 +189,10 @@ of those message identities now raises a conflict rather than rewriting existing
 evidence. Keep the old archive; use a separately selected new database for a clean
 rebuild from retained exports if epoch-zero correctness is needed. No automatic
 migration is performed. Empty-string timestamps are now rejected explicitly.
+
+Reviewed title-proposal application requires an explicit nonnegative integer
+`expected_revision`. Missing, null, boolean, string or fractional revisions are
+rejected rather than disabling the stale-preview guard. The lower-level `titles`
+Python API retains its documented optional revision argument for compatibility;
+external adapters should use the checked proposal workflow. Missing/unreadable
+SQLite databases produce clean CLI errors and are not created by preview/snapshot.

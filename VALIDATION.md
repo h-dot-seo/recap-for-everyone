@@ -59,3 +59,8 @@ cycles, invalid parent/node shapes, duplicate object keys, malformed authors and
 timestamps, clean CLI rejection, epoch-zero preservation, unchanged existing archive
 bytes on validation failure, a 4,000-node chain, and valid fork order/provenance.
 Legacy epoch-zero conflict regression confirms old archive bytes are preserved.
+
+Ninth increment: 38 synthetic tests passed. A regression reproduces the former
+null-revision stale-write bypass and now verifies rejection without changing title
+history or archive bytes. Missing, boolean, fractional, string and negative leases
+are rejected. CLI null-revision and missing-database failures contain no traceback.

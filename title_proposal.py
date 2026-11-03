@@ -2,6 +2,7 @@
 import argparse
 import hashlib
 import json
+import sqlite3
 from pathlib import Path
 from recap import readonly
 from session_workflow import titles
@@ -41,6 +42,8 @@ def preview(db, proposal):
 
 
 def apply_preview(db, reviewed):
+    if not isinstance(reviewed, dict) or type(reviewed.get('expected_revision')) is not int or reviewed['expected_revision'] < 0:
+        raise ValueError('reviewed preview requires a nonnegative integer expected_revision')
     proposal = reviewed['proposal']
     # Revalidate the content fingerprint immediately before writing the title.
     preview(db, proposal)
@@ -63,7 +66,7 @@ def main():
         else:
             value = json.loads(a.input.read_text(encoding='utf-8'))
             result = preview(a.db, value) if a.command == 'preview' else apply_preview(a.db, value)
-    except (ValueError, OSError, KeyError, TypeError) as e:
+    except (ValueError, OSError, KeyError, TypeError, sqlite3.Error) as e:
         p.exit(1, str(e) + '\n')
     print(json.dumps(result, ensure_ascii=False, indent=2))
 

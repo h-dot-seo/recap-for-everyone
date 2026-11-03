@@ -1,6 +1,6 @@
 {
   "project": "recap-for-everyone",
-  "release": "0.8.0-web-export-validation",
+  "release": "0.9.0-required-proposal-revisions",
   "date": "2026-11-03",
   "private_history_imported": false,
   "actual_corpora_included": false,
@@ -30,8 +30,8 @@
     },
     {
       "path": "README.md",
-      "bytes": 10950,
-      "sha256": "276d1c760119ea47b038e6df34618bb01501cb9d210d277f31b513aa618b70e0"
+      "bytes": 11431,
+      "sha256": "cc33e53403a60f6ad39627e57df7a0e8469442779328e683292eff4a83e2740a"
     },
     {
       "path": "RIGHTS.md",
@@ -50,8 +50,8 @@
     },
     {
       "path": "VALIDATION.md",
-      "bytes": 3874,
-      "sha256": "a950c8847a25ef9813f26e8715e20bc10db974f7bda627ed2dde73904108eab1"
+      "bytes": 4204,
+      "sha256": "374ccf151575227dd0bb60c60709cb5bb37a1db00949a7836143c4615e33af10"
     },
     {
       "path": "audit_publication.py",
@@ -135,8 +135,8 @@
     },
     {
       "path": "test_title_proposal.py",
-      "bytes": 1670,
-      "sha256": "531c37151b22230091a8cf349311d4e1b495586e49d2a85cd78240e36a8bcf1e"
+      "bytes": 3790,
+      "sha256": "d2007233fb0bb6fde7432bf1e0593ec2c630e1346e60a7ca33d80c1be646d337"
     },
     {
       "path": "test_web_validation.py",
@@ -145,8 +145,8 @@
     },
     {
       "path": "title_proposal.py",
-      "bytes": 3375,
-      "sha256": "2418758779ff8c2365e211ec00391c3e2e869b0a00ae670e1d2e81cf61574f84"
+      "bytes": 3629,
+      "sha256": "83fef303c5cdb8b91920fca5d891a9c170da94fb9bb401baec754da74e89a1c9"
     },
     {
       "path": "verify_manifest.py",
