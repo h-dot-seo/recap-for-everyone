@@ -27,8 +27,10 @@ For example, searching `STRASSE` matches the original `Straße`. The reported sp
 covers the six original characters, not the seven characters in its case-folded
 representation. A query matching part of an expanded character still points to
 that whole original character. Korean and emoji use the same code-point offsets.
-Combining sequences are not normalized: search retains its existing case-folded
-literal-substring semantics and does not equate different normalization forms.
+By default, combining sequences are not normalized: search retains its existing
+case-folded literal-substring semantics. Opt-in [canonical Unicode search](CANONICAL_UNICODE_SEARCH.md)
+equates normalization forms and reports original covering offsets, including
+composition and reordering caveats.
 
 The earliest match in source order is used, regardless of query term order. Up to
 60 characters of leading context are included when the full match fits. Excerpts

@@ -505,3 +505,32 @@ text on failure. Generic proposal/response JSON contracts and replay grammar rem
 unchanged. The complete suite passes 531 tests; publication and manifest checks
 cover 127 files. No real corpus, repair, encoding guessing, model transmission or
 merge is added. Exact-commit cross-platform CI is checked after publication.
+
+
+### 2026-11-04: opt-in canonical Unicode conversation search
+
+Thirteen independent synthetic regressions cover NFC/NFD Korean and accents,
+canonical mark reordering, pre-fold Greek ypogegrammeni, Hangul composition and
+existing case-fold expansion. Default matching and cursor scopes stay unchanged.
+Canonical mode applies consistently to current titles, opted-in history and bodies,
+with source/export filters, normalized equivalent queries and mode/Unicode-version
+cursor rejection before archive access. Invalid option types also fail before reads.
+
+Both web and typed-local synthetic exports complete import, canonical find, exact
+message view, reviewed title application, current lookup and historical lookup.
+Original exports, archived message evidence, provenance and read-only database
+bytes are preserved. ASCII-output CLI parity and unchanged source slices are
+checked, including reordered covering intervals longer than the excerpt. A mapper
+check over 100,000 ordinary Hangul characters stays below 512 KiB traced allocations;
+pathologically long combining sequences are explicitly not constant-memory.
+
+The suite includes 1,000 seeded transform/mapping trials. Separate local checks
+compared all 1,112,064 Unicode scalar values and 20,000 mixed-character cases with
+the runtime normalization transform (Unicode 15.0.0); an independent 10,000-case
+randomized check over decomposition/case-fold-changing characters also passed.
+These checks do not claim exhaustive multi-character sequence verification.
+
+The complete suite passes 544 tests. Publication scanning and exact byte-manifest
+verification cover 130 files. No corpus, network/model integration, source repair,
+compatibility normalization or merge is introduced. Exact-commit Ubuntu/Windows
+Python 3.10/3.12 CI is verified separately after publication.

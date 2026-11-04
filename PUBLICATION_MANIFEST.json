@@ -1,12 +1,12 @@
 {
   "project": "recap-for-everyone",
-  "release": "0.57.0-source-text-compatibility",
+  "release": "0.58.0-canonical-unicode-search",
   "date": "2026-11-04",
   "private_history_imported": false,
   "actual_corpora_included": false,
   "synthetic_examples_only": true,
   "license_status": "NOT_SELECTED",
-  "file_count": 126,
+  "file_count": 129,
   "files": [
     {
       "path": ".gitattributes",
@@ -30,8 +30,8 @@
     },
     {
       "path": "README.md",
-      "bytes": 59624,
-      "sha256": "e982682a14af85c9ccad3b0f087f6c89d9fe04e2fe7a994a12388f09487eb7e4"
+      "bytes": 59998,
+      "sha256": "4287a06ff2353e36e7256f89a81f219219a692cb5e7e52b3e8d50f630568b5e0"
     },
     {
       "path": "RIGHTS.md",
@@ -45,13 +45,13 @@
     },
     {
       "path": "SKILL.md",
-      "bytes": 6291,
-      "sha256": "dd02a6d813350241b3fcfbe3ce4c3fa3ef0bf51e0745e52fedbfb280f5588abe"
+      "bytes": 6691,
+      "sha256": "5e6f60a68868d2dda0393063d08ce4998b1cad5505ac6d81045262b0f261fa08"
     },
     {
       "path": "VALIDATION.md",
-      "bytes": 31443,
-      "sha256": "d5c6bc8a6beb151ff9084beaf36b34beec328682629d3e6618ef1705e04bd6c3"
+      "bytes": 33268,
+      "sha256": "e5c39e3fb74d97306c20e6144b3efa72a95db7a203eea50a4c6343ed4a745dba"
     },
     {
       "path": "attributed_title.py",
@@ -70,8 +70,8 @@
     },
     {
       "path": "conversation_search.py",
-      "bytes": 18699,
-      "sha256": "858c38ffb6e3ee61e5729128206addf56d4e64ffab5fb88f00108affc73cee41"
+      "bytes": 20140,
+      "sha256": "6f2d0545e1e341c67af1fda533ab0a9a5240dc77c9bd9ac5da0b63ffce637379"
     },
     {
       "path": "conversation_view.py",
@@ -82,6 +82,11 @@
       "path": "docs/ARCHITECTURE.md",
       "bytes": 2895,
       "sha256": "4c36ed56a12118c62606e43ad130359fad053a4d22f542f8ec41610913d87b2a"
+    },
+    {
+      "path": "docs/CANONICAL_UNICODE_SEARCH.md",
+      "bytes": 5094,
+      "sha256": "1dcb318d72f939e659f749bb74b5b90355e6c69d544a73b7078221a7d9f56e3f"
     },
     {
       "path": "docs/EXPORT_INVENTORY.md",
@@ -120,13 +125,13 @@
     },
     {
       "path": "docs/SEARCH_EXCERPTS.md",
-      "bytes": 5237,
-      "sha256": "0facb84493e7822ad491dd4d1ae98e29bdd4e2347aee341b07ed6a380a84573c"
+      "bytes": 5375,
+      "sha256": "c1e88caa3c088df3d899618801eccd336b87d9c792c13ab5c653bc434055659f"
     },
     {
       "path": "docs/SEARCH_PAGINATION.md",
-      "bytes": 5044,
-      "sha256": "9482c81bff41804a00d112b3afa51e0d94b02ccbf4c8e9805d46f053d1a5c7f4"
+      "bytes": 5283,
+      "sha256": "538e5a1d91c96fc2da747ad9dbe78c7e35ad9aa7e59164152fd16407ced31771"
     },
     {
       "path": "docs/SOURCE_ATTRIBUTED_TITLES.md",
@@ -135,8 +140,8 @@
     },
     {
       "path": "docs/SOURCE_TEXT_COMPATIBILITY.md",
-      "bytes": 4718,
-      "sha256": "e8e62b09d959969421a1a45c3ddbab582ae3638ba286a104b51e045c608d2f66"
+      "bytes": 4724,
+      "sha256": "e496fa4555e5c7f594c8f6f22db9353827021faea9698a113a84066e9602e7cb"
     },
     {
       "path": "docs/START_HERE.md",
@@ -250,8 +255,8 @@
     },
     {
       "path": "recap.py",
-      "bytes": 22349,
-      "sha256": "ae5b10303317b8bc506dcf5acb06c2a84bc05fa78ccfe27f45144b48b84f96b8"
+      "bytes": 22510,
+      "sha256": "28827b4519102f12c21e2e9ba8cb915237d0743922a7ced3eb4ae1655e57fbda"
     },
     {
       "path": "replay_local.py",
@@ -292,6 +297,11 @@
       "path": "test_branch_title.py",
       "bytes": 6788,
       "sha256": "e46492c5de2bf922934c66ac56283a7b0518310d39820a4dbd34f8e68d95f44e"
+    },
+    {
+      "path": "test_canonical_search.py",
+      "bytes": 13819,
+      "sha256": "c8d71cd1264e1985d566bf737c5e726884c7715bb856e4ff9eebdf4668cebe83"
     },
     {
       "path": "test_cli_e2e.py",
@@ -627,6 +637,11 @@
       "path": "title_transfer.py",
       "bytes": 4952,
       "sha256": "b4b33c6bb852c4620c8f78b263cdfd77499beed3c72a4be2252557e0644cb78d"
+    },
+    {
+      "path": "unicode_search.py",
+      "bytes": 3350,
+      "sha256": "fff6f39c4128d7478f6f26560d286a928fc6304016507722ae5ca1d5f21cbd7d"
     },
     {
       "path": "verify_manifest.py",

@@ -90,3 +90,9 @@ boundaries. Use `docs/SOURCE_TEXT_COMPATIBILITY.md` to distinguish compatibility
 from repair: original hashes still include every byte, Unicode message characters
 are retained, and other encodings or misplaced signatures fail. Do not rewrite
 source bytes or stale hashes to force a title workflow to proceed.
+
+For visually identical Korean or accented text that misses default literal search,
+try `find --canonical-unicode`. This is a read-only opt-in; do not rewrite source
+text or title evidence to force a match. Keep the mode and runtime Unicode version
+on cursor pages. Report original covering spans accurately when normalization
+reorders or composes characters. See `docs/CANONICAL_UNICODE_SEARCH.md`.

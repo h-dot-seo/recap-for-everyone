@@ -6,6 +6,8 @@ import hashlib
 import json
 import re
 import sqlite3
+import unicodedata
+from unicode_search import canonical_fold, canonical_span
 from recap import readonly
 from strict_json import loads
 
@@ -13,9 +15,12 @@ from strict_json import loads
 MAX_CURSOR_CHARS = 16384
 
 
-def _cursor_scope(terms, source, history, export):
+def _cursor_scope(terms, source, history, export, canonical_unicode=False):
     value = dict(protocol='recap.find.cursor.v1', terms=terms, source=source,
                  include_title_history=history, export_sha256=export)
+    if canonical_unicode:
+        value.update(canonical_unicode='NFC(NFD(text).casefold())',
+                     unicode_version=unicodedata.unidata_version)
     return hashlib.sha256(json.dumps(value, sort_keys=True, ensure_ascii=True,
                                      separators=(',', ':')).encode('ascii')).hexdigest()
 
@@ -72,8 +77,8 @@ def _sample_slot(masks, candidate):
     return slot
 
 
-def _matching_excerpt(original, folded, terms, width=240):
-    """Return an unchanged source slice around the first literal casefold hit.
+def _matching_excerpt(original, folded, terms, width=240, canonical_unicode=False):
+    """Return an unchanged source slice around the first transformed literal hit.
 
     Case folding can expand a character (for example, sharp s to two s's).
     Translate the folded span without retaining an offset array for a long message.
@@ -83,7 +88,9 @@ def _matching_excerpt(original, folded, terms, width=240):
             if (position := folded.find(term)) >= 0]
     position, _, term = min(hits)
     stop = position + len(term)
-    if original.isascii():
+    if canonical_unicode and not original.isascii():
+        start, end = canonical_span(original, position, stop)
+    elif original.isascii():
         start, end = position, stop
     else:
         folded_offset = 0
@@ -119,19 +126,22 @@ def _matching_export_provenance(connection, tables, source, conversation, messag
     return samples,count
 
 
-def find(db, query, source=None, limit=20, include_title_history=False, export_sha256=None, cursor=None):
+def find(db, query, source=None, limit=20, include_title_history=False, export_sha256=None, cursor=None, canonical_unicode=False):
     if not isinstance(query, str) or type(limit) is not int:
         raise ValueError('query must be text and limit must be an integer')
+    if type(canonical_unicode) is not bool:
+        raise ValueError('canonical_unicode must be boolean')
+    fold = canonical_fold if canonical_unicode else str.casefold
     if type(include_title_history) is not bool:
         raise ValueError('include_title_history must be boolean')
     if export_sha256 is not None and (not isinstance(export_sha256, str) or len(export_sha256) != 64 or any(ch not in '0123456789abcdef' for ch in export_sha256)):
         raise ValueError('export_sha256 must be a lowercase SHA-256 hex digest')
-    terms = query.casefold().split()
+    terms = fold(query).split()
     if not terms or len(terms) > 20 or not 1 <= limit <= 1000:
         raise ValueError('provide 1..20 search terms and limit 1..1000')
     # Repeating a query term must not give it extra evidence-sampling weight.
     terms = list(dict.fromkeys(terms))
-    scope = _cursor_scope(terms, source, include_title_history, export_sha256)
+    scope = _cursor_scope(terms, source, include_title_history, export_sha256, canonical_unicode)
     after = _decode_cursor(cursor, scope)
     position = (after['rank'], after['source'], after['conversation']) if after is not None else None
     c = readonly(db)
@@ -219,7 +229,7 @@ def find(db, query, source=None, limit=20, include_title_history=False, export_s
                     title, revision = current_title['title'], current_title['id']
                 else:
                     title, revision = original_title, 0
-                folded_title = title.casefold()
+                folded_title = fold(title)
                 found = [term in folded_title for term in terms]
                 item = dict(source_id=key[0], conversation_id=key[1], original_title=original_title,
                             display_title=title, title_revision=revision, message_count=0,
@@ -231,7 +241,8 @@ def find(db, query, source=None, limit=20, include_title_history=False, export_s
                     item.update(matched_historical_title=False, historical_title_matches=[],
                                 historical_title_match_count=0, historical_title_matches_truncated=False)
                     def match_prior(prior_title, prior_revision, origin):
-                        matches = [term in prior_title.casefold() for term in terms]
+                        prior_folded = fold(prior_title)
+                        matches = [term in prior_folded for term in terms]
                         for index, matched in enumerate(matches):
                             found[index] = found[index] or matched
                         if any(matches):
@@ -249,7 +260,7 @@ def find(db, query, source=None, limit=20, include_title_history=False, export_s
                     if revision > 0:
                         match_prior(original_title, 0, 'archived_original_title')
             item['message_count'] += 1
-            text = row['text'].casefold()
+            text = fold(row['text'])
             matches = [term in text for term in terms]
             found = [previous or matched for previous, matched in zip(found, matches)]
             if any(matches):
@@ -261,7 +272,7 @@ def find(db, query, source=None, limit=20, include_title_history=False, export_s
                     continue
                 match = dict(message_id=row['message_id'], role=row['role'],
                              source_sha256=row['source_sha256'], source_line=row['source_line'])
-                match.update(_matching_excerpt(row['text'], text, terms))
+                match.update(_matching_excerpt(row['text'], text, terms, canonical_unicode=canonical_unicode))
                 if export_sha256 is not None:
                     samples,count = _matching_export_provenance(c, provenance_tables, key[0], key[1], row['message_id'], export_sha256)
                     match.update(export_provenance=samples, export_provenance_count=count, export_provenance_truncated=count>3)
@@ -293,6 +304,11 @@ def find(db, query, source=None, limit=20, include_title_history=False, export_s
         if export_sha256 is not None:
             result.update(export_sha256=export_sha256, export_provenance_available=bool(provenance_tables),
                           export_scope='Only message bodies linked by original-export provenance are searched. Current and optional historical titles remain conversation-wide archive metadata, not export-snapshot titles.')
+        if canonical_unicode:
+            result.update(canonical_unicode=True, unicode_version=unicodedata.unidata_version,
+                normalization='NFC(NFD(text).casefold())',
+                semantics=result['semantics'].replace('case-insensitive literal substrings', 'canonical caseless NFC literal substrings'),
+                snippet_semantics='unchanged source slice around the first hit in normalized search order; at most 240 Unicode code points; zero-based half-open covering offsets into original message text; composition or reordering can include intervening original marks')
         return result
     finally:
         c.close()
@@ -304,8 +320,9 @@ def main():
     p.add_argument('--include-title-history', action='store_true')
     p.add_argument('--export-sha256', help='restrict message bodies to one original export provenance hash')
     p.add_argument('--cursor', help='continue using the previous result next_cursor with the same query and filters')
+    p.add_argument('--canonical-unicode', action='store_true', help='match canonical Unicode equivalents without rewriting evidence')
     a=p.parse_args()
-    try: result=find(a.db,a.query,a.source,a.limit,a.include_title_history,a.export_sha256,a.cursor)
+    try: result=find(a.db,a.query,a.source,a.limit,a.include_title_history,a.export_sha256,a.cursor,a.canonical_unicode)
     except (ValueError,OSError,sqlite3.Error) as e: p.exit(1,str(e)+'\n')
     print(json.dumps(result,ensure_ascii=True,indent=2))
 

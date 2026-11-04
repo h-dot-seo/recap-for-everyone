@@ -175,6 +175,12 @@ External model/search behavior and scientific meaning are not evaluated by CI.
 
 ## Find conversations by their current title
 
+If copied Korean or accented text looks identical but does not match, opt in with
+`find --canonical-unicode`. [Canonical Unicode search](docs/CANONICAL_UNICODE_SEARCH.md)
+matches composed/decomposed equivalents while preserving original evidence and
+covering snippet offsets. The default remains unchanged; cursor pages must keep
+the same mode and runtime Unicode version.
+
 Large result sets support [cursor pagination](docs/SEARCH_PAGINATION.md). Copy
 `next_cursor` into `find --cursor TOKEN` with the same query and filters to continue
 past the first page, including more than 1,000 matches. Title-first ranking and

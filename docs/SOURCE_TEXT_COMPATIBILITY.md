@@ -22,7 +22,7 @@ verified source selections. No source is read again merely to decode its signatu
 
 Successful export coverage adds `utf8_bom_present: true` when a signature was
 present. Normalized `ingest` receipts and successful replay projections also add
-that field for signed input. No-BOM response shapes remain unchanged. This flag
+that field for BOM-prefixed input. No-BOM response shapes remain unchanged. This flag
 describes byte framing, not a verified exporter, person or authorization.
 
 ZIP preparation validates a selected member under the same rules, then copies its

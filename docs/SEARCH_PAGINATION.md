@@ -90,3 +90,7 @@ do not rewrite archive IDs to manufacture a cursor.
 For a stale cursor, restart without `--cursor` and inspect the new result. Do not
 edit its hashes to force continuation. All search pages are read-only: no messages,
 original exports, titles or review states are modified.
+
+With `--canonical-unicode`, also keep that flag and the same runtime Unicode
+database version on every page. Canonically equivalent normalized query terms
+share a cursor scope. See [canonical Unicode search](CANONICAL_UNICODE_SEARCH.md).
