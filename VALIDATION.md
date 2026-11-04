@@ -1269,3 +1269,25 @@ This is a narrow supported-input contract, not proof of a universal or stable
 vendor export schema. No real sessions, model transmission, automatic repair,
 remote title changes or merge occurs. Exact-commit Ubuntu/Windows Python 3.10/3.12
 CI is checked after push.
+
+### 2026-11-04: compare CLI diagnostics across native line endings
+
+The first web-content-tag commit's CI run 41824981222 passed both Ubuntu jobs but
+failed Windows Python 3.10 and 3.12. Each Windows run reported two assertion
+failures among 816 tests: the new byte-captured stderr checks compared native CRLF
+against a literal LF. Production rejected the malformed input with the correct
+fixed diagnostic; the four-platform run was not successful.
+
+The two test assertions now normalize only CRLF to LF before requiring the exact
+ASCII diagnostic and one final newline. Extra content, other changed whitespace,
+non-ASCII payloads, traceback, stdout output, database writes and proposal-file
+creation remain failures. No production behavior or diagnostic is changed.
+
+A deterministic twelfth module test executes the two original failure workflows
+under an idempotent CRLF stderr adapter. It runs five actual CLI failures, retains
+stdout and return codes, and checks nested temporary-resource cleanup explicitly.
+Before the two assertion changes, this test reproduced both Windows failures on
+Linux. The corrected module passes 12 tests; the final complete suite passes 817
+tests in 103.746 seconds. Public audit and manifest still cover 161 files. A new
+exact-commit four-platform CI run is required after this correction is pushed;
+the earlier failed run remains recorded as failed.

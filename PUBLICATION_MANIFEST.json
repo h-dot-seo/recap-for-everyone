@@ -1,6 +1,6 @@
 {
   "project": "recap-for-everyone",
-  "release": "0.77.0-web-content-tag-validation",
+  "release": "0.77.1-cli-line-ending-tests",
   "date": "2026-11-04",
   "private_history_imported": false,
   "actual_corpora_included": false,
@@ -50,8 +50,8 @@
     },
     {
       "path": "VALIDATION.md",
-      "bytes": 81823,
-      "sha256": "9232b96b83f2787f9a49556d9c3d0d462e80c79fad07dbe814db1a7f25d8d221"
+      "bytes": 83209,
+      "sha256": "ede1f2dbcd352460cdfe3162d0ad791c664f034f796a484ee24c5c83ba0b4699"
     },
     {
       "path": "attributed_title.py",
@@ -715,8 +715,8 @@
     },
     {
       "path": "test_web_content_type_validation.py",
-      "bytes": 13856,
-      "sha256": "9107278e5c29900c4a30461ed9f03246abab87733c34cc903ec1f0cb70c58845"
+      "bytes": 15386,
+      "sha256": "6b9df6488bb12465f9604710b61267f098d75834cd549fc6f6114594f2c0626f"
     },
     {
       "path": "test_web_validation.py",

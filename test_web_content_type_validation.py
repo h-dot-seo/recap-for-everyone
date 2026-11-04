@@ -168,7 +168,7 @@ class WebContentTypeValidationTests(unittest.TestCase):
         result = self.call('--source', 'web', '--conversation', 'selected', self.path,
                            '--output', output, script='branch_title.py', success=False, encoding='ascii')
         self.assertEqual(result.stdout, b'')
-        self.assertEqual(result.stderr.decode('ascii'), self.diagnostic + '\n')
+        self.assertEqual(result.stderr.decode('ascii').replace('\r\n', '\n'), self.diagnostic + '\n')
         self.assertFalse(output.exists())
         self.assertEqual(self.db.read_bytes(), before)
         self.assertEqual(self.path.read_bytes(), raw)
@@ -182,9 +182,41 @@ class WebContentTypeValidationTests(unittest.TestCase):
         for args in commands:
             result = self.call(*args, success=False, encoding='ascii')
             self.assertEqual(result.stdout, b'')
-            self.assertEqual(result.stderr.decode('ascii'), self.diagnostic + '\n')
+            self.assertEqual(result.stderr.decode('ascii').replace('\r\n', '\n'), self.diagnostic + '\n')
             self.assertFalse(self.db.exists())
             self.assertEqual(self.path.read_bytes(), raw)
+
+    def test_failure_workflows_accept_windows_crlf_without_relaxing_other_assertions(self):
+        real_run = subprocess.run
+        observed = []
+
+        def windows_stderr(*args, **kwargs):
+            result = real_run(*args, **kwargs)
+            original_stdout = result.stdout
+            original_code = result.returncode
+            if result.returncode:
+                # Idempotent on Windows too; never synthesize CRCRLF.
+                result.stderr = result.stderr.replace(b'\r\n', b'\n').replace(b'\n', b'\r\n')
+                self.assertEqual(result.stderr, self.diagnostic.encode('ascii') + b'\r\n')
+                observed.append(result.stderr)
+            self.assertEqual(result.stdout, original_stdout)
+            self.assertEqual(result.returncode, original_code)
+            return result
+
+        methods = (
+            'test_malformed_meaningful_request_cannot_save_partial_greeting_title',
+            'test_cli_failures_are_fixed_value_free_without_partial_output_or_archive')
+        for method in methods:
+            with self.subTest(method=method):
+                case = type(self)(method)
+                try:
+                    case.setUp()
+                    with patch('subprocess.run', side_effect=windows_stderr):
+                        getattr(case, method)()
+                finally:
+                    self.assertTrue(case.doCleanups())
+                self.assertFalse(case.root.exists())
+        self.assertEqual(len(observed), 5)
 
     def test_zip_preparation_rejects_before_output_staging(self):
         raw = self.write(dict(content_type=None, text='SYNTHETIC_PRIVATE'))
