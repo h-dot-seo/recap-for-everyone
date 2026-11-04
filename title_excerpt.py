@@ -6,10 +6,15 @@ GREETINGS = frozenset(('hi', 'hello', 'hey', 'good morning', 'good afternoon',
                        'good evening', 'thanks', 'thank you', '안녕', '안녕하세요',
                        '반가워요', '감사합니다', '고마워요'))
 
+# These format characters affect ordinary text shaping and emoji sequences.
+# Keeping them is not a claim that their placement or rendered label is safe.
+JOIN_CONTROLS = frozenset(('\u200c', '\u200d'))
+
 
 def _clean(text):
-    # Keep source evidence unchanged; remove controls only from the proposed label.
-    return ' '.join(''.join(' ' if unicodedata.category(ch) in ('Cc', 'Cf') else ch
+    # Keep source evidence unchanged. Retain join controls in the label; replace
+    # other Cc/Cf characters as before and collapse ordinary whitespace.
+    return ' '.join(''.join(' ' if ch not in JOIN_CONTROLS and unicodedata.category(ch) in ('Cc', 'Cf') else ch
                            for ch in text).split())
 
 
@@ -20,10 +25,15 @@ def excerpt(rows):
         if row['role'] != 'user':
             continue
         text = _clean(row['text'])
-        if not any(ch.isalnum() for ch in text):
+        # A letter beyond the returned prefix must not make a title consisting
+        # only of punctuation, emoji or invisible join controls look usable.
+        if not any(ch.isalnum() for ch in text[:80]):
             continue
         fallback = fallback or (row, text)
-        if text.casefold().strip(' .!?,。！？') not in GREETINGS:
+        # Compare canonically equivalent greetings without normalizing the
+        # selected label, source message, evidence identity or fingerprint.
+        greeting_key = unicodedata.normalize('NFC', text).casefold().strip(' .!?,。！？')
+        if greeting_key not in GREETINGS:
             selected = (row, text)
             break
     if fallback is None:

@@ -122,3 +122,8 @@ opening message bodies unnecessarily. Read its current top-level revision, not a
 event's older revision, when checking later pages or an explicit manual title write.
 Old titles can reveal removed private data and are not automatically eligible for
 reapplication. No restore is automatic; see `docs/TITLE_HISTORY_VIEW.md`.
+
+Local excerpt generation compares greetings canonically without normalizing the
+selected label or source evidence, and preserves ZWJ/ZWNJ in short labels. This is
+not grapheme-aware truncation or privacy clearance; format-character hints and
+explicit review still apply. See `docs/TITLE_REVIEW_HINTS.md#unicode-excerpt-boundaries`.

@@ -1,12 +1,12 @@
 {
   "project": "recap-for-everyone",
-  "release": "0.62.0-title-history-view",
+  "release": "0.63.0-unicode-title-excerpts",
   "date": "2026-11-04",
   "private_history_imported": false,
   "actual_corpora_included": false,
   "synthetic_examples_only": true,
   "license_status": "NOT_SELECTED",
-  "file_count": 138,
+  "file_count": 139,
   "files": [
     {
       "path": ".gitattributes",
@@ -30,8 +30,8 @@
     },
     {
       "path": "README.md",
-      "bytes": 61577,
-      "sha256": "6b89d300b13fa3d220b942b04c3546c5732440202fd17f6776739c2fd3bd7b07"
+      "bytes": 62480,
+      "sha256": "fa679f6f805a020ce820806b069e48fb71eb5a3fa57619ac23762c529b2cb364"
     },
     {
       "path": "RIGHTS.md",
@@ -45,13 +45,13 @@
     },
     {
       "path": "SKILL.md",
-      "bytes": 8347,
-      "sha256": "61b629e671cc8117237d81b17ad9172bbbaf61aae7e0a48e4864e04c2aff4ad1"
+      "bytes": 8680,
+      "sha256": "1acdc5de2a33d1ba85471d3565ed51ff6e2d57336651da73a3ebb8825d39d8ef"
     },
     {
       "path": "VALIDATION.md",
-      "bytes": 40560,
-      "sha256": "48a79973f71f7b49795111e7b9dfcbc576d40970e7f70b7c911fe93e4f136ec2"
+      "bytes": 42686,
+      "sha256": "64597799ef07e7a3926d5f1d52779090db05afa4b65c520a154eae6c3c7ac153"
     },
     {
       "path": "attributed_title.py",
@@ -175,8 +175,8 @@
     },
     {
       "path": "docs/TITLE_REVIEW_HINTS.md",
-      "bytes": 7818,
-      "sha256": "c3d6f70d91556b796b202326e204aebfcfa6d7e79267d0680f593668c5ab6393"
+      "bytes": 10691,
+      "sha256": "43f958d1950c65d67b23ea1fbc37ea4753e8e2d79033400891d81b195c01bc2d"
     },
     {
       "path": "docs/TITLE_REVIEW_QUEUE.md",
@@ -604,6 +604,11 @@
       "sha256": "e59ec550ea80504eeaf91e7e293af8bdff736035ebec167811afc19df1b15966"
     },
     {
+      "path": "test_unicode_title_excerpt.py",
+      "bytes": 15768,
+      "sha256": "f5b5e8d66554e09babbe8ebeef5965eb1d292d99b0f269d33071c09fc2f961c9"
+    },
+    {
       "path": "test_unified_cli.py",
       "bytes": 4061,
       "sha256": "0a33d37d7ba88f49039321ea58b5521e55e51d49751c9325ac2c0c1c924fc71b"
@@ -640,8 +645,8 @@
     },
     {
       "path": "title_excerpt.py",
-      "bytes": 1413,
-      "sha256": "a2308b1a3d8a74f841957fe9ca3174a0c99705d1ab49ad4aada2bf52ef85b4e6"
+      "bytes": 2092,
+      "sha256": "ffcab18f5588dc334c241a1d148eee29accbb53cc9d0ec4444ab60d318904327"
     },
     {
       "path": "title_history.py",

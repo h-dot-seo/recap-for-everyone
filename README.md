@@ -295,12 +295,24 @@ python title_proposal.py --db ../demo.sqlite preview ../proposal.json > ../revie
 python title_proposal.py --db ../demo.sqlite apply ../reviewed-preview.json
 ```
 
-The local generator selects the first usable user message that is not an exact
-match for a small built-in English/Korean greeting list. It normalizes whitespace,
-removes control/format characters from the proposed label only, and takes up to 80
-characters. If all usable user messages are greetings, the output explicitly marks
+The local generator selects the first usable user message that does not match a
+small built-in English/Korean greeting list after NFC normalization, case folding
+and the existing punctuation trimming. NFC applies only to this comparison, so
+decomposed Korean greetings do not hide the next meaningful request. It normalizes
+whitespace and replaces control/format characters in the proposed label with spaces,
+except U+200C ZWNJ and U+200D ZWJ, which are preserved for text shaping and joined
+emoji. It takes up to 80 Unicode code points, not complete grapheme clusters.
+The returned prefix must itself contain an alphanumeric code point; otherwise that
+message is skipped rather than producing an invisible or punctuation-only title.
+If all usable user messages are greetings, the output explicitly marks
 that fallback. No usable user text produces an error rather than an assistant-based
 title. Source messages are never modified.
+
+The selected label retains its original normalization and join controls; it is
+not sanitized or guaranteed to render identically everywhere. Review hints still
+flag format characters. Truncation can split an emoji or combining sequence, and
+other format characters, including emoji tags, retain the existing space-replacement
+behavior. See [Unicode excerpt boundaries](docs/TITLE_REVIEW_HINTS.md#unicode-excerpt-boundaries).
 
 Output is a `local-extractive` proposal with one user evidence ID and the conversation
 content fingerprint. Generating and previewing are read-only; applying still requires

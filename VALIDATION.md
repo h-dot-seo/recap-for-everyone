@@ -436,37 +436,6 @@ reconstruction. Full source/archive reads remain necessary; outbound bounds do
 not establish an archive memory bound. Exact-commit cross-platform CI is checked
 separately after publication.
 
-
-### 2026-11-04: explicit bounded local title-history review
-
-Eighteen independent synthetic regressions cover the new read-only history API
-and both CLI routes. They verify newest-first local change events, global sparse
-revision IDs, exact source/conversation scope, repeated/no-op/reversal events,
-current versus historical revisions, offset boundaries, total/remaining counts
-and optional stale-page rejection. Other conversations' writes and new message
-imports do not invalidate the title-only guard; a no-op title write does.
-
-Original titles remain verbatim, including empty, multiline and overlength legacy
-values. Missing history tables are not created, missing databases stay missing,
-and orphan history cannot create an unknown conversation. Invalid identity/count/
-revision types are rejected before database access. SQL authorizer instrumentation
-denies message-body/role reads, and a row-factory check bounds materialized rows
-while reading a small page from 2001 events. A concurrent WAL rename does not mix
-the old current title with a new count or page.
-
-Synthetic web/local imports run through Unicode CLI history reads and deliberate
-revision-checked reversal. The reversal adds an event, preserves earlier labels,
-and rejects replay of the stale current revision. History itself performs no write
-and is not a content-bound proposal or approval. Existing title/suggestion behavior
-is retained; there is no new automatic undo operation.
-
-The full suite passes 607 tests. Publication scanning and byte-manifest checks
-cover 139 files. Row caps do not bound individual strings, native query work or
-latency, and old labels can expose removed private information. No private corpus,
-model call, external content transfer, automatic title mutation or merge is added.
-Exact-commit four-job CI is verified separately after push.
-
-
 ### 2026-11-04: complete locally supplied title responses
 
 Twenty-four independent synthetic tests exercise saved-request completion without
@@ -650,3 +619,66 @@ verification cover 136 files. Message-count bounds do not bound text/provenance
 bytes or all native database work. No private corpus, model call, external transfer,
 automatic title mutation or merge is introduced. Exact-commit four-job CI is checked
 separately after publication.
+
+
+### 2026-11-04: explicit bounded local title-history review
+
+Eighteen independent synthetic regressions cover the new read-only history API
+and both CLI routes. They verify newest-first local change events, global sparse
+revision IDs, exact source/conversation scope, repeated/no-op/reversal events,
+current versus historical revisions, offset boundaries, total/remaining counts
+and optional stale-page rejection. Other conversations' writes and new message
+imports do not invalidate the title-only guard; a no-op title write does.
+
+Original titles remain verbatim, including empty, multiline and overlength legacy
+values. Missing history tables are not created, missing databases stay missing,
+and orphan history cannot create an unknown conversation. Invalid identity/count/
+revision types are rejected before database access. SQL authorizer instrumentation
+denies message-body/role reads, and a row-factory check bounds materialized rows
+while reading a small page from 2001 events. A concurrent WAL rename does not mix
+the old current title with a new count or page.
+
+Synthetic web/local imports run through Unicode CLI history reads and deliberate
+revision-checked reversal. The reversal adds an event, preserves earlier labels,
+and rejects replay of the stale current revision. History itself performs no write
+and is not a content-bound proposal or approval. Existing title/suggestion behavior
+is retained; there is no new automatic undo operation.
+
+The full suite passes 607 tests. Publication scanning and byte-manifest checks
+cover 139 files. Row caps do not bound individual strings, native query work or
+latency, and old labels can expose removed private information. No private corpus,
+model call, external content transfer, automatic title mutation or merge is added.
+Exact-commit four-job CI is verified separately after push.
+
+
+### 2026-11-04: meaningful Unicode title excerpts
+
+Sixteen independent synthetic regressions and one explicit review/apply/search
+regression cover the shared excerpt rule. All built-in Korean greetings match
+canonically decomposed forms while selected requests and greeting fallbacks retain
+their original normalization. Compatibility forms, lookalikes and unlisted
+punctuation do not silently gain greeting status.
+
+ZWJ/ZWNJ remain in short emoji/text-shaping labels. Other Cc/Cf characters keep the
+existing space-replacement behavior, including emoji tags. The actual cleaned
+80-code-point prefix must contain an alphanumeric code point: retained invisible,
+punctuation, combining-mark or non-alphanumeric emoji prefixes do not become usable
+because a letter exists beyond the cap. Tests distinguish the last included and
+first excluded positions and confirm that cleaned-away controls consume no space.
+The tests explicitly retain code-point slicing behavior that can split a combining
+or emoji sequence; no complete grapheme or rendering support is claimed.
+
+Raw suggestions, informational title reads, review queues, web-branch proposals,
+local replay, source-attributed proposals and the offline local adapter agree.
+Replay/attribution use separate supported synthetic fixtures, preserving the replay
+metadata restriction. Five ASCII CLI paths, source bytes, archived text, IDs,
+original hashes and content fingerprints are checked. Format-character privacy
+hints remain visible. Canonically equivalent edits to raw content still invalidate
+saved proposals. Explicit application creates only a local title event, exact-emoji
+and canonical Korean title searches succeed, and repeat apply is rejected as stale.
+
+The complete suite passes 624 tests, and public audit/manifest checks cover 140
+files. No source repair, added dependency, live model call, private corpus, automatic
+approval or merge is introduced. The small built-in greeting list and heuristic
+excerpt remain review aids, not semantic summaries or privacy clearance. Exact
+commit Ubuntu/Windows Python 3.10/3.12 CI is checked separately after publication.

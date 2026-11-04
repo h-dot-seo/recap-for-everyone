@@ -19,6 +19,48 @@ Every `READY` item from `review-titles` and every title `preview` now includes a
 No model, external service, source-message scan or additional database write is
 performed by the assessment.
 
+## Unicode excerpt boundaries
+
+Greeting-only detection uses NFC on the comparison key before case folding and
+the existing punctuation trimming. For example, a decomposed `안녕하세요!` is
+recognized like its composed spelling, so a later useful user request can supply
+the title and its own evidence ID. This is a small fixed greeting list, not a
+language detector or meaning classifier. Full-width/compatibility spellings and
+other unlisted greetings are not added through NFKC normalization. Canonical
+equivalence and NFC are defined in the [Unicode normalization specification](https://www.unicode.org/versions/Unicode16.0.0/core-spec/chapter-3/).
+
+Only comparison is normalized. A selected decomposed request or greeting fallback
+retains its decomposed spelling in the label. Original message text, source bytes,
+IDs, provenance and the raw-content fingerprint remain untouched.
+
+Whitespace cleanup preserves U+200C ZERO WIDTH NON-JOINER and U+200D ZERO WIDTH
+JOINER instead of replacing them with spaces. These characters affect [text
+shaping](https://www.unicode.org/versions/Unicode16.0.0/core-spec/chapter-23/), and ZWJ can join
+parts of an [emoji sequence](https://www.unicode.org/reports/tr51/tr51-27.html).
+For example, a short `Synthetic 👩‍🔬 field study` label keeps its joiner. Other
+Cc/Cf characters, including bidi controls, zero-width spaces and emoji tags, still
+become spaces. This narrow exception is not full Unicode/emoji preservation or
+validation of joiner placement. It can retain confusing or inappropriate joiners.
+The existing `FORMAT_CHARACTERS_PRESENT` review hint still reports them.
+
+The 80-code-point cap is unchanged. It can cut inside a combining or emoji sequence,
+including immediately after a joiner. There is no grapheme segmentation, font check
+or rendering guarantee. Usability now requires an alphanumeric code point inside
+the actual cleaned 80-code-point prefix, not merely somewhere later in the full
+message. A prefix containing only retained joiners, punctuation, combining marks
+or non-alphanumeric emoji is skipped in favor of a later usable user message.
+If none exists, generation fails rather than suggesting an invisible/non-word label
+or inventing a later excerpt. Controls removed by cleanup do not consume the cap.
+Review awkward cuts and use explicit replacement wording when necessary.
+
+Raw suggestions, informational `title` suggestions, review queues, verified
+web-branch/local-replay/source-attributed excerpts and the offline local adapter
+all use this shared rule after their own evidence selection. It does not broaden
+any scope, confer approval or change title validation. Saved proposals and prior
+titles are not rewritten or invalidated merely because the generator changed;
+fresh generation can choose a different evidence message or wording, which must
+still be reviewed before application.
+
 ## What the hints mean
 
 - `character_count`: Unicode code points, not visible width, words or grapheme
