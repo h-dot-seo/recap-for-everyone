@@ -169,3 +169,38 @@ checks are unchanged. `generate` does not accept the option and external executi
 remains disabled/unconfigured. See [the native saved-response workflow](SAVED_TITLE_RESPONSE.md)
 for explicit review, receipt meaning and fixed `OUTPUT_FAILED` handling. Saving a
 request is not permission to send it, and saving a proposal is not title approval.
+
+## Editor-saved UTF-8 input files
+
+The CLI accepts strict UTF-8 with or without **one initial UTF-8 BOM** for its
+saved prepared-request, supplied-response, mock-response and consent JSON files.
+This extends the earlier no-BOM input contract so an editor-saved file need not be
+manually stripped or reconstructed. The shared file decoder ignores only the first
+three signature bytes for parsing. It never rewrites the input or changes quoted
+U+FEFF characters inside JSON strings. Native output still has no BOM.
+
+Original byte limits remain 8 MiB for a prepared-request envelope, 16 KiB for a
+response/mock file, and 8 KiB for a consent file, **including the signature**.
+Canonical object, payload and evidence-context budgets also remain in force. A
+file accepted without a BOM can exceed its limit after adding three bytes. Files
+are still read once with bounded reads; this is not encoding detection or repair.
+UTF-16/32, malformed UTF-8, partial/repeated signatures, a BOM after whitespace or
+an unquoted signature later in the document remain errors. Duplicate members,
+surrogates, nonfinite completed-response values and excessive nesting still reject.
+Errors retain the file's existing fixed code and never quote its contents.
+
+A signature on the saved request envelope does not change the canonical payload
+hash or confer freshness, evidence support, transmission permission or approval.
+Completion still recomputes the preparation and compares the entire canonical
+envelope before producing a proposal. A signature on an **original source export**
+does change its original hash and still requires matching imported provenance; do
+not confuse the two files or edit hashes to work around stale evidence.
+
+The in-memory JSON parser, `PreparedRequest.payload` bytes and direct Python
+`generate(..., mock_response=...)` string contract remain strict and do not strip
+a BOM. This applies only to the adapter's named input files, not every JSON reader,
+transfer document or manual-title plan. Mock execution remains synthetic only.
+A valid consent file, with or without a signature, still reaches
+`EXTERNAL_NOT_CONFIGURED` rather than a provider; disabled execution still reaches
+`EXTERNAL_DISABLED`. It cannot bypass missing or mismatched consent. No network
+transport, credentials, automatic title apply or remote rename is added.

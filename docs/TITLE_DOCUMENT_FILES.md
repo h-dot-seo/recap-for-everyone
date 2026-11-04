@@ -76,8 +76,11 @@ JSON strings elsewhere remain invalid. The supplied-proposal byte budget still
 counts every original byte, including the BOM. Reading never rewrites the file.
 
 Existing UTF-16/UTF-32 or malformed proposal files are not converted or repaired.
-This tolerance does not change shared JSON parsing, provider payload/consent files,
-transfer documents or title plans. Native output remains UTF-8 without a BOM.
+This title-document tolerance does not change shared in-memory JSON parsing,
+transfer documents or title plans. The separate adapter now also accepts one
+initial signature on its named input files under its own byte budgets; see
+[adapter input encoding](TITLE_ADAPTER.md#editor-saved-utf-8-input-files).
+Native output remains UTF-8 without a BOM.
 Generate a fresh valid file rather than renaming or editing encodings blindly.
 All document-shape, evidence, content-fingerprint and revision checks still apply;
 a file signature does not establish authenticity, approval or currentness.

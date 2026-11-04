@@ -12,6 +12,7 @@ from dataclasses import dataclass
 from pathlib import Path
 from urllib.parse import urlsplit, urlunsplit
 from strict_json import loads
+from source_text import decode_source
 from title_proposal import snapshot
 from title_rules import validate_title
 from title_suggestion import excerpt
@@ -389,7 +390,9 @@ def _read_bounded(path, limit, error_code):
             raw = stream.read(limit + 1)
         if len(raw) > limit:
             raise ValueError()
-        return raw.decode('utf-8')
+        # File framing only: retain the original byte budget (including a BOM).
+        # Canonical request payloads and in-memory mock strings stay unchanged.
+        return decode_source(raw)
     except (OSError, ValueError):
         raise AdapterError(error_code) from None
 

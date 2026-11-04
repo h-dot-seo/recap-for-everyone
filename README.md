@@ -516,7 +516,10 @@ reviewable proposal. It requires no network call and does not claim which model 
 Its offline `prepare` and `complete-response` commands now support native
 `--output NEW_JSON` with UTF-8 and no-overwrite publication, avoiding shell
 redirection. Saved request/proposal receipts are not transmission permission or
-title approval; external `generate` remains unchanged.
+title approval; external `generate` remains disabled/unconfigured. Named adapter
+input files also tolerate [one initial UTF-8 signature](docs/TITLE_ADAPTER.md#editor-saved-utf-8-input-files)
+from an editor, while counting its original bytes against the same limits. This
+does not relax source provenance, request freshness or explicit title review.
 
 ## Explicit web text shapes and branch coverage
 

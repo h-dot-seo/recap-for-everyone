@@ -59,9 +59,11 @@ It does not add support for unknown event kinds, compaction or inherited history
   Only the optional first three bytes are ignored for parsing.
 - Malformed exports reject before database access. Invalid ZIP members do not
   publish a prepared output. Unsupported replay returns no partial projected text.
-- Request, response, proposal and review-document JSON loaders are unchanged.
-  This compatibility applies to source exports and normalized ingestion, not an
-  implicit relaxation of every JSON contract.
+- This source-export policy does not implicitly relax every JSON contract.
+  [Title/review document readers](TITLE_DOCUMENT_FILES.md) and the separate
+  [adapter input-file readers](TITLE_ADAPTER.md#editor-saved-utf-8-input-files)
+  now have their own explicitly documented initial-signature support. Their
+  in-memory JSON contracts, byte budgets and validation rules remain distinct.
 
 Adding/removing a BOM or changing newline bytes changes the original source hash,
 even when extracted text is identical. An old `--expected-export-sha256` still

@@ -1547,3 +1547,41 @@ and byte manifest cover 171 files. External generate remains disabled/unconfigur
 does not accept --output, and transfer simulation remains unchanged. No actual user
 data, model execution/transmission, automatic title approval, remote mutation or
 merge occurs. Exact-commit Ubuntu/Windows Python 3.10/3.12 CI is checked after push.
+
+### 2026-11-04: accept editor-saved UTF-8 adapter input files
+
+A remaining file-workflow gap was explicit rather than a regression: exports and
+saved title/review documents accepted one initial UTF-8 signature, but the separate
+adapter rejected editor-saved prepared requests, supplied responses, mock responses
+and consent files with that framing. The bounded file reader now uses the shared
+strict UTF-8 signature decoder only after checking the original raw byte limit.
+This supersedes the preceding release's deliberately unchanged adapter input rule.
+
+Exactly one initial signature is optional; embedded quoted U+FEFF remains data.
+Native output remains signature-free. Repeated/misplaced/partial signatures,
+UTF-16/32, malformed Unicode, duplicate keys and excessive JSON nesting still fail.
+Canonical object budgets and completed-response finite-value checks remain intact.
+No in-memory JSON, canonical PreparedRequest payload or direct mock string contract
+was relaxed. A saved-envelope signature leaves canonical payload hashes unchanged,
+whereas a signature added to the original export still changes required source
+provenance and the freshly reverified preparation. Consent remains an exact local
+contract, never evidence of a transmission or approval to apply a title.
+
+Fourteen new self-authored synthetic tests cover all four evidence scopes through
+completion, preview, explicit apply and search; native output; unchanged originals;
+one bounded file read; embedded Unicode; raw and canonical size boundaries; fixed
+errors before archive access/output creation; stale preparations; forged evidence;
+source hash changes; mock file versus direct-string behavior; and disabled or
+unconfigured external execution with consent. Tests use ASCII subprocess transport
+with universal newlines and no real provider. Restoring the previous decoder only
+in memory caused six failing subtests across three new methods. Four no-signature
+CLI preparation/completion cases match the previous published stdout byte-for-byte.
+
+Independent review found no blocker and independently passed the 14 new tests and
+54 existing adapter tests. The focused encoding, scoped adapter, completion and
+native-output bundle passes 109 tests. The final full suite passes 928 tests in
+222.497 seconds. Public audit and byte manifest cover 172 files. Documentation
+separates input-file framing from source hashes, canonical payloads, budget checks
+and explicit review. No actual private data, external model execution/transmission,
+automatic title approval, remote mutation or merge occurs. Exact-commit
+Ubuntu/Windows Python 3.10/3.12 CI is checked after push.

@@ -80,12 +80,14 @@ invalid request produces no new output. Ordinary save failures use fixed
 parent and filesystem capabilities instead of changing source hashes or bypassing
 validation. A successful `SAVED` with incomplete cleanup is not a failed save.
 
-Native files remain UTF-8 without a BOM. This feature does not change input-decoding
-rules: adapter prepared-request, response, mock and consent readers still require
-UTF-8 without a BOM, even though separate proposal/preview readers tolerate one
-initial signature. No conversion or repair is performed. Legacy redirection remains
-possible but has shell encoding/overwrite hazards; do not combine it with native
-`--output` or use it on an input path.
+Native output remains UTF-8 without a BOM. Adapter input files now tolerate one
+initial UTF-8 signature, including a prepared request or response saved by an editor.
+All original signature bytes still count toward file limits. This is file framing,
+not permission to change the prepared request or repair malformed JSON. See
+[adapter input encoding](TITLE_ADAPTER.md#editor-saved-utf-8-input-files) for the
+exact boundaries. Legacy redirection remains possible but has shell
+encoding/overwrite hazards; do not combine it with native `--output` or use it on
+an input path.
 
 ## Use a separately obtained response
 
