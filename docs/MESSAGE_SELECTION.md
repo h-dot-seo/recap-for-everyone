@@ -13,6 +13,12 @@ match, not a title, source-file line number, substring or query. The explicit so
 and conversation keep identical IDs in other conversations or sources separate.
 An unknown message produces an error without creating or changing the archive.
 
+After inspecting a useful **user** message, `suggest-title --message ID` can use
+that exact message for a reviewable local title excerpt. This is a separate action,
+not an automatic consequence of opening a search hit. See [explicit title evidence
+selection](TITLE_REVIEW_HINTS.md#choose-a-more-informative-user-message) for the
+complete generate/preview/apply workflow and raw-history scope limitations.
+
 ## Page through a longer conversation
 
 ```sh

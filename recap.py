@@ -197,6 +197,8 @@ def main():
     for name in ('show', 'suggest-title', 'title', 'title-history'):
         command = sub.add_parser(name)
         command.add_argument('--source', required=True); command.add_argument('--conversation', required=True)
+        if name == 'suggest-title':
+            command.add_argument('--message', help='use exactly this archived user message for the excerpt; no alternate-message fallback')
         if name == 'show':
             command.add_argument('--limit', type=int, help='read at most this many messages (1..1000)')
             command.add_argument('--offset', type=int, default=0, help='message offset; requires --limit')
@@ -323,7 +325,7 @@ def main():
             result = find(args.db, args.query, args.source, args.limit, args.include_title_history, args.export_sha256, args.cursor, args.canonical_unicode)
         else:
             from title_suggestion import suggest
-            result = suggest(args.db, args.source, args.conversation)
+            result = suggest(args.db, args.source, args.conversation, args.message)
     except (OSError, ValueError, KeyError, TypeError, sqlite3.Error) as exc:
         p.exit(1, str(exc) + '\n')
     # JSON escapes preserve Unicode data even when the terminal is ASCII-only.

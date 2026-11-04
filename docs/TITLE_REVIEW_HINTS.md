@@ -19,6 +19,70 @@ Every `READY` item from `review-titles` and every title `preview` now includes a
 No model, external service, source-message scan or additional database write is
 performed by the assessment.
 
+## Choose a more informative user message
+
+The first non-greeting request can still be generic, such as `Can you help with
+my project?`, while a later request names the actual subject. Recap does not infer
+which topic matters most. After inspecting the conversation, use an exact archived
+user-message ID to generate an excerpt from that message only:
+
+```sh
+mkdir ../recap-title-focus-demo
+python recap.py --db ../recap-title-focus-demo/archive.sqlite import examples/title-focus-web.json --format web --source demo
+python recap.py --db ../recap-title-focus-demo/archive.sqlite find irrigation --source demo
+python recap.py --db ../recap-title-focus-demo/archive.sqlite show --source demo --conversation synthetic-title-focus --message u2
+python recap.py --db ../recap-title-focus-demo/archive.sqlite suggest-title --source demo --conversation synthetic-title-focus --message u2 > ../recap-title-focus-demo/proposal.json
+python recap.py --db ../recap-title-focus-demo/archive.sqlite preview-title ../recap-title-focus-demo/proposal.json --with-evidence > ../recap-title-focus-demo/reviewed.json
+```
+
+Choose a new private scratch directory outside this repository; do not overwrite
+existing files. Keep saved JSON as UTF-8, following [the walkthrough's shell
+guidance](TITLE_WALKTHROUGH.md). Read the proposal and complete reviewed document
+before deciding to apply. This example's title is `Compare synthetic orchard
+irrigation schedules`, with evidence `u2`, rather than the generic first request.
+The source bytes, original title and archive messages remain unchanged.
+
+Only after explicitly reviewing the result, apply the conversation-wide local
+display title with the existing checked operation:
+
+```sh
+python recap.py --db ../recap-title-focus-demo/archive.sqlite apply-title ../recap-title-focus-demo/reviewed.json
+```
+
+The standalone equivalent is `title_suggestion.py --db DB --source SOURCE
+--conversation CONVERSATION --message ID`; the Python API appends
+`message_id=None` to `suggest(db, source, conversation)`. Omission preserves
+the earlier proposal shape and first-non-greeting behavior. To use this candidate
+in a queue, pass its saved file to `review-titles --proposal FILE`, optionally
+with `--supplied-only`. Ordinary queues still generate their default raw excerpts.
+
+Selection is exact within the specified source and conversation, not a substring,
+title, source line, Unicode-normalized ID or automatic search choice. A missing
+ID, assistant/system/tool message or unusable selected prefix fails without
+falling back to another message. A selected greeting is still allowed and receives
+the existing greeting-fallback hint: that describes the excerpt rule applied to
+the **one selected message**, not substitution of a different message. The new
+`evidence_selection` object identifies the explicit raw-message choice. These
+descriptive fields are unsigned and do not prove human authorship or approval.
+
+The same whitespace/control cleanup, evidence ID and 80-code-point cap apply.
+No later sentence or substring is invented if the selected prefix is unhelpful.
+Use explicit replacement wording at preview when needed. The proposal retains
+the fingerprint of **all messages in this archived conversation**, not only the
+selected one: an import changing other conversation content still makes it stale.
+Generating and previewing remain read-only; title revision checks still run at
+apply. Selection reads the full content snapshot, so it is not a bounded-memory
+or private-text minimization option.
+
+This works on messages imported from web, local, local-codex or normalized JSONL,
+but it does not re-read or verify an original export. An archived `user` role is
+not proof that every part was human-authored. A selected message may belong to an
+alternate web branch, discarded local turn or contain harness text. Use the
+separate verified branch/replay/source-attributed workflows when those scopes
+matter; do not treat this flag as equivalent. No model, remote rename, automatic
+relevance score or approval is added. Review before sharing: IDs, text and titles
+can be private.
+
 ## Unicode excerpt boundaries
 
 Greeting-only detection uses NFC on the comparison key before case folding and

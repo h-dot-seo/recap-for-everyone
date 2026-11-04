@@ -123,6 +123,12 @@ event's older revision, when checking later pages or an explicit manual title wr
 Old titles can reveal removed private data and are not automatically eligible for
 reapplication. No restore is automatic; see `docs/TITLE_HISTORY_VIEW.md`.
 
+When the first request is generic, inspect the exact user message and use
+`suggest-title --message ID` to select its excerpt explicitly. Keep the full
+conversation fingerprint and normal preview/apply checks. This is raw archive
+selection, not branch/replay/attribution verification; missing, nonuser or unusable
+evidence must not fall back to another message. Follow the title review guide.
+
 Local excerpt generation compares greetings canonically without normalizing the
 selected label or source evidence, and preserves ZWJ/ZWNJ in short labels. This is
 not grapheme-aware truncation or privacy clearance; format-character hints and

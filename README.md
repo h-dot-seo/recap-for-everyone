@@ -131,6 +131,12 @@ share the same first-non-greeting user excerpt, with whitespace/control cleanup
 and an 80-code-point limit; they are not semantic summaries. Greeting-only inputs
 retain a greeting fallback. With no usable user text, `title` shows an informational
 `Untitled conversation` placeholder while proposal generation still rejects.
+If that first request is too generic, inspect a later user message and pass its
+exact ID with `suggest-title --message ID` to choose the excerpt evidence yourself.
+This uses one raw archived user message, keeps the entire conversation fingerprint
+and the same 80-code-point cap, and still requires preview/apply. It does not infer
+relevance or establish branch/replay/attribution scope. See the [tested example and
+selection limits](docs/TITLE_REVIEW_HINTS.md#choose-a-more-informative-user-message).
 Title reads return current/original titles, suggestions and revision history from
 one database snapshot. Separate commands can observe later changes.
 Local parsing now rejects malformed known response envelopes before archive work;

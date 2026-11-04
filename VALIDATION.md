@@ -743,3 +743,35 @@ cover 143 files. This does not add a fixed input/depth/memory budget or promise 
 unrelated database/I/O failures leave no files. Existing empty archives are not
 removed. No actual corpus, model transmission, automatic repair, source mutation
 or merge is added. Exact-commit four-job CI is checked separately after publication.
+
+### 2026-11-04: choose meaningful user-message title evidence explicitly
+
+Fifteen independent synthetic regressions verify the optional exact message selector
+on suggest-title and the standalone generator. A later concrete user request can
+supply the excerpt instead of a generic first request. Default proposal shape and
+first-non-greeting behavior remain unchanged. Invalid selector shapes reject before
+archive access; unknown, nonuser or unusable selected messages never substitute
+another message. Literal padded/NFC/NFD IDs remain distinct and source/conversation
+scope is exact.
+
+The generator reads one full content snapshot and retains its full fingerprint,
+so later imports outside the chosen evidence invalidate proposals and reviewed
+previews. Shared cleanup, greeting advisory and 80-code-point truncation stay
+unchanged, including the documented combining/emoji cut limitations. The optional
+selection metadata describes raw archive evidence, not authenticated authorship,
+branch/replay filtering, semantic quality or approval.
+
+Tests cover ASCII CLI parity and clean failures, supplied review queues, bounded
+review evidence, explicit operator wording, checked apply and current-title search.
+The shipped synthetic web example runs the documented commands exactly, with
+argument parsing before platform path substitution. It verifies no title change
+before the separate apply step, source/message/provenance preservation and stale
+reapply rejection. Web, legacy local, local-codex and basename/physical-line fallback
+IDs are covered. Explicit abandoned-branch and rolled-back raw message choices do
+not acquire branch/replay claims.
+
+The complete suite passes 664 tests. Publication audit and byte-manifest checks
+cover 145 files. No real conversations, model execution, remote mutation, automatic
+relevance inference, bulk approval or merge is added. The selector still reads the
+whole conversation content snapshot; it is not a resource bound or privacy filter.
+Exact-commit Ubuntu/Windows Python 3.10/3.12 CI is checked separately after push.
