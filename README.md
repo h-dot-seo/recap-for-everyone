@@ -238,6 +238,11 @@ private archives. No schema migration or database writes are required.
 
 ## Web-export validation boundaries
 
+Source readers also support [one initial UTF-8 signature and consistent physical
+line handling](docs/SOURCE_TEXT_COMPATIBILITY.md). Original bytes, byte counts,
+hashes and line provenance remain intact. This covers source import/inventory and
+verified title selections without guessing encodings or relaxing JSON/replay checks.
+
 Web import rejects duplicate JSON object keys, invalid parent references and parent
 cycles, including cycles through nodes without messages. Iterative validation
 supports deep parent chains without Python recursion. Valid forks retain their

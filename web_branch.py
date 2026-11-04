@@ -4,6 +4,7 @@ import json
 from pathlib import Path
 from strict_json import loads
 from session_workflow import _normalize_bytes
+from source_text import decode_source
 
 
 def branch_view(path, conversation, node=None):
@@ -15,7 +16,7 @@ def branch_view(path, conversation, node=None):
     raw = path.read_bytes()
     # Both parsing passes use the same immutable bytes, including the original hash.
     rows, coverage = _normalize_bytes(raw, path.name, 'web', include_report=True)
-    data = loads(raw.decode('utf-8'))
+    data = loads(decode_source(raw))
     matches = [c for c in data if (c.get('id') or c.get('conversation_id')) == conversation]
     if len(matches) != 1:
         raise ValueError('conversation must identify exactly one export record')

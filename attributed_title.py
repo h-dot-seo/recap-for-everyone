@@ -10,6 +10,7 @@ from strict_json import loads
 from title_proposal import content_fingerprint
 from title_rules import validate_title
 from title_suggestion import excerpt
+from source_text import physical_lines
 
 SCHEMA = 'recap.source-attributed-title.v1'
 
@@ -79,7 +80,7 @@ def attributed_evidence(db, source, conversation, path):
         raise ValueError('export contains no extracted messages for the selected conversation')
     # Match the parser's universal newline handling without treating Unicode
     # separators embedded inside JSON strings as physical record boundaries.
-    lines = raw.decode('utf-8').replace('\r\n', '\n').replace('\r', '\n').split('\n')
+    lines = physical_lines(raw)
     coverage = dict(total_text_parts=0, selected_user_text_parts=0, excluded_text_parts=0,
                     unknown_text_parts=0, non_user_text_parts=0, messages_with_selected_text=0)
     candidates = []

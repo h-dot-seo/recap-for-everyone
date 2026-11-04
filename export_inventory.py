@@ -6,6 +6,7 @@ from pathlib import Path
 
 from session_workflow import _normalize_bytes, _read_export_bytes
 from strict_json import loads
+from source_text import decode_source, physical_lines
 
 
 def list_export(path, kind, limit=50, offset=0, expected_export_sha256=None):
@@ -29,13 +30,12 @@ def list_export(path, kind, limit=50, offset=0, expected_export_sha256=None):
         if title is not None and title not in item['original_titles']:
             item['original_titles'].append(title)
 
-    text = raw.decode('utf-8')
     if kind == 'web':
-        for record in loads(text):
+        for record in loads(decode_source(raw)):
             register(record.get('id') or record.get('conversation_id'), record.get('title') or '')
     else:
         # Mirror local_parser's universal newlines, not Unicode splitlines.
-        for line in text.replace('\r\n', '\n').replace('\r', '\n').split('\n'):
+        for line in physical_lines(raw):
             if not line.strip():
                 continue
             record = loads(line)

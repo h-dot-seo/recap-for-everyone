@@ -5,6 +5,7 @@ import json
 import math
 from pathlib import Path
 from strict_json import loads
+from source_text import BOM_UTF8, physical_lines
 
 
 class Unsupported(ValueError):
@@ -53,7 +54,7 @@ def _token_metadata(payload, line):
 
 def _project(raw, original_sha256):
     try:
-        text = raw.decode('utf-8')
+        lines = physical_lines(raw)
     except UnicodeError:
         raise Unsupported('INVALID_UTF8', 0) from None
     session = None
@@ -64,7 +65,7 @@ def _project(raw, original_sha256):
     ignored_contexts = 0
     ignored_tokens = 0
     records = 0
-    for line_number, line in enumerate(text.split('\n'), 1):
+    for line_number, line in enumerate(lines, 1):
         if not line.strip():
             continue
         records += 1
@@ -234,10 +235,13 @@ def reconstruct_bytes(raw):
                     partial_output=False)
     except (ValueError, TypeError, RecursionError):
         return dict(supported=False, reason_code='INVALID_RECORD', line=0, original_sha256=digest, partial_output=False)
-    return dict(supported=True, contract='completed-turn-text-projection.v4', original_sha256=digest,
+    output = dict(supported=True, contract='completed-turn-text-projection.v4', original_sha256=digest,
                 **result, full_model_history_reconstructed=False,
                 scope='read-only text projection; no database, title or remote mutation',
                 warning='PRIVATE TEXT: only the supported grammar is projected; model context, tools, hidden state and UI visibility are not reconstructed')
+    if raw.startswith(BOM_UTF8):
+        output['utf8_bom_present'] = True
+    return output
 
 
 def main():

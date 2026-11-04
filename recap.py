@@ -6,6 +6,7 @@ import json
 import sqlite3
 from pathlib import Path
 from strict_json import loads
+from source_text import BOM_UTF8, physical_lines
 
 SCHEMA = '''
 CREATE TABLE IF NOT EXISTS artifacts (
@@ -31,7 +32,7 @@ def ingest(db, source, path, provenance=None):
     raw = Path(path).read_bytes()
     digest = hashlib.sha256(raw).hexdigest()
     records = []
-    for line_no, line in enumerate(raw.decode('utf-8').split('\n'), 1):
+    for line_no, line in enumerate(physical_lines(raw), 1):
         if not line.strip():
             continue
         try:
@@ -80,7 +81,10 @@ def ingest(db, source, path, provenance=None):
                 conn.executemany('INSERT OR IGNORE INTO export_provenance VALUES(?,?,?,?,?,?)',
                                  occurrences)
                 conn.executemany('INSERT OR IGNORE INTO export_occurrences VALUES(?,?,?,?,?,?)', occurrences)
-        return {'source_sha256': digest, 'records': len(records), 'inserted': inserted}
+        result = {'source_sha256': digest, 'records': len(records), 'inserted': inserted}
+        if raw.startswith(BOM_UTF8):
+            result['utf8_bom_present'] = True
+        return result
     finally:
         conn.close()
 

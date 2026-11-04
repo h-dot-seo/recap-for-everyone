@@ -13,6 +13,7 @@ from recap import ingest, readonly
 from strict_json import loads
 from title_rules import validate_title
 from title_excerpt import excerpt
+from source_text import BOM_UTF8, decode_source
 
 
 def _validate_mapping(mapping):
@@ -78,7 +79,7 @@ def normalize(path, kind, include_report=False, conversation=None, expected_expo
         if kind == 'web':
             # Reuse the immutable byte snapshot, not a second file read. Selecting
             # one identity must not silently combine duplicate export records.
-            records = loads(raw.decode('utf-8'))
+            records = loads(decode_source(raw))
             matches = sum((record.get('id') or record.get('conversation_id')) == conversation for record in records)
             if matches != 1:
                 raise ValueError('selected conversation must identify exactly one web export record')
@@ -98,6 +99,8 @@ def _normalize_bytes(raw, source_name, kind, include_report=False):
     digest = hashlib.sha256(raw).hexdigest()
     rows = []
     report = dict(format=kind, original_sha256=digest, original_bytes=len(raw))
+    if raw.startswith(BOM_UTF8):
+        report['utf8_bom_present'] = True
     if kind in ('local', 'local-codex'):
         # Parse the same byte snapshot that was hashed, even if the source changes.
         with tempfile.TemporaryDirectory() as tmp:
@@ -118,7 +121,7 @@ def _normalize_bytes(raw, source_name, kind, include_report=False):
                              role=m.role, timestamp=m.timestamp_utc or 'unknown', text=m.text,
                              origin_locator=f'line:{m.line_number}'))
     elif kind == 'web':
-        data = loads(raw.decode('utf-8'))
+        data = loads(decode_source(raw))
         if not isinstance(data, list):
             raise ValueError('web export must be an array of conversations with mapping nodes')
         report.update(conversations_in_export=len(data), mapping_nodes=0,

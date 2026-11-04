@@ -482,3 +482,26 @@ files. Cursors are private unsigned continuation data, not frozen content snapsh
 authentication or title approval. Every page still scans eligible evidence. No
 private corpus, external transmission, source mutation or merge is introduced.
 Exact-commit cross-platform CI is checked separately after publication.
+
+
+### 2026-11-04: consistent source signatures and physical lines
+
+Twenty synthetic regressions cover one optional initial UTF-8 BOM across web,
+legacy local, typed local and normalized ingestion. Shared decoding preserves
+original byte hashes/sizes and all quoted Unicode characters. LF, CRLF, bare CR,
+mixed boundaries and blank lines retain consistent physical locators. This fixes
+supported bare-CR sessions that imported but failed replay/title reconstruction.
+
+Tests cover inventory and selected import, branch/replay/attributed title input,
+manual plans, adapter preparation, Unicode preview/apply/search, single source
+reads, unchanged ZIP-member output bytes and existing empty-input policies.
+Signature/newline changes still fail old hash leases and provenance; intentional
+reimport preserves message identities and adds original occurrences. Changed
+source framing also invalidates saved scoped request context after reimport.
+
+Double/misplaced signatures, damaged UTF-8, UTF-16/32, duplicate keys and malformed
+records fail before database or prepared-output mutation. Replay supplies no partial
+text on failure. Generic proposal/response JSON contracts and replay grammar remain
+unchanged. The complete suite passes 531 tests; publication and manifest checks
+cover 127 files. No real corpus, repair, encoding guessing, model transmission or
+merge is added. Exact-commit cross-platform CI is checked after publication.

@@ -9,6 +9,7 @@ from session_workflow import _normalize_bytes
 from strict_json import loads
 from title_proposal import content_fingerprint
 from title_rules import validate_title
+from source_text import decode_source
 
 
 SCHEMA = 'recap.manual-title-plan.v2'
@@ -19,7 +20,7 @@ def make_plan(db, source, conversation, path, kind):
     raw = path.read_bytes()
     rows, coverage = _normalize_bytes(raw, path.name, kind, include_report=True)
     if kind == 'web':
-        matches = [c for c in loads(raw.decode('utf-8'))
+        matches = [c for c in loads(decode_source(raw))
                    if (c.get('id') or c.get('conversation_id')) == conversation]
         if len(matches) != 1:
             raise ValueError('conversation must identify exactly one export record')

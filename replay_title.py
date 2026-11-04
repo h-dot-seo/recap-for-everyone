@@ -10,6 +10,7 @@ from title_proposal import content_fingerprint
 from title_suggestion import excerpt
 from title_rules import validate_title
 from strict_json import loads
+from source_text import physical_lines
 
 
 def replay_evidence(db, source, conversation, path):
@@ -30,7 +31,7 @@ def replay_evidence(db, source, conversation, path):
             if origin['original_sha256'] == projection['original_sha256'] and origin['parent_id'] is None:
                 occurrence_index.setdefault(origin['locator'], {})[message['message_id']] = message
     by_locator = {}
-    source_lines = raw.decode('utf-8').split('\n')
+    source_lines = physical_lines(raw)
     for original in normalized:
         if original['conversation_id'] != conversation:
             raise ValueError('export normalization contains another conversation')

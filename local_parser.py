@@ -10,6 +10,7 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 from strict_json import loads
+from source_text import physical_lines
 
 
 class LocalImportError(ValueError):
@@ -116,9 +117,7 @@ def _message_text(payload: dict[str, Any], content_profile: str = "legacy") -> s
 
 def _records(path: Path) -> list[tuple[int, dict[str, Any]]]:
     records: list[tuple[int, dict[str, Any]]] = []
-    for line_number, line in enumerate(path.read_text(encoding="utf-8").split("\n"), 1):
-        if line.endswith("\r"):
-            line = line[:-1]
+    for line_number, line in enumerate(physical_lines(path.read_bytes()), 1):
         if not line.strip():
             continue
         try:

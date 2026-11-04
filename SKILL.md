@@ -84,3 +84,9 @@ and the same query/source/history/export filters. Use returned counts, not a nul
 token alone, to decide whether all matches were seen. Result membership or ranking
 changes require a restart; unchanged membership does not imply unchanged content.
 See `docs/SEARCH_PAGINATION.md`. Cursors contain private IDs and are not permissions.
+
+Source readers accept one initial UTF-8 BOM and consistent LF/CRLF/CR JSONL
+boundaries. Use `docs/SOURCE_TEXT_COMPATIBILITY.md` to distinguish compatibility
+from repair: original hashes still include every byte, Unicode message characters
+are retained, and other encodings or misplaced signatures fail. Do not rewrite
+source bytes or stale hashes to force a title workflow to proceed.

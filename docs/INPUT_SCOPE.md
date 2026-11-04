@@ -1,6 +1,10 @@
 # Select the input and indexing scope
 
 The import parsers process an explicitly named **local UTF-8 text file**.
+One optional initial UTF-8 signature is accepted. Local/normalized JSONL consistently
+recognizes LF, CRLF and CR physical lines while preserving original hashes and
+Unicode message text. See [source text compatibility](SOURCE_TEXT_COMPATIBILITY.md)
+for exact acceptance and failure boundaries. UTF-16/32 are not auto-detected.
 The separate [bounded ZIP preparation command](PREPARE_WEB_EXPORT.md) can create
 a new web JSON input from one explicitly selected archive member. It is not a web
 account collector or installed Codex session discovery tool. Use only exports you
