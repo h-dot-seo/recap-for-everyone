@@ -11,11 +11,34 @@ from title_rules import validate_title
 from title_review import assess_title
 
 
+def _freeze_document(value):
+    """Detach a JSON document before validation or I/O, including nested metadata.
+
+    This is a local value snapshot, not a signature or proof of human review.
+    Never retain caller-owned mutable evidence lists or provider context.
+    """
+    try:
+        return loads(json.dumps(value, ensure_ascii=False, allow_nan=False))
+    except (ValueError, TypeError, RecursionError):
+        raise ValueError('title document must contain valid finite JSON data') from None
+
+
+def read_document(path):
+    """Read one explicit title JSON file with a clean excessive-nesting error."""
+    try:
+        return loads(Path(path).read_text(encoding='utf-8'))
+    except RecursionError:
+        raise ValueError('title document nesting is too deep') from None
+
+
 def content_fingerprint(rows):
     return hashlib.sha256(json.dumps(rows, sort_keys=True, ensure_ascii=False).encode()).hexdigest()
 
 
 def snapshot(db, source, conversation):
+    if (not isinstance(source, str) or not source.strip() or
+            not isinstance(conversation, str) or not conversation):
+        raise ValueError('source and conversation must be nonempty text identities')
     c = readonly(db)
     try:
         rows = [dict(r) for r in c.execute(
@@ -46,6 +69,7 @@ def validate_against_snapshot(proposal, rows, digest):
 
 
 def preview(db, proposal, replacement_title=None):
+    proposal = _freeze_document(proposal)
     if not isinstance(proposal, dict):
         raise ValueError('title proposal must be a JSON object')
     source, conversation = proposal['source'], proposal['conversation']
@@ -65,6 +89,7 @@ def preview(db, proposal, replacement_title=None):
 
 
 def apply_preview(db, reviewed):
+    reviewed = _freeze_document(reviewed)
     if not isinstance(reviewed, dict) or type(reviewed.get('expected_revision')) is not int or reviewed['expected_revision'] < 0:
         raise ValueError('reviewed preview requires a nonnegative integer expected_revision')
     proposal = reviewed['proposal']
@@ -88,7 +113,7 @@ def main():
             result = dict(source=a.source, conversation=a.conversation, content_sha256=digest, messages=rows,
                           warning='Private local content; no external transmission is performed')
         else:
-            value = loads(a.input.read_text(encoding='utf-8'))
+            value = read_document(a.input)
             result = preview(a.db, value, a.title) if a.command == 'preview' else apply_preview(a.db, value)
     except (ValueError, OSError, KeyError, TypeError, sqlite3.Error) as e:
         p.exit(1, str(e) + '\n')

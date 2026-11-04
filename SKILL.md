@@ -96,3 +96,10 @@ try `find --canonical-unicode`. This is a read-only opt-in; do not rewrite sourc
 text or title evidence to force a match. Keep the mode and runtime Unicode version
 on cursor pages. Report original covering spans accurately when normalization
 reorders or composes characters. See `docs/CANONICAL_UNICODE_SEARCH.md`.
+
+Treat malformed known local response envelopes as source errors, not harmless
+omissions. Do not drop bad records to make title generation succeed. Python title
+callers must use valid finite JSON and exact text identities; preview/apply detach
+inputs but do not authenticate editable review files. Re-preview changed wording
+and retain content/revision checks. See `docs/INPUT_SCOPE.md` and
+`docs/TITLE_REVIEW_HINTS.md`.

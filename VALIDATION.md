@@ -534,3 +534,30 @@ The complete suite passes 544 tests. Publication scanning and exact byte-manifes
 verification cover 130 files. No corpus, network/model integration, source repair,
 compatibility normalization or merge is introduced. Exact-commit Ubuntu/Windows
 Python 3.10/3.12 CI is verified separately after publication.
+
+
+### 2026-11-04: malformed local records and detached title inputs
+
+Nineteen independent synthetic regressions cover malformed known response records
+and Python title-input snapshot isolation. Both local profiles reject nonobject
+response payloads, missing/invalid/blank type discriminators and malformed message
+roles before archive creation or mutation. Valid nonmessage types and unsupported
+roles retain existing skipped counts and warnings. Inspection, inventory, conflict
+checks, title helpers, BOM/physical-line diagnostics and clean CLI errors are covered.
+No actual sessions or private configuration were read; typed structure is checked
+against the pinned public response definitions cited in the input-scope guide.
+
+Preview copies nested proposal/evidence/context values before reads; apply copies
+the reviewed envelope before validation and writing. Regression hooks change the
+caller objects during reads or after validation and verify that the original
+independent snapshot is used. Replacement wording and unsigned advisory behavior
+remain unchanged. Nonfinite/unsupported/cyclic/invalid-Unicode metadata fails before
+archive access. Numeric/boolean IDs cannot match text archive IDs by SQLite coercion;
+valid literal Unicode, quoted, padded and whitespace conversation IDs stay exact.
+
+Excessively nested title JSON fails without traceback in both CLIs and all four
+preview/apply commands, preserving missing/existing database boundaries. The complete
+suite passes 563 tests; publication scanning and byte-manifest verification cover
+132 files. No new signature/approval claim, partial import, repair, real corpus,
+model transmission or merge is introduced. Remote matrix CI is checked separately
+for the exact pushed commit.

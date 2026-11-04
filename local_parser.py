@@ -211,9 +211,20 @@ def parse_artifact(path: Path, source_relative_path: str, artifact_kind: str = "
             sessions.append(SessionOccurrence(session_id, line_number, payload.get("cwd"), payload.get("originator")))
             current_session = session_id
             continue
-        if record_type != "response_item" or not isinstance(payload, dict) or payload.get("type") != "message":
+        if record_type != "response_item":
+            continue
+        # A malformed known response cannot safely be classified as an omitted
+        # tool or unsupported message. Reject before extracting any archive rows.
+        if not isinstance(payload, dict):
+            raise LocalImportError(f"invalid response item payload: {path}:{line_number}")
+        item_type = payload.get("type")
+        if not isinstance(item_type, str) or not item_type.strip():
+            raise LocalImportError(f"invalid response item type: {path}:{line_number}")
+        if item_type != "message":
             continue
         role = payload.get("role")
+        if not isinstance(role, str) or not role.strip():
+            raise LocalImportError(f"invalid response message role: {path}:{line_number}")
         if role not in {"user", "assistant"}:
             continue
         timestamp = value.get("timestamp")

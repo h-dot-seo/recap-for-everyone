@@ -129,6 +129,11 @@ retain a greeting fallback. With no usable user text, `title` shows an informati
 `Untitled conversation` placeholder while proposal generation still rejects.
 Title reads return current/original titles, suggestions and revision history from
 one database snapshot. Separate commands can observe later changes.
+Local parsing now rejects malformed known response envelopes before archive work;
+valid unsupported records remain counted skips. See [input boundaries](docs/INPUT_SCOPE.md).
+Python title preview/apply also detach caller-owned JSON and require text identities
+to prevent mutable-input substitutions and SQLite type coercion.
+[Review input snapshots](docs/TITLE_REVIEW_HINTS.md) explain the unsigned-document limits.
 Local display overrides retain previous titles without changing source messages.
 Restore a prior title with `--set` to append an auditable reversal. The original
 `recap.py search` still returns original message titles. Online rename, attachment

@@ -243,9 +243,8 @@ def main():
             else:
                 result = simulate(args.db, args.input, document(args.request), document(args.approval), MockTitleAdapter(target))
         elif args.command in ('preview-title', 'apply-title'):
-            from title_proposal import preview, apply_preview
-            from strict_json import loads
-            value = loads(Path(args.input).read_text(encoding='utf-8'))
+            from title_proposal import preview, apply_preview, read_document
+            value = read_document(args.input)
             if args.command == 'preview-title' and args.conversation is not None:
                 from title_batch import select_proposal
                 value = select_proposal(value, args.conversation)

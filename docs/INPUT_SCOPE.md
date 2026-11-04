@@ -135,3 +135,27 @@ and decide the intended scope again. No external verification service is used.
 For an existing archive, [read-only conflict diagnostics](IMPORT_CONFLICTS.md)
 can compare selected incoming identities before import. This is separate from
 source-only `inspect`, and it does not relax the importer's locked checks.
+
+## Malformed known local response records
+
+Both `local` and `local-codex` reject a `response_item` unless `payload` is an
+object with a nonempty string `type`. A `type: "message"` payload must also have
+a nonempty string `role`. Empty or whitespace-only discriminators are invalid;
+strings are not trimmed into a different type or role. A missing/null/list payload
+is not treated as a harmless omitted tool event. Earlier releases could silently
+skip that malformed record while importing other text and reporting no warning.
+
+These checks run during whole-file parsing, before database creation or changes,
+also for inspection, inventory, conflict checks and selected imports. Errors report
+the physical line without echoing payload contents. A malformed later record does
+not authorize partial import or title generation from the preceding text. Obtain
+a valid export or investigate the producer; the tool does not repair the source.
+Existing archives are not retroactively scanned or changed by this update.
+
+Valid nonmessage type names and nonempty unsupported roles remain explicit skips,
+with the existing counts and warnings. This does not add tool/media extraction or
+validate every skipped variant's internal fields. The generic metadata-only archive
+utility paths are unchanged. The typed profile's structural distinction follows
+the tagged response enum and message role field in the
+[pinned public Codex definitions](https://github.com/openai/codex/blob/f2b94ef8b52196f127d162c6db71e390b9bb265c/codex-rs/protocol/src/models.rs).
+It is not a claim of full current Codex replay compatibility.

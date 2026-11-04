@@ -91,3 +91,39 @@ policy enforcement. Apply performs the existing proposal checks again but does
 not enforce advisory flags. Do not edit a reviewed document to work around a
 failure: generate a fresh preview and inspect it. Existing callers that do not
 supply `--title` keep the original proposal unchanged.
+
+## Independent input snapshots for Python callers
+
+`preview(db, proposal)` takes its own JSON value snapshot before reading the
+archive. The returned proposal, evidence-ID list and nested descriptive metadata
+no longer share mutable objects with the caller. Changing the original proposal
+after preview does not silently change an already returned review or leave its
+advisory describing different wording. Explicit replacement titles still produce
+operator wording and discard old generation metadata as described above.
+
+`apply_preview(db, reviewed)` also takes its own JSON snapshot before revalidation
+and uses that same detached value through the checked title write. Changes to the
+caller's object after that copy cannot substitute a title, evidence list or
+revision between validation and writing. Callers should still avoid mutating an
+object while its initial copy is being serialized; this is not a shared-object
+thread synchronization API. Ordinary CLI file round-trips retain their existing
+proposal/preview structure and behavior.
+
+All retained API document data must be finite JSON values. Cycles, unsupported
+Python objects, nonfinite numbers and unpaired surrogates fail before archive
+reads or title writes, even in unused metadata. Excessively nested title files
+fail cleanly in both CLI entry points. This does not add a file-size limit or
+change other commands' input contracts.
+
+Snapshot identities must be nonempty strings: a numeric or boolean ID cannot
+select a text ID through SQLite's implicit type conversion. Source names must
+also contain a non-whitespace character. Literal accepted strings are preserved,
+including Unicode, quotation marks and meaningful padding; no normalization is
+used to redirect a proposal to another identity.
+
+These are consistency and safe-failure checks, not signing or authentication.
+Returned JSON remains editable and unsigned, advisory fields are still descriptive,
+and a saved file is not proof of human approval. Inspect the complete current
+preview and use a fresh preview for changed wording. Transactional content-hash
+and revision checks remain the final stale-write protection; no title is changed
+by preview, and no remote service is contacted.
