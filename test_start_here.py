@@ -1,4 +1,4 @@
-"""Execute the published start-here command lines, not a parallel approximation."""
+"""Execute published workflow arguments with this interpreter, not every shell."""
 import importlib.util
 import json
 from pathlib import Path

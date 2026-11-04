@@ -3,6 +3,9 @@
 These two examples use only invented conversations bundled in `examples/`.
 Python 3.10+ and SQLite FTS5 are required; there are no Python dependencies,
 accounts, credentials or network requests. Run commands from the repository root.
+First follow [installation and runtime checks](INSTALL.md) to obtain the workflow
+branch and choose a working launcher. Substitute that launcher for each leading
+`python`; a system with only `python3` need not provide a `python` command.
 Use a **new, private scratch directory outside the repository** for the database
 and JSON outputs. Below, `../recap-demo` stands for that directory: create it first,
 and substitute your chosen path. Do not reuse a directory containing important

@@ -16,6 +16,10 @@ Portable, local-first conversation archives with provenance and read-only search
 
 ## Start with your export
 
+First use [installation and runtime checks](docs/INSTALL.md) to get the workflow
+branch, choose your Python launcher and verify in-memory SQLite FTS5. The default
+`main` extraction does not contain all commands described here.
+
 New to this tool? Follow [Start here: ZIP/local file to a findable title](docs/START_HERE.md).
 It chooses the right input path and walks through 24 invented conversations, explicit
 review, defer/revisit, one local title change and search. The commands are tested
@@ -23,14 +27,16 @@ end-to-end. No model, account or remote rename is involved.
 
 ## Quick start for already-normalized JSONL
 
-Python 3.10+ with SQLite FTS5. No external Python dependencies, account or API key.
-Run from the repository root:
+Python 3.10+ compatibility with SQLite FTS5; choose a currently supported runtime.
+No external Python dependencies, account or API key. Run from the repository root,
+substituting your chosen launcher for `python`. Use a new scratch directory:
 
 ```sh
-python3 recap.py --db /tmp/recap-demo.sqlite ingest examples/conversations.jsonl --source demo
-python3 recap.py --db /tmp/recap-demo.sqlite search orchard
-python3 recap.py --db /tmp/recap-demo.sqlite stats
-python3 -m unittest discover -v
+mkdir ../recap-normalized-demo
+python recap.py --db ../recap-normalized-demo/archive.sqlite ingest examples/conversations.jsonl --source demo
+python recap.py --db ../recap-normalized-demo/archive.sqlite search orchard
+python recap.py --db ../recap-normalized-demo/archive.sqlite stats
+python -m unittest discover -v
 ```
 
 Use a writable database path outside this public repository for your own data.

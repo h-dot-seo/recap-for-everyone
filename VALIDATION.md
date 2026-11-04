@@ -806,3 +806,44 @@ The full suite passes 677 tests; publication audit and byte-manifest checks cove
 146 files. Existing archives and saved proposals are not retroactively repaired or
 invalidated. No actual corpus, model call, source rewriting, remote mutation or
 merge is added. Exact-commit four-job CI is checked separately after push.
+
+### 2026-11-04: first-run branch, launcher and SQLite checks
+
+Read-only repository inspection confirmed that main exposed only normalized ingest,
+search and stats, while the workflow guides described the development branch.
+An independent synthetic first-run reproduction also found a valid Python/FTS5
+installation with only python3 on PATH: the literal documented python command
+failed before the demo, while launcher substitution succeeded. Installation guidance
+now selects the exact workflow branch, explains source ZIP versus conversation ZIP,
+chooses one launcher consistently and links official Python/SQLite documentation.
+The normalized quickstart uses a new portable scratch directory instead of /tmp.
+
+Fourteen independent tests cover the new standalone runtime_check.py and documented
+entry arguments. The check verifies the Python compatibility minimum, then imports
+SQLite and performs a synthetic create/insert/MATCH round trip using only :memory:.
+Simulated old versions return before SQLite import; missing modules, SQLite failures
+at connect/create/insert/query/fetch/close and unexpected results return fixed codes.
+Connections close on failure, no disk-DB fallback or extension loading is attempted,
+and diagnostics do not expose underlying paths or error text. Non-SQLite programming
+errors still propagate rather than being silently classified as compatibility errors.
+
+Tests cover ASCII JSON, status/usage exit codes, temporary working directories and
+an audit hook that rejects disk/network/process/extension operations during the
+probe after standard-library imports are preloaded. This is not a claim that Python
+startup/module loading performs no filesystem reads. The real memory probe also
+passed with the available Python 3.13 launcher; the complete suite ran with the
+primary interpreter, not every possible runtime.
+
+The explicit clone branch/repository are checked as documentation, without a network
+clone or OS/Python installation. Documented checker/help and normalized mkdir/ingest/
+search/stats arguments run with synthetic files and preserved source bytes. The
+walkthroughs now state that tests substitute the test interpreter and control UTF-8
+output, rather than certifying literal launcher availability or every shell's
+redirection behavior. Runtime READY likewise does not certify checkout authenticity,
+filesystem permissions, source compatibility, shell encoding or full application
+support. The minimum Python version is not a security-lifecycle recommendation.
+
+The complete suite passes 691 tests; publication audit and byte-manifest checks cover
+149 files. No actual exports, account collection, model transmission, installation,
+settings changes, remote rename or merge occur. Exact-commit Ubuntu/Windows Python
+3.10/3.12 CI is checked separately after push.

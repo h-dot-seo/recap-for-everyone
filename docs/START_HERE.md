@@ -5,6 +5,11 @@ in their original app.** No account, API key, model, network or paid service is
 required. Titles suggested by default are shortened user-text excerpts, not
 semantic summaries. Review their meaning and private details yourself.
 
+For a first run, complete [branch installation and runtime checks](INSTALL.md).
+Use the same working launcher throughout: replace leading `python` with `python3`
+or `py -3` when that is what your installation provides. The default `main` checkout
+does not include all workflow commands shown here.
+
 ## Choose the input you actually have
 
 - **Downloaded ChatGPT ZIP:** `inspect-web-zip`, explicitly select a member,
@@ -44,8 +49,9 @@ Commands below require UTF-8 shell redirection, such as a POSIX shell or PowerSh
 not Windows PowerShell 5's default UTF-16. `>` overwrites its output before a command
 runs. Use the new demo directory, check each exit status and stop on failure. Open
 saved JSON in your editor at the review points; do not paste this whole page as an
-unattended script. The regression test runs these exact command lines with synthetic
-inputs, explicit review assertions and UTF-8 output files.
+unattended script. Regression tests execute these program arguments with the test
+runner's interpreter, synthetic inputs, explicit review assertions and UTF-8 output
+files. They do not test the literal launcher name or every shell's redirection.
 
 ### 1. Discover and explicitly prepare the web parts
 
@@ -155,7 +161,8 @@ Old titles can still be private. It is a read-only review aid, not an undo actio
 - **Conflicting import identity:** the transaction is rejected. Earlier part imports
   may still exist. Inspect your source label and provenance; do not overwrite evidence.
 - **No useful suggestion:** `UNAVAILABLE` or a weak excerpt is not a summary. Inspect
-  the conversation; skip/defer explicitly. An unavailable queue item cannot be passed
+  the conversation; select a more useful [exact user message](TITLE_REVIEW_HINTS.md#choose-a-more-informative-user-message),
+  provide explicit wording at preview for a valid proposal, or skip/defer. An unavailable queue item cannot be passed
   to `preview-title` as a generated proposal. See the operator proposal contract in README.
 - **Stale preview or saved queue:** refresh at offset 0, re-read and decide again.
   Do not auto-apply the new snapshot. [Review-state details](TITLE_REVIEW_STATE.md).
