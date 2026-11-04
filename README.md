@@ -87,6 +87,11 @@ Add `preview-title --with-evidence` for an explicitly requested private view of
 up to five cited user-message excerpts and bounded original provenance.
 [Evidence review](docs/TITLE_REVIEW_EVIDENCE.md) explains truncation and why raw
 excerpts are not automatically the exact passages used by scoped generation.
+For a useful request later in a verified web branch or retained local turns, add
+`--message ARCHIVED_ID` to `suggest-branch-title` or `suggest-replay-title`.
+Selection stays inside the verified scope and never falls back to another message;
+the full conversation fingerprint and separate preview/apply checks remain.
+See [scoped message selection](docs/TITLE_REVIEW_HINTS.md#choose-a-later-message-inside-a-verified-branch-or-retained-history).
 The standalone scripts remain supported with equivalent behavior. `inspect`,
 `list-export`, `web-branch`, `replay-local`, `prepare-web-export` and `inspect-web-zip` can omit `--db`.
 

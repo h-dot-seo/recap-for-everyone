@@ -42,8 +42,18 @@ def branch_evidence(db, source, conversation, path, node=None):
     return selected, content_fingerprint(rows), context
 
 
-def suggest_branch(db, source, conversation, path, node=None):
+def suggest_branch(db, source, conversation, path, node=None, message_id=None):
+    if message_id is not None and (not isinstance(message_id, str) or not message_id):
+        raise ValueError('selected message ID must be nonempty text')
     selected, digest, context = branch_evidence(db, source, conversation, path, node)
+    if message_id is not None:
+        # Verify the entire selected branch first. A later evidence choice must
+        # not bypass mismatches elsewhere on the path or select an alternate fork.
+        selected = [row for row in selected if row['message_id'] == message_id]
+        if len(selected) != 1 or selected[0]['role'] != 'user':
+            raise ValueError('selected message must identify one user message in the verified branch')
+        context['evidence_selection'] = dict(mode='explicit_user_message', message_id=message_id,
+                                            scope='verified web export branch')
     proposal = excerpt(selected)
     validate_title(proposal['title'])
     return dict(source=source, conversation=conversation, content_sha256=digest,
@@ -55,11 +65,12 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--db', required=True); parser.add_argument('--source', required=True)
     parser.add_argument('--conversation', required=True); parser.add_argument('--node')
+    parser.add_argument('--message', help='use exactly this archived user message inside the verified selected branch')
     parser.add_argument('input')
     add_output_argument(parser)
     args = parser.parse_args()
     try:
-        result = suggest_branch(args.db, args.source, args.conversation, args.input, args.node)
+        result = suggest_branch(args.db, args.source, args.conversation, args.input, args.node, args.message)
         result = save_if_requested(result, args, 'proposal')
     except (ValueError, OSError, KeyError, TypeError, sqlite3.Error) as error:
         parser.exit(1, str(error) + '\n')

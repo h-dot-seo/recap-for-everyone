@@ -167,9 +167,11 @@ def main():
     branch_title = sub.add_parser('suggest-branch-title', help='suggest a local title from an archived export branch')
     branch_title.add_argument('input'); branch_title.add_argument('--source', required=True)
     branch_title.add_argument('--conversation', required=True); branch_title.add_argument('--node')
+    branch_title.add_argument('--message', help='use exactly this archived user message inside the verified selected branch')
     replay_title = sub.add_parser('suggest-replay-title', help='suggest a checked local title from retained projected turns')
     replay_title.add_argument('input'); replay_title.add_argument('--source', required=True)
     replay_title.add_argument('--conversation', required=True)
+    replay_title.add_argument('--message', help='use exactly this archived user message inside the verified retained turns, not a projection ID')
     attributed = sub.add_parser('suggest-attributed-title', help='suggest a title from explicit user-source labels in a verified local-codex export')
     attributed.add_argument('input'); attributed.add_argument('--source', required=True)
     attributed.add_argument('--conversation', required=True)
@@ -298,7 +300,7 @@ def main():
             result = preview(args.db, value, args.title, args.with_evidence) if args.command == 'preview-title' else apply_preview(args.db, value)
         elif args.command == 'suggest-replay-title':
             from replay_title import suggest_replay
-            result = suggest_replay(args.db, args.source, args.conversation, args.input)
+            result = suggest_replay(args.db, args.source, args.conversation, args.input, args.message)
         elif args.command == 'suggest-attributed-title':
             from attributed_title import suggest_attributed
             result = suggest_attributed(args.db, args.source, args.conversation, args.input)
@@ -311,7 +313,7 @@ def main():
             result = check_plan(args.db, args.input, loads(Path(args.plan).read_text(encoding='utf-8')))
         elif args.command == 'suggest-branch-title':
             from branch_title import suggest_branch
-            result = suggest_branch(args.db, args.source, args.conversation, args.input, args.node)
+            result = suggest_branch(args.db, args.source, args.conversation, args.input, args.node, args.message)
         elif args.command == 'web-branch':
             from web_branch import branch_view
             result = branch_view(args.input, args.conversation, args.node)

@@ -44,6 +44,9 @@ be `Design a synthetic orchard experiment`; the reviewed file should show
 The shipped web fixture has no `current_node`, so this walkthrough explicitly
 selects `m2`. For another export use its valid current node or choose a node from
 its mapping; never guess a branch from array order. Import keeps all branches.
+If a later user request names the useful topic, [select an exact message within
+the verified branch or retained turns](TITLE_REVIEW_HINTS.md#choose-a-later-message-inside-a-verified-branch-or-retained-history)
+instead of giving up those scope checks to use raw evidence.
 
 **Only after reviewing the title, source and conversation**, run:
 

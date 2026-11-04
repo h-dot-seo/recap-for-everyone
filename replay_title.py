@@ -69,8 +69,18 @@ def replay_evidence(db, source, conversation, path):
     return selected, content_fingerprint(rows), context
 
 
-def suggest_replay(db, source, conversation, path):
+def suggest_replay(db, source, conversation, path, message_id=None):
+    if message_id is not None and (not isinstance(message_id, str) or not message_id):
+        raise ValueError('selected message ID must be nonempty text')
     selected, digest, context = replay_evidence(db, source, conversation, path)
+    if message_id is not None:
+        # Occurrence/projection verification still covers all source messages,
+        # including removed turns. Select only one resolved retained user row.
+        selected = [row for row in selected if row['message_id'] == message_id]
+        if len(selected) != 1 or selected[0]['role'] != 'user':
+            raise ValueError('selected message must identify one user message in the retained projection')
+        context['evidence_selection'] = dict(mode='explicit_user_message', message_id=message_id,
+                                            scope='verified retained local turns')
     suggestion = excerpt(selected)
     validate_title(suggestion['title'])
     projection = context['projection_context']
@@ -85,10 +95,11 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--db', required=True); parser.add_argument('--source', required=True)
     parser.add_argument('--conversation', required=True); parser.add_argument('input')
+    parser.add_argument('--message', help='use exactly this archived user message inside the verified retained turns, not a projection ID')
     add_output_argument(parser)
     args = parser.parse_args()
     try:
-        result = suggest_replay(args.db, args.source, args.conversation, args.input)
+        result = suggest_replay(args.db, args.source, args.conversation, args.input, args.message)
         result = save_if_requested(result, args, 'proposal')
     except (ValueError, OSError, KeyError, TypeError, sqlite3.Error) as error:
         parser.exit(1, str(error) + '\n')

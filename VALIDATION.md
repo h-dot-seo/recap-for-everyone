@@ -1125,3 +1125,50 @@ hash, selected-import, Unicode and CLI tests pass. Publication audit and byte ma
 cover 157 public files. No real conversation data, automatic collection, external
 model call, remote rename or merge occurs. Exact-commit Ubuntu/Windows Python
 3.10/3.12 CI is checked after push.
+
+### 2026-11-04: select a useful message without leaving verified title scope
+
+Synthetic web and retained-local examples reproduced a title-quality gap: a generic
+first non-greeting request kept supplying the excerpt even when a later verified
+user request named the actual topic. Raw --message selection could choose it, but
+without the original branch/replay verification contract. Both scoped suggestion
+commands now accept an optional exact archived --message ID; Python APIs append
+message_id=None without changing existing positional arguments or default output.
+
+The full original branch/replay evidence verification runs before narrowing the
+excerpt candidate. Exactly one in-scope user row is required. Off-branch, rolled-back,
+non-user, missing and ambiguous choices fail without fallback; an unusable prefix
+still fails, while an explicitly chosen greeting keeps its existing advisory.
+Malformed selector shapes reject before source/archive access. Entire branch-path
+verification and all raw replay source-occurrence checks remain, including removed
+turns. Whole raw-conversation fingerprints and normal scope context are retained.
+The added evidence_selection is descriptive/unsigned, not approval or authenticity.
+
+Eighteen independent synthetic tests cover later-request quality, default/None
+parity, exact scope and roles, pre-I/O validation, no fallback, greeting/Unicode/
+80-code-point behavior, ambiguous rows, other-scope content/provenance failures,
+whole-fingerprint stale apply, one source read and byte-for-byte read-only checks.
+ID-less replay tests select the original archive ID after renaming identical source
+bytes and reject a projection ID as an archive selector. CLI tests compare unified
+and standalone entry points, native saved proposals/previews, explicit apply/search,
+stale reapply and no output file after a rejected choice.
+
+A new invented 17-record local fixture has six raw messages, two retained turns and
+one removed turn. The documentation's 14 exact commands (including directory
+creation) are executed with private temporary-path substitution after tokenization.
+Tests inspect actual UTF-8 documents and receipt hashes, require both conversations
+to remain at revision zero until their own explicit apply, preserve source/raw
+snapshots, and verify retained/rollback counts and final title search. The test
+records returned global title-history revision IDs rather than assuming each
+conversation's first write receives revision 1. The existing raw-selection guide
+still executes its original seven commands; its section boundary now stops at the
+next level-two heading.
+
+The final complete local suite passes 795 tests in 163.363 seconds. The focused
+scoped/raw/adapter/attribution/output/CLI suite passes 116 tests, and the independent
+documentation bundle passes 40. Publication audit and byte manifest cover 159 public
+files. The 80-code-point cap can still cut graphemes. Source-attributed generation,
+provider preparation, narrow replay grammar, and separate preview/apply checks are
+unchanged. Apply checks the archive snapshot, not later source/current_node changes.
+No real sessions, model transmission, automatic semantic ranking, remote rename or
+merge occurs. Exact-commit Ubuntu/Windows Python 3.10/3.12 CI is checked after push.

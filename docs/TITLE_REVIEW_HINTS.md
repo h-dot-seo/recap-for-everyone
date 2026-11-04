@@ -84,6 +84,98 @@ matter; do not treat this flag as equivalent. No model, remote rename, automatic
 relevance score or approval is added. Review before sharing: IDs, text and titles
 can be private.
 
+## Choose a later message inside a verified branch or retained history
+
+A meaningful request can occur after a generic opener even within the correct web
+branch or retained local turns. `suggest-branch-title` and `suggest-replay-title`
+also accept `--message ID`, so you can choose that request without returning to
+the broader raw-content generator. Selection happens **after** the existing scope,
+content and provenance verification. It never widens the branch or restores a
+rolled-back turn.
+
+Choose a new private directory outside the repository and use the native UTF-8
+output workflow. Each saved JSON filename must be new. For the shipped web fixture:
+
+```sh
+mkdir ../recap-scoped-focus-demo
+python recap.py --db ../recap-scoped-focus-demo/archive.sqlite import examples/title-focus-web.json --format web --source web-focus
+python recap.py web-branch examples/title-focus-web.json --conversation synthetic-title-focus
+python recap.py --db ../recap-scoped-focus-demo/archive.sqlite suggest-branch-title examples/title-focus-web.json --source web-focus --conversation synthetic-title-focus --message u2 --output ../recap-scoped-focus-demo/web-proposal.json
+python recap.py --db ../recap-scoped-focus-demo/archive.sqlite preview-title ../recap-scoped-focus-demo/web-proposal.json --with-evidence --output ../recap-scoped-focus-demo/web-reviewed.json
+```
+
+The current branch includes `u2`, which yields `Compare synthetic orchard
+irrigation schedules` rather than the generic opening question. `--node` still
+chooses the branch endpoint; `--message` must be a user message on that path. It
+does not mean "select the branch containing this message." A message on a different
+fork or after the selected endpoint is rejected, even if it exists in the archive.
+
+For the local demonstration, use the same private directory or create it first
+if you skipped the web example:
+
+```sh
+python recap.py inspect examples/title-focus-local.jsonl --format local-codex
+python recap.py replay-local examples/title-focus-local.jsonl
+python recap.py --db ../recap-scoped-focus-demo/archive.sqlite import examples/title-focus-local.jsonl --format local-codex --source local-focus
+python recap.py --db ../recap-scoped-focus-demo/archive.sqlite show --source local-focus --conversation synthetic-local-focus --message focus-user
+python recap.py --db ../recap-scoped-focus-demo/archive.sqlite suggest-replay-title examples/title-focus-local.jsonl --source local-focus --conversation synthetic-local-focus --message focus-user --output ../recap-scoped-focus-demo/local-proposal.json
+python recap.py --db ../recap-scoped-focus-demo/archive.sqlite preview-title ../recap-scoped-focus-demo/local-proposal.json --with-evidence --output ../recap-scoped-focus-demo/local-reviewed.json
+```
+
+The source has six raw messages across three turns. The narrow supported replay
+retains two turns and excludes the final rolled-back turn. `focus-user` yields
+`Compare synthetic orchard watering schedules`; `discarded-user` is still in the
+raw archive but is not selectable for a retained-history proposal.
+
+Open each actual proposal and reviewed JSON before continuing. Verify the source,
+conversation, chosen user-message ID, title, previous title and expected revision.
+A `SAVED` receipt is not the document or an approval. Only after that review:
+
+```sh
+python recap.py --db ../recap-scoped-focus-demo/archive.sqlite apply-title ../recap-scoped-focus-demo/web-reviewed.json
+python recap.py --db ../recap-scoped-focus-demo/archive.sqlite apply-title ../recap-scoped-focus-demo/local-reviewed.json
+python recap.py --db ../recap-scoped-focus-demo/archive.sqlite find "orchard watering" --source local-focus
+```
+
+Apply only the examples you actually completed and reviewed. The search finds the
+local conversation; original raw messages, including the discarded turn, remain.
+These commands change local display titles, not live ChatGPT/Codex titles.
+
+### Exact IDs, unchanged validation and limits
+
+Use the **archived message ID**, as returned by `show`, not a title, line number,
+substring or `replay-local`'s `projection_id`. Explicit source IDs usually coincide,
+but ID-less source records have separate archive and projection identities. A
+renamed byte-identical source still resolves its archived IDs through verified
+hash/line provenance; do not guess a new filename-based ID. Multiple matching
+scoped rows are rejected rather than silently choosing an occurrence.
+
+Both standalone scripts support the same flag. Python APIs append
+`message_id=None` to `suggest_branch(..., node=None)` and `suggest_replay(...)`.
+Omitting it preserves the earlier first-non-greeting/fallback behavior and proposal shape.
+With selection, `evidence_selection` describes the exact ID and verified scope.
+The normal branch/projection context remains, and the raw whole-conversation
+fingerprint is unchanged. Descriptive context is unsigned, not proof of approval.
+
+Empty/nontext selectors fail before source or archive reads. Missing IDs, non-user
+messages, off-branch/rolled-back messages and unusable selected excerpts fail with
+no fallback. IDs are neither trimmed nor Unicode-normalized. Choosing a greeting
+is allowed but keeps the greeting-fallback advisory. Whitespace/control cleanup
+and the existing 80-code-point cap remain, including possible cuts inside a
+grapheme. This is still an excerpt, not semantic summarization or relevance scoring.
+
+Verification elsewhere in the original scope is not skipped: another branch-path
+message or any raw replay source occurrence can still invalidate the proposal.
+All raw conversation content still contributes to staleness checks, including
+off-branch or removed content. These flags do not bound memory or source reading,
+combine replay with per-content attribution, or authenticate human authorship.
+Source-attributed generation and provider request preparation are unchanged; they
+do not gain this selector. Preview/apply remain separate and retain their existing
+archive fingerprint and title-revision checks.
+Apply does not re-read a later source file or track a changed `current_node`.
+Regenerate and review a new proposal when you intend to use a different export
+snapshot or branch; do not treat saved context as a live source lease.
+
 ## Unicode excerpt boundaries
 
 Greeting-only detection uses NFC on the comparison key before case folding and

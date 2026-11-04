@@ -214,7 +214,7 @@ class SelectedTitleEvidenceTests(unittest.TestCase):
 
     def test_published_focus_example_commands_require_separate_apply(self):
         doc = Path('docs/TITLE_REVIEW_HINTS.md').read_text(encoding='utf-8')
-        section = doc.split('## Choose a more informative user message', 1)[1].split('## Unicode excerpt boundaries', 1)[0]
+        section = doc.split('## Choose a more informative user message', 1)[1].split('\n## ', 1)[0]
         commands = [line for line in section.splitlines() if line.startswith(('mkdir ', 'python recap.py '))]
         self.assertEqual(len(commands), 7)
         scratch = self.root / 'focus example with spaces'
