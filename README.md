@@ -1105,3 +1105,18 @@ neither changes source files, opens a database or imports automatically. The que
 itself can be private. Full-file validation and raw branch/rollback scope remain.
 Use the returned exact ID and original hash for selected import, then independently
 review title evidence. See [message-text discovery and reviewed-title example](docs/EXPORT_INVENTORY.md#find-a-conversation-by-remembered-message-text).
+
+### Find remembered requests without assistant echoes
+
+Pre-import text discovery accepts an optional `--text-role user` (or `assistant`,
+`system`, `tool`) together with `--text-contains`. For example:
+
+```sh
+python recap.py list-export examples/title-focus-local.jsonl --format local-codex --text-contains "orchard watering" --text-role user
+```
+
+This restricts matching occurrences before pagination without changing full-export
+validation or counts. The default still searches every extracted role. A role label
+is not proof of human authorship or retained history. See
+[the export inventory guide](docs/EXPORT_INVENTORY.md#restrict-remembered-text-to-one-message-role)
+for source-format limits, privacy, and the separate import/title-review boundary.

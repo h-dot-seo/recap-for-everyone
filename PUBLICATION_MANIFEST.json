@@ -1,12 +1,12 @@
 {
   "project": "recap-for-everyone",
-  "release": "0.86.0-adapter-message-selection",
+  "release": "0.87.0-role-scoped-export-discovery",
   "date": "2026-11-04",
   "private_history_imported": false,
   "actual_corpora_included": false,
   "synthetic_examples_only": true,
   "license_status": "NOT_SELECTED",
-  "file_count": 176,
+  "file_count": 177,
   "files": [
     {
       "path": ".gitattributes",
@@ -30,8 +30,8 @@
     },
     {
       "path": "README.md",
-      "bytes": 70888,
-      "sha256": "77e9a2f703c731e46241030ecb16d175030bbdcb6b596987c8f9ef909311e191"
+      "bytes": 71643,
+      "sha256": "ee7ff536a19829b529ed61c6d8e05f10290699af70265ed0a59efe2e40afa2a6"
     },
     {
       "path": "RIGHTS.md",
@@ -50,8 +50,8 @@
     },
     {
       "path": "VALIDATION.md",
-      "bytes": 110148,
-      "sha256": "4345b45d98a4984739731321e9f0ee22d882a567f45f47dc454a42380808e600"
+      "bytes": 111399,
+      "sha256": "adf8a0fb3f7aacdff9f99c2258b97bcca222c2485db35582ad49bcb3df1f8930"
     },
     {
       "path": "attributed_title.py",
@@ -100,8 +100,8 @@
     },
     {
       "path": "docs/EXPORT_INVENTORY.md",
-      "bytes": 18227,
-      "sha256": "baa6148bd7f4b281615aec194c16b3fda8bd5e22b527337de3f7902a64e30423"
+      "bytes": 19852,
+      "sha256": "53e087c997d90ad90476044afbbbe73cf697301f847ecf66d4784643dea031d1"
     },
     {
       "path": "docs/EXPORT_SCOPED_SEARCH.md",
@@ -295,8 +295,8 @@
     },
     {
       "path": "export_inventory.py",
-      "bytes": 9551,
-      "sha256": "d2e82975bc64a37a930662925429021f30bdf5894b58081ef3a2f278113e8980"
+      "bytes": 10458,
+      "sha256": "d1dadb3dc3fa9912e81f829eab8a3897129cad3e4bc6516b5ed54c8487c3ed91"
     },
     {
       "path": "import_check.py",
@@ -320,8 +320,8 @@
     },
     {
       "path": "recap.py",
-      "bytes": 27110,
-      "sha256": "34431f6819140919ddc00d2cec4c41b884e4006ef23cef19209bb568c4a14762"
+      "bytes": 27332,
+      "sha256": "62e88443955d2119ed15b57622e7ede79bf409b13853c554af15798a3d9a3708"
     },
     {
       "path": "replay_local.py",
@@ -442,6 +442,11 @@
       "path": "test_export_inventory_filter.py",
       "bytes": 18867,
       "sha256": "f606c5d9d0cf1dce56647fac663ff7b2bc40eb80ba65e292105b6e2da8bcefb3"
+    },
+    {
+      "path": "test_export_inventory_role_filter.py",
+      "bytes": 7926,
+      "sha256": "712c3373ae5b101e78b2c45922e73f4848855d208e0ef927cb512aa11e21a452"
     },
     {
       "path": "test_export_inventory_text_filter.py",

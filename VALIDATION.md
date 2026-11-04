@@ -1685,3 +1685,22 @@ passes 985 tests in 349.846 seconds. Public audit and byte manifest cover 177 fi
 No actual personal data, model transmission, automatic title approval, remote
 mutation or merge occurs. Exact-commit Ubuntu/Windows Python 3.10/3.12 CI is checked
 after push.
+
+## Role-scoped pre-import discovery (0.87.0)
+
+Added optional exact extracted-role filtering to remembered-text inventory queries
+in both CLI entry points. The selector narrows match occurrences before pagination,
+while full-file parsing, original hashes, grouping, ambiguity blockers, coverage and
+whole-conversation counts stay unchanged. Default all-role results remain unchanged.
+Web supports the four existing extracted roles; local system/tool searches honestly
+return no extracted matches. Role labels do not authenticate human authorship.
+
+Nine synthetic regressions cover web/local profiles, assistant echoes, repeated
+substrings, all web roles, noncurrent branches, unsupported local roles, pagination,
+hash leases, canonical Unicode, literal matching, invalid options before I/O,
+unmatched malformed records, default compatibility and both CLI entry points.
+The documented example was run successfully. Independent review found no blockers
+and passed 67 focused inventory tests. The full suite passes 994 tests in 230.153
+seconds. Publication audit and manifest cover 178 public files. No real source
+corpora, external model calls, remote title changes or merges were performed.
+Exact-commit cross-platform CI is checked after publication.

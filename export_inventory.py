@@ -13,7 +13,7 @@ from unicode_search import canonical_fold
 
 
 def list_export(path, kind, limit=50, offset=0, expected_export_sha256=None, *,
-                contains=None, canonical_unicode=False, text_contains=None):
+                contains=None, canonical_unicode=False, text_contains=None, text_role=None):
     if type(limit) is not int or not 1 <= limit <= 1000:
         raise ValueError('limit must be an integer in 1..1000')
     if type(offset) is not int or not 0 <= offset <= 2**63 - 1:
@@ -32,6 +32,11 @@ def list_export(path, kind, limit=50, offset=0, expected_export_sha256=None, *,
                 raise ValueError(name + ' must be non-whitespace text of at most 256 code points')
             if any(0xd800 <= ord(character) <= 0xdfff for character in value):
                 raise ValueError(name + ' must contain valid Unicode text')
+    if text_role is not None:
+        if not isinstance(text_role, str) or text_role not in ('user', 'assistant', 'system', 'tool'):
+            raise ValueError('text_role must be user, assistant, system or tool')
+        if text_contains is None:
+            raise ValueError('text_role requires text_contains')
     fold = canonical_fold if canonical_unicode else str.casefold
     path = Path(path)
     raw = _read_export_bytes(path, expected_export_sha256)
@@ -69,7 +74,8 @@ def list_export(path, kind, limit=50, offset=0, expected_export_sha256=None, *,
         roles.setdefault(identity, Counter())[row['role']] += 1
         # Count an extracted message occurrence once, not each substring hit.
         # Never join separate messages or limit the original metadata group.
-        if text_needle is not None and text_needle in fold(row['text']):
+        if (text_needle is not None and (text_role is None or row['role'] == text_role)
+                and text_needle in fold(row['text'])):
             matched_roles.setdefault(identity, Counter())[row['role']] += 1
     for identity, item in items.items():
         item['role_counts'] = dict(sorted(roles.get(identity, {}).items()))
@@ -117,6 +123,10 @@ def list_export(path, kind, limit=50, offset=0, expected_export_sha256=None, *,
             pagination_scope='matching identities only; total_conversations, selectable_conversations and coverage still describe the whole file',
             message_scope='all supported extracted roles; all web branches and raw local records, not effective history or source-attributed user text',
             warning='The echoed query can reveal message text. No extracted message-body fields are returned. Matching counts do not establish human authorship, effective history, import permission or title suitability; the full file is still read and validated.')
+    if text_role is not None:
+        result['filter']['text_role'] = text_role
+        result['filter']['message_scope'] = ('only extracted messages with the exact requested role; '
+            'all web branches and raw local records, not effective history or source-attributed user text')
     if 'filter' in result and canonical_unicode:
         result['filter'].update(normalization='NFC(NFD(text).casefold())',
                                 unicode_version=unicodedata.unidata_version)
@@ -133,12 +143,14 @@ def main():
     filters = parser.add_mutually_exclusive_group()
     filters.add_argument('--contains', help='filter IDs or existing web titles by one literal case-insensitive substring before pagination')
     filters.add_argument('--text-contains', help='find IDs by one literal substring in extracted message text; return metadata and match counts, not bodies')
+    parser.add_argument('--text-role', choices=['user', 'assistant', 'system', 'tool'],
+                        help='restrict text matches to one extracted role; requires --text-contains')
     parser.add_argument('--canonical-unicode', action='store_true', help='match canonical Unicode equivalents; requires --contains or --text-contains')
     args = parser.parse_args()
     try:
         result = list_export(args.input, args.format, args.limit, args.offset, args.expected_export_sha256,
                              contains=args.contains, canonical_unicode=args.canonical_unicode,
-                             text_contains=args.text_contains)
+                             text_contains=args.text_contains, text_role=args.text_role)
     except (ValueError, OSError, KeyError, TypeError) as error:
         parser.exit(1, str(error) + '\n')
     print(json.dumps(result, ensure_ascii=True, indent=2))

@@ -290,3 +290,30 @@ safe to publish. A source title can itself contain copied message text or secret
 The `contains_message_text:false` field describes omitted message-body fields,
 not a privacy guarantee. JSON escaping preserves Unicode on ASCII terminals;
 escaping is not redaction. Keep inventory output outside public repositories.
+
+## Restrict remembered text to one message role
+
+When an assistant repeats a phrase from a different conversation, restrict discovery
+to extracted user-role messages before selecting an opaque conversation ID:
+
+```sh
+python recap.py list-export examples/title-focus-local.jsonl --format local-codex --text-contains "orchard watering" --text-role user
+```
+
+`--text-role` requires `--text-contains`. It accepts `user`, `assistant`, `system`
+and `tool`, and is also available in `export_inventory.py`. Web exports can
+extract all four roles; current local parsers extract only user and assistant,
+so a system/tool filter there returns no matches rather than inventing messages.
+The filter runs before pagination and counts a matching occurrence once.
+`filter.text_role` records the requested role; `matched_role_counts` and
+`matched_messages` describe only the role-filtered matches. Whole-file coverage,
+`role_counts`, `extracted_messages`, ambiguity blockers and selectable counts
+still describe the full parsed export. Combine it with canonical Unicode matching
+and the original whole-file hash lease in exactly the same way as unscoped search.
+
+The full file is still read and validated, including unmatched conversations and
+roles. No message bodies are returned. The echoed query, titles and identifiers
+can still be private. A user role is a source label, not proof of human authorship:
+this searches all raw local records or web branches, not retained history or
+source-attributed user evidence. Import and title review remain separate actions.
+Omitting the selector preserves the previous all-extracted-role behavior.
