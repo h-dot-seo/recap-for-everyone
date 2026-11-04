@@ -967,3 +967,43 @@ queue and native-output suites pass 49 tests. Publication audit and byte manifes
 cover 153 files. The new tests were authored in this task, not independently
 reviewed. No real exports, account collection, model transmission, original-session
 rename or merge occurs. Four-platform exact-commit CI is verified after publication.
+
+### 2026-11-04: parse local source snapshots directly
+
+A synthetic inspection reproduced one full source-sized temporary write even though
+normalization already held the immutable input bytes. A malformed record then
+reported a removed temporary session.jsonl path instead of the selected filename.
+Local/local-codex normalization now passes the existing snapshot directly to a
+JSONL byte parser. It does not create that extra source copy or depend on a writable
+temporary directory for inspection, export inventory, conflict checking or scoped
+local title evidence. Record diagnostics use the source basename and physical line.
+
+The existing file-based parse_artifact routes remain supported, including SQLite
+integrity checking and path-based diagnostics. New parse_jsonl_bytes accepts immutable
+bytes and a nonempty source-relative text label; the label is not opened or resolved.
+Both entry points share the unchanged record/content extraction logic. Metadata-only
+utility policies, raw record order, profile differences and all admission guards
+remain in force; this is not format discovery or broader extraction.
+
+Fourteen new synthetic tests cover byte/file parity and explicit expected message
+IDs, physical lines, timestamp zero, text/variant hashes, BOM/mixed newlines and
+Unicode content. They exercise metadata-only labels, invalid byte/profile/label
+arguments, malformed records, unchanged SQLite routes, original-path versus label
+diagnostics, and checks with temporary staging and filesystem entry points blocked.
+This is code-path regression coverage, not an OS sandbox or a claim about all Python
+startup/import and SQLite filesystem activity.
+
+Workflow tests confirm one source read even when the file is deliberately replaced
+after that read; hashes, selection and fallback IDs still refer to the same captured
+bytes. Invalid input fails before database/staging work. Import still uses exactly
+one existing normalized-JSONL staging directory, preserves original provenance and
+is idempotent. Retained-turn and source-attributed title generation work with source
+staging disabled and still require a separate checked apply. Source files remain
+unchanged; web normalization remains separate.
+
+The final complete local suite passes 737 tests, and the adjacent parser/import/
+inventory/title suite passes 122 tests. Publication audit and byte manifest cover
+154 files. The new tests were authored in this task, not independently reviewed.
+Full-file memory use and import's normalized staging are explicitly retained. No
+real sessions, account discovery, model transmission, remote title change or merge
+occurs. Exact-commit Ubuntu/Windows Python 3.10/3.12 CI is checked after push.

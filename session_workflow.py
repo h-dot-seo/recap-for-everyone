@@ -8,7 +8,7 @@ import tempfile
 from contextlib import closing
 from collections import Counter
 from pathlib import Path
-from local_parser import parse_artifact
+from local_parser import parse_jsonl_bytes
 from recap import ingest, readonly
 from strict_json import loads
 from title_rules import validate_title
@@ -103,11 +103,9 @@ def _normalize_bytes(raw, source_name, kind, include_report=False):
     if raw.startswith(BOM_UTF8):
         report['utf8_bom_present'] = True
     if kind in ('local', 'local-codex'):
-        # Parse the same byte snapshot that was hashed, even if the source changes.
-        with tempfile.TemporaryDirectory() as tmp:
-            frozen = Path(tmp) / 'session.jsonl'
-            frozen.write_bytes(raw)
-            parsed = parse_artifact(frozen, source_name, content_profile='codex' if kind == 'local-codex' else 'legacy')
+        # Parse the already-hashed snapshot directly: inspection and scoped title
+        # reads must not need a second plaintext file in the temporary directory.
+        parsed = parse_jsonl_bytes(raw, source_name, content_profile='codex' if kind == 'local-codex' else 'legacy')
         report.update(local_content_profile='codex' if kind == 'local-codex' else 'legacy',
                       skipped_content_parts=parsed.skipped_content_parts,
                       rollout_context=dict(parsed.context_counts),

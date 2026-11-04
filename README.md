@@ -155,6 +155,12 @@ relevance or establish branch/replay/attribution scope. See the [tested example 
 selection limits](docs/TITLE_REVIEW_HINTS.md#choose-a-more-informative-user-message).
 Title reads return current/original titles, suggestions and revision history from
 one database snapshot. Separate commands can observe later changes.
+Local normalization parses its existing byte snapshot directly, avoiding a temporary
+source-file copy during inspection and source-backed title reads. Record errors now
+point to the selected basename and physical line. Hashes, fallback IDs and parsing
+rules are unchanged; import's separate normalized staging remains. See
+[local snapshot parsing](docs/INPUT_SCOPE.md#local-snapshot-parsing-and-error-locations).
+
 Local parsing now rejects malformed known response envelopes before archive work;
 valid unsupported records remain counted skips. See [input boundaries](docs/INPUT_SCOPE.md).
 Typed `local-codex` content also rejects malformed present type tags instead of

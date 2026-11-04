@@ -96,6 +96,33 @@ still rejected transactionally. Selection **never removes previously imported
 conversations**. Use a new private database if you want an archive containing only
 the newly chosen scope. Neither inspection nor a rejected selection creates a DB.
 
+### Local snapshot parsing and error locations
+
+Local and local-codex normalization now parse the already-read immutable byte
+snapshot directly. `inspect`, `list-export`, `check-import` and source-backed local
+title reads no longer create a temporary second copy of the source JSONL just to
+parse it. Record-validation diagnostics use the selected file's basename and its
+physical line, rather than a temporary `session.jsonl` path that no longer exists.
+The basename is a diagnostic label, not a resolved path or authenticated identity;
+use the exact input path you supplied to locate the source. Names can be private.
+
+Original hashes, BOM/newline handling, fallback message IDs, content profiles,
+omission/context counts, utility metadata rules and full-file validation stay the
+same. This is not streaming: the full source bytes and parsed records still occupy
+memory. It does not guarantee zero filesystem I/O by Python/SQLite or other commands.
+`import` still uses its existing separate temporary normalized JSONL to feed the
+archive writer, and deliberately writes the database. No automatic collection,
+format detection, content repair or relaxed validation is added.
+
+For Python callers, `local_parser.parse_jsonl_bytes(raw, source_relative_path,
+content_profile="legacy")` accepts immutable `bytes` plus a nonempty text label.
+The label is not opened or resolved. It is preserved in fallback IDs and byte-parser
+diagnostics and retains existing special metadata-only source-label policies.
+This API does not read files, stage bytes or open SQLite. The existing
+`parse_artifact(path, ...)` file/SQLite entry points stay supported; their file-based
+diagnostics continue to use the explicitly provided path. Neither interface verifies
+that a caller-supplied label is a genuine source identity.
+
 ## Bind inspection to exact source bytes
 
 `list-export` and `inspect` report the whole-file `original_sha256`. Copy that

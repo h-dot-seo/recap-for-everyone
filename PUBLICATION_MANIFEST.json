@@ -1,12 +1,12 @@
 {
   "project": "recap-for-everyone",
-  "release": "0.70.0-title-file-encoding",
+  "release": "0.71.0-direct-local-snapshots",
   "date": "2026-11-04",
   "private_history_imported": false,
   "actual_corpora_included": false,
   "synthetic_examples_only": true,
   "license_status": "NOT_SELECTED",
-  "file_count": 152,
+  "file_count": 153,
   "files": [
     {
       "path": ".gitattributes",
@@ -30,8 +30,8 @@
     },
     {
       "path": "README.md",
-      "bytes": 65297,
-      "sha256": "0361ed438d112efc0b0c2d4373c8db6f3e6586497427c9da8facf886bf2b2286"
+      "bytes": 65711,
+      "sha256": "c14d8f95c0c45fe2c6169f0aea4235e89c9df2547ebd17833a7a3033f4016948"
     },
     {
       "path": "RIGHTS.md",
@@ -50,8 +50,8 @@
     },
     {
       "path": "VALIDATION.md",
-      "bytes": 61313,
-      "sha256": "3fc2230d1e99a0cf822fd609fb3be73b52e13aab1dd028dc7b7039607ceb2b4c"
+      "bytes": 64011,
+      "sha256": "f4b6425863223c200decc0abcc78e0ac472f856a285ff56df2909d36dcb5c1ed"
     },
     {
       "path": "attributed_title.py",
@@ -105,8 +105,8 @@
     },
     {
       "path": "docs/INPUT_SCOPE.md",
-      "bytes": 19228,
-      "sha256": "efe1c9acd2864a333c7da7461efb605b30efd8074618275c67d46e678f3de049"
+      "bytes": 21030,
+      "sha256": "9a83675d450827aeaea85eb96a35ee05a32fc0d6f9000baf5edbcc79171568c1"
     },
     {
       "path": "docs/INSTALL.md",
@@ -270,8 +270,8 @@
     },
     {
       "path": "local_parser.py",
-      "bytes": 21262,
-      "sha256": "03f56a21b400469670b3f2c10a4f2c787fb9ecd9bc88a3f927a9677fb63fbc41"
+      "bytes": 22366,
+      "sha256": "e86f0b4f504375828000eb89c86a8c71e6c0e04c58427b1806d22741cdbbbfb9"
     },
     {
       "path": "prepare_web_export.py",
@@ -300,8 +300,8 @@
     },
     {
       "path": "session_workflow.py",
-      "bytes": 17690,
-      "sha256": "7bcabb18f70797b6e7b49900531bb7d7d10986f22c2cb835255f6b799a0d9345"
+      "bytes": 17633,
+      "sha256": "684bf77414ae5ea546ff51ad1c92d510c02fbe951b1cccfaa959dfdbdd9b9b56"
     },
     {
       "path": "source_identity.py",
@@ -417,6 +417,11 @@
       "path": "test_inspect_web_zip.py",
       "bytes": 8708,
       "sha256": "9df886f4176b0d649251df69be725b08bfea59079ed0ddc420f0757437a23095"
+    },
+    {
+      "path": "test_local_byte_snapshot.py",
+      "bytes": 16783,
+      "sha256": "6f1e39558a70fb9983e67796ef90c20daa6ad0875022dff34fed35500c0e6975"
     },
     {
       "path": "test_local_codex.py",

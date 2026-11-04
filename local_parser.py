@@ -123,9 +123,9 @@ def _message_text(payload: dict[str, Any], content_profile: str = "legacy") -> s
     return joined if content_profile == "codex" and joined.strip() else joined.strip()
 
 
-def _records(path: Path) -> list[tuple[int, dict[str, Any]]]:
+def _records(raw: bytes, path: Path | str) -> list[tuple[int, dict[str, Any]]]:
     records: list[tuple[int, dict[str, Any]]] = []
-    for line_number, line in enumerate(physical_lines(path.read_bytes()), 1):
+    for line_number, line in enumerate(physical_lines(raw), 1):
         if not line.strip():
             continue
         try:
@@ -193,7 +193,27 @@ def parse_artifact(path: Path, source_relative_path: str, artifact_kind: str = "
         return ParsedArtifact("not_applicable", "accepted_metadata_only", "sqlite_backup", None, (), ())
     if artifact_kind != "jsonl":
         raise LocalImportError(f"unsupported local artifact kind: {artifact_kind}")
-    records = _records(path)
+    return _parse_jsonl_records(_records(path.read_bytes(), path), path, source_relative_path, content_profile)
+
+
+def parse_jsonl_bytes(raw: bytes, source_relative_path: str,
+                      content_profile: str = "legacy") -> ParsedArtifact:
+    """Parse one immutable JSONL snapshot without filesystem access or staging.
+
+    source_relative_path is an exact identity/diagnostic label, not a file to open.
+    It retains the existing metadata-only utility and fallback-message-ID rules.
+    """
+    if not isinstance(raw, bytes):
+        raise LocalImportError("JSONL snapshot must be immutable bytes")
+    if not isinstance(source_relative_path, str) or not source_relative_path:
+        raise LocalImportError("source-relative label must be nonempty text")
+    if content_profile not in ("legacy", "codex"):
+        raise LocalImportError("unsupported local content profile")
+    return _parse_jsonl_records(_records(raw, source_relative_path), source_relative_path,
+                               source_relative_path, content_profile)
+
+
+def _parse_jsonl_records(records, path, source_relative_path, content_profile):
     if re.fullmatch(r"agents/(claude|antigravity|opencode)/raw/.+", source_relative_path):
         return ParsedArtifact("parsed", "accepted_metadata_only", "agent_raw_evidence", len(records), (), ())
     if source_relative_path == "session_index.jsonl":
