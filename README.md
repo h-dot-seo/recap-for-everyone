@@ -848,3 +848,24 @@ without decompression. It shows exact names and metadata-only rejection reasons,
 never certifies JSON validity or part completeness, and does not list unrelated
 account-file names. Pass its hash to preparation with `--expected-archive-sha256`
 when you want to reject a ZIP changed since inspection. See [candidate selection](docs/WEB_ZIP_INVENTORY.md).
+
+## Match-centered search evidence
+
+Conversation search now shows the matching part of a long message instead of
+always its first 240 characters. Each sample includes unchanged source text,
+code-point offsets, truncation flags and the first literal match span. Unicode
+case-fold expansion is mapped back to the original text; title-only matches do not
+invent message evidence. Ranking, provenance and history/export filters are
+unchanged. See [search excerpt fields and limits](docs/SEARCH_EXCERPTS.md).
+
+### Local metadata validation
+
+Both `local` and `local-codex` imports reject malformed session boundaries rather
+than silently assigning subsequent messages to the preceding session. Local
+message timestamps preserve numeric zero and accept missing/null as `unknown`.
+Empty strings, booleans, containers and nonfinite numbers are rejected before
+archive writes. Timestamp text is retained as supplied, not parsed as a date.
+If an older archive already stores a zero timestamp as `unknown`, reimport reports
+a conflicting identity and leaves the old evidence unchanged; it does not silently
+rewrite the archive. Use a separate archive/source for a deliberately corrected
+reimport and retain the original export for comparison.

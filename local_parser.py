@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import math
 import re
 import sqlite3
 from dataclasses import dataclass
@@ -197,8 +198,13 @@ def parse_artifact(path: Path, source_relative_path: str, artifact_kind: str = "
     for line_number, value in records:
         record_type = value.get("type")
         payload = value.get("payload")
-        if record_type == "session_meta" and isinstance(payload, dict):
-            session_id = _text(payload.get("id") or payload.get("session_id"), "session id")
+        if record_type == "session_meta":
+            if not isinstance(payload, dict):
+                raise LocalImportError(f"invalid session metadata payload: {path}:{line_number}")
+            try:
+                session_id = _text(payload.get("id") or payload.get("session_id"), "session id")
+            except LocalImportError as error:
+                raise LocalImportError(f"invalid session metadata identity: {path}:{line_number}") from error
             sessions.append(SessionOccurrence(session_id, line_number, payload.get("cwd"), payload.get("originator")))
             current_session = session_id
             continue
@@ -207,6 +213,11 @@ def parse_artifact(path: Path, source_relative_path: str, artifact_kind: str = "
         role = payload.get("role")
         if role not in {"user", "assistant"}:
             continue
+        timestamp = value.get("timestamp")
+        if timestamp is not None and (timestamp == "" or isinstance(timestamp, bool) or
+                not isinstance(timestamp, (str, int, float)) or
+                isinstance(timestamp, float) and not math.isfinite(timestamp)):
+            raise LocalImportError(f"message timestamp must be text or a finite number: {path}:{line_number}")
         text = _message_text(payload, content_profile)
         if content_profile == "codex":
             skipped_content_parts += sum(item.get("type") not in ("input_text", "output_text")
@@ -223,7 +234,7 @@ def parse_artifact(path: Path, source_relative_path: str, artifact_kind: str = "
         ).encode("ascii")).hexdigest()
         messages.append(MessageOccurrence(
             current_session, str(message_key), explicit_id, role, text,
-            str(value.get("timestamp") or ""), line_number,
+            "" if timestamp is None else str(timestamp), line_number,
             hashlib.sha256(text.encode("utf-8")).hexdigest(),
             variant_sha256,
         ))

@@ -227,3 +227,19 @@ ambiguous double-import rejection, missing evidence including discarded turns,
 unsupported/empty projections, legacy ledger compatibility, stale revision/content
 rejection and continued raw discarded-text search. No real rollout or remote title
 operation is exercised.
+
+### 2026-11-04: located search evidence and local metadata boundaries
+
+The full synthetic suite passes 288 tests. Nine new excerpt cases cover late
+message hits, source-order match selection, Unicode case-fold expansion, Korean
+and non-BMP code-point offsets, bounded partial long-term excerpts, title-only
+results, export provenance, unchanged archive bytes and both CLIs under ASCII
+stdout. The existing archive-scaling and snapshot/concurrency regressions pass.
+
+Nine new local-input cases cover both profiles, corrupt initial/intervening session
+metadata, valid alias boundaries, physical line diagnostics, missing/null/zero
+and invalid timestamps, unchanged archive bytes after failure, legacy-zero conflict
+protection and clean CLI rejection without echoing malformed values. No actual
+conversation history, account, model or external service was used. Publication
+scanning and byte-manifest verification pass for the selected 96-file candidate.
+Remote CI outcomes are checked separately for the exact pushed commit.

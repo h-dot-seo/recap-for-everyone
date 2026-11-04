@@ -5,6 +5,41 @@ import sqlite3
 from recap import readonly
 
 
+def _matching_excerpt(original, folded, terms, width=240):
+    """Return an unchanged source slice around the first literal casefold hit.
+
+    Case folding can expand a character (for example, sharp s to two s's).
+    Translate the folded span without retaining an offset array for a long message.
+    Offsets are Python string/code-point indices, never byte or UTF-16 offsets.
+    """
+    hits = [(position, index, term) for index, term in enumerate(terms)
+            if (position := folded.find(term)) >= 0]
+    position, _, term = min(hits)
+    stop = position + len(term)
+    if original.isascii():
+        start, end = position, stop
+    else:
+        folded_offset = 0
+        start = None
+        for index, character in enumerate(original):
+            folded_offset += len(character.casefold())
+            if start is None and folded_offset > position:
+                start = index
+            if folded_offset >= stop:
+                end = index + 1
+                break
+    # Prefer a little context before the hit, without clipping a fitting match.
+    context = min(60, max(0, width - (end - start)))
+    snippet_start = max(0, start - context)
+    snippet_end = min(len(original), snippet_start + width)
+    return dict(snippet=original[snippet_start:snippet_end],
+                snippet_start=snippet_start, snippet_end=snippet_end,
+                snippet_truncated_before=snippet_start > 0,
+                snippet_truncated_after=snippet_end < len(original),
+                first_match=dict(term=term, start=start, end=end,
+                                 fully_visible=end <= snippet_end))
+
+
 def _matching_export_provenance(connection, tables, source, conversation, message, digest):
     query = ' UNION '.join('SELECT locator,parent FROM '+table+
             ' WHERE source=? AND conversation=? AND message=? AND original_hash=?' for table in tables)
@@ -124,15 +159,17 @@ def find(db, query, source=None, limit=20, include_title_history=False, export_s
             matches = [term in text for term in terms]
             found = [previous or matched for previous, matched in zip(found, matches)]
             if any(matches) and len(item['message_matches']) < 3:
-                match = dict(message_id=row['message_id'], role=row['role'], snippet=row['text'][:240],
+                match = dict(message_id=row['message_id'], role=row['role'],
                              source_sha256=row['source_sha256'], source_line=row['source_line'])
+                match.update(_matching_excerpt(row['text'], text, terms))
                 if export_sha256 is not None:
                     samples,count = _matching_export_provenance(c, provenance_tables, key[0], key[1], row['message_id'], export_sha256)
                     match.update(export_provenance=samples, export_provenance_count=count, export_provenance_truncated=count>3)
                 item['message_matches'].append(match)
         finish()
         result = dict(matches=(title_hits + historical_hits + text_hits)[:limit], total_matches=total, truncated=total > limit,
-                      semantics='case-insensitive literal substrings; AND across current title and conversation messages')
+                      semantics='case-insensitive literal substrings; AND across current title and conversation messages',
+                      snippet_semantics='unchanged source slice around the first matching term; at most 240 Unicode code points; zero-based half-open offsets into original message text')
         if include_title_history:
             result.update(semantics='case-insensitive literal substrings; AND across current title, prior local titles and conversation messages',
                           title_history_scope='local archive only; at most three matching prior title records per conversation, newest overrides first then archived original',
@@ -153,7 +190,7 @@ def main():
     a=p.parse_args()
     try: result=find(a.db,a.query,a.source,a.limit,a.include_title_history,a.export_sha256)
     except (ValueError,OSError,sqlite3.Error) as e: p.exit(1,str(e)+'\n')
-    print(json.dumps(result,ensure_ascii=a.include_title_history or a.export_sha256 is not None,indent=2))
+    print(json.dumps(result,ensure_ascii=True,indent=2))
 
 
 if __name__=='__main__': main()
