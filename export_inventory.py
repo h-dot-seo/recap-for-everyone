@@ -7,6 +7,7 @@ from pathlib import Path
 from session_workflow import _normalize_bytes, _read_export_bytes
 from strict_json import loads
 from source_text import decode_source, physical_lines
+from source_identity import aliased_identity
 
 
 def list_export(path, kind, limit=50, offset=0, expected_export_sha256=None):
@@ -32,7 +33,7 @@ def list_export(path, kind, limit=50, offset=0, expected_export_sha256=None):
 
     if kind == 'web':
         for record in loads(decode_source(raw)):
-            register(record.get('id') or record.get('conversation_id'), record.get('title') or '')
+            register(aliased_identity(record, 'conversation_id'), record.get('title') or '')
     else:
         # Mirror local_parser's universal newlines, not Unicode splitlines.
         for line in physical_lines(raw):
@@ -41,7 +42,7 @@ def list_export(path, kind, limit=50, offset=0, expected_export_sha256=None):
             record = loads(line)
             if record.get('type') == 'session_meta':
                 payload = record['payload']
-                register(payload.get('id') or payload.get('session_id'))
+                register(aliased_identity(payload, 'session_id'))
     roles = {}
     for row in rows:
         identity = row['conversation_id']

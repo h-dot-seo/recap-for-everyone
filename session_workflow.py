@@ -14,6 +14,7 @@ from strict_json import loads
 from title_rules import validate_title
 from title_excerpt import excerpt
 from source_text import BOM_UTF8, decode_source
+from source_identity import aliased_identity
 
 
 def _validate_mapping(mapping):
@@ -80,7 +81,7 @@ def normalize(path, kind, include_report=False, conversation=None, expected_expo
             # Reuse the immutable byte snapshot, not a second file read. Selecting
             # one identity must not silently combine duplicate export records.
             records = loads(decode_source(raw))
-            matches = sum((record.get('id') or record.get('conversation_id')) == conversation for record in records)
+            matches = sum(aliased_identity(record, 'conversation_id') == conversation for record in records)
             if matches != 1:
                 raise ValueError('selected conversation must identify exactly one web export record')
         selected = [row for row in rows if row['conversation_id'] == conversation]
@@ -131,9 +132,7 @@ def _normalize_bytes(raw, source_name, kind, include_report=False):
         for conv in data:
             if not isinstance(conv, dict) or not isinstance(conv.get('mapping'), dict):
                 raise ValueError('conversation must contain a mapping object')
-            cid = conv.get('id') or conv.get('conversation_id')
-            if not isinstance(cid, str) or not cid:
-                raise ValueError('conversation ID required')
+            cid = aliased_identity(conv, 'conversation_id')
             if conv.get('title') is not None and not isinstance(conv['title'], str):
                 raise ValueError('conversation title must be text or null')
             _validate_mapping(conv['mapping'])

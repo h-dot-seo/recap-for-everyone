@@ -127,3 +127,9 @@ Local excerpt generation compares greetings canonically without normalizing the
 selected label or source evidence, and preserves ZWJ/ZWNJ in short labels. This is
 not grapheme-aware truncation or privacy clearance; format-character hints and
 explicit review still apply. See `docs/TITLE_REVIEW_HINTS.md#unicode-excerpt-boundaries`.
+
+Treat conflicting web/local identity aliases or malformed supplied message IDs as
+source errors, not permission to choose a target or invent a fallback identity.
+Missing/null/empty fallback compatibility does not authenticate an ID. Keep literal
+identities and original hashes; do not edit aliases to force title generation.
+See `docs/INPUT_SCOPE.md#source-identities-must-resolve-without-guessing`.

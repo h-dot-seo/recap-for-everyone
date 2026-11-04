@@ -5,6 +5,7 @@ from pathlib import Path
 from strict_json import loads
 from session_workflow import _normalize_bytes
 from source_text import decode_source
+from source_identity import aliased_identity
 
 
 def branch_view(path, conversation, node=None):
@@ -17,7 +18,7 @@ def branch_view(path, conversation, node=None):
     # Both parsing passes use the same immutable bytes, including the original hash.
     rows, coverage = _normalize_bytes(raw, path.name, 'web', include_report=True)
     data = loads(decode_source(raw))
-    matches = [c for c in data if (c.get('id') or c.get('conversation_id')) == conversation]
+    matches = [c for c in data if aliased_identity(c, 'conversation_id') == conversation]
     if len(matches) != 1:
         raise ValueError('conversation must identify exactly one export record')
     conv = matches[0]

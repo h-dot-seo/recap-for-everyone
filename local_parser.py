@@ -11,6 +11,7 @@ from pathlib import Path
 from typing import Any
 from strict_json import loads
 from source_text import physical_lines
+from source_identity import aliased_identity, optional_message_identity
 
 
 class LocalImportError(ValueError):
@@ -205,8 +206,8 @@ def parse_artifact(path: Path, source_relative_path: str, artifact_kind: str = "
             if not isinstance(payload, dict):
                 raise LocalImportError(f"invalid session metadata payload: {path}:{line_number}")
             try:
-                session_id = _text(payload.get("id") or payload.get("session_id"), "session id")
-            except LocalImportError as error:
+                session_id = aliased_identity(payload, "session_id")
+            except ValueError as error:
                 raise LocalImportError(f"invalid session metadata identity: {path}:{line_number}") from error
             sessions.append(SessionOccurrence(session_id, line_number, payload.get("cwd"), payload.get("originator")))
             current_session = session_id
@@ -227,6 +228,10 @@ def parse_artifact(path: Path, source_relative_path: str, artifact_kind: str = "
             raise LocalImportError(f"invalid response message role: {path}:{line_number}")
         if role not in {"user", "assistant"}:
             continue
+        try:
+            raw_key = optional_message_identity(payload)
+        except ValueError as error:
+            raise LocalImportError(f"invalid response message identity: {path}:{line_number}") from error
         timestamp = value.get("timestamp")
         if timestamp is not None and (timestamp == "" or isinstance(timestamp, bool) or
                 not isinstance(timestamp, (str, int, float)) or
@@ -240,8 +245,7 @@ def parse_artifact(path: Path, source_relative_path: str, artifact_kind: str = "
             continue
         if not current_session:
             raise LocalImportError(f"JSONL message has no session metadata: {path}:{line_number}")
-        raw_key = payload.get("id")
-        explicit_id = isinstance(raw_key, str) and bool(raw_key)
+        explicit_id = raw_key is not None
         message_key = raw_key if explicit_id else f"{source_relative_path}:{line_number}"
         variant_sha256 = hashlib.sha256(json.dumps(
             value, ensure_ascii=True, sort_keys=True, separators=(",", ":"),

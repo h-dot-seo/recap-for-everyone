@@ -682,3 +682,32 @@ files. No source repair, added dependency, live model call, private corpus, auto
 approval or merge is introduced. The small built-in greeting list and heuristic
 excerpt remain review aids, not semantic summaries or privacy clearance. Exact
 commit Ubuntu/Windows Python 3.10/3.12 CI is checked separately after publication.
+
+
+### 2026-11-04: unambiguous source identities before archive work
+
+Ten independent synthetic regressions cover one shared resolver for web
+id/conversation_id and local id/session_id fields. Conflicting nonempty strings
+and malformed primary or secondary values reject the source, including empty-text
+and unselected records. Missing/null/empty-string alias fallback remains explicit
+compatibility. Equal decoded strings retain their exact spelling; whitespace,
+padding and canonically distinct Unicode identities are not normalized together.
+
+Supported local user/assistant message IDs reject nonstring values before text
+omission. Missing/null/empty values retain basename/physical-line IDs and coverage
+warnings. Unsupported role/nonmessage skips and the stricter replay grammar remain
+unchanged. BOM and physical-line diagnostics preserve original locations without
+echoing conflicting identities or message contents.
+
+Tests verify inspection, selected import, inventory, source conflict checks, web
+branch proposals and manual title plans agree. Malformed source cannot create a
+new archive or mutate an existing one, and a conflicting source cannot produce a
+proposal/plan for a silently chosen target. Valid alias-only/matching/fallback
+inputs retain source bytes, hashes, locators and evidence IDs through the local
+workflow. Existing archives are not migrated or automatically invalidated.
+
+The full suite passes 634 tests; publication audit and byte-manifest checks cover
+142 files. No UUID/prefix inference, source repair, private corpus, model call,
+external transmission, remote rename or merge is introduced. The previous
+80-code-point title limit and its documented rendering limitations are unchanged.
+Exact-commit Ubuntu/Windows Python 3.10/3.12 CI is checked separately after push.

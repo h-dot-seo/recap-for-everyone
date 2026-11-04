@@ -159,3 +159,52 @@ utility paths are unchanged. The typed profile's structural distinction follows
 the tagged response enum and message role field in the
 [pinned public Codex definitions](https://github.com/openai/codex/blob/f2b94ef8b52196f127d162c6db71e390b9bb265c/codex-rs/protocol/src/models.rs).
 It is not a claim of full current Codex replay compatibility.
+
+## Source identities must resolve without guessing
+
+Web conversation records can provide `id` or `conversation_id`; local session
+metadata can provide `id` or `session_id`. If both contain nonempty strings they
+must match exactly. A conflicting pair fails instead of silently choosing the
+first field and potentially directing search/title work to the wrong conversation.
+Every supplied value other than null or the empty string must be a string,
+including the secondary field when the primary already looks valid. Numbers, booleans and containers are
+not coerced or ignored as missing identities.
+
+Missing, null and empty-string fields keep the existing fallback behavior. They
+mean no identity was supplied in that field; another valid alias is still required.
+If neither alias supplies a nonempty string, parsing fails. Empty-string fallback
+is importer compatibility, not a claim that every producer emits valid empty IDs.
+Nonempty strings remain literal: no trimming, case folding, Unicode normalization,
+UUID/prefix guessing or remote account verification. Padded and whitespace-only
+strings retain their existing treatment; visually similar strings can still be
+different IDs. Two canonically equivalent but code-point-distinct aliases are a
+conflict. JSON escape spelling does not distinguish equal decoded strings.
+
+For supported local user/assistant messages, `payload.id` must likewise be text,
+null or absent. Missing, null and empty strings still use the original source
+basename and physical line number, with the existing fallback-ID coverage warning.
+A supplied number, boolean or container is now an error, even when that message
+has no extracted text. It is not silently replaced with a different identity.
+Unsupported-role/nonmessage skip behavior and metadata-only utility paths are not
+expanded or newly validated by this rule.
+
+The local optional typed message ID follows the public Codex
+[response field](https://github.com/openai/codex/blob/f2b94ef8b52196f127d162c6db71e390b9bb265c/codex-rs/protocol/src/models.rs)
+and [transparent string representation](https://github.com/openai/codex/blob/f2b94ef8b52196f127d162c6db71e390b9bb265c/codex-rs/protocol/src/response_item_id.rs).
+These references do not authenticate IDs, authorize actions or establish universal
+web-export compatibility. The separate replay grammar stays stricter: for example,
+its existing empty-message-ID rejection and required primary session ID remain.
+
+Whole-file inspection/import, selected imports, export inventory, web branch views
+and source-backed title plans now share the alias resolver. A malformed unselected
+conversation or later local boundary still rejects the file before archive access;
+selection cannot conceal it. Diagnostics do not echo conflicting IDs or message
+contents. Local errors retain their physical-line location. Original hashes,
+source bytes, mapping IDs and physical locators are not repaired or rewritten.
+
+Existing archives and saved proposals are not automatically migrated or invalidated.
+Source-backed workflows can reject a previously admitted ambiguous export. Obtain
+or deliberately inspect corrected source and compare it in a separate archive when
+needed; changing a source ID may create a different message rather than update the
+old one. Never drop an alias, guess an ID or rewrite an expected hash merely to
+make a failed title workflow proceed.

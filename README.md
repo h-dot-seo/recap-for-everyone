@@ -135,6 +135,11 @@ Title reads return current/original titles, suggestions and revision history fro
 one database snapshot. Separate commands can observe later changes.
 Local parsing now rejects malformed known response envelopes before archive work;
 valid unsupported records remain counted skips. See [input boundaries](docs/INPUT_SCOPE.md).
+Web/local identity aliases must agree exactly when both are supplied, and malformed
+local message IDs cannot silently become filename/line IDs. Missing/null/empty
+fallback remains explicit compatibility. The same checks apply to inventory,
+selection and source-backed title workflows before archive access. See
+[source identity rules](docs/INPUT_SCOPE.md#source-identities-must-resolve-without-guessing).
 Python title preview/apply also detach caller-owned JSON and require text identities
 to prevent mutable-input substitutions and SQLite type coercion.
 [Review input snapshots](docs/TITLE_REVIEW_HINTS.md) explain the unsigned-document limits.
