@@ -24,13 +24,29 @@ This release rejects that conflict; it does not silently choose a newer record.
 
 ## Import transaction
 
-Read the explicitly selected file, validate records, hash original bytes, insert its
-artifact record and message rows in one transaction. The FTS insert trigger runs in
-that transaction. Reimporting a file inserts no duplicate messages. An artifact
-record may still capture a new source-file version whose messages were all seen.
-Messages retain their first accepted provenance locator; the small CLI does not
-maintain every later duplicate occurrence. The separate parser utilities support
-richer occurrence bookkeeping for a future integration.
+The normalized-file CLI reads its explicitly selected input once; the byte API
+accepts an immutable snapshot. Both validate all normalized records and incoming
+identity conflicts before opening SQLite, then use the same archive write path.
+Artifact, message, original-export provenance and FTS changes share the data
+transaction. Schema initialization remains a separate earlier step: this is not a
+promise that every possible failure leaves no new database file or schema.
+
+Web/local export adapters hash the exact original source bytes, normalize their
+selected messages in memory and pass the generated JSONL bytes to that same writer.
+They do not create temporary source or normalized JSONL files. The normalized
+artifact hash retains the prior platform-native text newline behavior; it is not
+the original export's hash or a cross-platform canonical identity. Original export
+hashes and physical mapping/line locators are retained separately in the coverage
+receipt and companion provenance ledgers. SQLite still writes the selected archive
+and may use its own journal or internal temporary storage.
+
+Reimporting unchanged identities inserts no duplicate messages. A new artifact may
+record a later input whose messages were already accepted. Messages keep their first
+accepted normalized artifact hash and line. Export imports additionally retain
+original hash/locator/parent occurrences in the additive export_occurrences ledger,
+with the legacy export_provenance ledger supported for compatibility. Query views
+combine these ledgers without inventing missing historical evidence. No message or
+original title is overwritten to reconcile a conflicting export.
 
 ## Read-only query boundary
 

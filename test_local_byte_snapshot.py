@@ -150,7 +150,7 @@ class LocalByteWorkflowTests(unittest.TestCase):
     def test_inspection_inventory_and_conflict_check_work_with_temporary_staging_disabled(self):
         import_export(self.db, 'demo', self.path, 'local-codex')
         before = self.db.read_bytes(); original = self.path.read_bytes()
-        with patch('session_workflow.tempfile.TemporaryDirectory', side_effect=AssertionError('no source staging')), \
+        with patch('tempfile.TemporaryDirectory', side_effect=AssertionError('no source staging')), \
              patch.object(Path, 'write_bytes', side_effect=AssertionError('no source write')):
             for kind in ('local', 'local-codex'):
                 with self.subTest(kind=kind):
@@ -171,7 +171,7 @@ class LocalByteWorkflowTests(unittest.TestCase):
             raw = reader(path); path.write_bytes(b'changed synthetic file after read')
             return raw
         with patch.object(Path, 'read_bytes', snapshot), \
-             patch('session_workflow.tempfile.TemporaryDirectory', side_effect=AssertionError('no staging')):
+             patch('tempfile.TemporaryDirectory', side_effect=AssertionError('no staging')):
             rows, report = normalize(self.path, 'local-codex', True, 'synthetic', hashlib.sha256(original).hexdigest())
         self.assertEqual(calls, [self.path]); self.assertEqual(len(rows), 2)
         self.assertEqual(rows[1]['message_id'], self.path.name+':3')
@@ -179,14 +179,10 @@ class LocalByteWorkflowTests(unittest.TestCase):
         self.assertEqual(report['original_sha256'], hashlib.sha256(original).hexdigest())
         self.assertEqual(report['original_bytes'], len(original))
 
-    def test_import_keeps_only_its_existing_normalized_staging_and_provenance(self):
-        factory = tempfile.TemporaryDirectory; staged = []
-        def track(*args, **kwargs):
-            result = factory(*args, **kwargs); staged.append(result.name); return result
+    def test_import_preserves_provenance_without_temporary_jsonl_staging(self):
         raw = self.path.read_bytes()
-        with patch('session_workflow.tempfile.TemporaryDirectory', side_effect=track):
+        with patch('tempfile.TemporaryDirectory', side_effect=AssertionError('no JSONL staging')):
             result = import_export(self.db, 'demo', self.path, 'local-codex')
-        self.assertEqual(len(staged), 1)
         self.assertEqual(result['inserted'], 2); self.assertEqual(result['coverage']['original_sha256'], hashlib.sha256(raw).hexdigest())
         with closing(sqlite3.connect(self.db)) as connection:
             origins = connection.execute('SELECT original_hash,locator FROM export_occurrences ORDER BY locator').fetchall()
@@ -197,7 +193,7 @@ class LocalByteWorkflowTests(unittest.TestCase):
     def test_invalid_local_input_reports_selected_basename_before_db_or_staging(self):
         self.path.write_bytes(jsonl([local_records()[0], dict(type='response_item', payload=False)]))
         raw = self.path.read_bytes()
-        with patch('session_workflow.tempfile.TemporaryDirectory', side_effect=AssertionError('no staging')), \
+        with patch('tempfile.TemporaryDirectory', side_effect=AssertionError('no staging')), \
              patch('sqlite3.connect', side_effect=AssertionError('no database')):
             operations = [lambda: inspect_export(self.path, 'local-codex'),
                           lambda: list_export(self.path, 'local-codex'),
@@ -232,7 +228,7 @@ class LocalByteWorkflowTests(unittest.TestCase):
         import_export(self.db, 'replay', replay, 'local-codex')
         import_export(self.db, 'attributed', attributed, 'local-codex')
         before = self.db.read_bytes(); originals = {p:p.read_bytes() for p in (replay, attributed)}
-        with patch('session_workflow.tempfile.TemporaryDirectory', side_effect=AssertionError('no source staging')), \
+        with patch('tempfile.TemporaryDirectory', side_effect=AssertionError('no source staging')), \
              patch.object(Path, 'write_bytes', side_effect=AssertionError('no source write')):
             retained = suggest_replay(self.db, 'replay', 'synthetic', replay)
             labeled = suggest_attributed(self.db, 'attributed', 'synthetic-attributed', attributed)

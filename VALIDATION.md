@@ -1007,3 +1007,41 @@ inventory/title suite passes 122 tests. Publication audit and byte manifest cove
 Full-file memory use and import's normalized staging are explicitly retained. No
 real sessions, account discovery, model transmission, remote title change or merge
 occurs. Exact-commit Ubuntu/Windows Python 3.10/3.12 CI is checked after push.
+
+### 2026-11-04: ingest normalized export bytes without staging
+
+The remaining export-import handoff previously wrote normalized JSONL to a temporary
+file only for the archive writer to read it again. Export adapters now use an
+immutable byte-ingestion entry point shared with the existing file API. They no
+longer require Python temporary-file creation for that handoff. SQLite archive,
+journal and internal temporary-storage behavior is unchanged, and the archive
+location must still be writable. This is not a disk-free import or memory bound.
+
+The normalized bytes deliberately use the same UTF-8 text writer and native newline
+translation as the former file stage. Tests construct a real file using the old
+serialization and compare bytes, receipts, logical archive/FTS/provenance tables and
+search results with the new import for web, legacy local and typed local, both whole
+and selected input. This runs on each CI platform rather than assuming Unix LF or
+silently changing Windows normalized artifact hashes. Original-export hashes remain
+separate from derived normalized artifact hashes; the documentation clarifies both.
+
+Fourteen new synthetic tests cover raw file/byte parity including BOM and mixed
+newlines, one source read, invalid/mutable raw input, exact source labels, empty and
+identical reimports, incoming contradictions before database creation, archive
+conflict rollback, provenance-trigger rollback, additive original occurrences and
+preservation of first accepted message provenance. Source labels now explicitly
+require non-whitespace text, rejecting nontext Python inputs without coercion or
+uncaught attribute errors. No accepted text label is normalized or trimmed.
+
+Three-format import/preview/explicit-apply workflows and actual CLI dispatch run
+with Python temporary-file factories denied. Tests block input-file writes while
+allowing the intended SQLite work. Existing export-hash guards were moved to the
+actual ingest_bytes boundary, not removed or left patching an unused function.
+The architecture guide also now describes current additive provenance and the
+separate schema/data-transaction boundary instead of obsolete initial-CLI limits.
+
+The final full local suite passes 751 tests; 133 focused import/hash/provenance/
+parser/title tests and final manifest checks pass. Publication audit and byte
+manifest cover 155 files. New tests were authored in this task, not independently
+reviewed. No real exports, account collection, model transmission, remote rename
+or merge occurs. Exact-commit Ubuntu/Windows Python 3.10/3.12 CI is checked after push.

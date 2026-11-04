@@ -110,9 +110,11 @@ Original hashes, BOM/newline handling, fallback message IDs, content profiles,
 omission/context counts, utility metadata rules and full-file validation stay the
 same. This is not streaming: the full source bytes and parsed records still occupy
 memory. It does not guarantee zero filesystem I/O by Python/SQLite or other commands.
-`import` still uses its existing separate temporary normalized JSONL to feed the
-archive writer, and deliberately writes the database. No automatic collection,
-format detection, content repair or relaxed validation is added.
+Export `import` also passes derived normalized JSONL bytes directly to the archive
+writer, without a temporary normalized file. It still deliberately writes the
+selected SQLite database, whose journal and internal temporary-storage needs are
+unchanged. A writable private archive directory is still required. No automatic
+collection, format detection, content repair or relaxed validation is added.
 
 For Python callers, `local_parser.parse_jsonl_bytes(raw, source_relative_path,
 content_profile="legacy")` accepts immutable `bytes` plus a nonempty text label.
@@ -122,6 +124,31 @@ This API does not read files, stage bytes or open SQLite. The existing
 `parse_artifact(path, ...)` file/SQLite entry points stay supported; their file-based
 diagnostics continue to use the explicitly provided path. Neither interface verifies
 that a caller-supplied label is a genuine source identity.
+
+### Normalized bytes and compatibility
+
+`recap.ingest_bytes(db, source, raw, provenance=None)` shares the file-ingest record
+validation, transaction, conflict and provenance rules. It accepts immutable `bytes`
+and an explicit non-whitespace text source label. Labels remain exact, not trimmed,
+normalized or converted from numbers/bytes. Invalid source labels fail before file
+reads in `ingest(...)` and before database access in both entry points. The file
+entry point remains supported and reads its input once before using the byte path.
+
+For export import, in-memory normalization deliberately retains the previous UTF-8
+text-writer behavior, including native Windows CRLF line separators. Existing
+normalized artifact hashes and source-line locators therefore remain compatible on
+the same platform; this is not a new cross-platform canonical JSONL format. The
+receipt's `source_sha256` identifies those derived normalized bytes. Use
+`coverage.original_sha256` and the original-export provenance ledgers for the exact
+chosen export bytes. Existing archived message provenance is never rewritten just
+because a later export is imported.
+
+All record and incoming-identity checks still run before opening SQLite. Existing
+archive conflicts and provenance failures still roll back the data transaction;
+schema setup and all possible filesystem failures are not newly made atomic. Full
+source, parsed rows and normalized bytes remain in memory. Removing Python's extra
+JSONL staging does not promise bounded memory, disk-free database writes, encryption
+or absence of every OS/SQLite temporary file. Keep the original export privately.
 
 ## Bind inspection to exact source bytes
 

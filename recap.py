@@ -26,10 +26,25 @@ CREATE TRIGGER IF NOT EXISTS messages_ai AFTER INSERT ON messages BEGIN
 '''
 
 
+def _validate_source(source):
+    if not isinstance(source, str) or not source.strip():
+        raise ValueError('source must be nonempty text')
+
+
 def ingest(db, source, path, provenance=None):
-    if not source or not source.strip():
-        raise ValueError('source must not be empty')
-    raw = Path(path).read_bytes()
+    _validate_source(source)
+    return ingest_bytes(db, source, Path(path).read_bytes(), provenance)
+
+
+def ingest_bytes(db, source, raw, provenance=None):
+    """Validate and ingest one immutable normalized JSONL byte snapshot.
+
+    Uses the same transaction, identity and provenance rules as file ingestion.
+    This writes the explicitly selected SQLite archive, not a temporary input file.
+    """
+    _validate_source(source)
+    if not isinstance(raw, bytes):
+        raise ValueError('normalized input must be immutable bytes')
     digest = hashlib.sha256(raw).hexdigest()
     records = []
     incoming = {}

@@ -1,15 +1,15 @@
 """Explicit export adapters and reversible local title organization (no network)."""
 import argparse
 import hashlib
+import io
 import json
 import math
 import sqlite3
-import tempfile
 from contextlib import closing
 from collections import Counter
 from pathlib import Path
 from local_parser import parse_jsonl_bytes
-from recap import ingest, readonly
+from recap import ingest_bytes, readonly
 from strict_json import loads
 from title_rules import validate_title
 from title_excerpt import excerpt
@@ -199,14 +199,21 @@ def inspect_export(path, kind, conversation=None, expected_export_sha256=None):
     return dict(report, mode='inspection only; no database access')
 
 
+def _normalized_bytes(rows):
+    # Match the previous UTF-8 Path.write_text default newline translation,
+    # including Windows CRLF artifact hashes, but keep the derived bytes in memory.
+    with io.BytesIO() as buffer:
+        with io.TextIOWrapper(buffer, encoding='utf-8', newline=None) as text:
+            text.write(''.join(json.dumps(row, ensure_ascii=False) + '\n' for row in rows))
+            text.flush()
+            return buffer.getvalue()
+
+
 def import_export(db, source, path, kind, conversation=None, expected_export_sha256=None):
     rows, report = normalize(path, kind, include_report=True, conversation=conversation,
                              expected_export_sha256=expected_export_sha256)
-    # Keep original hash/locator/branch metadata in a companion provenance table.
-    with tempfile.TemporaryDirectory() as tmp:
-        normalized = Path(tmp) / 'normalized.jsonl'
-        normalized.write_text(''.join(json.dumps(r, ensure_ascii=False) + '\n' for r in rows), encoding='utf-8')
-        result = ingest(db, source, normalized, provenance=rows)
+    # Keep original hash/locator/branch metadata in companion provenance tables.
+    result = ingest_bytes(db, source, _normalized_bytes(rows), provenance=rows)
     result['coverage'] = report
     return result
 

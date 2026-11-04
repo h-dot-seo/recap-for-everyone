@@ -110,7 +110,7 @@ class ExportHashLeaseTests(unittest.TestCase):
                 with self.subTest(token=repr(token)), \
                      patch.object(Path, 'read_bytes', side_effect=AssertionError('read before validation')), \
                      patch('session_workflow._normalize_bytes', side_effect=AssertionError('parsed')), \
-                     patch('session_workflow.ingest', side_effect=AssertionError('database touched')):
+                     patch('session_workflow.ingest_bytes', side_effect=AssertionError('database touched')):
                     with self.assertRaises(ValueError):
                         call()
                 self.assertFalse(self.db.exists())
@@ -123,7 +123,7 @@ class ExportHashLeaseTests(unittest.TestCase):
             for call in self.calls(kind, digest):
                 with patch('session_workflow._normalize_bytes', side_effect=AssertionError('parsed')), \
                      patch('export_inventory._normalize_bytes', side_effect=AssertionError('parsed')), \
-                     patch('session_workflow.ingest', side_effect=AssertionError('database touched')):
+                     patch('session_workflow.ingest_bytes', side_effect=AssertionError('database touched')):
                     self.assert_mismatch(call)
                 self.assertFalse(self.db.exists())
                 self.assertEqual(self.path.read_bytes(), malformed)

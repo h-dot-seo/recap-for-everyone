@@ -158,7 +158,8 @@ one database snapshot. Separate commands can observe later changes.
 Local normalization parses its existing byte snapshot directly, avoiding a temporary
 source-file copy during inspection and source-backed title reads. Record errors now
 point to the selected basename and physical line. Hashes, fallback IDs and parsing
-rules are unchanged; import's separate normalized staging remains. See
+rules are unchanged. Export import also passes normalized bytes directly to the
+archive writer instead of staging a second JSONL file. See
 [local snapshot parsing](docs/INPUT_SCOPE.md#local-snapshot-parsing-and-error-locations).
 
 Local parsing now rejects malformed known response envelopes before archive work;
