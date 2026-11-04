@@ -1232,3 +1232,40 @@ Hash equality is not authentication, content validation, part completeness or an
 atomic multi-part import. No real sessions, model transmission, automatic member
 selection, remote rename or merge occurs. Exact-commit Ubuntu/Windows Python
 3.10/3.12 CI is checked after push.
+
+### 2026-11-04: reject malformed web content tags before partial extraction
+
+A synthetic greeting followed by a substantive text-field request with
+content_type: ["code"] previously imported only the greeting and could suggest
+"Hello!" as the title. Malformed tags paired with string parts could also import
+without warnings. Present null, boolean, numeric, array, object, empty and
+whitespace-only tags now reject the whole input with a fixed field-only diagnostic.
+The shared web extractor performs this check before returning parsed output or
+accessing the archive. It does not guess, trim or repair a tag.
+
+Missing tags retain the existing string-parts compatibility path. Unknown nonblank
+strings, exact code/execution_output behavior, raw text, omissions and provenance
+remain unchanged. Full-file validation still includes unselected conversations and
+branch nodes; ZIP preparation rejects malformed selected web JSON before staging.
+Existing partial archives, archive-only suggestions, saved proposals and title
+history are not retroactively repaired or invalidated.
+
+Eleven independent synthetic tests cover all malformed tag categories and four
+supported roles, every shared whole-file reader, off-path nodes, no database
+connection/creation, unchanged existing archive/source bytes, and fixed ASCII CLI
+errors without text leakage, traceback or partial JSON. They preserve absent,
+unknown and padded-tag behavior, exact Unicode string-parts text/provenance, and
+code/output shape rejection. A corrected synthetic source imports deliberately,
+generates a substantive native UTF-8 proposal, stays read-only through preview,
+then explicitly applies the title and finds the conversation. The test checks the
+positive applied revision and exact display title, unchanged original title/body/
+provenance, and idempotent reimport. Malformed input cannot save a partial branch
+proposal; ZIP rejection occurs before output staging.
+
+The final complete local suite passes 816 tests in 100.362 seconds. The focused
+web/branch/ZIP/typed-local bundle passes 64 tests, and the independent affected
+suite passes 139. The publication audit and byte manifest cover 161 public files.
+This is a narrow supported-input contract, not proof of a universal or stable
+vendor export schema. No real sessions, model transmission, automatic repair,
+remote title changes or merge occurs. Exact-commit Ubuntu/Windows Python 3.10/3.12
+CI is checked after push.

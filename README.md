@@ -1004,6 +1004,16 @@ case-fold expansion is mapped back to the original text; title-only matches do n
 invent message evidence. Ranking, provenance and history/export filters are
 unchanged. See [search excerpt fields and limits](docs/SEARCH_EXCERPTS.md).
 
+### Web content tag validation
+
+Web imports now reject a malformed present `content_type` before accepting partial
+text or touching the archive. This prevents an invalid tag on a substantive request
+from silently leaving only an earlier greeting available for a title. Missing tags
+and nonblank unknown strings keep their existing limited compatibility behavior;
+no guessed repair or new text shape is added. The same validation covers inspection,
+selected imports, branch reads and ZIP preparation. Existing partial archives and
+saved titles are not automatically changed. See [web tag boundaries](docs/INPUT_SCOPE.md#malformed-web-content-tags).
+
 ### Local metadata validation
 
 Both `local` and `local-codex` imports reject malformed session boundaries rather

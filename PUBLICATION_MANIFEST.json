@@ -1,12 +1,12 @@
 {
   "project": "recap-for-everyone",
-  "release": "0.76.0-zip-inventory-hash-lease",
+  "release": "0.77.0-web-content-tag-validation",
   "date": "2026-11-04",
   "private_history_imported": false,
   "actual_corpora_included": false,
   "synthetic_examples_only": true,
   "license_status": "NOT_SELECTED",
-  "file_count": 159,
+  "file_count": 160,
   "files": [
     {
       "path": ".gitattributes",
@@ -30,8 +30,8 @@
     },
     {
       "path": "README.md",
-      "bytes": 67033,
-      "sha256": "35929d138bf112ced40316162efc72b3e1950f02b7b9d58893be630100d49992"
+      "bytes": 67682,
+      "sha256": "cd409b08b5a47230b01ae2d7b7d35e3fa378b61dda985802b2844fe257c8f7ed"
     },
     {
       "path": "RIGHTS.md",
@@ -50,8 +50,8 @@
     },
     {
       "path": "VALIDATION.md",
-      "bytes": 79381,
-      "sha256": "a346b5575336828ee1321876ca8af6d725a19f991a0e5bda0b5463638a780687"
+      "bytes": 81823,
+      "sha256": "9232b96b83f2787f9a49556d9c3d0d462e80c79fad07dbe814db1a7f25d8d221"
     },
     {
       "path": "attributed_title.py",
@@ -105,8 +105,8 @@
     },
     {
       "path": "docs/INPUT_SCOPE.md",
-      "bytes": 23774,
-      "sha256": "473d23db13a859f6139d0ec92d4012982db3e26fb11b62ea68991b99e5b9b7e9"
+      "bytes": 26107,
+      "sha256": "a932dbb55e1033547471949622a68836bac57837cc4a51ef7406b6f41bf488da"
     },
     {
       "path": "docs/INSTALL.md",
@@ -305,8 +305,8 @@
     },
     {
       "path": "session_workflow.py",
-      "bytes": 17939,
-      "sha256": "21403224a1d13a210e34d6a80e68a70370f20c0e0764cc2cbb9a4f360c157b26"
+      "bytes": 18245,
+      "sha256": "593701c40fc32968df83618ad61251df646589bd43dcb4a285765387d331349b"
     },
     {
       "path": "source_identity.py",
@@ -712,6 +712,11 @@
       "path": "test_web_content.py",
       "bytes": 5856,
       "sha256": "83594ff9b43a2891c2e348810b95436c26246758520df8f6b8e0d1d72d1f4d21"
+    },
+    {
+      "path": "test_web_content_type_validation.py",
+      "bytes": 13856,
+      "sha256": "9107278e5c29900c4a30461ed9f03246abab87733c34cc903ec1f0cb70c58845"
     },
     {
       "path": "test_web_validation.py",

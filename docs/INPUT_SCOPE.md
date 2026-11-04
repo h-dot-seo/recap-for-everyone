@@ -203,6 +203,42 @@ For an existing archive, [read-only conflict diagnostics](IMPORT_CONFLICTS.md)
 can compare selected incoming identities before import. This is separate from
 source-only `inspect`, and it does not relax the importer's locked checks.
 
+## Malformed web content tags
+
+A web message's **present** `content_type` must be a nonempty string containing a
+non-whitespace character. Null, booleans, numbers, arrays, objects, empty strings
+and whitespace-only strings reject the entire input. For example,
+`{"content_type":["code"],"text":"Compare synthetic irrigation designs"}` is
+malformed, not an unsupported text variant that can safely be discarded. Previously
+a file with an earlier greeting and this request could import only the greeting
+and later suggest that greeting as its title. Malformed tags paired with `parts`
+could also be accepted without a warning. Neither case is accepted now.
+
+Validation rejects the input before any parsed result is returned or database
+access/write occurs, including when the malformed message is outside a selected
+conversation or branch. `inspect`,
+`list-export`, `check-import`, imports and source-backed branch/title commands all
+share the check. Preparing a selected ZIP member also refuses that malformed web
+JSON before creating an output file. The diagnostic names only the field, not its
+value or message text; the ZIP preparation wrapper keeps its general unsupported
+web-export error. Keep and investigate the original export rather than automatically
+changing the tag or importing the earlier partial text.
+
+An **absent** tag remains supported for legacy string `parts`. A nonblank unknown
+tag also retains existing behavior: string parts can be extracted, nontext parts
+are counted as omitted, and an unsupported `text` field is skipped with a warning.
+Tags are not trimmed or normalized. For example, `" code "` is not the supported
+`code` text-field variant. Valid `code` and `execution_output` still require string
+`text` and reject simultaneous `parts`. This is a narrow input contract, not a
+claim that every producer or future export format uses these shapes.
+
+Already imported partial archives, saved proposals and applied titles are not
+retroactively scanned, repaired or invalidated. Raw archive-only title generation
+does not reread the original export. Reinspect the source and deliberately import a
+valid export before generating and reviewing a new proposal; normal identity
+conflict and provenance rules still apply. This check adds no text inference,
+account collection, model call or remote title change.
+
 ## Malformed known local response records
 
 Both `local` and `local-codex` reject a `response_item` unless `payload` is an

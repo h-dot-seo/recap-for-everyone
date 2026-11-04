@@ -41,6 +41,10 @@ def _validate_mapping(mapping):
 def _web_text(content, coverage):
     """Explicit text-bearing shapes only; never stringify attachment metadata."""
     kind = content.get('content_type')
+    # Missing tags retain the parts-based compatibility path. A malformed
+    # supplied discriminator must not silently erase a text-field request.
+    if 'content_type' in content and (not isinstance(kind, str) or not kind.strip()):
+        raise ValueError('message content_type must be nonempty text')
     if kind in ('code', 'execution_output'):
         text = content.get('text')
         if not isinstance(text, str):
