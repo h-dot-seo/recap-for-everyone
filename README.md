@@ -87,6 +87,9 @@ Add `preview-title --with-evidence` for an explicitly requested private view of
 up to five cited user-message excerpts and bounded original provenance.
 [Evidence review](docs/TITLE_REVIEW_EVIDENCE.md) explains truncation and why raw
 excerpts are not automatically the exact passages used by scoped generation.
+If `find` omits matching messages, its conversation cursor does not page those
+body samples. [Browse the remaining raw messages](docs/OMITTED_SEARCH_MESSAGES.md)
+with scoped `show` pages before choosing a later user request for a title.
 For a useful request later in a verified web branch or retained local turns, add
 `--message ARCHIVED_ID` to `suggest-branch-title` or `suggest-replay-title`.
 Selection stays inside the verified scope and never falls back to another message;

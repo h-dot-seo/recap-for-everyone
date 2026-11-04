@@ -24,7 +24,12 @@ performed by the assessment.
 The first non-greeting request can still be generic, such as `Can you help with
 my project?`, while a later request names the actual subject. Recap does not infer
 which topic matters most. After inspecting the conversation, use an exact archived
-user-message ID to generate an excerpt from that message only:
+user-message ID to generate an excerpt from that message only.
+
+If search shows only assistant samples or reports truncated matching messages,
+[page through omitted evidence](OMITTED_SEARCH_MESSAGES.md) using the existing
+scoped `show` command. A null conversation cursor does not mean every matching
+message was shown. Read each message's role before selecting title evidence.
 
 ```sh
 mkdir ../recap-title-focus-demo

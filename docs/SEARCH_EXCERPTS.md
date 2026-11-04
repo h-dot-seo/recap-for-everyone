@@ -89,3 +89,15 @@ perform more than three such fetches even though at most three samples are retur
 To continue past a truncated set of conversations, use [search pagination](SEARCH_PAGINATION.md).
 Each page preserves these excerpt and coverage rules. Pagination order consistency
 is separate from evidence freshness and title approval.
+
+## Read matching messages that were not sampled
+
+`next_cursor` continues conversations, not the omitted messages indicated by
+`message_matches_truncated`. It can be null while many matching bodies remain
+unsampled. A larger `find --limit` also does not raise the three-message sample cap.
+Use scoped `show --limit ... --offset ...` pages and follow `selection.next_offset`
+to read the remaining raw conversation, then choose useful user evidence explicitly.
+[The synthetic later-message walkthrough](OMITTED_SEARCH_MESSAGES.md) demonstrates
+assistant-only search samples, four existing message pages, and a reviewed title
+from the later user request. Paging is not restricted to matching messages or a
+verified branch/replay scope.

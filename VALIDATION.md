@@ -1338,3 +1338,40 @@ source-hash, first-run and scoped-title bundle passes 96. Public audit and byte
 manifest cover 162 files. No real data, model transmission, source modification,
 remote title mutation or merge occurs. Exact-commit Ubuntu/Windows Python 3.10/3.12
 CI is checked after push.
+
+### 2026-11-04: bridge omitted search samples to reviewed user evidence
+
+A read-only synthetic audit found a navigation gap, not a missing parser or an
+inaccessible-message defect: find could show three assistant samples and a null
+conversation cursor while a later matching user request remained unsampled.
+Existing scoped show pages reached that request. A new filtering flag was not
+needed; the guide now connects existing paging to exact user-message title choice.
+
+The new invented local fixture has 68 records and 67 messages: one generic opening
+user request, 65 assistant status notes, and a final substantive user request.
+The query cobalt orchard matches 66 bodies, while the three retained samples are
+assistant messages. Query-term coverage is complete even though useful user evidence
+is not sampled. The guide distinguishes conversation cursors from message pages,
+explains that increasing find's conversation limit does not increase body samples,
+and links from search excerpts, pagination, title-review hints and the README.
+
+Five synthetic regression tests cover fixture structure, equivalent web/local
+flows, exact documentation commands, fresh later-page behavior and valid guide
+links. Four existing show pages return 20/20/20/7 messages and reach focus-user.
+Assistant evidence selection rejects; default wording remains the generic opener;
+explicit focus-user selection produces the substantive excerpt. The eleven exact
+guide commands execute after tokenization and temporary-path substitution, verify
+native UTF-8 proposal/preview receipts and byte hashes, keep revision zero and
+archive bytes unchanged until explicit apply, then verify the new display title.
+Original message, artifact and provenance rows and source bytes remain unchanged.
+SQLite test handles close explicitly and subprocess output uses text mode.
+
+The guide labels raw branch/rollback/export-version scope, full-message privacy,
+message-count versus byte bounds, and fresh snapshots across offset pages. The
+fixture has no completed-turn replay grammar; it demonstrates raw paging only.
+Production parsing, search sampling, pagination and title behavior are unchanged.
+The final complete suite passes 842 tests in 160.432 seconds; the focused sample,
+cursor and title-selection bundle passes 61. Public audit and byte manifest cover
+165 files. No real source data, model transmission, automatic approval, remote title
+mutation or merge occurs. Exact-commit Ubuntu/Windows Python 3.10/3.12 CI is checked
+after push.

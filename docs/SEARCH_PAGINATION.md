@@ -19,6 +19,12 @@ The per-call limit remains 1 through 1,000, but pagination can traverse more tha
 fresh first page. This applies to conversation `find`, not the separate FTS message
 `search` command or export inventory.
 
+A null conversation cursor can coexist with `message_matches_truncated: true`
+inside a returned conversation. Those omitted body samples are not another cursor
+page. Browse that exact source/conversation with existing `show` message pages;
+[the omitted-message walkthrough](OMITTED_SEARCH_MESSAGES.md) connects this to
+selecting user evidence and reviewing a useful local title.
+
 ## Ranking and counts
 
 The existing ranking is preserved across page boundaries:

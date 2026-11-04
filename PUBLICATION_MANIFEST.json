@@ -1,12 +1,12 @@
 {
   "project": "recap-for-everyone",
-  "release": "0.78.0-export-text-discovery",
+  "release": "0.79.0-omitted-message-review",
   "date": "2026-11-04",
   "private_history_imported": false,
   "actual_corpora_included": false,
   "synthetic_examples_only": true,
   "license_status": "NOT_SELECTED",
-  "file_count": 161,
+  "file_count": 164,
   "files": [
     {
       "path": ".gitattributes",
@@ -30,8 +30,8 @@
     },
     {
       "path": "README.md",
-      "bytes": 68460,
-      "sha256": "122867e6690e02f0d0c394d4726c71bc69fffd5a8a33e0d362c55e08c382b233"
+      "bytes": 68697,
+      "sha256": "6806a94d61fe016c0f447c19636bdeaecca089e85b699caa7de89b34cae33bc7"
     },
     {
       "path": "RIGHTS.md",
@@ -50,8 +50,8 @@
     },
     {
       "path": "VALIDATION.md",
-      "bytes": 86370,
-      "sha256": "d6d34270aca625c7b449902e36fea87656c11f750a2aa75a9d985e83d3962eea"
+      "bytes": 88881,
+      "sha256": "22022e37cce55080396d817dfb87e8b6eabdcc0cdb3eed635cb4664f3d101270"
     },
     {
       "path": "attributed_title.py",
@@ -119,6 +119,11 @@
       "sha256": "c145f1455409d8d34e29dbe549f61e4c06944a91ff7ca8f35155eb0b9666a8aa"
     },
     {
+      "path": "docs/OMITTED_SEARCH_MESSAGES.md",
+      "bytes": 6206,
+      "sha256": "354c4d9478d1884e0458ebad1be4cf79737d7b96b7232d4a7376f01c1aa30d9e"
+    },
+    {
       "path": "docs/PREPARE_WEB_EXPORT.md",
       "bytes": 6609,
       "sha256": "289dd71e0fb2c91be67f817c4d507a761e24f6dbdddf01fd79aee5a78d54f22b"
@@ -130,13 +135,13 @@
     },
     {
       "path": "docs/SEARCH_EXCERPTS.md",
-      "bytes": 5375,
-      "sha256": "c1e88caa3c088df3d899618801eccd336b87d9c792c13ab5c653bc434055659f"
+      "bytes": 6108,
+      "sha256": "ccb9cc784e95ffead7c66ef8c70ef2c4d3a0bdabc554bae2d39c5a953530a281"
     },
     {
       "path": "docs/SEARCH_PAGINATION.md",
-      "bytes": 5283,
-      "sha256": "538e5a1d91c96fc2da747ad9dbe78c7e35ad9aa7e59164152fd16407ced31771"
+      "bytes": 5663,
+      "sha256": "f969415cb532acc3cd89d421bfc75d6e9c32c5ebc74b61233246e7d2f057db5f"
     },
     {
       "path": "docs/SOURCE_ATTRIBUTED_TITLES.md",
@@ -185,8 +190,8 @@
     },
     {
       "path": "docs/TITLE_REVIEW_HINTS.md",
-      "bytes": 21139,
-      "sha256": "62e0e938a486179fad3a7cbafa89aa589f8df7f2bde869947f940883516dcfbe"
+      "bytes": 21454,
+      "sha256": "f9edb276ba5bcc6d6fb5617e18a1383adddd2aa060e8a03634e616c1e973ca38"
     },
     {
       "path": "docs/TITLE_REVIEW_QUEUE.md",
@@ -227,6 +232,11 @@
       "path": "examples/make_review_demo.py",
       "bytes": 2750,
       "sha256": "dea2610b515194ad7a5cb7dbc7fce25e4c8a8fda5120425e1686ff6ad8019be0"
+    },
+    {
+      "path": "examples/message-review-local.jsonl",
+      "bytes": 12585,
+      "sha256": "86b9f414e940d00785a9ea5f0e0a994d02b0327b8596640f8a826ffdc3479cae"
     },
     {
       "path": "examples/rollback-session.jsonl",
@@ -462,6 +472,11 @@
       "path": "test_normalized_byte_ingest.py",
       "bytes": 13530,
       "sha256": "c24ba5df15411a776d4cdd2cc3c952c0f92c1155350f26e5734c4e1d5ed424f5"
+    },
+    {
+      "path": "test_omitted_message_review.py",
+      "bytes": 13341,
+      "sha256": "9125aa101a067f38505b6a9a78d4826a7b56ac6eea2831f8ee0dd6ad3c02e6e4"
     },
     {
       "path": "test_prepare_web_export.py",
