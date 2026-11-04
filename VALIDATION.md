@@ -459,3 +459,26 @@ not performed. Neither those labels nor payload/hash consistency prove model
 execution, semantic title quality, actual prior transmission or consent. No real
 model call, credential handling, private corpus, remote rename or merge is added.
 Exact-commit cross-platform CI is checked separately after publication.
+
+
+### 2026-11-04: continue ranked conversation searches
+
+Thirteen independent synthetic tests traverse cursor pages across current-title,
+historical-title and body matches without changing ranking or evidence excerpts.
+They cover 1,207 matching conversations beyond the single-call limit, changing
+page size, Unicode/quoted/control-character IDs, exact page counters and source,
+query, history and export-scope binding. Malformed tokens reject before DB access.
+
+A same-snapshot streaming digest binds matching identities and ranking groups.
+Tests reject stale membership/rank and missing positions, while allowing explicitly
+fresh wording when membership/rank is unchanged. WAL concurrency verifies that one
+scan supplies both results and cursor consistency. SQL tracing checks one body scan,
+no OFFSET and no writes; a 2,200-conversation late-page memory regression checks
+that skipped results are not retained. Both CLIs, export provenance, deterministic
+repeats and explicit oversized-identity pagination blockers are covered.
+
+The complete suite passes 511 tests; publication and manifest checks cover 124
+files. Cursors are private unsigned continuation data, not frozen content snapshots,
+authentication or title approval. Every page still scans eligible evidence. No
+private corpus, external transmission, source mutation or merge is introduced.
+Exact-commit cross-platform CI is checked separately after publication.

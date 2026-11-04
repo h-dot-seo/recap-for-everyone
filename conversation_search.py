@@ -1,8 +1,54 @@
 """Read-only conversation search across current display titles and message text."""
 import argparse
+import base64
+import binascii
+import hashlib
 import json
+import re
 import sqlite3
 from recap import readonly
+from strict_json import loads
+
+
+MAX_CURSOR_CHARS = 16384
+
+
+def _cursor_scope(terms, source, history, export):
+    value = dict(protocol='recap.find.cursor.v1', terms=terms, source=source,
+                 include_title_history=history, export_sha256=export)
+    return hashlib.sha256(json.dumps(value, sort_keys=True, ensure_ascii=True,
+                                     separators=(',', ':')).encode('ascii')).hexdigest()
+
+
+def _decode_cursor(token, scope):
+    if token is None:
+        return None
+    try:
+        if (not isinstance(token, str) or not 0 < len(token) <= MAX_CURSOR_CHARS or
+                not re.fullmatch(r'[A-Za-z0-9_-]+', token)):
+            raise ValueError()
+        raw = base64.b64decode(token + '=' * (-len(token) % 4), altchars=b'-_', validate=True)
+        value = loads(raw.decode('utf-8'))
+        if (not isinstance(value, dict) or set(value) != {
+                'v', 'scope_sha256', 'order_sha256', 'rank', 'source', 'conversation'} or
+                type(value['v']) is not int or value['v'] != 1 or
+                type(value['rank']) is not int or value['rank'] not in (0, 1, 2) or
+                any(not isinstance(value[key], str) or not value[key] for key in ('source', 'conversation')) or
+                any(not isinstance(value[key], str) or not re.fullmatch(r'[0-9a-f]{64}', value[key])
+                    for key in ('scope_sha256', 'order_sha256')) or value['scope_sha256'] != scope):
+            raise ValueError()
+        return value
+    except (ValueError, TypeError, KeyError, binascii.Error, RecursionError):
+        raise ValueError('invalid search cursor or different query/filter scope; restart without a cursor') from None
+
+
+def _encode_cursor(item, scope, order):
+    rank = 0 if item['matched_title'] else 1 if item.get('matched_historical_title') else 2
+    value = dict(v=1, scope_sha256=scope, order_sha256=order, rank=rank,
+                 source=item['source_id'], conversation=item['conversation_id'])
+    token = base64.urlsafe_b64encode(json.dumps(value, sort_keys=True, ensure_ascii=True,
+        separators=(',', ':')).encode('ascii')).decode('ascii').rstrip('=')
+    return token if len(token) <= MAX_CURSOR_CHARS else None
 
 
 def _sample_slot(masks, candidate):
@@ -73,7 +119,7 @@ def _matching_export_provenance(connection, tables, source, conversation, messag
     return samples,count
 
 
-def find(db, query, source=None, limit=20, include_title_history=False, export_sha256=None):
+def find(db, query, source=None, limit=20, include_title_history=False, export_sha256=None, cursor=None):
     if not isinstance(query, str) or type(limit) is not int:
         raise ValueError('query must be text and limit must be an integer')
     if type(include_title_history) is not bool:
@@ -85,6 +131,9 @@ def find(db, query, source=None, limit=20, include_title_history=False, export_s
         raise ValueError('provide 1..20 search terms and limit 1..1000')
     # Repeating a query term must not give it extra evidence-sampling weight.
     terms = list(dict.fromkeys(terms))
+    scope = _cursor_scope(terms, source, include_title_history, export_sha256)
+    after = _decode_cursor(cursor, scope)
+    position = (after['rank'], after['source'], after['conversation']) if after is not None else None
     c = readonly(db)
     try:
         c.execute('BEGIN')
@@ -121,12 +170,14 @@ def find(db, query, source=None, limit=20, include_title_history=False, export_s
         # Keep only the current conversation's term flags and three body samples.
         # Three bounded buckets preserve title-first ranking without storing all hits.
         title_hits, historical_hits, text_hits = [], [], []
-        total = 0
+        total = available = 0
+        position_seen = after is None
+        order_digest = hashlib.sha256()
         item, key, found = None, None, None
         body_mask, sample_masks = 0, []
 
         def finish():
-            nonlocal total
+            nonlocal total, available, position_seen
             if item is None or not all(found):
                 return
             sampled_mask = 0
@@ -139,6 +190,15 @@ def find(db, query, source=None, limit=20, include_title_history=False, export_s
                 unsampled_terms=[term for index, term in enumerate(terms) if (body_mask & ~sampled_mask) & (1 << index)],
                 all_matched_terms_sampled=body_mask == sampled_mask)
             total += 1
+            rank = 0 if item['matched_title'] else 1 if item.get('matched_historical_title') else 2
+            item_position = (rank, item['source_id'], item['conversation_id'])
+            order_digest.update(json.dumps(item_position, ensure_ascii=True,
+                separators=(',', ':')).encode('ascii') + b'\n')
+            if item_position == position:
+                position_seen = True
+            if position is not None and item_position <= position:
+                return
+            available += 1
             bucket = title_hits if item['matched_title'] else historical_hits if item.get('matched_historical_title') else text_hits
             if len(bucket) < limit:
                 bucket.append(item)
@@ -212,10 +272,20 @@ def find(db, query, source=None, limit=20, include_title_history=False, export_s
                 sample_masks.append(mask)
                 item['message_matches'].append(match)
         finish()
-        result = dict(matches=(title_hits + historical_hits + text_hits)[:limit], total_matches=total, truncated=total > limit,
+        order = order_digest.hexdigest()
+        if after is not None and (after['order_sha256'] != order or not position_seen):
+            raise ValueError('search result order changed or cursor position is unavailable; restart without a cursor')
+        page = (title_hits + historical_hits + text_hits)[:limit]
+        remaining = available - len(page)
+        next_cursor = _encode_cursor(page[-1], scope, order) if page and remaining else None
+        result = dict(matches=page, total_matches=total, truncated=remaining > 0,
+                      next_cursor=next_cursor, skipped_matches=total-available, remaining_matches=remaining,
+                      pagination_semantics='cursor binds query/filter scope and matching conversation membership/ranking; each page reads fresh evidence in one snapshot; no complete content snapshot is retained between pages',
                       semantics='case-insensitive literal substrings; AND across current title and conversation messages',
                       snippet_semantics='unchanged source slice around the first matching term; at most 240 Unicode code points; zero-based half-open offsets into original message text',
                       message_sample_semantics='at most three bodies selected by streaming distinct literal-term coverage, then summed term coverage, then earliest ties; coverage describes full selected bodies, not necessarily the 240-code-point excerpts; no semantic ranking or globally optimal coverage guarantee')
+        if remaining and next_cursor is None:
+            result['pagination_blocker'] = 'CURSOR_IDENTITY_TOO_LARGE'
         if include_title_history:
             result.update(semantics='case-insensitive literal substrings; AND across current title, prior local titles and conversation messages',
                           title_history_scope='local archive only; at most three matching prior title records per conversation, newest overrides first then archived original',
@@ -233,8 +303,9 @@ def main():
     p.add_argument('--db',required=True); p.add_argument('query'); p.add_argument('--source'); p.add_argument('--limit',type=int,default=20)
     p.add_argument('--include-title-history', action='store_true')
     p.add_argument('--export-sha256', help='restrict message bodies to one original export provenance hash')
+    p.add_argument('--cursor', help='continue using the previous result next_cursor with the same query and filters')
     a=p.parse_args()
-    try: result=find(a.db,a.query,a.source,a.limit,a.include_title_history,a.export_sha256)
+    try: result=find(a.db,a.query,a.source,a.limit,a.include_title_history,a.export_sha256,a.cursor)
     except (ValueError,OSError,sqlite3.Error) as e: p.exit(1,str(e)+'\n')
     print(json.dumps(result,ensure_ascii=True,indent=2))
 

@@ -78,3 +78,9 @@ with the unchanged saved preparation and same explicit configuration/scope.
 See `docs/SAVED_TITLE_RESPONSE.md`. It revalidates evidence and performs no model
 execution or send. Do not label real output as a synthetic mock, invent proof of
 provider execution, edit stale hashes, or skip the normal title review/apply.
+
+For truncated conversation search, continue with `find --cursor NEXT_CURSOR`
+and the same query/source/history/export filters. Use returned counts, not a null
+token alone, to decide whether all matches were seen. Result membership or ranking
+changes require a restart; unchanged membership does not imply unchanged content.
+See `docs/SEARCH_PAGINATION.md`. Cursors contain private IDs and are not permissions.

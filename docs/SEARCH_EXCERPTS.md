@@ -83,3 +83,7 @@ all matching terms; `unsampled_terms` makes that limitation explicit.
 Excerpt/provenance details are fetched only when an incoming body enters the
 retained sample. A retained body may later be replaced, so a streaming search can
 perform more than three such fetches even though at most three samples are returned.
+
+To continue past a truncated set of conversations, use [search pagination](SEARCH_PAGINATION.md).
+Each page preserves these excerpt and coverage rules. Pagination order consistency
+is separate from evidence freshness and title approval.

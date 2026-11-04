@@ -175,6 +175,12 @@ External model/search behavior and scientific meaning are not evaluated by CI.
 
 ## Find conversations by their current title
 
+Large result sets support [cursor pagination](docs/SEARCH_PAGINATION.md). Copy
+`next_cursor` into `find --cursor TOKEN` with the same query and filters to continue
+past the first page, including more than 1,000 matches. Title-first ranking and
+bounded evidence samples remain unchanged; changed result membership/order requires
+a fresh search. Each page reads fresh evidence, not a saved content snapshot.
+
 ```sh
 python conversation_search.py --db ../demo.sqlite "orchard plan" --source demo
 ```
