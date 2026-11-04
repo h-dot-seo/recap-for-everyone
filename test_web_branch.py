@@ -85,7 +85,7 @@ class BranchTests(unittest.TestCase):
         self.assertNotEqual(result.returncode, 0); self.assertNotIn('Traceback', result.stderr)
 
     def test_both_entrypoints_escape_unicode_on_ascii_stdout(self):
-        self.data[0]['mapping']['active']['message']['content']['parts'] = ['한글 \ud800']
+        self.data[0]['mapping']['active']['message']['content']['parts'] = ['한글 🌱']
         self.write()
         results = []
         for prefix in [('web_branch.py',), ('recap.py', 'web-branch')]:
@@ -96,6 +96,22 @@ class BranchTests(unittest.TestCase):
             self.assertNotIn('Traceback', result.stderr)
             results.append(json.loads(result.stdout))
         self.assertEqual(results[0], results[1])
+
+    def test_both_branch_entrypoints_reject_unpaired_surrogates(self):
+        self.data[0]['mapping']['active']['message']['content']['parts'] = ['PRIVATE_SYNTHETIC\ud800']
+        self.write()
+        original = self.path.read_bytes()
+        with self.assertRaisesRegex(ValueError, 'unpaired surrogates'):
+            branch_view(self.path, 'synthetic')
+        for prefix in [('web_branch.py',), ('recap.py', 'web-branch')]:
+            result = subprocess.run([sys.executable, *prefix, str(self.path), '--conversation', 'synthetic'],
+                                    capture_output=True, text=True, timeout=20,
+                                    env=dict(os.environ, PYTHONIOENCODING='ascii'))
+            self.assertNotEqual(result.returncode, 0)
+            self.assertIn('unpaired surrogates', result.stderr)
+            self.assertNotIn('PRIVATE_SYNTHETIC', result.stderr)
+            self.assertNotIn('Traceback', result.stderr)
+        self.assertEqual(self.path.read_bytes(), original)
 
     def test_long_path_is_iterative(self):
         self.data[0]['mapping'] = {str(i): dict(parent=str(i-1) if i else None) for i in range(4000)}

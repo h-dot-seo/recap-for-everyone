@@ -1,12 +1,12 @@
 {
   "project": "recap-for-everyone",
-  "release": "0.43.0-search-evidence-and-local-metadata",
+  "release": "0.44.0-unicode-import-boundaries",
   "date": "2026-11-04",
   "private_history_imported": false,
   "actual_corpora_included": false,
   "synthetic_examples_only": true,
   "license_status": "NOT_SELECTED",
-  "file_count": 95,
+  "file_count": 96,
   "files": [
     {
       "path": ".gitattributes",
@@ -30,8 +30,8 @@
     },
     {
       "path": "README.md",
-      "bytes": 53947,
-      "sha256": "370f1ba93aa64888c29117cf9f1eae61a283cc2d5c455b0e18739040c594bfb7"
+      "bytes": 54349,
+      "sha256": "ad1ea07c27808997562bae27110f475bcbe8b48299e4375e70f60bf03888c701"
     },
     {
       "path": "RIGHTS.md",
@@ -50,8 +50,8 @@
     },
     {
       "path": "VALIDATION.md",
-      "bytes": 15090,
-      "sha256": "ed471c6497530f785f8664464c22c50719054ba5d234367011129ce1462404b7"
+      "bytes": 15935,
+      "sha256": "0edbf85c5b8e3f5af4e83a11c4947eb5860b24d62481e2a02d1784a072a0de41"
     },
     {
       "path": "audit_publication.py",
@@ -205,8 +205,8 @@
     },
     {
       "path": "strict_json.py",
-      "bytes": 448,
-      "sha256": "84f75c0fd3fcde4cbceadcb10deebadc43f551afec0f3f01ba035381e366f447"
+      "bytes": 1290,
+      "sha256": "fe0084b50e9e388b1e62c2ee4998c596adaaf8b915ce8902f3cabd4b68b0cfa2"
     },
     {
       "path": "test_archive_scaling.py",
@@ -409,14 +409,19 @@
       "sha256": "a95bba432960cf926d85ca032e1deb2835956001e00c8f74fdfab0fe36ebc2df"
     },
     {
+      "path": "test_unicode_json.py",
+      "bytes": 7126,
+      "sha256": "e59ec550ea80504eeaf91e7e293af8bdff736035ebec167811afc19df1b15966"
+    },
+    {
       "path": "test_unified_cli.py",
       "bytes": 4061,
       "sha256": "0a33d37d7ba88f49039321ea58b5521e55e51d49751c9325ac2c0c1c924fc71b"
     },
     {
       "path": "test_web_branch.py",
-      "bytes": 5630,
-      "sha256": "5453d9f4ff938386087e8e99dd4af3545565c037157820cba19f5f31883e56d1"
+      "bytes": 6631,
+      "sha256": "c7f107cf2159dd0d3e5af562a6ac017e63bda006e1363bd708d89c07bcf1e8fc"
     },
     {
       "path": "test_web_content.py",

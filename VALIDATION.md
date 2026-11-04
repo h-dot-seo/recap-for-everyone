@@ -243,3 +243,17 @@ protection and clean CLI rejection without echoing malformed values. No actual
 conversation history, account, model or external service was used. Publication
 scanning and byte-manifest verification pass for the selected 96-file candidate.
 Remote CI outcomes are checked separately for the exact pushed commit.
+
+### 2026-11-04: Unicode JSON rejection before archive access
+
+Eight additional synthetic cases exercise lone surrogate values and object keys,
+including unused nested metadata, across normalized JSONL, web and both local
+profiles. They check no database creation, byte-for-byte preservation of existing
+archives, inspection/import consistency, valid escaped pairs/emoji/Korean round
+trips and clean CLI errors without input content. The complete suite now passes
+296 tests. Publication scanning and byte-manifest verification cover the selected
+97-file candidate. No original text is repaired or replaced by this decoder.
+
+The earlier web-branch ASCII-output fixture now uses valid Korean/emoji text.
+A separate regression explicitly rejects the formerly accepted lone-surrogate
+branch input without altering the export or echoing its content.

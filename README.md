@@ -264,8 +264,13 @@ diagnostics do not echo the key or value. Original bytes/hashes and line provena
 remain unchanged for accepted inputs. Previously accepted ambiguous files must be
 corrected by their owner or re-exported; they are not automatically repaired.
 Duplicate keys are rejected even when their values match or occur in unused
-metadata. This decoder is duplicate-safe, not a full RFC-strict or resource-limited
-JSON parser; ordinary Python JSON depth/size behavior still applies.
+metadata. All decoded string keys and values also reject unpaired Unicode
+surrogates, including unused metadata. Valid escaped surrogate pairs (for example,
+emoji), Korean text and ordinary Unicode values remain unchanged. Inspection and
+import use this same check before database creation; invalid strings are not
+replaced, dropped or silently repaired. Diagnostics do not echo the bad string.
+This decoder is duplicate-safe and Unicode-safe, not a full RFC-strict or
+resource-limited JSON parser; ordinary Python JSON depth/size behavior still applies.
 
 ## Inspect an export before importing
 
