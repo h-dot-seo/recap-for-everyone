@@ -9,6 +9,7 @@ import subprocess
 import sys
 import tempfile
 import unittest
+from contextlib import closing
 from pathlib import Path
 from unittest.mock import patch
 
@@ -144,21 +145,21 @@ class ScopedMessageSelectionTests(unittest.TestCase):
             self.assertTrue(result['truncated'])
 
     def test_selection_does_not_bypass_other_scoped_content_verification(self):
-        with sqlite3.connect(self.db) as connection:
+        with closing(sqlite3.connect(self.db)) as connection, connection:
             connection.execute("UPDATE messages SET text='Corrupted synthetic opener' WHERE message_id IN ('opening','openingu')")
         for mode in ('branch', 'replay'):
             with self.subTest(mode=mode), self.assertRaises(ValueError):
                 self.suggest(mode, self.identity(mode, 'chosen'))
 
     def test_selection_does_not_bypass_discarded_replay_provenance(self):
-        with sqlite3.connect(self.db) as connection:
+        with closing(sqlite3.connect(self.db)) as connection, connection:
             for table in ('export_provenance', 'export_occurrences'):
                 connection.execute(f"DELETE FROM {table} WHERE message='discardedu'")
         with self.assertRaisesRegex(ValueError, 'exactly one'):
             self.suggest('replay', 'chosenu')
 
     def test_selection_does_not_bypass_other_branch_provenance(self):
-        with sqlite3.connect(self.db) as connection:
+        with closing(sqlite3.connect(self.db)) as connection, connection:
             for table in ('export_provenance', 'export_occurrences'):
                 connection.execute(f"DELETE FROM {table} WHERE message='opening'")
         with self.assertRaisesRegex(ValueError, 'provenance'):
@@ -167,10 +168,43 @@ class ScopedMessageSelectionTests(unittest.TestCase):
     def test_unselected_raw_content_change_blocks_reviewed_apply(self):
         for mode, identity in (('branch', 'excluded'), ('replay', 'discardedu')):
             reviewed = preview(self.db, self.suggest(mode, self.identity(mode, 'chosen')))
-            with sqlite3.connect(self.db) as connection:
+            with closing(sqlite3.connect(self.db)) as connection, connection:
                 connection.execute('UPDATE messages SET text=? WHERE message_id=?', ('Changed synthetic raw history', identity))
             with self.assertRaisesRegex(ValueError, 'snapshot'):
                 apply_preview(self.db, reviewed)
+
+    def test_mutation_cases_close_connections_without_garbage_collection(self):
+        # Keep strong references to every connection, so CPython refcounting
+        # cannot hide an unclosed handle that locks files on Windows/PyPy.
+        original_connect = sqlite3.connect
+        names = (
+            'test_selection_does_not_bypass_discarded_replay_provenance',
+            'test_selection_does_not_bypass_other_branch_provenance',
+            'test_selection_does_not_bypass_other_scoped_content_verification',
+            'test_unselected_raw_content_change_blocks_reviewed_apply',
+        )
+        for name in names:
+            with self.subTest(case=name):
+                case = type(self)(name)
+                connections = []
+                def tracked_connect(*args, **kwargs):
+                    connection = original_connect(*args, **kwargs)
+                    connections.append(connection)
+                    return connection
+                try:
+                    case.setUp()
+                    with patch('sqlite3.connect', side_effect=tracked_connect):
+                        getattr(case, name)()
+                    self.assertTrue(connections, 'mutation case must open a tracked connection')
+                    for connection in connections:
+                        with self.assertRaisesRegex(sqlite3.ProgrammingError, 'closed'):
+                            connection.execute('SELECT 1')
+                finally:
+                    # Even a regression must release handles before temporary
+                    # directory cleanup, without masking the failed assertion.
+                    for connection in connections:
+                        connection.close()
+                    self.assertTrue(case.doCleanups(), 'nested mutation-case cleanup failed')
 
     def test_ambiguous_scoped_rows_fail_closed(self):
         for mode, evidence, module in (('branch', branch_evidence, 'branch_title'), ('replay', replay_evidence, 'replay_title')):

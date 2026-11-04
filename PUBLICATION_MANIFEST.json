@@ -1,6 +1,6 @@
 {
   "project": "recap-for-everyone",
-  "release": "0.75.0-scoped-message-titles",
+  "release": "0.75.1-close-test-connections",
   "date": "2026-11-04",
   "private_history_imported": false,
   "actual_corpora_included": false,
@@ -50,8 +50,8 @@
     },
     {
       "path": "VALIDATION.md",
-      "bytes": 75361,
-      "sha256": "5a6c008354012c1adf53e72958852bc64b914088e5f7d33afeb087c01aaae57c"
+      "bytes": 76927,
+      "sha256": "bb1d235d5d6c97f6619d823b4a58b2c7aab2c4211bf3b491c679f149afe2ab32"
     },
     {
       "path": "attributed_title.py",
@@ -525,8 +525,8 @@
     },
     {
       "path": "test_scoped_message_selection.py",
-      "bytes": 20776,
-      "sha256": "7125f83140ae629fe111df3d9daad6aac84c356f5219575c3ec568d22dd92a4b"
+      "bytes": 22689,
+      "sha256": "6b43cd83f39e73a1134cd8fdbc03b1af5e40a19563efff497ba90759d2499c00"
     },
     {
       "path": "test_scoped_title_adapter.py",

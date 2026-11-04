@@ -1172,3 +1172,27 @@ provider preparation, narrow replay grammar, and separate preview/apply checks a
 unchanged. Apply checks the archive snapshot, not later source/current_node changes.
 No real sessions, model transmission, automatic semantic ranking, remote rename or
 merge occurs. Exact-commit Ubuntu/Windows Python 3.10/3.12 CI is checked after push.
+
+### 2026-11-04: close test-owned SQLite handles before cleanup
+
+The first scoped-message commit's CI run 41819049829 passed Ubuntu Python 3.10/3.12
+and Windows Python 3.10, but Windows Python 3.12 failed four new test cleanups with
+WinError 32. The mutation fixtures used SQLite's transaction context manager, which
+commits/rolls back without closing the connection. Garbage-collection timing had
+hidden the open handles locally; this was not a successful four-platform run.
+
+All four test-owned mutation contexts now explicitly close connections while
+retaining their transaction contexts and every content/provenance/staleness
+assertion. A deterministic nineteenth module test holds strong references to
+connections opened by those four cases, checks that each is closed before temporary
+cleanup, and closes handles before cleanup even if a regression is detected. Nested cleanup
+success is asserted rather than silently ignored.
+It does not rely on garbage collection, sleeps, skipped assertions or ignored
+cleanup errors. An independent in-memory reversion probe restored the old leaking
+contexts and produced the expected four closure failures with zero cleanup errors.
+
+Production parsing, selection, title review and output behavior are unchanged.
+The final complete local suite passes 796 tests in 143.672 seconds; the scoped and
+documentation bundle passes 41. The public audit and manifest still cover 159 files.
+A new exact-commit four-platform CI run is checked after this correction is pushed;
+the failed earlier run is not reclassified as successful.
