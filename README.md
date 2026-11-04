@@ -212,6 +212,12 @@ result candidates and per-conversation term flags; it is not a semantic index.
 
 ## Read-only conversation views
 
+After finding a message, `show --around-message ID --before 2 --after 2` opens
+[bounded raw neighbors](docs/MESSAGE_SELECTION.md) without locating its page offset.
+This explicit broader view stays within the chosen source/conversation, preserves
+provenance, and does not reconstruct branches, turns or an export-specific snapshot.
+Exact `--message` behavior remains unchanged.
+
 Use the structured view to browse imported conversations and see reviewed local
 names without replacing source evidence:
 

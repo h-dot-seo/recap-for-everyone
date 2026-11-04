@@ -60,7 +60,36 @@ def conversations(db, source=None, limit=50, offset=0):
         connection.close()
 
 
-def conversation(db, source, conversation_id, limit=None, offset=0, message_id=None):
+def _context_window(connection, source, conversation_id, anchor, before, after):
+    """Find a bounded interval in this conversation's archive insertion order."""
+    identity = (source, conversation_id)
+    row = connection.execute('SELECT message_pk FROM messages WHERE source_id=? '
+                             'AND conversation_id=? AND message_id=?', (*identity, anchor)).fetchone()
+    if row is None:
+        raise ValueError('unknown message in conversation')
+    pk = row['message_pk']
+    earlier = connection.execute('SELECT message_pk FROM messages WHERE source_id=? '
+        'AND conversation_id=? AND message_pk<? ORDER BY message_pk DESC LIMIT ?',
+        (*identity, pk, before)).fetchall()
+    later = connection.execute('SELECT message_pk FROM messages WHERE source_id=? '
+        'AND conversation_id=? AND message_pk>? ORDER BY message_pk LIMIT ?',
+        (*identity, pk, after)).fetchall()
+    anchor_offset = connection.execute('SELECT COUNT(*) FROM messages WHERE source_id=? '
+        'AND conversation_id=? AND message_pk<?', (*identity, pk)).fetchone()[0]
+    selection = dict(mode='context', anchor_message_id=anchor, anchor_index=len(earlier),
+        anchor_offset=anchor_offset, before=before, after=after,
+        returned_before=len(earlier), returned_after=len(later), offset=anchor_offset-len(earlier),
+        context_scope='neighbors in archive insertion order; no branch, replay or original-export filter',
+        warning='PRIVATE MESSAGE TEXT. Neighbors can include other roles, alternate branches, discarded history or other export versions. Insertion order does not establish a reply or turn relationship. Message-count bounds are not byte limits; separate calls can observe newer state.')
+    return (earlier[-1]['message_pk'] if earlier else pk,
+            later[-1]['message_pk'] if later else pk, selection)
+
+
+def conversation(db, source, conversation_id, limit=None, offset=0, message_id=None,
+                 around_message_id=None, before=None, after=None):
+    if (not isinstance(source, str) or not source.strip() or
+            not isinstance(conversation_id, str) or not conversation_id):
+        raise ValueError('source and conversation must be nonempty text identities')
     if limit is not None and (type(limit) is not int or not 1 <= limit <= 1000):
         raise ValueError('message limit must be an integer in 1..1000')
     if type(offset) is not int or not 0 <= offset <= 2**63-1:
@@ -71,6 +100,18 @@ def conversation(db, source, conversation_id, limit=None, offset=0, message_id=N
         raise ValueError('message ID must be nonempty text')
     if message_id is not None and (limit is not None or offset):
         raise ValueError('select an exact message or a message page, not both')
+    if around_message_id is None:
+        if before is not None or after is not None:
+            raise ValueError('before and after require an around-message selection')
+    else:
+        if not isinstance(around_message_id, str) or not around_message_id:
+            raise ValueError('around-message ID must be nonempty text')
+        if message_id is not None or limit is not None or offset:
+            raise ValueError('select around-message context, an exact message or a page, not multiple modes')
+        before = 2 if before is None else before
+        after = 2 if after is None else after
+        if any(type(value) is not int or not 0 <= value <= 50 for value in (before, after)):
+            raise ValueError('before and after must be integers in 0..50')
     connection = readonly(db)
     try:
         # Metadata, overrides and messages must describe one SQLite read snapshot.
@@ -81,9 +122,15 @@ def conversation(db, source, conversation_id, limit=None, offset=0, message_id=N
             raise ValueError('unknown conversation')
         selection_sql = ' WHERE source_id=? AND conversation_id=?'
         selection_params = (source, conversation_id)
+        context = None
         if message_id is not None:
             selection_sql += ' AND message_id=?'
             selection_params += (message_id,)
+        elif around_message_id is not None:
+            lower, upper, context = _context_window(connection, source, conversation_id,
+                                                    around_message_id, before, after)
+            selection_sql += ' AND message_pk BETWEEN ? AND ?'
+            selection_params += (lower, upper)
         selection_sql += ' ORDER BY message_pk'
         if limit is not None:
             selection_sql += ' LIMIT ? OFFSET ?'
@@ -102,7 +149,7 @@ def conversation(db, source, conversation_id, limit=None, offset=0, message_id=N
             # the whole conversation's occurrence ledger before discarding it.
             provenance_filter = ' WHERE source=? AND conversation=?'
             provenance_params = (source, conversation_id)
-            if limit is not None or message_id is not None:
+            if limit is not None or message_id is not None or context is not None:
                 provenance_filter += ' AND message IN (SELECT message_id FROM messages' + selection_sql + ')'
                 provenance_params += selection_params
             query = ' UNION '.join('SELECT message,original_hash,locator,parent FROM ' + name +
@@ -117,7 +164,13 @@ def conversation(db, source, conversation_id, limit=None, offset=0, message_id=N
         result = dict(**summary, messages=messages, message_order='archive insertion order',
                       branch_scope='all imported text nodes; not an active-branch reconstruction',
                       scope='local archive only')
-        if message_id is not None:
+        if context is not None:
+            next_offset = context['offset'] + len(messages)
+            context.update(returned_messages=len(messages), omitted_before=context['offset'],
+                           omitted_after=summary['message_count']-next_offset,
+                           next_offset=next_offset if next_offset < summary['message_count'] else None)
+            result['selection'] = context
+        elif message_id is not None:
             result['selection'] = dict(mode='message', message_id=message_id, returned_messages=1)
         elif limit is not None:
             next_offset = offset + len(messages)
@@ -143,11 +196,15 @@ def main():
     show.add_argument('--limit', type=int, help='read at most this many messages (1..1000)')
     show.add_argument('--offset', type=int, default=0, help='message offset; requires --limit')
     show.add_argument('--message', help='read exactly this message ID; excludes --limit/--offset')
+    show.add_argument('--around-message', help='read bounded raw archive neighbors around this exact message ID')
+    show.add_argument('--before', type=int, help='earlier archive neighbors, 0..50; default 2 with --around-message')
+    show.add_argument('--after', type=int, help='later archive neighbors, 0..50; default 2 with --around-message')
     args = parser.parse_args()
     try:
         result = (conversations(args.db, args.source, args.limit, args.offset)
                   if args.command == 'list' else conversation(args.db, args.source, args.conversation,
-                                                             args.limit, args.offset, args.message))
+                                                             args.limit, args.offset, args.message,
+                                                             args.around_message, args.before, args.after))
     except (ValueError, OSError, sqlite3.Error) as exc:
         parser.exit(1, str(exc) + '\n')
     print(json.dumps(result, ensure_ascii=True, indent=2))

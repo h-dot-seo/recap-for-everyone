@@ -591,3 +591,32 @@ verification cover 135 files. Body caps are not a total document/memory/work bou
 raw excerpts are not semantic support or privacy clearance. No real corpus, model
 call, transmission, automatic approval or merge is added. Exact-commit four-job
 CI is checked separately after push.
+
+
+### 2026-11-04: bounded neighbors around an exact message identity
+
+Thirteen independent synthetic regressions cover the new explicit around-message
+view. Default/exact/page behavior remains unchanged for valid identities. Context
+resolves two neighbors per side by default, accepts each count from zero through
+50, and clips at conversation boundaries. The 101-message maximum, actual/omitted
+counts, anchor/window offsets and continuation offset are verified across interleaved
+primary keys, descending timestamps and nonlexical/quoted/Unicode message IDs.
+
+Source/conversation/anchor scope is exact. Invalid identity types, counts and mode
+combinations fail before database access, and accepted padded strings stay literal.
+Row-factory instrumentation verifies that only window bodies/provenance materialize;
+legacy/additive/no-provenance behavior and ASCII-output CLI parity are covered.
+A concurrent WAL write after window selection does not mix changed title/body or
+provenance with the current snapshot. Subsequent calls correctly see the new state.
+
+Synthetic web/local flows cover import, search, around-message navigation and an
+explicit revision-checked title change while preserving source bytes and message
+evidence. An export-scoped search regression confirms the intentionally broader
+neighbor scope: it is not silently filtered to the search export or presented as
+an active branch, retained history, chronological turn or reply relationship.
+
+The complete suite passes 589 tests. Publication scanning and exact byte-manifest
+verification cover 136 files. Message-count bounds do not bound text/provenance
+bytes or all native database work. No private corpus, model call, external transfer,
+automatic title mutation or merge is introduced. Exact-commit four-job CI is checked
+separately after publication.

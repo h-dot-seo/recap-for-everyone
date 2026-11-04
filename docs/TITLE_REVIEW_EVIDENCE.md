@@ -110,3 +110,8 @@ Saved previews with evidence contain more private data. Keep them outside this
 repository, inspect them before any sharing, and do not assume Unicode escaping
 or advisory flags redact anything. There is no model call, upload, privacy
 clearance, semantic validation or automatic title application.
+
+If one cited message needs surrounding archive records, explicitly request
+[`show --around-message`](MESSAGE_SELECTION.md) with small before/after counts.
+That reveals additional messages and roles; those neighbors are not added to the
+proposal evidence and do not prove a reply, branch or retained-turn relationship.

@@ -193,6 +193,9 @@ def main():
             command.add_argument('--limit', type=int, help='read at most this many messages (1..1000)')
             command.add_argument('--offset', type=int, default=0, help='message offset; requires --limit')
             command.add_argument('--message', help='read exactly this message ID; excludes --limit/--offset')
+            command.add_argument('--around-message', help='read bounded raw archive neighbors around this exact message ID')
+            command.add_argument('--before', type=int, help='earlier archive neighbors, 0..50; default 2 with --around-message')
+            command.add_argument('--after', type=int, help='later archive neighbors, 0..50; default 2 with --around-message')
         if name == 'title':
             command.add_argument('--set'); command.add_argument('--expected-revision', type=int)
     args = p.parse_args()
@@ -296,7 +299,8 @@ def main():
             result = conversations(args.db, args.source, args.limit, args.offset)
         elif args.command == 'show':
             from conversation_view import conversation
-            result = conversation(args.db, args.source, args.conversation, args.limit, args.offset, args.message)
+            result = conversation(args.db, args.source, args.conversation, args.limit, args.offset, args.message,
+                                  args.around_message, args.before, args.after)
         elif args.command == 'find':
             from conversation_search import find
             result = find(args.db, args.query, args.source, args.limit, args.include_title_history, args.export_sha256, args.cursor, args.canonical_unicode)

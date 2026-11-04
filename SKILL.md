@@ -109,3 +109,10 @@ preview-only `--with-evidence` option. Respect the added private-text exposure a
 read the message/provenance truncation counts. Raw archived prefixes are not proof
 of the exact scoped generation passage or semantic support. Keep apply separate
 and explicit. See `docs/TITLE_REVIEW_EVIDENCE.md`.
+
+To inspect a hit with adjacent archive records, explicitly use
+`show --around-message ID --before N --after N` (each 0..50, default 2 per side).
+Keep source/conversation exact and disclose that this broadens private-text output.
+Neighbors follow insertion order, may mix branches/discarded turns/export versions,
+and are not automatically proposal evidence. Prefer exact `--message` when extra
+context is unnecessary; see `docs/MESSAGE_SELECTION.md`.
