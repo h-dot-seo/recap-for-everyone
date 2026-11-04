@@ -91,3 +91,39 @@ Repeating a selected import remains idempotent; conflicting message identities a
 still rejected transactionally. Selection **never removes previously imported
 conversations**. Use a new private database if you want an archive containing only
 the newly chosen scope. Neither inspection nor a rejected selection creates a DB.
+
+## Bind inspection to exact source bytes
+
+`list-export` and `inspect` report the whole-file `original_sha256`. Copy that
+lowercase digest into `--expected-export-sha256` on a later `list-export`,
+`inspect` or `import` command to require the identical source bytes. Unified and
+standalone commands support the same option for web, local and local-codex input.
+
+This copyable check uses the unchanged shipped synthetic web example:
+
+```sh
+python recap.py inspect examples/web-export.json --format web --conversation synthetic-chat --expected-export-sha256 207e4b25d6088c4cbc729deeb5aa9993077214dbeadc8e19eb099b762175e434
+```
+
+For your own input, use **its** digest, never the example's. The flag works with
+or without `--conversation`; a selected import still checks the entire original
+file, including unselected content. Changed whitespace or newline bytes also
+invalidate it. Renaming an otherwise identical file does not change this hash,
+but local fallback message IDs can still depend on its basename.
+
+Invalid hash syntax rejects before reading the source. A mismatch rejects before
+parsing or database access, even if the new file is malformed. A match does not
+skip format, identity, provenance or transaction checks. The importer reads the
+source once and parses that checked byte snapshot, not a second file read.
+
+Successful inspection echoes `expected_export_sha256` beside `original_sha256`.
+Import and inventory return it inside `coverage`. This field is present only
+when the option was supplied, preserving existing no-option report shapes.
+Use the same hash for later inventory pages to detect a changed file. The check
+does not retain a snapshot across commands or stop another program changing the
+file after it was read; the current operation uses the already checked bytes.
+
+This is an operator-selected consistency check, not a signature, identity proof,
+permission record or completeness guarantee. Do not automatically replace a
+rejected expected hash with the latest one and retry. Inspect the changed source
+and decide the intended scope again. No external verification service is used.

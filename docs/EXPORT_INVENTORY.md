@@ -73,9 +73,11 @@ access, directory discovery, upload, source modification or automatic import.
 The existing local parser uses a temporary copy of the same bytes for validation.
 
 Each call reads original bytes once, preserves their SHA-256 and returns
-`original_sha256`. Repeated pages are separate snapshots. If the file changes,
-restart paging; this inventory does not bind a later import to an earlier hash.
-Keep the original file and inspect the import receipt's original hash.
+`original_sha256`. Repeated pages are separate snapshots. To require the same
+bytes on a later page, inspection or import, pass that digest with
+`--expected-export-sha256`. See [the source-hash check](INPUT_SCOPE.md#bind-inspection-to-exact-source-bytes).
+Without this option, a later call reads the file as it exists then. If the file
+changes, inspect it again rather than replacing a mismatch with automatic approval.
 
 **IDs and titles may be private.** Body-free output is not anonymized, redacted or
 safe to publish. A source title can itself contain copied message text or secrets.

@@ -317,3 +317,17 @@ workflow pass. A conflict regression distinguishes parser selection support from
 successful database insertion. No title or ID redaction, memory bound or vendor
 schema completeness is claimed. The full suite passes 372 tests; publication
 scanning and byte-manifest verification cover the selected 109-file candidate.
+
+
+### 2026-11-04: optional original-export hash consistency
+
+Sixteen new synthetic tests bind inventory pages, inspections and imports to an
+operator-supplied whole-file SHA-256. All formats and CLI routes cover matching
+receipts, exact provenance, original no-option compatibility, syntax rejection
+before source reads, mismatch rejection before parsing/database access, changed
+unselected content and newline bytes, unchanged existing/new database safety,
+renamed source files, immutable read snapshots and continued format/selection validation.
+The copyable documentation command verifies the shipped fixture's actual hash.
+The complete suite passes 388 tests. Publication scanning and byte-manifest
+verification cover 110 files. This hash check is not authenticated authorization,
+a persistent snapshot, a completeness claim or an external service.

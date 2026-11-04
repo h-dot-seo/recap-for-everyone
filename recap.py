@@ -115,9 +115,11 @@ def main():
     check = sub.add_parser('inspect', help='inspect export coverage without a database')
     check.add_argument('input'); check.add_argument('--format', choices=['web', 'local', 'local-codex'], required=True)
     check.add_argument('--conversation', help='inspect an explicit conversation selection without writing')
+    check.add_argument('--expected-export-sha256', help='require the exact original whole-file hash from earlier inspection')
     inventory = sub.add_parser('list-export', help='list export IDs, titles and selection support without importing')
     inventory.add_argument('input'); inventory.add_argument('--format', choices=['web', 'local', 'local-codex'], required=True)
     inventory.add_argument('--limit', type=int, default=50); inventory.add_argument('--offset', type=int, default=0)
+    inventory.add_argument('--expected-export-sha256', help='require the same original whole-file hash as an earlier page')
     zip_info = sub.add_parser('inspect-web-zip', help='list conventional conversation JSON member metadata without decompression')
     zip_info.add_argument('input'); zip_info.add_argument('--limit', type=int, default=50); zip_info.add_argument('--offset', type=int, default=0)
     prepare = sub.add_parser('prepare-web-export', help='validate one explicit ZIP JSON member and publish a new no-overwrite local file')
@@ -164,6 +166,7 @@ def main():
     export = sub.add_parser('import', help='import an explicitly selected web/local export')
     export.add_argument('input'); export.add_argument('--format', choices=['web', 'local', 'local-codex'], required=True); export.add_argument('--source', required=True)
     export.add_argument('--conversation', help='import only this explicit conversation after validating the whole file')
+    export.add_argument('--expected-export-sha256', help='require the exact original whole-file hash from earlier inspection')
     listing = sub.add_parser('list', help='list conversations and current display titles')
     listing.add_argument('--source'); listing.add_argument('--limit', type=int, default=50); listing.add_argument('--offset', type=int, default=0)
     find = sub.add_parser('find', help='search current titles and conversation text')
@@ -185,7 +188,7 @@ def main():
     try:
         if args.command == 'list-export':
             from export_inventory import list_export
-            result = list_export(args.input, args.format, args.limit, args.offset)
+            result = list_export(args.input, args.format, args.limit, args.offset, args.expected_export_sha256)
         elif args.command == 'inspect-web-zip':
             from inspect_web_zip import inspect_web_zip
             result = inspect_web_zip(args.input, args.limit, args.offset)
@@ -264,9 +267,9 @@ def main():
             # Lazy adapter imports keep the core library free of import cycles.
             from session_workflow import inspect_export, import_export, titles
             if args.command == 'inspect':
-                result = inspect_export(args.input, args.format, args.conversation)
+                result = inspect_export(args.input, args.format, args.conversation, args.expected_export_sha256)
             elif args.command == 'import':
-                result = import_export(args.db, args.source, args.input, args.format, args.conversation)
+                result = import_export(args.db, args.source, args.input, args.format, args.conversation, args.expected_export_sha256)
             else:
                 if args.set is not None and args.expected_revision is None:
                     raise ValueError('--set requires --expected-revision from a title preview')

@@ -75,6 +75,9 @@ To choose a conversation before importing, run `recap.py list-export INPUT --for
 (or use `local`/`local-codex`). It lists exact IDs, existing web titles and selection
 blockers without a database or message-body output. Titles and IDs may still be
 private. See [export inventory](docs/EXPORT_INVENTORY.md).
+Carry its `original_sha256` into `--expected-export-sha256` on later inventory,
+inspection or import commands when you want to reject changed source bytes.
+This optional consistency check does not replace format validation or authorization.
 
 Start with the [two-format title walkthrough](docs/TITLE_WALKTHROUGH.md) for
 copyable synthetic web and Codex local examples, expected results and recovery

@@ -44,3 +44,7 @@ or the explicit `local`/`local-codex` format. Read its selection blockers and fu
 Do not import everything just to learn an ID. Inventory output omits message-body
 fields but includes private IDs and web titles; do not publish it. See
 `docs/EXPORT_INVENTORY.md` for duplicate IDs, zero-text identities and page limits.
+Carry a reviewed inventory/inspection `original_sha256` into the optional
+`--expected-export-sha256` on later pages, inspection or import when exact source
+continuity matters. A mismatch needs fresh inspection, not an automatic hash
+replacement. This consistency check does not grant authorization.

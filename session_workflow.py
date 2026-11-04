@@ -55,10 +55,22 @@ def _web_text(content, coverage):
     return '\n'.join(part for part in parts if isinstance(part, str))
 
 
-def normalize(path, kind, include_report=False, conversation=None):
+def _read_export_bytes(path, expected_export_sha256=None):
+    if expected_export_sha256 is not None and (not isinstance(expected_export_sha256, str) or
+            len(expected_export_sha256) != 64 or any(ch not in '0123456789abcdef' for ch in expected_export_sha256)):
+        raise ValueError('expected export hash must be a lowercase SHA-256 hex digest')
+    raw = Path(path).read_bytes()
+    if expected_export_sha256 is not None and hashlib.sha256(raw).hexdigest() != expected_export_sha256:
+        raise ValueError('export changed after inspection; inspect and select again')
+    return raw
+
+
+def normalize(path, kind, include_report=False, conversation=None, expected_export_sha256=None):
     path = Path(path)
-    raw = path.read_bytes()
+    raw = _read_export_bytes(path, expected_export_sha256)
     rows, report = _normalize_bytes(raw, path.name, kind, include_report=True)
+    if expected_export_sha256 is not None:
+        report['expected_export_sha256'] = expected_export_sha256
     if conversation is not None:
         if not isinstance(conversation, str) or not conversation:
             raise ValueError('selected conversation must be a nonempty string')
@@ -180,13 +192,15 @@ def _normalize_bytes(raw, source_name, kind, include_report=False):
     return (rows, report) if include_report else rows
 
 
-def inspect_export(path, kind, conversation=None):
-    _, report = normalize(path, kind, include_report=True, conversation=conversation)
+def inspect_export(path, kind, conversation=None, expected_export_sha256=None):
+    _, report = normalize(path, kind, include_report=True, conversation=conversation,
+                          expected_export_sha256=expected_export_sha256)
     return dict(report, mode='inspection only; no database access')
 
 
-def import_export(db, source, path, kind, conversation=None):
-    rows, report = normalize(path, kind, include_report=True, conversation=conversation)
+def import_export(db, source, path, kind, conversation=None, expected_export_sha256=None):
+    rows, report = normalize(path, kind, include_report=True, conversation=conversation,
+                             expected_export_sha256=expected_export_sha256)
     # Keep original hash/locator/branch metadata in a companion provenance table.
     with tempfile.TemporaryDirectory() as tmp:
         normalized = Path(tmp) / 'normalized.jsonl'
@@ -237,6 +251,8 @@ def main():
     check = sub.add_parser('inspect'); check.add_argument('path'); check.add_argument('--format', choices=['web', 'local', 'local-codex'], required=True)
     imp.add_argument('--conversation', help='import only this explicit conversation after validating the whole file')
     check.add_argument('--conversation', help='inspect an explicit conversation selection without writing')
+    for command in (imp, check):
+        command.add_argument('--expected-export-sha256', help='require the exact original whole-file hash from earlier inspection')
     t = sub.add_parser('title'); t.add_argument('--source', required=True); t.add_argument('--conversation', required=True); t.add_argument('--set')
     t.add_argument('--expected-revision', type=int)
     a = p.parse_args()
@@ -246,9 +262,9 @@ def main():
         if a.command == 'title' and a.set is not None and a.expected_revision is None:
             raise ValueError('--set requires --expected-revision from a title preview')
         if a.command == 'inspect':
-            result = inspect_export(a.path, a.format, a.conversation)
+            result = inspect_export(a.path, a.format, a.conversation, a.expected_export_sha256)
         elif a.command == 'import':
-            result = import_export(a.db, a.source, a.path, a.format, a.conversation)
+            result = import_export(a.db, a.source, a.path, a.format, a.conversation, a.expected_export_sha256)
         else:
             result = titles(a.db, a.source, a.conversation, a.set, a.expected_revision)
     except (ValueError, OSError, KeyError, TypeError, sqlite3.Error) as e:
