@@ -437,6 +437,36 @@ not establish an archive memory bound. Exact-commit cross-platform CI is checked
 separately after publication.
 
 
+### 2026-11-04: explicit bounded local title-history review
+
+Eighteen independent synthetic regressions cover the new read-only history API
+and both CLI routes. They verify newest-first local change events, global sparse
+revision IDs, exact source/conversation scope, repeated/no-op/reversal events,
+current versus historical revisions, offset boundaries, total/remaining counts
+and optional stale-page rejection. Other conversations' writes and new message
+imports do not invalidate the title-only guard; a no-op title write does.
+
+Original titles remain verbatim, including empty, multiline and overlength legacy
+values. Missing history tables are not created, missing databases stay missing,
+and orphan history cannot create an unknown conversation. Invalid identity/count/
+revision types are rejected before database access. SQL authorizer instrumentation
+denies message-body/role reads, and a row-factory check bounds materialized rows
+while reading a small page from 2001 events. A concurrent WAL rename does not mix
+the old current title with a new count or page.
+
+Synthetic web/local imports run through Unicode CLI history reads and deliberate
+revision-checked reversal. The reversal adds an event, preserves earlier labels,
+and rejects replay of the stale current revision. History itself performs no write
+and is not a content-bound proposal or approval. Existing title/suggestion behavior
+is retained; there is no new automatic undo operation.
+
+The full suite passes 607 tests. Publication scanning and byte-manifest checks
+cover 139 files. Row caps do not bound individual strings, native query work or
+latency, and old labels can expose removed private information. No private corpus,
+model call, external content transfer, automatic title mutation or merge is added.
+Exact-commit four-job CI is verified separately after push.
+
+
 ### 2026-11-04: complete locally supplied title responses
 
 Twenty-four independent synthetic tests exercise saved-request completion without

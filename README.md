@@ -946,6 +946,13 @@ reimport and retain the original export for comparison.
 
 ## Open only the evidence you need
 
+`title-history --source SOURCE --conversation ID --limit 20` reads bounded local
+title-change events without selecting message-body columns or generating excerpts.
+It shows current and historical revisions separately; use `--expected-revision`
+on later pages to reject intervening title changes. Old labels may contain removed
+private information. No title is restored automatically. See [history review and
+deliberate reuse of earlier wording](docs/TITLE_HISTORY_VIEW.md).
+
 `show --message MESSAGE_ID` reads one exact archived message with its provenance.
 `show --limit 50 --offset 0` reads a message page and returns the next offset.
 Source/conversation identities remain explicit, title summaries and whole-conversation

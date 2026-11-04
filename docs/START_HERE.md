@@ -142,6 +142,11 @@ reviewed local title change, not deletion of history or restoration of a remote 
 For current-node web or retained-turn local titles, use the more specific
 [two-format walkthrough](TITLE_WALKTHROUGH.md) instead of the raw-content queue.
 
+If you want to compare exact earlier labels before deciding, use the explicit
+[`title-history` view](TITLE_HISTORY_VIEW.md). It shows bounded local change events,
+current revision and archived original title without reading message-body columns.
+Old titles can still be private. It is a read-only review aid, not an undo action.
+
 ## If you get stuck
 
 - **Existing demo/output path:** choose a new path. Do not delete valuable files to retry.

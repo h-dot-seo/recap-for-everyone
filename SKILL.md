@@ -116,3 +116,9 @@ Keep source/conversation exact and disclose that this broadens private-text outp
 Neighbors follow insertion order, may mix branches/discarded turns/export versions,
 and are not automatically proposal evidence. Prefer exact `--message` when extra
 context is unnecessary; see `docs/MESSAGE_SELECTION.md`.
+
+When reviewing past local title wording, prefer explicit `title-history` over
+opening message bodies unnecessarily. Read its current top-level revision, not an
+event's older revision, when checking later pages or an explicit manual title write.
+Old titles can reveal removed private data and are not automatically eligible for
+reapplication. No restore is automatic; see `docs/TITLE_HISTORY_VIEW.md`.

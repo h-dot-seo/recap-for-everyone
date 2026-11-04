@@ -80,3 +80,8 @@ be large. No timing benchmark or large-archive speed guarantee is claimed.
 All raw messages, original exports, title history and review decisions are preserved.
 The command has no restore/undo/delete side effect. Prior titles describe local
 archive history, not a verified chronology of remote platform titles.
+
+Once you know the exact identity, use the [bounded title-history view](TITLE_HISTORY_VIEW.md)
+to inspect local change revisions and earlier wording without selecting message-body
+columns. It provides an optional current-revision check for subsequent pages and
+does not automatically restore or apply anything.

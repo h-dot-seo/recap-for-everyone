@@ -186,7 +186,7 @@ def main():
     find.add_argument('--include-title-history', action='store_true', help='also search prior local display titles; may reveal old private labels')
     find.add_argument('--canonical-unicode', action='store_true', help='match canonical Unicode equivalents without rewriting evidence')
     find.add_argument('--cursor', help='continue with the previous search next_cursor and the same query/filters')
-    for name in ('show', 'suggest-title', 'title'):
+    for name in ('show', 'suggest-title', 'title', 'title-history'):
         command = sub.add_parser(name)
         command.add_argument('--source', required=True); command.add_argument('--conversation', required=True)
         if name == 'show':
@@ -198,6 +198,11 @@ def main():
             command.add_argument('--after', type=int, help='later archive neighbors, 0..50; default 2 with --around-message')
         if name == 'title':
             command.add_argument('--set'); command.add_argument('--expected-revision', type=int)
+        if name == 'title-history':
+            command.add_argument('--limit', type=int, default=20)
+            command.add_argument('--offset', type=int, default=0)
+            command.add_argument('--expected-revision', type=int,
+                                 help='reject title history changed since an earlier page')
     args = p.parse_args()
     if args.command not in ('inspect', 'list-export', 'web-branch', 'replay-local', 'prepare-web-export', 'inspect-web-zip') and not args.db:
         p.error('--db is required except for inspect, list-export, web-branch, replay-local, prepare-web-export and inspect-web-zip')
@@ -294,6 +299,10 @@ def main():
                 if args.set is not None and args.expected_revision is None:
                     raise ValueError('--set requires --expected-revision from a title preview')
                 result = titles(args.db, args.source, args.conversation, args.set, args.expected_revision)
+        elif args.command == 'title-history':
+            from title_history import history
+            result = history(args.db, args.source, args.conversation,
+                             args.limit, args.offset, args.expected_revision)
         elif args.command == 'list':
             from conversation_view import conversations
             result = conversations(args.db, args.source, args.limit, args.offset)
