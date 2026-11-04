@@ -23,6 +23,12 @@ from title_proposal import apply_preview, preview, snapshot
 from title_review_state import review_state_from_queue
 
 
+def documented_arguments(line, scratch):
+    # Parse the published relative-path command first. Substituting Windows
+    # paths before POSIX shlex parsing would consume backslashes and spaces.
+    return [part.replace('../recap-supplied-demo', str(scratch)) for part in shlex.split(line)]
+
+
 class SuppliedTitleQueueTests(unittest.TestCase):
     def setUp(self):
         self.tmp = tempfile.TemporaryDirectory(); self.addCleanup(self.tmp.cleanup)
@@ -250,6 +256,17 @@ class SuppliedTitleQueueTests(unittest.TestCase):
         self.assertEqual(queue['items'][0]['review_state']['expected_content_sha256'], candidate['content_sha256'])
         self.assertEqual(self.queue([candidate])['items'][0]['reason_code'], 'SUPPLIED_PROPOSAL_STALE')
 
+    def test_documented_path_substitution_preserves_windows_separators_and_spaces(self):
+        for scratch in (r'C:\Synthetic Work\review', '/tmp/synthetic review'):
+            with self.subTest(scratch=scratch):
+                self.assertEqual(documented_arguments('mkdir ../recap-supplied-demo', scratch),
+                                 ['mkdir', scratch])
+                args = documented_arguments('python recap.py --db ../recap-supplied-demo/archive.sqlite '
+                    'find "lunar calendar" > ../recap-supplied-demo/result.json', scratch)
+                self.assertEqual(args[3], scratch + '/archive.sqlite')
+                self.assertEqual(args[5], 'lunar calendar')
+                self.assertEqual(args[-1], scratch + '/result.json')
+
     def test_documented_supplied_workflow_exact_commands_and_explicit_review(self):
         document = Path('docs/SUPPLIED_TITLE_REVIEW.md').read_text(encoding='utf-8')
         blocks = re.findall(r'```sh\n(.*?)```', document, re.S)
@@ -260,7 +277,7 @@ class SuppliedTitleQueueTests(unittest.TestCase):
         review_checked = False; applied = False
         for line in '\n'.join(blocks).splitlines():
             if not line.strip(): continue
-            args = shlex.split(line.replace('../recap-supplied-demo', str(scratch)))
+            args = documented_arguments(line, scratch)
             if args[0] == 'mkdir':
                 self.assertEqual(args, ['mkdir', str(scratch)]); scratch.mkdir(); continue
             self.assertEqual(args[:2], ['python', 'recap.py'])

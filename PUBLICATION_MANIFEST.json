@@ -1,6 +1,6 @@
 {
   "project": "recap-for-everyone",
-  "release": "0.52.0-supplied-title-review",
+  "release": "0.52.1-windows-walkthrough",
   "date": "2026-11-04",
   "private_history_imported": false,
   "actual_corpora_included": false,
@@ -50,8 +50,8 @@
     },
     {
       "path": "VALIDATION.md",
-      "bytes": 23638,
-      "sha256": "1b419e7f31c5414df371d17bc2f0660c14a51be39697a2a6e051e847659e1f1a"
+      "bytes": 24332,
+      "sha256": "565220a2676af5be72d7157315b9a14cbb60988f09295410ab487ca096673955"
     },
     {
       "path": "attributed_title.py",
@@ -435,8 +435,8 @@
     },
     {
       "path": "test_supplied_title_queue.py",
-      "bytes": 21868,
-      "sha256": "555e2a84c87f8f4385e77bc2690ca28a8b7d112925da25e209a839463dcb0dbe"
+      "bytes": 22893,
+      "sha256": "489f71a48b9aa6c6b2772e6be15c625f730c85335d45a4e21b548f6fea79dc0b"
     },
     {
       "path": "test_title_adapter.py",

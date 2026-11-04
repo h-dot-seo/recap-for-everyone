@@ -378,3 +378,15 @@ The complete suite passes 430 tests; publication scan and manifest verification
 cover 117 files. Supplied context/provider labels remain unsigned and unverified;
 only selected page candidates receive archive-content validation. This increment
 adds no semantic model call, automatic fallback, bulk apply or remote mutation.
+
+
+### 2026-11-04: Windows walkthrough path substitution
+
+Remote Windows CI exposed a portability error in the documented-command test:
+it inserted an absolute Windows scratch path before POSIX shell tokenization,
+which consumed backslashes and split spaces. The test now tokenizes the published
+relative command first, then replaces complete argument values. A platform-neutral
+regression exercises Windows and POSIX paths containing spaces, redirection and
+a quoted multiword query. This is a test-harness fix, not an application path
+rewrite. The full local suite passes 431 tests; 117-file publication and manifest
+checks pass. The corrected commit's Windows/Linux CI is checked separately.
