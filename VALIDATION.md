@@ -331,3 +331,17 @@ The copyable documentation command verifies the shipped fixture's actual hash.
 The complete suite passes 388 tests. Publication scanning and byte-manifest
 verification cover 110 files. This hash check is not authenticated authorization,
 a persistent snapshot, a completeness claim or an external service.
+
+
+### 2026-11-04: consistent title excerpts and read snapshots
+
+Ten new synthetic regressions align the informational title command with ordinary
+local excerpt proposals for greetings, Korean/control cleanup, truncation and
+no-usable-user fallback. They verify read/write receipt parity, raw text and
+original/current/history preservation, source isolation, ASCII-safe CLIs and
+read-only/missing-database behavior. A WAL concurrent mutation test verifies that
+content, original/current title, revision and history share one read snapshot;
+removing the read transaction makes that regression fail. The unchanged excerpt
+algorithm now lives in one pure helper and is reexported for existing callers.
+No semantic summary or new branch/source filtering is introduced. The complete
+suite passes 398 tests; publication scan and manifest verification cover 112 files.

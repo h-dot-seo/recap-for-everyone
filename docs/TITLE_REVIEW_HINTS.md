@@ -4,6 +4,16 @@ A useful title must be readable, distinctive and appropriate to display in a
 sidebar or search result. Recap cannot certify those properties. It can provide
 small deterministic **advisory checks** while you decide what to keep.
 
+The `title` command's informational `suggested_title` and ordinary `suggest-title`
+use the same local excerpt rules: skip usable greeting-only messages when a later
+user request exists, clean whitespace/control characters, then limit to 80 code
+points. The original messages are unchanged. With no usable user evidence,
+`title` still lets you inspect/revise the current title and reports the placeholder
+`Untitled conversation`; `suggest-title` instead rejects rather than inventing
+evidence. A placeholder is not an approved proposal or an automatic rename.
+This raw-content rule does not select a web branch, retained turns or source labels.
+Those remain separate opt-in workflows.
+
 Every `READY` item from `review-titles` and every title `preview` now includes a
 `title_advisory` object. This is computed locally from the proposed title only.
 No model, external service, source-message scan or additional database write is

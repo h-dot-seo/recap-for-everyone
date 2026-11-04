@@ -12,6 +12,7 @@ from local_parser import parse_artifact
 from recap import ingest, readonly
 from strict_json import loads
 from title_rules import validate_title
+from title_excerpt import excerpt
 
 
 def _validate_mapping(mapping):
@@ -217,16 +218,23 @@ def titles(db, source, conversation, title=None, expected_revision=None, expecte
     try:
         if title is not None:
             c.execute('BEGIN IMMEDIATE')
+        else:
+            c.execute('BEGIN')
         if expected_content_sha256 is not None:
             content = [dict(zip(('message_id','role','text'), r)) for r in c.execute(
                 'SELECT message_id,role,text FROM messages WHERE source_id=? AND conversation_id=? ORDER BY message_pk', (source, conversation))]
             digest = hashlib.sha256(json.dumps(content, sort_keys=True, ensure_ascii=False).encode()).hexdigest()
             if digest != expected_content_sha256:
                 raise ValueError('conversation changed after proposal generation')
-        messages = c.execute('SELECT role,text,title FROM messages WHERE source_id=? AND conversation_id=? ORDER BY message_pk', (source, conversation)).fetchall()
+        messages = c.execute('SELECT role,text,title,message_id FROM messages WHERE source_id=? AND conversation_id=? ORDER BY message_pk', (source, conversation)).fetchall()
         if not messages:
             raise ValueError('unknown conversation')
-        suggestion = next((' '.join(m[1].split())[:80] for m in messages if m[0] == 'user'), 'Untitled conversation')
+        try:
+            suggestion = excerpt([dict(role=m[0], text=m[1], message_id=m[3]) for m in messages])['title']
+        except ValueError:
+            # Informational title reads still work without usable user evidence.
+            # Proposal generation remains stricter and never invents evidence.
+            suggestion = 'Untitled conversation'
         exists = c.execute("SELECT 1 FROM sqlite_master WHERE name='title_history'").fetchone()
         history = c.execute('SELECT title,id FROM title_history WHERE source=? AND conversation=? ORDER BY id', (source, conversation)).fetchall() if exists else []
         revision = history[-1][1] if history else 0

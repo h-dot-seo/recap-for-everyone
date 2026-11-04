@@ -110,8 +110,13 @@ python session_workflow.py --db ../demo.sqlite title --source demo --conversatio
 python session_workflow.py --db ../demo.sqlite title --source demo --conversation synthetic-chat --set "Orchard experiment plan" --expected-revision 0
 ```
 
-Title preview is read-only. Suggestions are the first user request, whitespace
-normalized and truncated to 80 characters; they are not semantic summaries.
+Title preview is read-only. The informational `title` command and `suggest-title`
+share the same first-non-greeting user excerpt, with whitespace/control cleanup
+and an 80-code-point limit; they are not semantic summaries. Greeting-only inputs
+retain a greeting fallback. With no usable user text, `title` shows an informational
+`Untitled conversation` placeholder while proposal generation still rejects.
+Title reads return current/original titles, suggestions and revision history from
+one database snapshot. Separate commands can observe later changes.
 Local display overrides retain previous titles without changing source messages.
 Restore a prior title with `--set` to append an auditable reversal. The original
 `recap.py search` still returns original message titles. Online rename, attachment

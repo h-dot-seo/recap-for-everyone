@@ -1,12 +1,12 @@
 {
   "project": "recap-for-everyone",
-  "release": "0.49.0-export-hash-consistency",
+  "release": "0.50.0-consistent-title-excerpts",
   "date": "2026-11-04",
   "private_history_imported": false,
   "actual_corpora_included": false,
   "synthetic_examples_only": true,
   "license_status": "NOT_SELECTED",
-  "file_count": 109,
+  "file_count": 111,
   "files": [
     {
       "path": ".gitattributes",
@@ -30,8 +30,8 @@
     },
     {
       "path": "README.md",
-      "bytes": 56776,
-      "sha256": "e311dbd736d3ce75ba044ebaa3461939150d25897d93142cf4002989ad28b0bb"
+      "bytes": 57177,
+      "sha256": "accfc1423023864e2cc3886e7de869806f39074ba9a6dcce30813833e9246ba5"
     },
     {
       "path": "RIGHTS.md",
@@ -50,8 +50,8 @@
     },
     {
       "path": "VALIDATION.md",
-      "bytes": 20747,
-      "sha256": "d625ddc8bdf8ba56763ad7cfd8d1dffa0b7059c9c27692d7967745a7dcd633b9"
+      "bytes": 21608,
+      "sha256": "6c7b34ff0e63d9d952f4e82653a0bec7e99f9946dd489743f0596adf7e99026d"
     },
     {
       "path": "attributed_title.py",
@@ -135,8 +135,8 @@
     },
     {
       "path": "docs/TITLE_REVIEW_HINTS.md",
-      "bytes": 4633,
-      "sha256": "9dd994366a552a02c58534d46e0ec797872e39f5256252344e9e81268f8756e0"
+      "bytes": 5318,
+      "sha256": "84d449a948f3874a3e781e3cde0c672195c48ebf0364fa304f1c0a985630ed9e"
     },
     {
       "path": "docs/TITLE_REVIEW_QUEUE.md",
@@ -230,8 +230,8 @@
     },
     {
       "path": "session_workflow.py",
-      "bytes": 17321,
-      "sha256": "edee7830c4061c957b57b51ef1fecbef0620687f9b746c36212a757bdf28a5f4"
+      "bytes": 17649,
+      "sha256": "0a9c1c8f85358df5236f9ec587a3368550b05f7917c93318184ac069082115f3"
     },
     {
       "path": "strict_json.py",
@@ -439,6 +439,11 @@
       "sha256": "942ecf0c782335eba1100d8f6f80ac27ecf8ef5a0b504779bd9e1bc49cce6dc2"
     },
     {
+      "path": "test_title_read_consistency.py",
+      "bytes": 10562,
+      "sha256": "4566a16874870400927393e7daf5baa5fc78b40b9b9cca21de6e24c4e036b092"
+    },
+    {
       "path": "test_title_review.py",
       "bytes": 6590,
       "sha256": "b599f83c0fa848768339de4aa3748d5c452de94956966a4dfb10e6601acdfabb"
@@ -509,6 +514,11 @@
       "sha256": "6d2246c063355b0a6b23d2c4fbe3bd4caa786258d2ec912f4cdf4c0d258f3d40"
     },
     {
+      "path": "title_excerpt.py",
+      "bytes": 1413,
+      "sha256": "a2308b1a3d8a74f841957fe9ca3174a0c99705d1ab49ad4aada2bf52ef85b4e6"
+    },
+    {
       "path": "title_plan.py",
       "bytes": 4389,
       "sha256": "b0dc558785c06c77540b23e3dbe20d091f4c440ed2926db9ce9574b20815c976"
@@ -535,8 +545,8 @@
     },
     {
       "path": "title_suggestion.py",
-      "bytes": 2259,
-      "sha256": "d6ab86b788dc77f3dacd9d88fa0a995daf6e64b5f3d32c6f4f0243603ab24b65"
+      "bytes": 984,
+      "sha256": "f82cde40d054be55c669a305921721c2e049e2ea605d7864a19ed19095499132"
     },
     {
       "path": "title_transfer.py",
