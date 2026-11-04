@@ -208,3 +208,52 @@ or deliberately inspect corrected source and compare it in a separate archive wh
 needed; changing a source ID may create a different message rather than update the
 old one. Never drop an alias, guess an ID or rewrite an expected hash merely to
 make a failed title workflow proceed.
+
+## Clean failure for decoder nesting and conflicting incoming records
+
+If Python's JSON decoder raises a recursion-depth error, the shared reader now
+reports `JSON nesting is too deep` as an ordinary source-validation error instead
+of leaking a traceback. JSONL wrappers retain the physical line number; replay
+reports `INVALID_JSON` at that line with no partial projected text. The whole file
+still has to parse, including unknown metadata and unselected conversations.
+No recursion limit is increased and no source text is echoed in the diagnostic.
+
+This is not a new fixed numeric nesting/byte limit, streaming parser, resource
+budget or repair step. Decoder limits can differ by Python runtime, input shape
+and call stack. Inputs the decoder accepts still follow the normal validation
+rules. Long bracket characters inside a JSON string are not treated as nesting,
+and long flat parent graphs retain their existing iterative validation.
+
+Before connecting to SQLite, `ingest` now checks the **incoming normalized batch**
+for repeated `(conversation_id, message_id)` identities whose role, timestamp,
+original title or text differs. This prevents a contradictory input from creating
+an empty database/schema and then failing later. Existing databases are also left
+untouched by this early failure. The source label is fixed for the whole import;
+identities from different conversations are separate.
+
+Identical repeats are still allowed and remain in record/artifact counts, while
+one archived message and one FTS row are inserted per identity. Existing provenance
+rules retain distinct source occurrences and deduplicate equal hash/locator entries.
+The first admitted occurrence keeps its existing source-line behavior. Different
+optional metadata outside the compared fields does not create a new conflict.
+The preflight adds memory proportional to unique incoming identities; it is not
+a constant-memory or bounded-input import.
+
+This comparison happens **after optional conversation selection**. It does not
+newly reject contradictory identities belonging only to an excluded conversation.
+Structural/JSON validation still covers the whole file. Source-only `inspect` and
+`list-export` still describe parsing rather than promise successful import; use
+[`check-import`](IMPORT_CONFLICTS.md) with an existing archive for conflict detail.
+
+The error's `line` is a physical normalized-input line for direct `ingest`. Export
+adapters produce a temporary normalized message stream, so their conflict line is
+the one-based selected normalized occurrence, not the original JSONL line or web
+node. Keep source provenance for the original location. IDs and differing values
+are not echoed.
+
+Comparisons against the existing archive still execute inside `BEGIN IMMEDIATE`.
+Preflight does not replace that lock or protect against a later source/archive
+change. Other database, provenance, permission or I/O failures retain their existing
+behavior; this is not a guarantee that every failed operation leaves no filesystem
+artifact. Existing empty databases from older failures are not removed. Nothing
+is automatically repaired, merged, retried or renamed.

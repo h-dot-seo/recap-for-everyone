@@ -78,6 +78,13 @@ or other conditions can fail. No messages is also not a successful extraction.
 Normal import still checks identities under its write lock and rolls back a
 conflicting batch. This report is not a lease, authorization or automatic retry.
 
+The importer additionally rejects conflicting repeats within its selected normalized
+input **before opening SQLite**, so that known input contradiction cannot leave a
+new empty archive behind. Identical repeats keep their existing counts/provenance.
+This does not change this read-only report's comparisons or the locked archive
+checks. See [failure boundaries](INPUT_SCOPE.md#clean-failure-for-decoder-nesting-and-conflicting-incoming-records)
+for selected-scope, line-number and other-failure limitations.
+
 Keep the source and archive unchanged when investigating. A title-only conflict
 is still a conflict, not permission to replace original titles. There is no
 automatic merge, repair, conflict override, source renaming or deletion step.

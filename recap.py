@@ -32,6 +32,7 @@ def ingest(db, source, path, provenance=None):
     raw = Path(path).read_bytes()
     digest = hashlib.sha256(raw).hexdigest()
     records = []
+    incoming = {}
     for line_no, line in enumerate(physical_lines(raw), 1):
         if not line.strip():
             continue
@@ -47,6 +48,13 @@ def ingest(db, source, path, provenance=None):
         title = row.get('title', '')
         if not isinstance(title, str):
             raise ValueError(f'invalid title at line {line_no}')
+        key = (row['conversation_id'], row['message_id'])
+        values = (row['role'], row['timestamp'], title, row['text'])
+        if key in incoming and incoming[key] != values:
+            # Input-only contradictions must not create an empty archive/schema.
+            # Archive comparisons still run under the write lock below.
+            raise ValueError(f'conflicting message identity at line {line_no}')
+        incoming[key] = values
         records.append((row, title, line_no))
     conn = sqlite3.connect(db)
     try:

@@ -711,3 +711,35 @@ The full suite passes 634 tests; publication audit and byte-manifest checks cove
 external transmission, remote rename or merge is introduced. The previous
 80-code-point title limit and its documented rendering limitations are unchanged.
 Exact-commit Ubuntu/Windows Python 3.10/3.12 CI is checked separately after push.
+
+
+### 2026-11-04: clean nested-JSON and incoming-conflict failures
+
+Fifteen synthetic regressions cover decoder recursion errors and contradictory
+incoming identities. Shared JSON decoding translates RecursionError into a fixed
+ValueError without raising the interpreter limit or echoing input. Deep arrays in
+web/local/normalized metadata fail cleanly, including unselected web content and
+late JSONL rows. Replay reports INVALID_JSON at the physical line without partial
+text. Long bracket strings and ordinary nesting remain accepted. Tests deliberately
+do not assert a universal object/array depth threshold across Python runtimes.
+
+Incoming role/timestamp/original-title/text conflicts are detected before SQLite
+connection for normalized ingest, web duplicate conversation/node records and
+repeated explicit local message IDs. A mocked connection proves rejection precedes
+schema creation; missing paths remain absent and existing archive bytes stay equal.
+BOM/LF/CRLF/CR physical normalized-line diagnostics and clean CLI failures omit
+private synthetic values. Export-adapter conflict lines remain selected normalized
+occurrence numbers, not original source locations.
+
+Identical repeats preserve record counts, first source-line behavior, FTS deduplication
+and distinct provenance occurrences. Absent message IDs remain distinct physical
+occurrences. The check covers only the selected incoming batch; parser-only
+inspection and read-only conflict reporting retain their earlier roles. An archive-
+only conflict test verifies BEGIN IMMEDIATE precedes comparisons and the entire
+batch rolls back, so preflight does not replace the existing write-lock checks.
+
+The complete suite passes 649 tests. Publication audit and byte-manifest verification
+cover 143 files. This does not add a fixed input/depth/memory budget or promise that
+unrelated database/I/O failures leave no files. Existing empty archives are not
+removed. No actual corpus, model transmission, automatic repair, source mutation
+or merge is added. Exact-commit four-job CI is checked separately after publication.

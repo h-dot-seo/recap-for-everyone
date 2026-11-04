@@ -1,12 +1,12 @@
 {
   "project": "recap-for-everyone",
-  "release": "0.64.0-unambiguous-source-identities",
+  "release": "0.65.0-clean-import-failures",
   "date": "2026-11-04",
   "private_history_imported": false,
   "actual_corpora_included": false,
   "synthetic_examples_only": true,
   "license_status": "NOT_SELECTED",
-  "file_count": 141,
+  "file_count": 142,
   "files": [
     {
       "path": ".gitattributes",
@@ -30,8 +30,8 @@
     },
     {
       "path": "README.md",
-      "bytes": 62885,
-      "sha256": "e00473f54ef3d910052184d0fa2c273c26ffcf9f3c5b41e140578e082ca8953b"
+      "bytes": 63402,
+      "sha256": "09e00ff68619e091af6a3977a38a7715993fb22a46dca745f695715b9fab6bd2"
     },
     {
       "path": "RIGHTS.md",
@@ -50,8 +50,8 @@
     },
     {
       "path": "VALIDATION.md",
-      "bytes": 44487,
-      "sha256": "db3c5184067f23d9a4b43402eb7a7a73432dd2e8a65ebb73d24b7008a6e64eb3"
+      "bytes": 46572,
+      "sha256": "379c215da3272e81d24622b83b58976993fbf74033721be3f0b5664fddc2d2fa"
     },
     {
       "path": "attributed_title.py",
@@ -100,13 +100,13 @@
     },
     {
       "path": "docs/IMPORT_CONFLICTS.md",
-      "bytes": 5030,
-      "sha256": "7e489d3b6ec0f709dc3df63a580156297c01d63f724bd135faa2deeb98594539"
+      "bytes": 5539,
+      "sha256": "69569dba904ed314966369aa55534cc69eb7b83624c5ea421df94eeb6bca9c02"
     },
     {
       "path": "docs/INPUT_SCOPE.md",
-      "bytes": 13601,
-      "sha256": "3df131cb9703625eff650680d30cac949ddb9a1e03086eb221a84eb781a5b806"
+      "bytes": 16753,
+      "sha256": "bdea318153965a5b49b3d938650b517e7ee4164bd6e303b0f9387d4ddf49656a"
     },
     {
       "path": "docs/MESSAGE_SELECTION.md",
@@ -265,8 +265,8 @@
     },
     {
       "path": "recap.py",
-      "bytes": 23677,
-      "sha256": "b038fc431838a26b4eac564c3dad2b742a7842d31c276222036478c72a63eabf"
+      "bytes": 24142,
+      "sha256": "fa9743eb355ae7469650c80ef8107a4db621926b9286e2349eb7b42a2a2650b6"
     },
     {
       "path": "replay_local.py",
@@ -295,8 +295,8 @@
     },
     {
       "path": "strict_json.py",
-      "bytes": 1290,
-      "sha256": "fe0084b50e9e388b1e62c2ee4998c596adaaf8b915ce8902f3cabd4b68b0cfa2"
+      "bytes": 1548,
+      "sha256": "9d6cf2f784e195b1cbc7427b022455bc35521b3271ecaffa5e34f935f320d416"
     },
     {
       "path": "test_archive_scaling.py",
@@ -382,6 +382,11 @@
       "path": "test_import_check.py",
       "bytes": 14445,
       "sha256": "0d11cf840872c4dbefb30b183d1526539d1b95cbcf9eb5f7074759dece87d4e0"
+    },
+    {
+      "path": "test_import_failure_boundaries.py",
+      "bytes": 14252,
+      "sha256": "d2866b6ac4f9265cbe4b49ee44c38c219367ebbfd58e2e08dce3106c6c55c0b1"
     },
     {
       "path": "test_import_inspection.py",

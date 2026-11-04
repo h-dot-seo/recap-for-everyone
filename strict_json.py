@@ -17,7 +17,12 @@ def _unique_object(pairs):
 
 
 def loads(text):
-    value = json.loads(text, object_pairs_hook=_unique_object)
+    try:
+        value = json.loads(text, object_pairs_hook=_unique_object)
+    except RecursionError:
+        # Let existing ValueError boundaries report a clean source error. Do not
+        # echo JSON fragments or raise the interpreter's recursion limit.
+        raise ValueError('JSON nesting is too deep') from None
     # json.loads already joins valid escaped UTF-16 pairs. Any remaining
     # surrogate is not a Unicode scalar and cannot be stored safely as UTF-8.
     # Check all keys/values before callers create an archive or report inspection

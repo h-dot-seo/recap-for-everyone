@@ -157,6 +157,13 @@ revision comparison and history insertion, so a stale preview cannot overwrite a
 newer title. The Python API retains optional revision checking for compatibility;
 callers should always supply it. Reversal is another checked title change.
 
+Conflicting repeated identities within an incoming normalized batch now fail before
+SQLite connection/schema creation, while identical repeats and locked comparisons
+against existing records retain their behavior. JSON decoder recursion errors also
+become clean validation failures rather than tracebacks. See the [precise failure
+boundaries](docs/INPUT_SCOPE.md#clean-failure-for-decoder-nesting-and-conflicting-incoming-records);
+these checks are not a general memory limit or a guarantee about every I/O failure.
+
 ## External title proposal contract
 
 `title_proposal.py` supplies a local contract for an operator or future semantic
