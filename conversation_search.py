@@ -5,6 +5,27 @@ import sqlite3
 from recap import readonly
 
 
+def _sample_slot(masks, candidate):
+    """Choose a bounded streaming coverage improvement, preserving early ties."""
+    if len(masks) < 3:
+        return len(masks)
+
+    def score(values):
+        covered = 0
+        for value in values:
+            covered |= value
+        return covered.bit_count(), sum(value.bit_count() for value in values)
+
+    best = score(masks)
+    slot = None
+    # On equal improvement, replace the latest existing message first.
+    for index in range(len(masks) - 1, -1, -1):
+        value = score(masks[:index] + masks[index + 1:] + [candidate])
+        if value > best:
+            best, slot = value, index
+    return slot
+
+
 def _matching_excerpt(original, folded, terms, width=240):
     """Return an unchanged source slice around the first literal casefold hit.
 
@@ -62,6 +83,8 @@ def find(db, query, source=None, limit=20, include_title_history=False, export_s
     terms = query.casefold().split()
     if not terms or len(terms) > 20 or not 1 <= limit <= 1000:
         raise ValueError('provide 1..20 search terms and limit 1..1000')
+    # Repeating a query term must not give it extra evidence-sampling weight.
+    terms = list(dict.fromkeys(terms))
     c = readonly(db)
     try:
         c.execute('BEGIN')
@@ -95,16 +118,26 @@ def find(db, query, source=None, limit=20, include_title_history=False, export_s
             params.extend([export_sha256]*len(checks))
         if filters: sql += ' WHERE '+' AND '.join(filters)
         sql += ' ORDER BY source_id COLLATE BINARY,conversation_id COLLATE BINARY,message_pk'
-        # Keep only the current conversation's term flags and first three hits.
+        # Keep only the current conversation's term flags and three body samples.
         # Three bounded buckets preserve title-first ranking without storing all hits.
         title_hits, historical_hits, text_hits = [], [], []
         total = 0
         item, key, found = None, None, None
+        body_mask, sample_masks = 0, []
 
         def finish():
             nonlocal total
             if item is None or not all(found):
                 return
+            sampled_mask = 0
+            for mask in sample_masks:
+                sampled_mask |= mask
+            item['message_matches_truncated'] = item['message_match_count'] > len(item['message_matches'])
+            item['message_term_coverage'] = dict(
+                matched_terms=[term for index, term in enumerate(terms) if body_mask & (1 << index)],
+                sampled_terms=[term for index, term in enumerate(terms) if sampled_mask & (1 << index)],
+                unsampled_terms=[term for index, term in enumerate(terms) if (body_mask & ~sampled_mask) & (1 << index)],
+                all_matched_terms_sampled=body_mask == sampled_mask)
             total += 1
             bucket = title_hits if item['matched_title'] else historical_hits if item.get('matched_historical_title') else text_hits
             if len(bucket) < limit:
@@ -130,7 +163,8 @@ def find(db, query, source=None, limit=20, include_title_history=False, export_s
                 found = [term in folded_title for term in terms]
                 item = dict(source_id=key[0], conversation_id=key[1], original_title=original_title,
                             display_title=title, title_revision=revision, message_count=0,
-                            matched_title=any(found), message_matches=[])
+                            matched_title=any(found), message_matches=[], message_match_count=0)
+                body_mask, sample_masks = 0, []
                 if export_sha256 is not None:
                     item.update(matched_export_sha256=export_sha256, message_count_scope='messages linked to this original export only')
                 if include_title_history:
@@ -158,18 +192,30 @@ def find(db, query, source=None, limit=20, include_title_history=False, export_s
             text = row['text'].casefold()
             matches = [term in text for term in terms]
             found = [previous or matched for previous, matched in zip(found, matches)]
-            if any(matches) and len(item['message_matches']) < 3:
+            if any(matches):
+                item['message_match_count'] += 1
+                mask = sum(1 << index for index, matched in enumerate(matches) if matched)
+                body_mask |= mask
+                slot = _sample_slot(sample_masks, mask)
+                if slot is None:
+                    continue
                 match = dict(message_id=row['message_id'], role=row['role'],
                              source_sha256=row['source_sha256'], source_line=row['source_line'])
                 match.update(_matching_excerpt(row['text'], text, terms))
                 if export_sha256 is not None:
                     samples,count = _matching_export_provenance(c, provenance_tables, key[0], key[1], row['message_id'], export_sha256)
                     match.update(export_provenance=samples, export_provenance_count=count, export_provenance_truncated=count>3)
+                if slot < len(sample_masks):
+                    del sample_masks[slot]
+                    del item['message_matches'][slot]
+                # The incoming body is later than every retained sample.
+                sample_masks.append(mask)
                 item['message_matches'].append(match)
         finish()
         result = dict(matches=(title_hits + historical_hits + text_hits)[:limit], total_matches=total, truncated=total > limit,
                       semantics='case-insensitive literal substrings; AND across current title and conversation messages',
-                      snippet_semantics='unchanged source slice around the first matching term; at most 240 Unicode code points; zero-based half-open offsets into original message text')
+                      snippet_semantics='unchanged source slice around the first matching term; at most 240 Unicode code points; zero-based half-open offsets into original message text',
+                      message_sample_semantics='at most three bodies selected by streaming distinct literal-term coverage, then summed term coverage, then earliest ties; coverage describes full selected bodies, not necessarily the 240-code-point excerpts; no semantic ranking or globally optimal coverage guarantee')
         if include_title_history:
             result.update(semantics='case-insensitive literal substrings; AND across current title, prior local titles and conversation messages',
                           title_history_scope='local archive only; at most three matching prior title records per conversation, newest overrides first then archived original',

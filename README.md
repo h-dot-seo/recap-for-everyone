@@ -883,3 +883,12 @@ Source/conversation identities remain explicit, title summaries and whole-conver
 counts remain visible, and SQL limits both message and provenance retrieval. Omitting
 these options retains the existing full view. See [message selection and paging](docs/MESSAGE_SELECTION.md)
 for structured fields, snapshot limits and the path from a search result to evidence.
+
+### Search sample coverage
+
+Search now chooses up to three body samples that improve distinct query-term
+coverage, so a later rare term need not be hidden behind redundant early hits.
+Results also report exact matching-message counts, omitted-sample flags and which
+body-matched terms are missing from the sample. This is deterministic bounded
+literal coverage, not semantic ranking or a guarantee every term fits in the
+visible excerpt. See [sample selection and coverage fields](docs/SEARCH_EXCERPTS.md#diverse-bounded-body-samples).

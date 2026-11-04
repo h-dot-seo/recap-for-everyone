@@ -1,12 +1,12 @@
 {
   "project": "recap-for-everyone",
-  "release": "0.45.0-selected-message-evidence",
+  "release": "0.46.0-search-sample-coverage",
   "date": "2026-11-04",
   "private_history_imported": false,
   "actual_corpora_included": false,
   "synthetic_examples_only": true,
   "license_status": "NOT_SELECTED",
-  "file_count": 98,
+  "file_count": 99,
   "files": [
     {
       "path": ".gitattributes",
@@ -30,8 +30,8 @@
     },
     {
       "path": "README.md",
-      "bytes": 54914,
-      "sha256": "48cdf0f703ed2b294701272fd1f0af7259af5b6ef80a223a13b8ab2cf8796f4f"
+      "bytes": 55451,
+      "sha256": "8ae1dc112ae9e22230a02f0e7daa8e61bbed10a59db403c644420ed39b7335b6"
     },
     {
       "path": "RIGHTS.md",
@@ -50,8 +50,8 @@
     },
     {
       "path": "VALIDATION.md",
-      "bytes": 16906,
-      "sha256": "960f952424cc592158b77084964c33110af50dec1656646ad5704e128691a215"
+      "bytes": 17695,
+      "sha256": "ff73ca7664da133bab1429397bbc7539f366ffd1d0f10352a497d201fda3fcee"
     },
     {
       "path": "audit_publication.py",
@@ -65,8 +65,8 @@
     },
     {
       "path": "conversation_search.py",
-      "bytes": 12211,
-      "sha256": "a420d89ec7d12ce87568c4ae7cc7495d86790ddc5b6b08f8248a861dc6341b27"
+      "bytes": 14589,
+      "sha256": "5532d3cb33cc13e3ba7775bc7303efbe95bbaf679ee0748810ffd90f1e03732c"
     },
     {
       "path": "conversation_view.py",
@@ -100,8 +100,8 @@
     },
     {
       "path": "docs/SEARCH_EXCERPTS.md",
-      "bytes": 2488,
-      "sha256": "5a02202d1189fffc65c98415d28e672da146ef761d10cb592225df2a66c023ca"
+      "bytes": 4999,
+      "sha256": "d6891738e62418723563f05627b1ce5898e93477486df8ece88d63526ec5bf8e"
     },
     {
       "path": "docs/START_HERE.md",
@@ -342,6 +342,11 @@
       "path": "test_search_excerpts.py",
       "bytes": 6910,
       "sha256": "2165e7e5599b383d13ba03dd8ad0ceec2ae5457fcc6652f3d43acf9a176de950"
+    },
+    {
+      "path": "test_search_sample_coverage.py",
+      "bytes": 11186,
+      "sha256": "7381e847325804aa66aaf9359ef9bd4a0dbdd35fe0223f3928cb06f407bc0167"
     },
     {
       "path": "test_selected_import.py",

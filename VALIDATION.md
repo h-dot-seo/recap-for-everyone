@@ -271,3 +271,15 @@ offsets and source-artifact provenance. The complete suite passes 310 tests. Pub
 cover the selected 99-file candidate. Pagination limits message count, not bytes
 or occurrences; separate requests do not share a durable snapshot. No real corpus
 or external service is tested.
+
+### 2026-11-04: bounded search sample coverage
+
+Fifteen new synthetic tests cover late rare-term evidence, deterministic streaming
+coverage/tie behavior, insertion-order output, duplicate case-folded query terms,
+exact matching-body counts, explicit unsampled terms, current/historical title-only
+results, unchanged AND/ranking/limit behavior, source/export isolation, ASCII-safe
+CLI parity and no-write checks. A 51-body export fixture verifies that only four
+entering candidates need excerpt/provenance retrieval while the final sample stays
+at three. Coverage is measured on full selected bodies, not visible excerpts, and
+no globally optimal or semantic sample selection is claimed. The complete suite
+passes 325 tests; publication scanning and manifest verification cover 100 files.
