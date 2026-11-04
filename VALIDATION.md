@@ -303,3 +303,17 @@ prevents a successful title commit from appearing to fail when printing its
 Unicode JSON result. The complete synthetic suite passes 352 tests. Publication
 scanning and byte-manifest verification cover 106 selected files. Remote CI is
 checked separately for the exact pushed commit.
+
+
+### 2026-11-04: discover export identities before import
+
+Twenty new synthetic tests exercise the read-only export inventory for web, legacy
+local and typed local formats. Coverage includes exact IDs and existing web titles,
+zero-text/media-only identities, duplicate web IDs, repeated local metadata and
+message occurrences, full-file/off-page validation, body-field exclusion, source
+hashes and single reads, Unicode/newline parity, pagination and both ASCII-safe
+CLIs without a database. The documented examples and discover-to-selected-import
+workflow pass. A conflict regression distinguishes parser selection support from
+successful database insertion. No title or ID redaction, memory bound or vendor
+schema completeness is claimed. The full suite passes 372 tests; publication
+scanning and byte-manifest verification cover the selected 109-file candidate.

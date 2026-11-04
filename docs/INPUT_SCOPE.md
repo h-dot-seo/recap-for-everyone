@@ -31,9 +31,11 @@ python recap.py --db ../recap-demo/archive.sqlite import examples/web-export.jso
 
 Create a new private directory outside the repository for the database first.
 For your own export, use its exact conversation ID, not its title. There is no
-fuzzy ID selection. Obtain it from your own export in an editor or from an archive
-you already intentionally imported. Do not import the whole file merely to learn
-an ID if that exceeds your intended scope. Local formats use the session ID:
+fuzzy ID selection. Use [the read-only export inventory](EXPORT_INVENTORY.md),
+`recap.py list-export INPUT --format FORMAT`, to find IDs and existing web titles
+without creating a database or printing message bodies. IDs/titles may still be
+private. Do not import the whole file merely to learn an ID if that exceeds your
+intended scope. Local formats use the session ID:
 
 ```sh
 python recap.py inspect examples/rollback-session.jsonl --format local-codex --conversation synthetic-rollout

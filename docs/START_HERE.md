@@ -25,6 +25,11 @@ Keep original files. Choose a stable `--source` label and the exact same `--db` 
 returning. Source labels are your archive grouping, not verified account identities.
 Do not use one label for unrelated inputs with conflicting conversation/message IDs.
 
+Want only one conversation? Use [the export inventory](EXPORT_INVENTORY.md) to
+find its exact ID before import. It lists existing web titles and extraction counts
+without printing message-body fields or creating a database. Titles and IDs can
+still be private. Follow the selected-import steps in [input scope](INPUT_SCOPE.md).
+
 ## Try the entire journey with 24 invented conversations
 
 Run from the repository root with Python 3.10+ and SQLite FTS5. The example generator

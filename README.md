@@ -69,7 +69,12 @@ titles and text; the original `search` command still performs message-level FTS.
 `recap.py --db ... preview-title proposal.json` then
 `recap.py --db ... apply-title reviewed.json` for reviewed proposal application.
 The standalone scripts remain supported with equivalent behavior. `inspect`,
-`web-branch`, `replay-local`, `prepare-web-export` and `inspect-web-zip` can omit `--db`.
+`list-export`, `web-branch`, `replay-local`, `prepare-web-export` and `inspect-web-zip` can omit `--db`.
+
+To choose a conversation before importing, run `recap.py list-export INPUT --format web`
+(or use `local`/`local-codex`). It lists exact IDs, existing web titles and selection
+blockers without a database or message-body output. Titles and IDs may still be
+private. See [export inventory](docs/EXPORT_INVENTORY.md).
 
 Start with the [two-format title walkthrough](docs/TITLE_WALKTHROUGH.md) for
 copyable synthetic web and Codex local examples, expected results and recovery

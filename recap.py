@@ -115,6 +115,9 @@ def main():
     check = sub.add_parser('inspect', help='inspect export coverage without a database')
     check.add_argument('input'); check.add_argument('--format', choices=['web', 'local', 'local-codex'], required=True)
     check.add_argument('--conversation', help='inspect an explicit conversation selection without writing')
+    inventory = sub.add_parser('list-export', help='list export IDs, titles and selection support without importing')
+    inventory.add_argument('input'); inventory.add_argument('--format', choices=['web', 'local', 'local-codex'], required=True)
+    inventory.add_argument('--limit', type=int, default=50); inventory.add_argument('--offset', type=int, default=0)
     zip_info = sub.add_parser('inspect-web-zip', help='list conventional conversation JSON member metadata without decompression')
     zip_info.add_argument('input'); zip_info.add_argument('--limit', type=int, default=50); zip_info.add_argument('--offset', type=int, default=0)
     prepare = sub.add_parser('prepare-web-export', help='validate one explicit ZIP JSON member and publish a new no-overwrite local file')
@@ -177,10 +180,13 @@ def main():
         if name == 'title':
             command.add_argument('--set'); command.add_argument('--expected-revision', type=int)
     args = p.parse_args()
-    if args.command not in ('inspect', 'web-branch', 'replay-local', 'prepare-web-export', 'inspect-web-zip') and not args.db:
-        p.error('--db is required except for inspect, web-branch, replay-local, prepare-web-export and inspect-web-zip')
+    if args.command not in ('inspect', 'list-export', 'web-branch', 'replay-local', 'prepare-web-export', 'inspect-web-zip') and not args.db:
+        p.error('--db is required except for inspect, list-export, web-branch, replay-local, prepare-web-export and inspect-web-zip')
     try:
-        if args.command == 'inspect-web-zip':
+        if args.command == 'list-export':
+            from export_inventory import list_export
+            result = list_export(args.input, args.format, args.limit, args.offset)
+        elif args.command == 'inspect-web-zip':
             from inspect_web_zip import inspect_web_zip
             result = inspect_web_zip(args.input, args.limit, args.offset)
         elif args.command == 'prepare-web-export':

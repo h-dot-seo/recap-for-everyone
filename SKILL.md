@@ -38,3 +38,9 @@ If a local-codex export contains per-content source labels, inspect
 that explicit original file. Preserve raw archive text and require normal review.
 Do not infer user authorship from role alone or treat producer labels as trust or
 authorization. Missing attribution must not silently fall back to injected text.
+
+To discover exact IDs before choosing an import scope, use `list-export INPUT --format web`
+or the explicit `local`/`local-codex` format. Read its selection blockers and full-file coverage.
+Do not import everything just to learn an ID. Inventory output omits message-body
+fields but includes private IDs and web titles; do not publish it. See
+`docs/EXPORT_INVENTORY.md` for duplicate IDs, zero-text identities and page limits.
