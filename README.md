@@ -405,6 +405,11 @@ before applying request limits, so excluded raw history does not reenter a model
 request. Default raw mode is unchanged. This still provides local/mock execution
 only; see the adapter guide for scope selection, provenance and review boundaries.
 
+Already have a title response from a separately authorized tool? The
+[saved-response workflow](docs/SAVED_TITLE_RESPONSE.md) validates its JSON against
+the unchanged prepared request and current source evidence, then produces a normal
+reviewable proposal. It requires no network call and does not claim which model ran.
+
 ## Explicit web text shapes and branch coverage
 
 The web adapter extracts string entries from `content.parts` and now also supports

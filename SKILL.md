@@ -72,3 +72,9 @@ requires the original `--input` file and verifies its archive association before
 bounding user evidence. These scopes are alternatives, not a combined filter.
 Inspect the actual prepared payload and local coverage, not just a first excerpt.
 No external transport is supplied, and source labels/context are not trust or consent.
+
+For an already obtained response, use `title_adapter.py ... complete-response`
+with the unchanged saved preparation and same explicit configuration/scope.
+See `docs/SAVED_TITLE_RESPONSE.md`. It revalidates evidence and performs no model
+execution or send. Do not label real output as a synthetic mock, invent proof of
+provider execution, edit stale hashes, or skip the normal title review/apply.

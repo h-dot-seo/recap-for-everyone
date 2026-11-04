@@ -3,7 +3,7 @@
 ## Implemented boundary
 
 `title_adapter.py` prepares a provider-neutral request and turns validated local/mock
-responses into the existing proposal shape. It never changes a title. The operator
+or explicitly supplied response files into the existing proposal shape. It never changes a title. The operator
 must separately preview and apply a proposal with the existing content/revision
 checks. No actual semantic model is connected, and no semantic quality is claimed.
 
@@ -11,6 +11,11 @@ Only two built-in implementations execute: local excerpt selection and a synthet
 mock response. The external path is deliberately unconfigured. Enabling it and
 providing matching consent still returns `EXTERNAL_NOT_CONFIGURED`; no HTTP client,
 credential lookup, API call or payment behavior is included.
+
+For a response already obtained through a separately authorized tool, use the
+[saved-response workflow](SAVED_TITLE_RESPONSE.md). Its read-only `complete-response`
+command revalidates the original preparation against current evidence before making
+a proposal. It performs no external execution and does not attest model provenance.
 
 ## Frozen request
 
@@ -126,7 +131,8 @@ limits raw/mock response input and its IPC envelope to 16,384 bytes.
 
 Errors use fixed codes: `CONFIG_INVALID`, `SOURCE_ERROR`, `NO_USER_EVIDENCE`,
 `REQUEST_INVALID`, `CONSENT_REQUIRED`, `EXTERNAL_DISABLED`,
-`EXTERNAL_NOT_CONFIGURED`, `INVALID_RESPONSE`, `PROVIDER_FAILED`, and `TIMEOUT`.
+`EXTERNAL_NOT_CONFIGURED`, `INVALID_RESPONSE`, `PROVIDER_FAILED`, `TIMEOUT`, and
+`PREPARED_REQUEST_STALE` for changed saved preparations.
 Provider exception strings, raw response text and private source paths are not
 included in CLI errors. Generation does not write logs or title history.
 

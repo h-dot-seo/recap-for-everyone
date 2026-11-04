@@ -435,3 +435,27 @@ and attribution are separate alternatives, not a combined effective-human-histor
 reconstruction. Full source/archive reads remain necessary; outbound bounds do
 not establish an archive memory bound. Exact-commit cross-platform CI is checked
 separately after publication.
+
+
+### 2026-11-04: complete locally supplied title responses
+
+Twenty-four independent synthetic tests exercise saved-request completion without
+any provider execution. The current archive and explicit source scope reconstruct
+the complete preparation document; canonical comparison rejects changed bodies,
+recomputed forged hashes, configuration, source/context changes and numeric-type
+substitutions. Response evidence remains limited to the exact bounded user payload.
+
+Tests cover raw and all three scoped requests, single-read bounded UTF-8 files,
+nonfinite/duplicate-key/malformed inputs before database reads, repeatable readonly
+completion, no sockets/subprocesses/automatic apply, provider-kind combinations,
+Unicode review/apply/search and post-completion content/revision changes. The exact
+new documented walkthrough uses invented request/response data, explicit pre-apply
+review assertions and Windows-safe command tokenization. Existing prepare output
+and disabled/unconfigured external generation remain unchanged.
+
+The complete suite passes 498 tests; publication and manifest checks cover 122
+files. The response is explicitly marked locally supplied with provider execution
+not performed. Neither those labels nor payload/hash consistency prove model
+execution, semantic title quality, actual prior transmission or consent. No real
+model call, credential handling, private corpus, remote rename or merge is added.
+Exact-commit cross-platform CI is checked separately after publication.
