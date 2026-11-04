@@ -1,12 +1,12 @@
 {
   "project": "recap-for-everyone",
-  "release": "0.85.0-title-api-validation",
+  "release": "0.86.0-adapter-message-selection",
   "date": "2026-11-04",
   "private_history_imported": false,
   "actual_corpora_included": false,
   "synthetic_examples_only": true,
   "license_status": "NOT_SELECTED",
-  "file_count": 172,
+  "file_count": 176,
   "files": [
     {
       "path": ".gitattributes",
@@ -30,8 +30,8 @@
     },
     {
       "path": "README.md",
-      "bytes": 70432,
-      "sha256": "410bd66a01a6b6ead588b1ee59110a2f6f60b301624e7b3fb470d6e177a237be"
+      "bytes": 70888,
+      "sha256": "77e9a2f703c731e46241030ecb16d175030bbdcb6b596987c8f9ef909311e191"
     },
     {
       "path": "RIGHTS.md",
@@ -50,8 +50,8 @@
     },
     {
       "path": "VALIDATION.md",
-      "bytes": 106317,
-      "sha256": "90720c4421e63cacf8c393d8a9977f6d8f67ee1be21d62c15fb7eca5201b2f3c"
+      "bytes": 110148,
+      "sha256": "4345b45d98a4984739731321e9f0ee22d882a567f45f47dc454a42380808e600"
     },
     {
       "path": "attributed_title.py",
@@ -77,6 +77,11 @@
       "path": "conversation_view.py",
       "bytes": 12973,
       "sha256": "63568e9c197e32e26284438f536a3b69925abefd0d41f87befb54f9e1a00ccbb"
+    },
+    {
+      "path": "docs/ADAPTER_MESSAGE_SELECTION.md",
+      "bytes": 9628,
+      "sha256": "460cbdb2ffc7cf40854722004538973fc2b894e4e825118706fded150e584ef0"
     },
     {
       "path": "docs/ARCHITECTURE.md",
@@ -135,8 +140,8 @@
     },
     {
       "path": "docs/SAVED_TITLE_RESPONSE.md",
-      "bytes": 9644,
-      "sha256": "ebd1508c6f745dc9a625eb58c4ef7f9ab2cd7df3d42378e830a9abfd70ed6432"
+      "bytes": 10041,
+      "sha256": "a4276d396436b07836748cf797615b4b73e6d01d61a33e517e9b09e870d6656d"
     },
     {
       "path": "docs/SEARCH_EXCERPTS.md",
@@ -170,8 +175,8 @@
     },
     {
       "path": "docs/TITLE_ADAPTER.md",
-      "bytes": 13004,
-      "sha256": "cbf3d386166fab79599c39fc024d60ab3f3a5289ba4e7d89865186f87d33f279"
+      "bytes": 13422,
+      "sha256": "3b979ccefdce7b63ac8c86538e6c666e57e74ae9e629b8eaf960c359e03b279e"
     },
     {
       "path": "docs/TITLE_DOCUMENT_FILES.md",
@@ -195,8 +200,8 @@
     },
     {
       "path": "docs/TITLE_REVIEW_HINTS.md",
-      "bytes": 21723,
-      "sha256": "f0098bb0cdd6278955f9285c9ca0b0b595b205af7fc24a4a66972bda8f624829"
+      "bytes": 21838,
+      "sha256": "52ce894c51015aba329641dba8be9773de6b348668a0392e909c6259f45913a3"
     },
     {
       "path": "docs/TITLE_REVIEW_QUEUE.md",
@@ -222,6 +227,16 @@
       "path": "docs/WEB_ZIP_INVENTORY.md",
       "bytes": 6720,
       "sha256": "7d4d8090589ea875d8bc1164f4f7e19b0cacdd77c717a10daa6ab11dfea641db"
+    },
+    {
+      "path": "examples/adapter-message-focus.jsonl",
+      "bytes": 5277,
+      "sha256": "0cf470634ccefb18c8c657086d3dda960d6661a5365d744759998f6df21e0bd9"
+    },
+    {
+      "path": "examples/adapter-message-response.json",
+      "bytes": 102,
+      "sha256": "18415cef7a15dd29ef0ca31e1a678d7a6a68ef6ace06ff7f7d57d64769632005"
     },
     {
       "path": "examples/conversations.jsonl",
@@ -347,6 +362,11 @@
       "path": "test_adapter_file_encoding.py",
       "bytes": 16889,
       "sha256": "33319f98368643fac7be0451a16a7834506a17e78e18c1fc0b968f47677b4c5a"
+    },
+    {
+      "path": "test_adapter_message_selection.py",
+      "bytes": 43750,
+      "sha256": "094d6f2df24d84b95a68f17dbe15a6b919aeb3397e4a1a2f9fa506aa31113145"
     },
     {
       "path": "test_adapter_native_output.py",
@@ -610,8 +630,8 @@
     },
     {
       "path": "test_selected_title_evidence.py",
-      "bytes": 19845,
-      "sha256": "c174823a523f514b415195b202ae8589e1bf1941ae5ab573a8e20899b17ecf44"
+      "bytes": 20123,
+      "sha256": "f519ea250015f6e50e1879d4629f64c0c8f13999a02179ab43b64654e47c1c4b"
     },
     {
       "path": "test_session_workflow.py",
@@ -790,8 +810,8 @@
     },
     {
       "path": "title_adapter.py",
-      "bytes": 22246,
-      "sha256": "bb0c3f033573b69079befe39094acb1ef4030211f514ff61b1c6754175e5a514"
+      "bytes": 28494,
+      "sha256": "2530aeac2b61a0ce5c1a262cac5a882c7441308f1853e8071649b1172265b2c2"
     },
     {
       "path": "title_batch.py",

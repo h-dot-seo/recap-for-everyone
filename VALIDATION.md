@@ -1629,3 +1629,59 @@ automatic repair of existing ledger entries, inferred approval or new title
 semantics. Existing source evidence and the 80-code-point excerpt limit are
 unchanged. No actual personal data, model transmission, remote mutation or merge
 occurs. Exact-commit Ubuntu/Windows Python 3.10/3.12 CI is checked after push.
+
+### 2026-11-04: carry a selected request through the offline adapter
+
+A synthetic end-to-end audit found a missing bridge, not a parser regression: an
+older meaningful user-attributed request was found by search and accepted by the
+direct excerpt selector, but twenty later Thanks messages displaced it from the
+adapter's documented recent-user window. A supplied response citing the omitted ID
+correctly failed, and editing the saved preparation correctly became stale.
+
+The adapter now accepts an optional exact message selector in preparation,
+local/mock generation and supplied-response completion. It verifies the existing
+entire source scope first, then requires one eligible user occurrence before
+applying the unchanged request limits. Attributed repeats require an exact original
+physical locator even when selected text agrees. An explicit occurrence may choose
+one valid attribution variant without the default duplicate-ID ambiguity, but
+malformed or mismatched evidence elsewhere in the verified scope still rejects.
+Raw, web branch, retained replay and source-attributed boundaries are preserved.
+
+A bounded immutable evidence_selection field records scope, exact archive ID,
+requested locator and resolved attributed locator, with authenticated false. It is
+local envelope/proposal context, not provider payload. Completion rebuilds the
+recipe and compares the entire preparation, so changing or dropping a selector
+stales it even when the resulting payload would be identical. Full raw-content
+fingerprints and source provenance checks remain. Scoped counts still describe all
+eligible source evidence and omitted distinct IDs, not omitted occurrences; full
+context may describe unchosen occurrences. These metadata checks are not source
+authentication for manually constructed PreparedRequest values. The normal saved-
+response path rechecks actual evidence before producing a proposal.
+
+No-selector outputs remain unchanged. Independent baseline comparisons covered all
+four scopes, repeated attributed IDs and truncation. A review also identified an
+invalid-call error-precedence change; early option validation was narrowed to new
+selector paths, and a regression preserves the previous no-selector order. Existing
+raw reads do not gain an unnecessary ID set. Payload/context/response byte limits,
+BOM file framing, native no-overwrite saves, external-disabled behavior and the
+80-code-point local excerpt cap remain unchanged.
+
+Twenty-eight independently authored synthetic tests cover the old-topic bridge,
+all scopes, role/membership failures, repeated occurrences, complete source
+verification, provenance and whole-content staleness, immutable selection,
+selector syntax before I/O, literal Unicode IDs, exact 65,536-byte acceptance and
+65,537-byte rejection, existing text limits, fixed errors, native/BOM files,
+local/mock execution and the disabled/unconfigured external path. The new ten-
+command guide is executed exactly: all four saved receipts are checked, the archive
+stays unchanged until separate apply, and the applied title is found afterward.
+Its two fixtures contain only invented data. The earlier raw exact-message guide
+also now uses native saving instead of shell redirection, with its existing
+regression verifying both actual files and receipts rather than simulating writes.
+
+Independent review found no supported-workflow blocker and passed 78 focused tests.
+The adapter/document bundle passed 137 tests before the final added precedence
+regression; the final new suite passed all 28. The complete final suite, run alone,
+passes 985 tests in 349.846 seconds. Public audit and byte manifest cover 177 files.
+No actual personal data, model transmission, automatic title approval, remote
+mutation or merge occurs. Exact-commit Ubuntu/Windows Python 3.10/3.12 CI is checked
+after push.

@@ -24,7 +24,8 @@ JSON bytes. Provider input contains the protocol, model, instruction and selecte
 user-message IDs/text only. Source/conversation identifiers, assistant/tool messages,
 database paths and the full-conversation fingerprint remain in the local envelope.
 
-Selection considers the most recent 20 user messages, includes at most the first
+Without an exact message selector, selection considers the most recent 20 user
+messages, includes at most the first
 4,000 characters of each, and keeps at most 12,000 characters in total, favoring the
 newest messages. Included rows are returned in original archive order. The final
 serialized request is limited to 65,536 bytes. Long identifiers can still cause a
@@ -61,7 +62,7 @@ selected conversation. They do not reconstruct a selection from a saved proposal
 unsigned context. Changed or unimported source bytes, ambiguous occurrences and
 unsupported shapes fail without raw fallback.
 
-All eligible selected user texts, not just the first excerpt's evidence, feed the
+By default, all eligible selected user texts, not just the first excerpt's evidence, feed the
 existing recent-user limits. Selection occurs **before** the 20-message, 4,000-character
 per-message and 12,000-character total bounds. Repeated selected occurrences with
 one archive ID and identical text collapse at their most recent position. If the
@@ -94,6 +95,12 @@ frozen separately and limited to 1 MiB. It is private, unsigned and not reauthen
 by preview/apply. Neither context, source hash nor source/conversation labels are
 added to outbound payload bytes. Only a changed outbound payload changes the
 consent hash. No actual transmission is implemented.
+
+To carry an older request found by search into this workflow, use the optional
+[exact message selection](ADAPTER_MESSAGE_SELECTION.md). It selects one user
+occurrence only after full scope verification and freezes the choice locally for
+completion. Repeated attributed IDs require an exact `--origin-locator`. Existing
+no-selector shapes and selection remain unchanged.
 
 Review the resulting proposal through `preview-title`, then explicitly apply one
 reviewed title, or supply it to `review-titles --proposal FILE --supplied-only`.

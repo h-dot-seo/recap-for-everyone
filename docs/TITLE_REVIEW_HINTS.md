@@ -36,13 +36,14 @@ mkdir ../recap-title-focus-demo
 python recap.py --db ../recap-title-focus-demo/archive.sqlite import examples/title-focus-web.json --format web --source demo
 python recap.py --db ../recap-title-focus-demo/archive.sqlite find irrigation --source demo
 python recap.py --db ../recap-title-focus-demo/archive.sqlite show --source demo --conversation synthetic-title-focus --message u2
-python recap.py --db ../recap-title-focus-demo/archive.sqlite suggest-title --source demo --conversation synthetic-title-focus --message u2 > ../recap-title-focus-demo/proposal.json
-python recap.py --db ../recap-title-focus-demo/archive.sqlite preview-title ../recap-title-focus-demo/proposal.json --with-evidence > ../recap-title-focus-demo/reviewed.json
+python recap.py --db ../recap-title-focus-demo/archive.sqlite suggest-title --source demo --conversation synthetic-title-focus --message u2 --output ../recap-title-focus-demo/proposal.json
+python recap.py --db ../recap-title-focus-demo/archive.sqlite preview-title ../recap-title-focus-demo/proposal.json --with-evidence --output ../recap-title-focus-demo/reviewed.json
 ```
 
 Choose a new private scratch directory outside this repository; do not overwrite
-existing files. Keep saved JSON as UTF-8, following [the walkthrough's shell
-guidance](TITLE_WALKTHROUGH.md). Read the proposal and complete reviewed document
+existing files. The commands save native UTF-8 without shell redirection, following
+[the saved-document rules](TITLE_DOCUMENT_FILES.md). Stdout contains only a receipt,
+not the saved proposal or preview. Read the actual proposal and complete reviewed document
 before deciding to apply. This example's title is `Compare synthetic orchard
 irrigation schedules`, with evidence `u2`, rather than the generic first request.
 The source bytes, original title and archive messages remain unchanged.

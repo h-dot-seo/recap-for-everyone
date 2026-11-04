@@ -527,6 +527,13 @@ input files also tolerate [one initial UTF-8 signature](docs/TITLE_ADAPTER.md#ed
 from an editor, while counting its original bytes against the same limits. This
 does not relax source provenance, request freshness or explicit title review.
 
+If the useful request you found is older than the adapter's recent-user window,
+[select that exact message](docs/ADAPTER_MESSAGE_SELECTION.md) for preparation and
+completion. Selection stays inside the verified raw/branch/replay/attributed scope,
+freezes the explicit choice locally and preserves full-content freshness checks.
+Repeated attributed occurrences require their exact original locator. This adds
+no model connection or automatic title change.
+
 ## Explicit web text shapes and branch coverage
 
 The web adapter extracts string entries from `content.parts` and now also supports

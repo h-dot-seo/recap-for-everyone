@@ -89,6 +89,12 @@ exact boundaries. Legacy redirection remains possible but has shell
 encoding/overwrite hazards; do not combine it with native `--output` or use it on
 an input path.
 
+For a meaningful older request omitted by the default recent-user window, use the
+[exact-message adapter workflow](ADAPTER_MESSAGE_SELECTION.md). Repeat its explicit
+`--message` and any `--origin-locator` in preparation and completion; the frozen
+choice is checked locally alongside source scope and content freshness. Editing a
+saved payload is not a supported substitute for a new preparation.
+
 ## Use a separately obtained response
 
 A response is one UTF-8 JSON object with a single-line `title` and nonempty unique

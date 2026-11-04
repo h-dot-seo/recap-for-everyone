@@ -1,5 +1,6 @@
 """Synthetic exact-user-message title selection and reviewed archive workflows."""
 import copy
+import hashlib
 import json
 import os
 import shlex
@@ -232,12 +233,8 @@ class SelectedTitleEvidenceTests(unittest.TestCase):
                 Path(args[1]).mkdir()
                 continue
             self.assertEqual(args.pop(0), 'python')
-            target = None
-            if '>' in args:
-                redirect = args.index('>')
-                self.assertEqual(len(args), redirect + 2)
-                target = Path(args[redirect + 1])
-                args = args[:redirect]
+            self.assertNotIn('>', args, 'the exact-message guide uses native saving')
+            target = Path(args[args.index('--output') + 1]) if '--output' in args else None
             is_apply = 'apply-title' in args
             if is_apply:
                 self.assertEqual(db.read_bytes(), baseline)
@@ -256,7 +253,12 @@ class SelectedTitleEvidenceTests(unittest.TestCase):
             value = json.loads(result.stdout)
             results.append(value)
             if target:
-                target.write_text(json.dumps(value, ensure_ascii=False), encoding='utf-8')
+                raw = target.read_bytes()
+                self.assertFalse(raw.startswith(b'\xef\xbb\xbf'))
+                self.assertEqual(value['status'], 'SAVED')
+                self.assertEqual(value['sha256'], hashlib.sha256(raw).hexdigest())
+                self.assertEqual(value['bytes'], len(raw))
+                self.assertEqual(value['document_kind'], 'proposal' if 'suggest-title' in args else 'preview')
             if 'import' in args:
                 baseline = db.read_bytes()
                 initial_snapshot = snapshot(db, 'demo', 'synthetic-title-focus')
