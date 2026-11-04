@@ -989,8 +989,11 @@ See [official format references and preparation limits](docs/PREPARE_WEB_EXPORT.
 Use `inspect-web-zip ZIP` first to list conventionally named conversation JSON parts
 without decompression. It shows exact names and metadata-only rejection reasons,
 never certifies JSON validity or part completeness, and does not list unrelated
-account-file names. Pass its hash to preparation with `--expected-archive-sha256`
-when you want to reject a ZIP changed since inspection. See [candidate selection](docs/WEB_ZIP_INVENTORY.md).
+account-file names. Pass the first page's hash to later candidate pages and preparation
+with `--expected-archive-sha256` to reject a ZIP changed since inspection. Without
+that option each page is independent, so replacement or reordering can repeat or
+skip entries. Pagination still reads the bounded whole ZIP and does not establish
+part completeness. See [candidate selection](docs/WEB_ZIP_INVENTORY.md).
 
 ## Match-centered search evidence
 

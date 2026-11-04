@@ -35,6 +35,18 @@ def archive_bytes(path):
     return raw
 
 
+def _validate_expected_archive_sha256(expected):
+    if expected is not None and (not isinstance(expected, str) or len(expected) != 64 or any(ch not in '0123456789abcdef' for ch in expected)):
+        raise ValueError('expected archive hash must be a lowercase SHA-256 hex digest')
+
+
+def _checked_archive_sha256(raw, expected):
+    digest = hashlib.sha256(raw).hexdigest()
+    if expected is not None and digest != expected:
+        raise ValueError('ZIP archive changed after inspection; inspect and select again')
+    return digest
+
+
 def member_problem(info):
     """Metadata-only eligibility shared with read-only candidate inspection."""
     try:
@@ -56,15 +68,12 @@ def member_problem(info):
 
 
 def prepare_web_export(path, member, output, expected_archive_sha256=None):
-    if expected_archive_sha256 is not None and (not isinstance(expected_archive_sha256, str) or len(expected_archive_sha256) != 64 or any(ch not in '0123456789abcdef' for ch in expected_archive_sha256)):
-        raise ValueError('expected archive hash must be a lowercase SHA-256 hex digest')
+    _validate_expected_archive_sha256(expected_archive_sha256)
     member = _safe_member(member)
     if not member.lower().endswith('.json'):
         raise ValueError('select one JSON member, not an HTML page or attachment')
     raw = archive_bytes(path)
-    archive_digest = hashlib.sha256(raw).hexdigest()
-    if expected_archive_sha256 is not None and archive_digest != expected_archive_sha256:
-        raise ValueError('ZIP archive changed after inspection; inspect and select again')
+    archive_digest = _checked_archive_sha256(raw, expected_archive_sha256)
     try:
         with zipfile.ZipFile(io.BytesIO(raw)) as archive:
             entries = archive.infolist()

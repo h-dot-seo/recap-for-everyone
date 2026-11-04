@@ -58,10 +58,46 @@ check are shared with preparation. Pagination limits the displayed candidates
 and `other_entries_not_listed` describe the whole snapshot. `next_offset` is null at
 the end. Candidate names can themselves be private; keep the JSON output private.
 
+## Keep candidate pages on one ZIP snapshot
+
+For a small page, start with:
+
+```sh
+python recap.py inspect-web-zip ../private-data/export.zip --limit 1 --offset 0
+```
+
+Save this first response's `archive_sha256`. If `next_offset` is not null, use that
+exact offset and **the first page's digest** on the next request:
+
+```sh
+python recap.py inspect-web-zip ../private-data/export.zip --limit 1 --offset NEXT_OFFSET --expected-archive-sha256 ARCHIVE_SHA256
+```
+
+Replace `NEXT_OFFSET` and `ARCHIVE_SHA256` with those returned values, not literal
+placeholder text. Continue deliberately using each returned `next_offset` and the
+same first-page digest until `next_offset` is null. Keep the same page size unless
+you intend to change it; the offset is a candidate index, not a page number.
+
+Without the optional hash, every call independently lists the ZIP currently at the
+path. Replacement, reordering or added entries can then repeat or skip candidates
+across pages even when `total_candidates` is unchanged. With the hash, a mismatch
+fails before ZIP metadata parsing, including requests past the last candidate.
+Invalid hash syntax fails before source-file reading. The expected hash must be
+exactly 64 lowercase hexadecimal characters, as for preparation.
+
+The digest binds **all ZIP bytes**, including unrelated entries and archive comments,
+not just displayed candidates. Every page still reads the full bounded snapshot;
+this is not a streaming cursor or a cached inventory. A matching digest does not
+validate member contents or prove all parts exist. If the file changed, restart at
+offset zero and review the new inventory; do not combine old and new pages or simply
+replace the expected hash while continuing an old offset. Use the original page
+digest again for the explicit preparation below. Nothing is prepared or imported by
+paging, and separate preparations/imports are not one atomic operation.
+
 ## Bind selection to the inspected ZIP
 
-Copy the exact candidate `member` and the inventory's `archive_sha256`, then prepare
-one part to a new private file:
+Copy the exact candidate `member` and the first inventory page's `archive_sha256`,
+then prepare one part to a new private file:
 
 ```sh
 python recap.py prepare-web-export ../private-data/export.zip --member conversations-001.json --output ../private-data/part-001.json --expected-archive-sha256 ARCHIVE_SHA256

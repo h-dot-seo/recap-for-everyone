@@ -81,8 +81,10 @@ python recap.py prepare-web-export ../recap-start-demo/web.zip --member conversa
 The generated ZIP contains exactly two known parts, deliberately in reverse order.
 For **your own** ZIP, do not copy these member names: inspect its inventory, choose
 explicit members and preferably bind preparation with `--expected-archive-sha256`
-using the returned digest. Metadata eligibility does not verify JSON, CRC or that
-all parts exist. Parts are not automatically imported, merged or treated as one
+using the returned digest. If the inventory spans pages, use that same first-page
+digest with `inspect-web-zip --expected-archive-sha256` on each later page; restart
+inspection if it changes rather than mixing pages. Metadata eligibility does not
+verify JSON, CRC or that all parts exist. Parts are not automatically imported, merged or treated as one
 atomic operation. The two-part completeness here is known only from this generator.
 
 ### 2. Inspect coverage, then import deliberately

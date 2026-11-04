@@ -157,6 +157,7 @@ def main():
     inventory.add_argument('--canonical-unicode', action='store_true', help='match canonical Unicode equivalents; requires --contains')
     zip_info = sub.add_parser('inspect-web-zip', help='list conventional conversation JSON member metadata without decompression')
     zip_info.add_argument('input'); zip_info.add_argument('--limit', type=int, default=50); zip_info.add_argument('--offset', type=int, default=0)
+    zip_info.add_argument('--expected-archive-sha256', help='require the same whole ZIP byte snapshot as an earlier candidate page')
     prepare = sub.add_parser('prepare-web-export', help='validate one explicit ZIP JSON member and publish a new no-overwrite local file')
     prepare.add_argument('input'); prepare.add_argument('--member', required=True); prepare.add_argument('--output', required=True)
     prepare.add_argument('--expected-archive-sha256', help='reject a ZIP whose bytes changed since metadata inspection')
@@ -252,7 +253,7 @@ def main():
                                  contains=args.contains, canonical_unicode=args.canonical_unicode)
         elif args.command == 'inspect-web-zip':
             from inspect_web_zip import inspect_web_zip
-            result = inspect_web_zip(args.input, args.limit, args.offset)
+            result = inspect_web_zip(args.input, args.limit, args.offset, args.expected_archive_sha256)
         elif args.command == 'check-import':
             from import_check import check_import
             result = check_import(args.db, args.source, args.input, args.format, args.conversation,

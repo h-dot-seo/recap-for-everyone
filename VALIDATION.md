@@ -1196,3 +1196,39 @@ The final complete local suite passes 796 tests in 143.672 seconds; the scoped a
 documentation bundle passes 41. The public audit and manifest still cover 159 files.
 A new exact-commit four-platform CI run is checked after this correction is pushed;
 the failed earlier run is not reclassified as successful.
+
+### 2026-11-04: bind ZIP inventory pages to the inspected archive
+
+A synthetic three-candidate ZIP replacement reproduced duplicate pagination:
+page one returned conversations-001.json, then a replacement with a different first
+entry and the same candidate count returned conversations-001.json again at offset
+one. Each unpinned response exposed its own hash, but the inventory had no option
+to enforce equality. Explicit preparation already rejected a changed archive.
+
+The optional inspect-web-zip --expected-archive-sha256 and fourth Python API
+argument now bind later candidate pages to the first bounded whole-ZIP snapshot.
+Inspection and preparation share strict lowercase digest validation and mismatch
+checking. Invalid syntax fails before file I/O; a mismatch fails before ZIP metadata
+parsing, including requests beyond the last candidate. One read supplies both the
+metadata and returned digest. Existing calls, explicit None and matching hashes
+produce the same result shape. Unpinned behavior and all existing bounds remain.
+
+Nine independent synthetic tests cover stable pages, replacement/reordering,
+unrelated entries and archive comments, malformed digest types and text, invalid
+ZIP error ordering, one-read source replacement, no decompression/database/output
+writes, limits, and CLI failures with no JSON result. Exact documented pagination
+commands are executed after tokenization and temporary-path substitution. A pinned
+two-part workflow imports 12 invented web conversations and 12 local sessions,
+saves separate UTF-8 queue/preview files with verified receipt hashes, stays at
+revision zero until explicit apply, then finds the selected Unicode title. Original
+source bytes, archived messages/provenance and the saved queue remain unchanged.
+Successful inventory ignores both absent and opaque existing database paths.
+
+The complete final local suite passes 805 tests in 127.021 seconds; the focused ZIP,
+export-hash, inventory and first-run bundle passes 64 tests. The public audit and
+byte manifest cover 160 files. The first-page digest must also be used for explicit
+preparation; a mismatch requires restarting inventory rather than mixing pages.
+Hash equality is not authentication, content validation, part completeness or an
+atomic multi-part import. No real sessions, model transmission, automatic member
+selection, remote rename or merge occurs. Exact-commit Ubuntu/Windows Python
+3.10/3.12 CI is checked after push.
