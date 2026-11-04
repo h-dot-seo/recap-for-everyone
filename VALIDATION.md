@@ -775,3 +775,34 @@ cover 145 files. No real conversations, model execution, remote mutation, automa
 relevance inference, bulk approval or merge is added. The selector still reads the
 whole conversation content snapshot; it is not a resource bound or privacy filter.
 Exact-commit Ubuntu/Windows Python 3.10/3.12 CI is checked separately after push.
+
+### 2026-11-04: reject malformed typed parts before losing user evidence
+
+Thirteen independent synthetic tests reproduce and prevent a typed local content
+part with an array type from silently disappearing while an earlier greeting is
+imported and proposed as the title. Present null/boolean/number/container/empty/
+whitespace type values now reject supported user/assistant messages in local-codex.
+A malformed later part rejects even after valid text and when its own text is
+absent, empty or whitespace. A mocked SQLite connection proves no database access
+occurs first; missing archives remain absent and existing source/archive bytes stay
+equal on rejection.
+
+Whole-file inspection, inventory, conflict checks, selected import and source-backed
+attributed proposals reject malformed later or unselected content without partial
+results. Fixed diagnostics locate the physical line across BOM, LF, CRLF, CR and
+blank lines without echoing the tag or text. Existing malformed content-array,
+item-object and text-value failures also gain physical-line context. Five ASCII
+CLI error paths produce no traceback, payload or partial JSON.
+
+Missing type tags intentionally remain counted compatibility skips. Valid unknown,
+media and padded nonempty tags remain unsupported without coercion or metadata
+stringification. Legacy profile extraction, unsupported roles/nonmessage variants
+and metadata-only utility paths retain their earlier contracts. Valid raw bytes,
+text and variant hashes, physical provenance and idempotent imports are unchanged.
+The public pinned ContentItem model informs this narrow shape check, not a claim
+of universal producer-schema validation or complete replay compatibility.
+
+The full suite passes 677 tests; publication audit and byte-manifest checks cover
+146 files. Existing archives and saved proposals are not retroactively repaired or
+invalidated. No actual corpus, model call, source rewriting, remote mutation or
+merge is added. Exact-commit four-job CI is checked separately after push.

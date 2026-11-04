@@ -160,6 +160,42 @@ the tagged response enum and message role field in the
 [pinned public Codex definitions](https://github.com/openai/codex/blob/f2b94ef8b52196f127d162c6db71e390b9bb265c/codex-rs/protocol/src/models.rs).
 It is not a claim of full current Codex replay compatibility.
 
+### Malformed typed content must not erase a request
+
+In `local-codex`, a content item's **present** `type` must be a nonempty string
+containing a non-whitespace character. Null, numbers, booleans, arrays, objects,
+empty strings and whitespace-only strings reject the source. For example,
+`{"type":["input_text"],"text":"Synthetic irrigation question"}` is malformed,
+not an unsupported media item. Earlier behavior could drop this substantive
+request, import only an earlier greeting and then suggest that greeting as a title.
+The importer now fails instead of silently accepting that incomplete extraction.
+
+An **absent** `type` remains the existing untyped-content compatibility skip, with
+the skipped-part count and warning. Valid unknown/nontext nonempty type strings
+also remain skips; their text/metadata is not guessed or stringified. Type names
+are not trimmed into another variant: `" input_text "` remains unsupported.
+Only exact `input_text` and `output_text` variants supply typed text, and their
+`text` must still be a string. This is a narrow shape check, not full validation
+of nontext variants or arbitrary future producer schemas. The public
+[ContentItem definition](https://github.com/openai/codex/blob/f2b94ef8b52196f127d162c6db71e390b9bb265c/codex-rs/protocol/src/models.rs)
+uses a string-tagged enum; the importer deliberately retains the missing-tag
+compatibility behavior rather than claiming strict producer-schema equivalence.
+
+The rule applies only to supported user/assistant messages in the typed profile.
+The legacy `local` text extraction policy, unsupported-role/nonmessage skips and
+metadata-only archive utility paths are unchanged. Choosing the legacy profile
+solely to bypass a failed typed validation is not a repair. Obtain or investigate
+the valid source instead; existing archive messages are never rewritten.
+
+Whole-file typed validation runs before archive access, even when the malformed
+part is later in a message or in an unselected session. Inspection, inventory,
+conflict checks, import and source-attributed title generation therefore reject
+the same malformed source rather than using preceding text. Invalid typed content
+errors include the physical record line and fixed diagnostic labels, without
+echoing the content or malformed tag. Source files, hashes and valid occurrence
+locators are not changed. Existing archives and previously saved proposals are
+not retroactively rescanned or invalidated by this parser change.
+
 ## Source identities must resolve without guessing
 
 Web conversation records can provide `id` or `conversation_id`; local session

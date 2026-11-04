@@ -141,6 +141,9 @@ Title reads return current/original titles, suggestions and revision history fro
 one database snapshot. Separate commands can observe later changes.
 Local parsing now rejects malformed known response envelopes before archive work;
 valid unsupported records remain counted skips. See [input boundaries](docs/INPUT_SCOPE.md).
+Typed `local-codex` content also rejects malformed present type tags instead of
+silently losing a user request; missing tags and valid unknown variants retain
+their documented compatibility skips. Errors identify the physical record line.
 Web/local identity aliases must agree exactly when both are supplied, and malformed
 local message IDs cannot silently become filename/line IDs. Missing/null/empty
 fallback remains explicit compatibility. The same checks apply to inventory,

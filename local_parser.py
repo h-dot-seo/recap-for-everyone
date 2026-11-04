@@ -105,8 +105,15 @@ def _message_text(payload: dict[str, Any], content_profile: str = "legacy") -> s
             if content_profile == "codex":
                 raise LocalImportError("typed content item must be an object")
             continue
-        if content_profile == "codex" and item.get("type") not in ("input_text", "output_text"):
-            continue
+        if content_profile == "codex":
+            kind = item.get("type")
+            # Missing tags remain the deliberate untyped-content compatibility
+            # skip. A supplied malformed tag is not a valid unsupported variant:
+            # silently dropping it can erase the actual user request.
+            if "type" in item and (not isinstance(kind, str) or not kind.strip()):
+                raise LocalImportError("typed content item type must be nonempty text")
+            if kind not in ("input_text", "output_text"):
+                continue
         value = item.get("text")
         if content_profile == "codex" and not isinstance(value, str):
             raise LocalImportError("typed text content requires a string")
@@ -237,7 +244,11 @@ def parse_artifact(path: Path, source_relative_path: str, artifact_kind: str = "
                 not isinstance(timestamp, (str, int, float)) or
                 isinstance(timestamp, float) and not math.isfinite(timestamp)):
             raise LocalImportError(f"message timestamp must be text or a finite number: {path}:{line_number}")
-        text = _message_text(payload, content_profile)
+        try:
+            text = _message_text(payload, content_profile)
+        except LocalImportError as error:
+            # _message_text diagnostics contain fixed labels, never content.
+            raise LocalImportError(f"{error}: {path}:{line_number}") from error
         if content_profile == "codex":
             skipped_content_parts += sum(item.get("type") not in ("input_text", "output_text")
                                          for item in payload["content"])

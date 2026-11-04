@@ -1,12 +1,12 @@
 {
   "project": "recap-for-everyone",
-  "release": "0.66.0-selected-title-evidence",
+  "release": "0.67.0-typed-content-shapes",
   "date": "2026-11-04",
   "private_history_imported": false,
   "actual_corpora_included": false,
   "synthetic_examples_only": true,
   "license_status": "NOT_SELECTED",
-  "file_count": 144,
+  "file_count": 145,
   "files": [
     {
       "path": ".gitattributes",
@@ -30,8 +30,8 @@
     },
     {
       "path": "README.md",
-      "bytes": 63903,
-      "sha256": "47d680df015e1f5ea73a828a62b61eb46c591c64a2799951a5ee9ab1961c2f47"
+      "bytes": 64142,
+      "sha256": "c856fdd5679b3f22c1fe3cdd57e3ad5581e3875fd54e1d162d068a9c8fa34acd"
     },
     {
       "path": "RIGHTS.md",
@@ -50,8 +50,8 @@
     },
     {
       "path": "VALIDATION.md",
-      "bytes": 48634,
-      "sha256": "84ed37e35e3eaf9108312f36230592557015a03ab158a9c2e1746788a12975eb"
+      "bytes": 50655,
+      "sha256": "1697b34078945efcb36e7d1ed6342d0c46c522c960b058bb102155f9e51bcb49"
     },
     {
       "path": "attributed_title.py",
@@ -105,8 +105,8 @@
     },
     {
       "path": "docs/INPUT_SCOPE.md",
-      "bytes": 16753,
-      "sha256": "bdea318153965a5b49b3d938650b517e7ee4164bd6e303b0f9387d4ddf49656a"
+      "bytes": 19228,
+      "sha256": "efe1c9acd2864a333c7da7461efb605b30efd8074618275c67d46e678f3de049"
     },
     {
       "path": "docs/MESSAGE_SELECTION.md",
@@ -260,8 +260,8 @@
     },
     {
       "path": "local_parser.py",
-      "bytes": 20605,
-      "sha256": "ddc81fa1e69ba574c6c25a1f13734bbf16d3916e8c52be8855e97d195b085910"
+      "bytes": 21262,
+      "sha256": "03f56a21b400469670b3f2c10a4f2c787fb9ecd9bc88a3f927a9677fb63fbc41"
     },
     {
       "path": "prepare_web_export.py",
@@ -617,6 +617,11 @@
       "path": "test_title_walkthrough.py",
       "bytes": 5312,
       "sha256": "a95bba432960cf926d85ca032e1deb2835956001e00c8f74fdfab0fe36ebc2df"
+    },
+    {
+      "path": "test_typed_content_shapes.py",
+      "bytes": 14118,
+      "sha256": "b4a41d04ff40235a573f67b7c8d7d51fae10316ef7c4846c86ea352490fe7954"
     },
     {
       "path": "test_unicode_cli_titles.py",
