@@ -1291,3 +1291,50 @@ Linux. The corrected module passes 12 tests; the final complete suite passes 817
 tests in 103.746 seconds. Public audit and manifest still cover 161 files. A new
 exact-commit four-platform CI run is required after this correction is pushed;
 the earlier failed run remains recorded as failed.
+
+### 2026-11-04: discover a session by remembered message text before import
+
+Two synthetic local sessions with opaque IDs reproduced the next usability gap:
+metadata-only --contains could not find a remembered phrase present in extracted
+message text, and archive find required importing first. list-export now offers
+explicit --text-contains in both CLIs and the keyword-only Python API. It is
+mutually exclusive with metadata --contains, which retains its existing behavior.
+
+Text mode matches one literal case-folded substring inside one normalized message,
+with optional existing canonical-Unicode matching. It never joins separate messages
+or searches source metadata as body text. Returned identities add matched_messages
+and sorted matched_role_counts; each matching normalized occurrence counts once,
+not each repeated substring. Full identity metadata and selection blockers remain.
+The filter reports global matching counts while pagination uses matching-ID offsets.
+Default and metadata-filter output matched the previous published implementation
+exactly in twelve independent comparisons across all three formats.
+
+The output contains no extracted body/excerpt/message-ID/locator fields, but the
+echoed query can itself reveal message text. Matching includes all supported
+extracted roles, alternate web branches and raw local rollback/harness text. It is
+not a user-intent, active-history, title-quality, privacy or completeness guarantee.
+The chosen parser's extraction rules, whole-file validation, original hash lease,
+one-read snapshot and lack of database access remain unchanged. No automatic
+selection or import occurs; selected import still keeps the whole chosen identity.
+
+Twenty independent synthetic tests cover opaque IDs, role/occurrence counts,
+literal punctuation and whitespace, Unicode expansion and canonical matching,
+legacy/typed parser differences, supported web text fields, omissions, duplicate
+web-ID ambiguity, off-path/rollback text, sparse matches beyond the first 1000 IDs,
+invalid arguments before reads, malformed unmatched content, no-body result fields,
+source/hash integrity and both CLI entry points. All three formats complete
+hash-bound selected import, native UTF-8 proposal/preview and explicit title apply.
+
+The documentation's three discovery commands and eight walkthrough commands run
+exactly, with tokenization before platform-path substitution. The walkthrough
+finds one user match among six raw local messages, imports the checked full hash,
+selects the retained focus-user message, verifies saved UTF-8 receipt hashes, and
+keeps title revision zero until explicit apply. Original messages, provenance,
+occurrence records and source bytes remain unchanged. Test SQLite handles close
+explicitly and subprocess text mode handles native line endings.
+
+The final full suite passes 837 tests in 141.148 seconds; the focused inventory,
+source-hash, first-run and scoped-title bundle passes 96. Public audit and byte
+manifest cover 162 files. No real data, model transmission, source modification,
+remote title mutation or merge occurs. Exact-commit Ubuntu/Windows Python 3.10/3.12
+CI is checked after push.

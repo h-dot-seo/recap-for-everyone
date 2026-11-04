@@ -41,8 +41,12 @@ without creating a database or printing message bodies. IDs/titles may still be
 private. The inventory's optional `--contains` filter can find part of an existing
 web title or ID before paging, without searching message bodies or relaxing
 full-file validation. Use its exact returned ID for selection. Do not import the
-whole file merely to learn an ID if that exceeds your intended scope. Local formats
-use the session ID:
+whole file merely to learn an ID if that exceeds your intended scope. For an opaque
+local ID or generic web title, explicitly use `list-export --text-contains` to locate
+a remembered phrase inside supported extracted messages. It returns IDs and counts,
+not body fields, but its echoed query can be private. This searches all raw extracted
+roles/branches/turns, not only active or human-authored history; later selected import
+still keeps the entire chosen conversation. Local formats use the session ID:
 
 ```sh
 python recap.py inspect examples/rollback-session.jsonl --format local-codex --conversation synthetic-rollout

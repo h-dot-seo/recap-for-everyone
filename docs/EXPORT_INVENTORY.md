@@ -91,7 +91,8 @@ the same flags. Python callers use the keyword-only `contains=` and
 
 By default, Unicode normalization is not performed. Add `--canonical-unicode`
 when composed/decomposed spelling should match, for example NFC and decomposed
-Korean or accented text. It requires `--contains` and uses the existing
+Korean or accented text. It requires `--contains` or the explicit message-text
+filter below, and uses the existing
 `NFC(NFD(text).casefold())` search-copy rule. The receipt records the normalization
 and runtime Unicode version. It is not accent removal, compatibility-width folding,
 transliteration or fuzzy matching. Original IDs, titles, source bytes and hashes
@@ -125,6 +126,105 @@ source-reading scope. Every call still reads and validates the full file and
 extracts supported text internally before building the body-free inventory.
 Filtering is not a streaming, memory-bound, redaction or completeness guarantee.
 The echoed query, IDs and titles may be private, even when no body field appears.
+
+## Find a conversation by remembered message text
+
+Local session IDs may be opaque and web titles may all say `New chat`. If you
+remember a phrase from a message instead, explicitly use `--text-contains`:
+
+```sh
+python recap.py list-export examples/web-export.json --format web --text-contains "orchard experiment"
+python recap.py list-export examples/source-attributed-session.jsonl --format local-codex --text-contains "lunar calendar"
+python export_inventory.py examples/source-attributed-session.jsonl --format local-codex --text-contains "LUNAR CALENDAR" --canonical-unicode
+```
+
+This returns the exact conversation ID, existing titles and counts, **not message
+bodies, excerpts, message IDs or source locators**. Choose either `--contains`
+(metadata) or `--text-contains` (extracted message text), not both. Existing
+metadata searches do not start searching bodies implicitly. Python callers add
+keyword-only `text_contains=...`; the existing positional arguments stay unchanged.
+Both filters use the same nonblank, valid-Unicode, 256-code-point query limit,
+literal case folding and optional canonical-Unicode matching. Leading/trailing
+query whitespace is meaningful. Use `--text-contains=VALUE` for a leading hyphen.
+
+A phrase must occur inside **one normalized extracted message**. Separate messages,
+conversation IDs, titles, metadata and sessions are never joined for matching.
+Content parts joined by the existing extractor can match across their inserted
+newline. Extraction still follows the chosen format: `local` uses legacy dictionary
+text extraction and whitespace cleanup, `local-codex` preserves supported typed
+input/output text, and web text uses its supported parts/code/output shapes. Records
+or parts omitted by that parser are not searched or inferred. Legacy `local` can
+extract a dictionary's text regardless of its content type; choose `local-codex`
+when you need the narrower typed-content extraction contract.
+
+All extracted roles are searched: user/assistant for these local adapters and also
+system/tool for web. All web branches and raw local messages remain in scope,
+including rolled-back local turns and harness text inside an extracted message.
+This does not reconstruct the visible branch, retained history or human-authored
+parts. A match is not proof of user intent, completeness or suitable title evidence.
+For narrower title evidence, use the separate verified branch/replay/attribution
+workflows after deliberate import.
+
+In text mode only, each returned identity adds `matched_messages` and
+`matched_role_counts`. Each matching normalized message occurrence counts once,
+even if the phrase repeats within it. Repeated source records can count separately,
+including records that import later deduplicates or rejects. Existing
+`extracted_messages`, `role_counts`, original titles and blockers still describe
+the entire identity. Duplicate web IDs remain `AMBIGUOUS_WEB_ID` even if only one
+record's body matches; filtering never chooses that record or repairs the identity.
+
+The `filter` summary reports `text_contains`, the matching scope, global
+`matched_messages`, `matched_conversations` and `matched_selectable_conversations`.
+These counts cover all matches, not just the page. Existing top-level counts,
+coverage and original hash remain whole-file values. Empty/media-only identities
+cannot match without extracted text; zero matches do not prove the source has no
+relevant media or omitted content. Full-file validation still rejects malformed
+unmatched content, even for zero results or an offset beyond the last match.
+
+Pages use matching-ID offsets in the same exact Unicode-code-point order. Keep the
+same phrase and canonical mode and use the first response's original hash on later
+pages. Restart at offset zero when changing the query. This is read-only full-file
+parsing, not a streaming search, private-text minimization, automatic selection,
+import or model call. No database is accessed, even if the unified CLI is given
+`--db`.
+
+**The echoed query may itself reveal message text.** IDs, source titles and match
+counts can also be sensitive. `contains_message_text:false` only means extracted
+message-body fields are omitted; it is not redaction or permission to share output.
+
+### From a phrase to a reviewed title
+
+Use a new private directory outside the repository. Do not overwrite an existing
+scratch directory or saved document. These exact commands use only shipped
+invented content:
+
+```sh
+mkdir ../recap-text-search-demo
+python recap.py list-export examples/title-focus-local.jsonl --format local-codex --text-contains "orchard watering"
+python recap.py --db ../recap-text-search-demo/archive.sqlite import examples/title-focus-local.jsonl --format local-codex --source local-search --conversation synthetic-local-focus --expected-export-sha256 4bf9f45d8f22b79b4469002d62a4b3ef82a60fdceb340b0c2bfdd036f678209b
+python recap.py --db ../recap-text-search-demo/archive.sqlite show --source local-search --conversation synthetic-local-focus --message focus-user
+python recap.py --db ../recap-text-search-demo/archive.sqlite suggest-replay-title examples/title-focus-local.jsonl --source local-search --conversation synthetic-local-focus --message focus-user --output ../recap-text-search-demo/proposal.json
+python recap.py --db ../recap-text-search-demo/archive.sqlite preview-title ../recap-text-search-demo/proposal.json --with-evidence --output ../recap-text-search-demo/reviewed.json
+```
+
+The inventory identifies `synthetic-local-focus`, with one matching user message
+among six raw messages. The fixed digest above belongs only to this unchanged
+example; use your own inventory's `original_sha256` for your file. Selected import
+keeps the **entire conversation**, not just matching messages. Inspect `focus-user`
+and the actual saved proposal/preview, rather than treating a search match or a
+`SAVED` receipt as approval. The verified replay excludes the rolled-back turn;
+the proposed title is `Compare synthetic orchard watering schedules`, with the
+same 80-code-point excerpt cap and separate title revision/content checks.
+
+Only after reviewing the selected identity, evidence and proposed wording:
+
+```sh
+python recap.py --db ../recap-text-search-demo/archive.sqlite apply-title ../recap-text-search-demo/reviewed.json
+python recap.py --db ../recap-text-search-demo/archive.sqlite find "orchard watering" --source local-search
+```
+
+The local title changes only on explicit apply. Original messages, export bytes
+and provenance remain intact, and nothing is renamed in the live source app.
 
 ## Pages, privacy and unchanged source bytes
 

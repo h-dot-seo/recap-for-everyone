@@ -36,8 +36,11 @@ without printing message-body fields or creating a database. Titles and IDs can
 still be private. Follow the selected-import steps in [input scope](INPUT_SCOPE.md).
 If you know part of an existing web title or local session ID, add
 `--contains "remembered text"` to `list-export` to filter metadata before paging.
-This does not search message bodies or reduce full-file validation. Select the
-returned exact ID and hash deliberately; a title match does not authorize import.
+This metadata filter does not search message bodies. If you remember a message
+phrase instead, explicitly use `--text-contains "remembered phrase"`; it returns
+IDs and match counts without body fields. The echoed query may itself be private.
+Neither filter reduces full-file validation. Select the returned exact ID and hash
+deliberately; a match does not authorize import or identify suitable title evidence.
 
 ## Try the entire journey with 24 invented conversations
 

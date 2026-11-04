@@ -1062,3 +1062,14 @@ with authenticated human authorship. See the [synthetic walkthrough and strict
 compatibility contract](docs/SOURCE_ATTRIBUTED_TITLES.md). Raw inspection surfaces
 metadata presence without filtering by it. Existing raw/branch/replay title paths
 remain available; the replay grammar also now accepts explicit legacy history mode.
+
+## Find a session by remembered text before import
+
+`list-export --text-contains "remembered phrase"` can find opaque local session IDs
+or generically titled web conversations through one literal extracted-message
+substring. It returns IDs, existing titles and matching message/role counts without
+body fields. This explicit mode is separate from metadata-only `--contains`;
+neither changes source files, opens a database or imports automatically. The query
+itself can be private. Full-file validation and raw branch/rollback scope remain.
+Use the returned exact ID and original hash for selected import, then independently
+review title evidence. See [message-text discovery and reviewed-title example](docs/EXPORT_INVENTORY.md#find-a-conversation-by-remembered-message-text).

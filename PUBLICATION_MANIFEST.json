@@ -1,12 +1,12 @@
 {
   "project": "recap-for-everyone",
-  "release": "0.77.1-cli-line-ending-tests",
+  "release": "0.78.0-export-text-discovery",
   "date": "2026-11-04",
   "private_history_imported": false,
   "actual_corpora_included": false,
   "synthetic_examples_only": true,
   "license_status": "NOT_SELECTED",
-  "file_count": 160,
+  "file_count": 161,
   "files": [
     {
       "path": ".gitattributes",
@@ -30,8 +30,8 @@
     },
     {
       "path": "README.md",
-      "bytes": 67682,
-      "sha256": "cd409b08b5a47230b01ae2d7b7d35e3fa378b61dda985802b2844fe257c8f7ed"
+      "bytes": 68460,
+      "sha256": "122867e6690e02f0d0c394d4726c71bc69fffd5a8a33e0d362c55e08c382b233"
     },
     {
       "path": "RIGHTS.md",
@@ -50,8 +50,8 @@
     },
     {
       "path": "VALIDATION.md",
-      "bytes": 83209,
-      "sha256": "ede1f2dbcd352460cdfe3162d0ad791c664f034f796a484ee24c5c83ba0b4699"
+      "bytes": 86370,
+      "sha256": "d6d34270aca625c7b449902e36fea87656c11f750a2aa75a9d985e83d3962eea"
     },
     {
       "path": "attributed_title.py",
@@ -90,8 +90,8 @@
     },
     {
       "path": "docs/EXPORT_INVENTORY.md",
-      "bytes": 9199,
-      "sha256": "a28997c2f066a39e4096f86ce0fbae39b3b045df82ec1fb61397829eeaf6a790"
+      "bytes": 15810,
+      "sha256": "739cb8307dc606ffd7f2676403ffae080e45a1f089a257b9832b472e60a515c5"
     },
     {
       "path": "docs/EXPORT_SCOPED_SEARCH.md",
@@ -105,8 +105,8 @@
     },
     {
       "path": "docs/INPUT_SCOPE.md",
-      "bytes": 26107,
-      "sha256": "a932dbb55e1033547471949622a68836bac57837cc4a51ef7406b6f41bf488da"
+      "bytes": 26508,
+      "sha256": "691120de9beab52c9a77e1eaf933390780e507fb38e4d029a080650857b87808"
     },
     {
       "path": "docs/INSTALL.md",
@@ -150,8 +150,8 @@
     },
     {
       "path": "docs/START_HERE.md",
-      "bytes": 12268,
-      "sha256": "d22acec5b5d353e9fd3ace1bdceb78f4aaf46658c5f45d326d1587690983aa6c"
+      "bytes": 12517,
+      "sha256": "59b9d61677dcdbe6531de584e078c1af11f34942c6038f48c8764f23eafb03e9"
     },
     {
       "path": "docs/SUPPLIED_TITLE_REVIEW.md",
@@ -260,8 +260,8 @@
     },
     {
       "path": "export_inventory.py",
-      "bytes": 6929,
-      "sha256": "1e439ddbfdd97b060436b3543e37db0f6422087ff2d4062f597f815fcc38cf98"
+      "bytes": 9328,
+      "sha256": "b77d38461d8edde29b315e540fcd29472f41dc4b20f4446b99b9e968597506c7"
     },
     {
       "path": "import_check.py",
@@ -285,8 +285,8 @@
     },
     {
       "path": "recap.py",
-      "bytes": 26536,
-      "sha256": "d1e11cae1c4a3165c2def8e9a552c1630fc26148aa1eda51f8441f5ef966e39e"
+      "bytes": 26833,
+      "sha256": "b9a629daab3debb05a9212a4294356f63e8f4d792470acdf5f0e49ad7e65cc11"
     },
     {
       "path": "replay_local.py",
@@ -387,6 +387,11 @@
       "path": "test_export_inventory_filter.py",
       "bytes": 18867,
       "sha256": "f606c5d9d0cf1dce56647fac663ff7b2bc40eb80ba65e292105b6e2da8bcefb3"
+    },
+    {
+      "path": "test_export_inventory_text_filter.py",
+      "bytes": 25819,
+      "sha256": "dffb92e7ee40275c32a60d2123c948cad7eb9691d6e4d4846e11fa4055cb92e7"
     },
     {
       "path": "test_export_occurrences.py",

@@ -153,8 +153,10 @@ def main():
     inventory.add_argument('input'); inventory.add_argument('--format', choices=['web', 'local', 'local-codex'], required=True)
     inventory.add_argument('--limit', type=int, default=50); inventory.add_argument('--offset', type=int, default=0)
     inventory.add_argument('--expected-export-sha256', help='require the same original whole-file hash as an earlier page')
-    inventory.add_argument('--contains', help='filter IDs or existing web titles by one literal case-insensitive substring before pagination')
-    inventory.add_argument('--canonical-unicode', action='store_true', help='match canonical Unicode equivalents; requires --contains')
+    filters = inventory.add_mutually_exclusive_group()
+    filters.add_argument('--contains', help='filter IDs or existing web titles by one literal case-insensitive substring before pagination')
+    filters.add_argument('--text-contains', help='find IDs by one literal substring in extracted message text; return metadata and match counts, not bodies')
+    inventory.add_argument('--canonical-unicode', action='store_true', help='match canonical Unicode equivalents; requires --contains or --text-contains')
     zip_info = sub.add_parser('inspect-web-zip', help='list conventional conversation JSON member metadata without decompression')
     zip_info.add_argument('input'); zip_info.add_argument('--limit', type=int, default=50); zip_info.add_argument('--offset', type=int, default=0)
     zip_info.add_argument('--expected-archive-sha256', help='require the same whole ZIP byte snapshot as an earlier candidate page')
@@ -250,7 +252,8 @@ def main():
         if args.command == 'list-export':
             from export_inventory import list_export
             result = list_export(args.input, args.format, args.limit, args.offset, args.expected_export_sha256,
-                                 contains=args.contains, canonical_unicode=args.canonical_unicode)
+                                 contains=args.contains, canonical_unicode=args.canonical_unicode,
+                                 text_contains=args.text_contains)
         elif args.command == 'inspect-web-zip':
             from inspect_web_zip import inspect_web_zip
             result = inspect_web_zip(args.input, args.limit, args.offset, args.expected_archive_sha256)
