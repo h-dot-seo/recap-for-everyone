@@ -930,3 +930,40 @@ All 709 local tests pass again, including 18 native-output tests; final publicat
 and manifest checks cover 152 files. Exact-commit four-platform CI is rechecked after
 publishing this test-only correction. No real data or additional runtime behavior
 is introduced.
+
+### 2026-11-04: editor-saved title document compatibility
+
+Synthetic reproduction showed that adding a single initial UTF-8 BOM to an otherwise
+valid title proposal made both the single-document and supplied-candidate readers
+reject it. Title proposal/preview reading, supplied proposal reading and saved queues
+for explicit review-state decisions now use the existing strict UTF-8 source decoder.
+Only one signature at the beginning is consumed. Embedded U+FEFF string data remains
+exact; files are not rewritten, and native output still writes UTF-8 without a BOM.
+
+Fourteen synthetic tests exercise both encodings with Unicode, leading JSON
+whitespace and embedded signature characters; repeated/noninitial signatures,
+UTF-16/UTF-32, invalid UTF-8, duplicate keys, unpaired surrogates and excessive
+nesting remain failures. The supplied-file cumulative byte limit counts original
+BOM bytes, including at its exact boundary. Shared in-memory JSON decoding and the
+provider/consent/transfer/title-plan file contracts are not broadened.
+
+The web-branch and typed local-attribution journeys generate native proposal files,
+simulate editor-added signatures, preview private evidence without archive changes,
+then explicitly apply and search. Standalone preview/apply parity, mixed supplied
+queues, explicit deferred state, stale state/revision/content rejection, output
+absence on failure, receipt misuse and original file preservation are covered.
+The supplied-candidate guide now uses actual native --output files; its command
+test validates saved contents and receipt hashes rather than writing captured stdout.
+
+A related reproduction found that a JSON queue could decode successfully but exceed
+recursion capacity while detaching a selected item. Selected queue items/proposals
+and supplied candidates now turn deepcopy RecursionError into a fixed ValueError,
+without private exception text or traceback. Tests cover the clean CLI failure
+with and without a BOM and both detached selection stages with injected errors.
+There is no universal numeric nesting promise or increase to interpreter limits.
+
+The complete local suite passes 723 tests; the final focused encoding, supplied
+queue and native-output suites pass 49 tests. Publication audit and byte manifest
+cover 153 files. The new tests were authored in this task, not independently
+reviewed. No real exports, account collection, model transmission, original-session
+rename or merge occurs. Four-platform exact-commit CI is verified after publication.

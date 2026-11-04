@@ -77,6 +77,10 @@ titles and text; the original `search` command still performs message-level FTS.
 Use `--output NEW_JSON` on title suggestions, review queues and previews to create
 UTF-8 files without overwriting existing paths or relying on shell redirection.
 Stdout then contains a receipt; open the saved document before applying.
+Editor-saved title proposals, queues and previews can contain one initial UTF-8
+BOM; reading preserves file bytes and all evidence/revision checks. UTF-16 and
+malformed JSON remain unsupported.
+
 [Native title JSON files](docs/TITLE_DOCUMENT_FILES.md) lists supported commands
 and filesystem limits. The default stdout mode remains available.
 Add `preview-title --with-evidence` for an explicitly requested private view of

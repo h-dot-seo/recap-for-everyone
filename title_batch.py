@@ -11,6 +11,7 @@ from title_rules import validate_title
 from title_review import assess_title
 from title_review_state import state_snapshot
 from strict_json import loads
+from source_text import decode_source
 
 SCHEMA = 'recap.title-review-queue.v1'
 MAX_SUPPLIED_PROPOSALS = 1000
@@ -29,7 +30,7 @@ def load_supplied_proposals(paths):
         if used > MAX_SUPPLIED_BYTES:
             raise ValueError('supplied proposal files exceed the combined 1 MiB limit')
         try:
-            proposal = loads(raw.decode('utf-8'))
+            proposal = loads(decode_source(raw))
             # Python's decoder accepts NaN/Infinity and can overflow large JSON
             # exponents. Reject nonfinite values anywhere in retained metadata.
             json.dumps(proposal, ensure_ascii=False, allow_nan=False)
@@ -154,7 +155,7 @@ def review_queue(db, source, limit=20, offset=0, unrenamed_only=False, review_st
                     except (ValueError, TypeError, KeyError):
                         item.update(status='UNAVAILABLE', reason_code='SUPPLIED_PROPOSAL_INVALID')
                     else:
-                        proposal = copy.deepcopy(candidate)
+                        proposal = _copy_queue_value(candidate)
             else:
                 try:
                     proposed = excerpt(rows)
@@ -227,6 +228,13 @@ def review_queue(db, source, limit=20, offset=0, unrenamed_only=False, review_st
         connection.close()
 
 
+def _copy_queue_value(value):
+    try:
+        return copy.deepcopy(value)
+    except RecursionError:
+        raise ValueError('selected queue item nesting is too deep') from None
+
+
 def select_queue_item(queue, conversation):
     """Select exactly one untrusted item, including an unavailable suggestion."""
     if not isinstance(queue, dict) or queue.get('schema') != SCHEMA or not isinstance(queue.get('items'), list):
@@ -234,7 +242,7 @@ def select_queue_item(queue, conversation):
     matches = [item for item in queue['items'] if isinstance(item, dict) and item.get('conversation') == conversation]
     if len(matches) != 1:
         raise ValueError('select exactly one conversation from the queue')
-    return copy.deepcopy(matches[0])
+    return _copy_queue_value(matches[0])
 
 
 def select_proposal(queue, conversation):
@@ -245,4 +253,4 @@ def select_proposal(queue, conversation):
     proposal = item.get('proposal')
     if not isinstance(proposal, dict) or proposal.get('source') != queue.get('source') or proposal.get('conversation') != conversation:
         raise ValueError('queue and proposal identities do not match')
-    return copy.deepcopy(proposal)
+    return _copy_queue_value(proposal)

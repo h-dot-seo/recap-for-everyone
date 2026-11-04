@@ -11,6 +11,7 @@ from title_rules import validate_title
 from title_review import assess_title
 from conversation_view import _inventory
 from title_evidence import review_evidence
+from source_text import decode_source
 
 
 def _freeze_document(value):
@@ -26,9 +27,9 @@ def _freeze_document(value):
 
 
 def read_document(path):
-    """Read one explicit title JSON file with a clean excessive-nesting error."""
+    """Read strict UTF-8 title JSON, tolerating one initial UTF-8 signature."""
     try:
-        return loads(Path(path).read_text(encoding='utf-8'))
+        return loads(decode_source(Path(path).read_bytes()))
     except RecursionError:
         raise ValueError('title document nesting is too deep') from None
 

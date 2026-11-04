@@ -13,17 +13,19 @@ in this mode, calls a model, applies titles or changes a remote conversation.
 ## Synthetic web/local workflow
 
 Run from the repository root. Create a new private scratch directory outside it;
-choose another path if this one already exists. Redirection must write UTF-8, such
-as a POSIX shell or PowerShell 7. `>` overwrites its target before execution, so use
-new files, check each exit status and stop on failure.
+choose another path if this one already exists. Supported title commands save
+UTF-8 files directly with `--output`; existing paths are refused, not overwritten.
+Use a private directory with hard-link support, check each exit status and stop
+on failure. Stdout is a metadata receipt, not the saved proposal or queue. See
+[saved title documents](TITLE_DOCUMENT_FILES.md) for the file and cleanup contract.
 
 ```sh
 mkdir ../recap-supplied-demo
 python recap.py --db ../recap-supplied-demo/archive.sqlite import examples/web-export.json --format web --source demo
 python recap.py --db ../recap-supplied-demo/archive.sqlite import examples/source-attributed-session.jsonl --format local-codex --source demo
-python recap.py --db ../recap-supplied-demo/archive.sqlite suggest-branch-title examples/web-export.json --source demo --conversation synthetic-chat --node m2 > ../recap-supplied-demo/web-proposal.json
-python recap.py --db ../recap-supplied-demo/archive.sqlite suggest-attributed-title examples/source-attributed-session.jsonl --source demo --conversation synthetic-attributed > ../recap-supplied-demo/local-proposal.json
-python recap.py --db ../recap-supplied-demo/archive.sqlite review-titles --source demo --proposal ../recap-supplied-demo/web-proposal.json --proposal ../recap-supplied-demo/local-proposal.json --supplied-only > ../recap-supplied-demo/queue.json
+python recap.py --db ../recap-supplied-demo/archive.sqlite suggest-branch-title examples/web-export.json --source demo --conversation synthetic-chat --node m2 --output ../recap-supplied-demo/web-proposal.json
+python recap.py --db ../recap-supplied-demo/archive.sqlite suggest-attributed-title examples/source-attributed-session.jsonl --source demo --conversation synthetic-attributed --output ../recap-supplied-demo/local-proposal.json
+python recap.py --db ../recap-supplied-demo/archive.sqlite review-titles --source demo --proposal ../recap-supplied-demo/web-proposal.json --proposal ../recap-supplied-demo/local-proposal.json --supplied-only --output ../recap-supplied-demo/queue.json
 ```
 
 Open all three output files. The queue has two `READY` candidates: the orchard
@@ -35,7 +37,7 @@ Branch/attribution context is retained for inspection, not authenticated anew.
 Select one candidate for a fresh preview:
 
 ```sh
-python recap.py --db ../recap-supplied-demo/archive.sqlite preview-title ../recap-supplied-demo/queue.json --conversation synthetic-attributed > ../recap-supplied-demo/reviewed.json
+python recap.py --db ../recap-supplied-demo/archive.sqlite preview-title ../recap-supplied-demo/queue.json --conversation synthetic-attributed --output ../recap-supplied-demo/reviewed.json
 ```
 
 **Read `reviewed.json` before continuing.** Confirm source `demo`, conversation
@@ -53,6 +55,14 @@ The existing [review-state controls](TITLE_REVIEW_STATE.md), `--unrenamed-only`,
 state filters and explicit replacement wording still work with supplied queues.
 
 ## Input and per-item checks
+
+A supplied proposal can be UTF-8 with or without one signature (BOM) at the
+very start of the file. The combined byte limit counts the original bytes, including
+that signature. UTF-16, repeated or misplaced signatures outside JSON strings,
+duplicate JSON members and malformed text remain invalid. A signature inside a
+JSON string remains ordinary content; it is never stripped from evidence or titles.
+The same file decoding applies to saved queues used for preview/review-state and
+saved previews used for explicit apply. No files are rewritten during reading.
 
 Each file contains one ordinary proposal JSON object, not an entire queue or a
 reviewed preview. Use the existing proposal contract: exact source/conversation,

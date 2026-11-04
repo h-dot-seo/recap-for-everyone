@@ -283,9 +283,10 @@ class SuppliedTitleQueueTests(unittest.TestCase):
             self.assertEqual(args[:2], ['python', 'recap.py'])
             args[0] = sys.executable
             target = None
-            if '>' in args:
-                position = args.index('>'); self.assertEqual(len(args), position+2)
-                target = Path(args[position+1]); args = args[:position]
+            self.assertNotIn('>', args)
+            if '--output' in args:
+                position = args.index('--output'); self.assertEqual(len(args), position+2)
+                target = Path(args[position+1])
                 self.assertFalse(target.exists())
             if 'apply-title' in args:
                 reviewed = json.loads((scratch/'reviewed.json').read_text(encoding='utf-8'))
@@ -300,7 +301,15 @@ class SuppliedTitleQueueTests(unittest.TestCase):
             result = subprocess.run(args, capture_output=True, timeout=20)
             self.assertEqual(result.returncode, 0, result.stderr)
             value = json.loads(result.stdout)
-            if target is not None: target.write_bytes(result.stdout)
+            if target is not None:
+                self.assertEqual(value['schema'], 'recap.saved-title-json.v1')
+                self.assertEqual(value['status'], 'SAVED')
+                raw = target.read_bytes()
+                self.assertEqual(value['bytes'], len(raw))
+                self.assertEqual(value['sha256'], hashlib.sha256(raw).hexdigest())
+                self.assertTrue(value['staging_cleanup_complete'])
+                self.assertFalse(raw.startswith(b'\xef\xbb\xbf'))
+                value = json.loads(raw)
             if 'review-titles' in args:
                 self.assertEqual(value['ready_count'], 2)
                 local = select_proposal(value, 'synthetic-attributed')

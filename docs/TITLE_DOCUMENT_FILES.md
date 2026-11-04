@@ -61,8 +61,23 @@ Without `--output`, stdout behavior and JSON shapes remain unchanged.
 The program writes UTF-8 **without a BOM**, readable Unicode and a final newline.
 It does not depend on the shell's redirection encoding. Korean and emoji remain
 literal characters in the saved JSON; the metadata receipt remains ASCII-safe.
-Existing UTF-16 or malformed proposal files are not converted or repaired. Generate
-a fresh valid file rather than renaming or editing encodings blindly.
+If an editor subsequently saves a proposal, queue or reviewed preview as UTF-8
+with one BOM at the very start, title preview/apply, supplied-candidate review and
+`review-state --from-queue` accept it. The same applies to standalone preview/apply.
+This only removes the initial file signature during decoding: a U+FEFF character
+inside a JSON string stays unchanged. Repeated signatures or signatures outside
+JSON strings elsewhere remain invalid. The supplied-proposal byte budget still
+counts every original byte, including the BOM. Reading never rewrites the file.
+
+Existing UTF-16/UTF-32 or malformed proposal files are not converted or repaired.
+This tolerance does not change shared JSON parsing, provider payload/consent files,
+transfer documents or title plans. Native output remains UTF-8 without a BOM.
+Generate a fresh valid file rather than renaming or editing encodings blindly.
+All document-shape, evidence, content-fingerprint and revision checks still apply;
+a file signature does not establish authenticity, approval or currentness.
+Deeply nested selected queue items or supplied candidates fail with a fixed diagnostic if copying
+exceeds the runtime recursion capacity, rather than printing a traceback. There is
+no new fixed nesting guarantee or raised interpreter recursion limit.
 
 The destination's parent must already exist. Full generation/validation and JSON
 serialization complete before staging. A private same-directory temporary file is

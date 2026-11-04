@@ -247,8 +247,8 @@ def main():
             if args.from_queue is not None:
                 if args.set is None or any(value is not None for value in (args.expected_state_revision, args.expected_title_revision, args.expected_content_sha256)):
                     raise ValueError('--from-queue requires --set and cannot be combined with explicit expected values')
-                from strict_json import loads
-                queue = loads(Path(args.from_queue).read_text(encoding='utf-8'))
+                from title_proposal import read_document
+                queue = read_document(args.from_queue)
                 result = review_state_from_queue(args.db, args.source, args.conversation, args.set, queue)
             else:
                 result = review_state(args.db, args.source, args.conversation, args.set, args.expected_state_revision, args.expected_title_revision, args.expected_content_sha256)
