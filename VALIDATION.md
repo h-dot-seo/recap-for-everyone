@@ -257,3 +257,17 @@ trips and clean CLI errors without input content. The complete suite now passes
 The earlier web-branch ASCII-output fixture now uses valid Korean/emoji text.
 A separate regression explicitly rejects the formerly accepted lone-surrogate
 branch input without altering the export or echoing its content.
+
+### 2026-11-04: selected conversation evidence
+
+Fourteen new synthetic tests cover exact-message and paginated detail views,
+validation before database access, empty pages, source/conversation isolation,
+quoted IDs, legacy/absent provenance, current/original title preservation, CLI
+parity and rejection, Unicode output under ASCII terminals and no-write checks.
+SQLite row-factory instrumentation verifies that only selected bodies and
+provenance are materialized. A WAL regression mutates title/body/provenance during
+the read and confirms that the current result retains one consistent snapshot. A search-to-detail round trip retains exact snippet
+offsets and source-artifact provenance. The complete suite passes 310 tests. Publication scan and byte-manifest verification
+cover the selected 99-file candidate. Pagination limits message count, not bytes
+or occurrences; separate requests do not share a durable snapshot. No real corpus
+or external service is tested.

@@ -1,12 +1,12 @@
 {
   "project": "recap-for-everyone",
-  "release": "0.44.0-unicode-import-boundaries",
+  "release": "0.45.0-selected-message-evidence",
   "date": "2026-11-04",
   "private_history_imported": false,
   "actual_corpora_included": false,
   "synthetic_examples_only": true,
   "license_status": "NOT_SELECTED",
-  "file_count": 96,
+  "file_count": 98,
   "files": [
     {
       "path": ".gitattributes",
@@ -30,8 +30,8 @@
     },
     {
       "path": "README.md",
-      "bytes": 54349,
-      "sha256": "ad1ea07c27808997562bae27110f475bcbe8b48299e4375e70f60bf03888c701"
+      "bytes": 54914,
+      "sha256": "48cdf0f703ed2b294701272fd1f0af7259af5b6ef80a223a13b8ab2cf8796f4f"
     },
     {
       "path": "RIGHTS.md",
@@ -45,13 +45,13 @@
     },
     {
       "path": "SKILL.md",
-      "bytes": 1783,
-      "sha256": "bbb50149ce02719247e4f33306ddfa82744c7cba94de769f0ed950d94045b098"
+      "bytes": 2289,
+      "sha256": "7cebc1870a72b89735f7816fc089092756e012fea66de0b4accbc32cd3be7a93"
     },
     {
       "path": "VALIDATION.md",
-      "bytes": 15935,
-      "sha256": "0edbf85c5b8e3f5af4e83a11c4947eb5860b24d62481e2a02d1784a072a0de41"
+      "bytes": 16906,
+      "sha256": "960f952424cc592158b77084964c33110af50dec1656646ad5704e128691a215"
     },
     {
       "path": "audit_publication.py",
@@ -70,8 +70,8 @@
     },
     {
       "path": "conversation_view.py",
-      "bytes": 5848,
-      "sha256": "d83afc9414c13a04f8dd0395cd32acb7336edaf361f6ad65fc66029c06ac4689"
+      "bytes": 8454,
+      "sha256": "c035a75f3c685be40bbc1593601ce65de499ca64f9d0a8a9323210151dc1bdb7"
     },
     {
       "path": "docs/ARCHITECTURE.md",
@@ -87,6 +87,11 @@
       "path": "docs/INPUT_SCOPE.md",
       "bytes": 5807,
       "sha256": "d7b8e127998f17cd9ad13d06d4ea54edc8719add5a1b09db61971f88b45978c5"
+    },
+    {
+      "path": "docs/MESSAGE_SELECTION.md",
+      "bytes": 3753,
+      "sha256": "00f5a042c42004a2d2b0f16c8f01ebc48d71497307dda801c8e991e77c204469"
     },
     {
       "path": "docs/PREPARE_WEB_EXPORT.md",
@@ -185,8 +190,8 @@
     },
     {
       "path": "recap.py",
-      "bytes": 18977,
-      "sha256": "8a4750d53edddb19849b7ce28ac1c26619e88843b9f1374b13c3b07560b27a70"
+      "bytes": 19372,
+      "sha256": "3775558b15cd4486dd36594d5a645613240a421c8b54d3f291fbe6d6597c7cd0"
     },
     {
       "path": "replay_local.py",
@@ -232,6 +237,11 @@
       "path": "test_conversation_search.py",
       "bytes": 2048,
       "sha256": "6ab6b87cdcbe2e2c0693c1c8031f54a717d9ef049ec3afc4751814a210f0fed6"
+    },
+    {
+      "path": "test_conversation_selection.py",
+      "bytes": 16171,
+      "sha256": "f14317e8f788ad56b80b1999f199da80d568ee9e974cba472e6fc017a80fdef3"
     },
     {
       "path": "test_conversation_view.py",

@@ -167,6 +167,10 @@ def main():
     for name in ('show', 'suggest-title', 'title'):
         command = sub.add_parser(name)
         command.add_argument('--source', required=True); command.add_argument('--conversation', required=True)
+        if name == 'show':
+            command.add_argument('--limit', type=int, help='read at most this many messages (1..1000)')
+            command.add_argument('--offset', type=int, default=0, help='message offset; requires --limit')
+            command.add_argument('--message', help='read exactly this message ID; excludes --limit/--offset')
         if name == 'title':
             command.add_argument('--set'); command.add_argument('--expected-revision', type=int)
     args = p.parse_args()
@@ -260,7 +264,7 @@ def main():
             result = conversations(args.db, args.source, args.limit, args.offset)
         elif args.command == 'show':
             from conversation_view import conversation
-            result = conversation(args.db, args.source, args.conversation)
+            result = conversation(args.db, args.source, args.conversation, args.limit, args.offset, args.message)
         elif args.command == 'find':
             from conversation_search import find
             result = find(args.db, args.query, args.source, args.limit, args.include_title_history, args.export_sha256)
@@ -269,7 +273,7 @@ def main():
             result = suggest(args.db, args.source, args.conversation)
     except (OSError, ValueError, KeyError, TypeError, sqlite3.Error) as exc:
         p.exit(1, str(exc) + '\n')
-    print(json.dumps(result, ensure_ascii=args.command in ('inspect-web-zip', 'prepare-web-export', 'find', 'inspect', 'import', 'web-branch', 'suggest-branch-title', 'suggest-replay-title', 'preview-title', 'apply-title', 'review-titles', 'review-state', 'title-adapter-dry-run', 'title-adapter-simulate', 'export-title-plan', 'check-title-plan'), indent=2))
+    print(json.dumps(result, ensure_ascii=args.command in ('show', 'inspect-web-zip', 'prepare-web-export', 'find', 'inspect', 'import', 'web-branch', 'suggest-branch-title', 'suggest-replay-title', 'preview-title', 'apply-title', 'review-titles', 'review-state', 'title-adapter-dry-run', 'title-adapter-simulate', 'export-title-plan', 'check-title-plan'), indent=2))
 
 
 if __name__ == '__main__':

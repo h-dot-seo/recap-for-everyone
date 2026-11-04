@@ -874,3 +874,12 @@ If an older archive already stores a zero timestamp as `unknown`, reimport repor
 a conflicting identity and leaves the old evidence unchanged; it does not silently
 rewrite the archive. Use a separate archive/source for a deliberately corrected
 reimport and retain the original export for comparison.
+
+## Open only the evidence you need
+
+`show --message MESSAGE_ID` reads one exact archived message with its provenance.
+`show --limit 50 --offset 0` reads a message page and returns the next offset.
+Source/conversation identities remain explicit, title summaries and whole-conversation
+counts remain visible, and SQL limits both message and provenance retrieval. Omitting
+these options retains the existing full view. See [message selection and paging](docs/MESSAGE_SELECTION.md)
+for structured fields, snapshot limits and the path from a search result to evidence.

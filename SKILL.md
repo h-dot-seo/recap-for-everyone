@@ -25,3 +25,10 @@ and review title proposals before applying them.
 
 See the README workflow section for the new local CLI and explicit limitations.
 Use only authorized inputs; shipped examples are entirely synthetic.
+
+For a search hit, prefer `show --source SOURCE --conversation CONVERSATION --message MESSAGE_ID`
+to retrieve only that message's complete archived evidence. For longer sessions,
+use `show --limit N --offset OFFSET` and its `selection.next_offset`. Each call has
+one read snapshot; separate pages can change. The summary `message_count` remains
+the whole-conversation count. Do not mistake the selected view for export-scoped
+provenance or an active-branch reconstruction. See `docs/MESSAGE_SELECTION.md`.
