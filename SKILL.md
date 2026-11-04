@@ -48,3 +48,8 @@ Carry a reviewed inventory/inspection `original_sha256` into the optional
 `--expected-export-sha256` on later pages, inspection or import when exact source
 continuity matters. A mismatch needs fresh inspection, not an automatic hash
 replacement. This consistency check does not grant authorization.
+
+For repeated imports into an existing archive, consider `check-import` before
+the actual import. Use `docs/IMPORT_CONFLICTS.md` to distinguish source-title,
+text and metadata conflicts without printing their values. A clear check is not
+permission or a guarantee, and a title-only conflict must not be auto-repaired.

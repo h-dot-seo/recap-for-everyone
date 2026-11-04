@@ -127,3 +127,7 @@ This is an operator-selected consistency check, not a signature, identity proof,
 permission record or completeness guarantee. Do not automatically replace a
 rejected expected hash with the latest one and retry. Inspect the changed source
 and decide the intended scope again. No external verification service is used.
+
+For an existing archive, [read-only conflict diagnostics](IMPORT_CONFLICTS.md)
+can compare selected incoming identities before import. This is separate from
+source-only `inspect`, and it does not relax the importer's locked checks.

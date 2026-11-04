@@ -345,3 +345,17 @@ removing the read transaction makes that regression fail. The unchanged excerpt
 algorithm now lives in one pure helper and is reexported for existing callers.
 No semantic summary or new branch/source filtering is introduced. The complete
 suite passes 398 tests; publication scan and manifest verification cover 112 files.
+
+
+### 2026-11-04: read-only reimport conflict diagnostics
+
+Sixteen synthetic tests cover archive/source identity comparisons, title-only,
+text, role, timestamp and mixed changes, repeated-input counts, bounded samples,
+new rows preceding conflicts, local profiles, selected/hash-bound input, one
+source read, no database creation, unchanged schema/provenance/title history,
+canary-value exclusion and both CLI exit/report paths. A WAL test holds all
+comparisons to one read snapshot, and a later-change test confirms real import
+still rejects conflicts after a previously clear advisory report. The documented
+commands run against a new synthetic scratch archive. No conflict override,
+repair, title-value output or import policy change is introduced. The complete
+suite passes 414 tests; publication scan and manifest verification cover 115 files.

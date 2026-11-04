@@ -167,6 +167,10 @@ def main():
     export.add_argument('input'); export.add_argument('--format', choices=['web', 'local', 'local-codex'], required=True); export.add_argument('--source', required=True)
     export.add_argument('--conversation', help='import only this explicit conversation after validating the whole file')
     export.add_argument('--expected-export-sha256', help='require the exact original whole-file hash from earlier inspection')
+    admission = sub.add_parser('check-import', help='diagnose identity conflicts against an existing archive without importing')
+    admission.add_argument('input'); admission.add_argument('--format', choices=['web', 'local', 'local-codex'], required=True)
+    admission.add_argument('--source', required=True); admission.add_argument('--conversation')
+    admission.add_argument('--expected-export-sha256'); admission.add_argument('--limit', type=int, default=20)
     listing = sub.add_parser('list', help='list conversations and current display titles')
     listing.add_argument('--source'); listing.add_argument('--limit', type=int, default=50); listing.add_argument('--offset', type=int, default=0)
     find = sub.add_parser('find', help='search current titles and conversation text')
@@ -192,6 +196,10 @@ def main():
         elif args.command == 'inspect-web-zip':
             from inspect_web_zip import inspect_web_zip
             result = inspect_web_zip(args.input, args.limit, args.offset)
+        elif args.command == 'check-import':
+            from import_check import check_import
+            result = check_import(args.db, args.source, args.input, args.format, args.conversation,
+                                  args.expected_export_sha256, args.limit)
         elif args.command == 'prepare-web-export':
             from prepare_web_export import prepare_web_export
             result = prepare_web_export(args.input, args.member, args.output, args.expected_archive_sha256)
@@ -291,6 +299,8 @@ def main():
     # JSON escapes preserve Unicode data even when the terminal is ASCII-only.
     # In particular, a committed title change must not look failed at print time.
     print(json.dumps(result, ensure_ascii=True, indent=2))
+    if args.command == 'check-import' and result['conflicts_found']:
+        raise SystemExit(1)
 
 
 if __name__ == '__main__':

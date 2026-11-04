@@ -1,12 +1,12 @@
 {
   "project": "recap-for-everyone",
-  "release": "0.50.0-consistent-title-excerpts",
+  "release": "0.51.0-import-conflict-diagnostics",
   "date": "2026-11-04",
   "private_history_imported": false,
   "actual_corpora_included": false,
   "synthetic_examples_only": true,
   "license_status": "NOT_SELECTED",
-  "file_count": 111,
+  "file_count": 114,
   "files": [
     {
       "path": ".gitattributes",
@@ -30,8 +30,8 @@
     },
     {
       "path": "README.md",
-      "bytes": 57177,
-      "sha256": "accfc1423023864e2cc3886e7de869806f39074ba9a6dcce30813833e9246ba5"
+      "bytes": 57509,
+      "sha256": "6e7a43ef140529f189fec044ea24bbafb302eb105ae91f62979907862382250c"
     },
     {
       "path": "RIGHTS.md",
@@ -45,13 +45,13 @@
     },
     {
       "path": "SKILL.md",
-      "bytes": 3413,
-      "sha256": "e70aee59d1dbca15f8639072baef31c70b4a2f8ebc814954fff5dadb6978c5ef"
+      "bytes": 3731,
+      "sha256": "992625d2c2e765c62abe5a293a9aba0efc7477988975677efd80d94d4f843017"
     },
     {
       "path": "VALIDATION.md",
-      "bytes": 21608,
-      "sha256": "6c7b34ff0e63d9d952f4e82653a0bec7e99f9946dd489743f0596adf7e99026d"
+      "bytes": 22457,
+      "sha256": "fceed2d86878ba4dccf617a749670f29f4e4ff9bfe3d7dce6f56b65f98c49f9e"
     },
     {
       "path": "attributed_title.py",
@@ -94,9 +94,14 @@
       "sha256": "3d9e0b4988b5b4a393fdd30996e0b0ef7f701a15f58ca57ae2f612377a4960af"
     },
     {
+      "path": "docs/IMPORT_CONFLICTS.md",
+      "bytes": 5030,
+      "sha256": "7e489d3b6ec0f709dc3df63a580156297c01d63f724bd135faa2deeb98594539"
+    },
+    {
       "path": "docs/INPUT_SCOPE.md",
-      "bytes": 8051,
-      "sha256": "6925dbb2a6be38b38c64e172b45ffe305d33d84dbcfcdebf31de173d1f5c2ff6"
+      "bytes": 8284,
+      "sha256": "244122e1ece8cf83e05deb593f769463e2ff90b24690916e0ffee380ef72995d"
     },
     {
       "path": "docs/MESSAGE_SELECTION.md",
@@ -199,6 +204,11 @@
       "sha256": "e83d9e293e3b2204dc3b8b5c1c6f967cd5ed8f916c3500d467670da3184df49d"
     },
     {
+      "path": "import_check.py",
+      "bytes": 4900,
+      "sha256": "8a208734340b47e7c67cc4df68a6c8ab5f9d8b99e47c70f2ea81fe448e254ead"
+    },
+    {
       "path": "inspect_web_zip.py",
       "bytes": 3027,
       "sha256": "ecf1c629555bfcccfe13c28ab126f039a9c800c5638d361cc1a9e8d66180fe25"
@@ -215,8 +225,8 @@
     },
     {
       "path": "recap.py",
-      "bytes": 20769,
-      "sha256": "68ee2cc4bfc3fc384f98156f613b1307d8c4cdb9e514d78c6ccc0682e5db2e06"
+      "bytes": 21601,
+      "sha256": "a865bf58a7afd4e98a50fd82c7e98761cecc0cddb21cb203d6cb4883525eb4a2"
     },
     {
       "path": "replay_local.py",
@@ -302,6 +312,11 @@
       "path": "test_historical_title_search.py",
       "bytes": 7581,
       "sha256": "76dca80b4f7f759a020169613eafa4dfd0d35a23fb3656b32edde7e1b4ee33cd"
+    },
+    {
+      "path": "test_import_check.py",
+      "bytes": 14445,
+      "sha256": "0d11cf840872c4dbefb30b183d1526539d1b95cbcf9eb5f7074759dece87d4e0"
     },
     {
       "path": "test_import_inspection.py",

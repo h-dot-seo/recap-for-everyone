@@ -78,6 +78,10 @@ private. See [export inventory](docs/EXPORT_INVENTORY.md).
 Carry its `original_sha256` into `--expected-export-sha256` on later inventory,
 inspection or import commands when you want to reject changed source bytes.
 This optional consistency check does not replace format validation or authorization.
+For a reimport into an existing archive, `check-import INPUT --format FORMAT --source SOURCE`
+with `--db DB` reports title-only, text and metadata identity conflicts without
+changing the archive. [Conflict diagnostics](docs/IMPORT_CONFLICTS.md) explain
+bounded samples, duplicate occurrences and why a clear check is only advisory.
 
 Start with the [two-format title walkthrough](docs/TITLE_WALKTHROUGH.md) for
 copyable synthetic web and Codex local examples, expected results and recovery
