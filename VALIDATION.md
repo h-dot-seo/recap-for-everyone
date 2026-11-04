@@ -1461,3 +1461,45 @@ and byte manifest cover 169 files. All data is synthetic, SQLite test handles cl
 explicitly, and CLI tests normalize platform newlines via text mode. No real data,
 model transmission, source rewrite, remote title mutation or merge occurs.
 Exact-commit Ubuntu/Windows Python 3.10/3.12 CI is checked after push.
+
+### 2026-11-04: reject damaged local tags before identity assignment
+
+An independent synthetic audit reproduced identity contamination: a valid session A
+and message followed by a record with malformed present type and an apparent B
+payload, then a valid message, caused both messages to be imported under A. The
+damaged payload does not establish a valid B boundary, so silently skipping it is
+not a sound basis for continuing identity assignment. A damaged response tag could
+also drop the substantive request and leave only an earlier generic title candidate.
+
+After metadata-only utility admission, both local parser profiles now reject a
+present top-level type unless it is a nonblank string. Errors use a fixed label
+and physical line, without tag/payload/text values. This deliberately narrows an
+older compatibility case that accepted an object tag as unknown. Its old coverage
+test now checks still-supported missing-tag behavior instead; malformed tags have
+dedicated failure regressions. Missing tags, nonblank unknown strings and exact
+untrimmed tag semantics remain unchanged, so this is not a complete boundary or
+producer-schema validator. The pinned public Codex RolloutItemWire definition in
+history/src/rollout_payload.rs uses a string-tagged enum; the guide links the exact
+verified revision and distinguishes Recap's looser compatibility policy.
+
+Fifteen new synthetic tests exercise both profiles, repeated malformed boundaries,
+malformed response tags, early database avoidance, unchanged existing archives and
+title revisions, selected/unmatched content, direct byte/path parsers, BOM/blank
+physical lines and LF/CRLF/CR handling, literal missing/unknown tags, valid multiple
+sessions, metadata-only index/agent-raw/SQLite exceptions, hash-check precedence,
+source-backed title rejection and fourteen CLI failure paths with no partial JSON,
+new database or saved proposal. All SQLite handles close explicitly and subprocess
+text mode handles native line endings. An in-memory load of the previous parser
+produced 40 failing subtests across three methods; production files were not swapped.
+
+Independent review found no blocking code issue and independently passed 43 tests.
+The focused local validation, byte parsing and metadata-inventory bundle passes 66;
+the final full suite passes 899 tests in 187.398 seconds. Public audit and byte
+manifest cover 170 files. Documentation explicitly identifies the changed malformed
+input contract, retained unknown-tag caveats and lack of retrospective repair.
+Existing archives and previously saved titles are not automatically rescanned or
+moved, and the stricter replay path can reject under its own earlier grammar.
+
+No actual personal data, model transmission, source rewriting, guessed boundary,
+remote title mutation or merge occurs. Exact-commit Ubuntu/Windows Python 3.10/3.12
+CI is checked after push.

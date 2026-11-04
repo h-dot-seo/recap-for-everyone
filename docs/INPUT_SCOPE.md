@@ -243,6 +243,58 @@ valid export before generating and reviewing a new proposal; normal identity
 conflict and provenance rules still apply. This check adds no text inference,
 account collection, model call or remote title change.
 
+## Malformed local record tags can hide a session boundary
+
+Both `local` and `local-codex` now reject a rollout record whose **present** top-level
+`type` is null, a boolean, number, array, object, empty string or whitespace-only
+string. Previously these values were counted as unknown records and skipped. That
+could discard a user request or, more seriously, conceal an intended session boundary:
+a valid session A, a damaged record containing an apparent session B payload, then
+a valid message would import that later message under A.
+
+The damaged payload does not prove a second session exists. Recap therefore fails
+the whole operation rather than guessing its type, resetting to a guessed ID or
+silently continuing with the previous identity. The fixed diagnostic is
+`invalid local record type`, followed by the source label and physical line number.
+It does not echo the malformed tag, payload, session IDs or message text. Parsing
+rejects before database access/write or partial results, including when the damaged
+record occurs after useful messages or outside an explicit conversation selection.
+
+This is a **deliberate narrowing** of previously accepted malformed tags, not just
+a new warning. An older generic unknown-record test admitted object-valued tags;
+that behavior is replaced by rejection and regression tests for boundary safety.
+Well-formed existing messages and source bytes are not repaired or rewritten.
+
+Compatibility still has explicit limits:
+
+- An **absent** type keeps the existing unknown-record skip and warning.
+- Nonblank unknown string tags still skip with fixed coverage counts. Strings are
+  not trimmed, case folded or guessed: `" session_meta "` is not `session_meta`.
+  This does not detect every misspelled/missing boundary or establish completeness.
+- The metadata-only utility contracts run first and are unchanged. Exact
+  `session_index.jsonl` inputs validate their index fields without interpreting extra
+  rollout tags; generic agent-raw utilities and SQLite backups retain their existing
+  behavior. See [index inventory limits](EXPORT_INVENTORY.md#session-index-metadata-is-not-a-message-export).
+- This is not full schema validation of every unknown record or payload. The
+  [pinned public Codex wire definition](https://github.com/openai/codex/blob/f2b94ef8b52196f127d162c6db71e390b9bb265c/codex-rs/history/src/rollout_payload.rs)
+  uses a string-tagged record enum. Recap's missing-tag and unknown-string compatibility
+  remains deliberately looser; no universal or current-version replay compatibility
+  is implied.
+
+Inspection, inventory, conflict checks, imports and source-attributed title readers
+share the parser check. The stricter replay/title path can reject earlier under its
+own projection grammar. This rejected input cannot produce a new greeting-only
+proposal or silently assign messages across its damaged boundary. Existing archives, saved
+proposals and applied titles are not retroactively scanned or corrected, and raw
+archive-only title generation does not reread the original source.
+
+Keep and investigate the original export or obtain a valid one. Do not delete a
+failed type field, coerce it to a string or select a broader profile just to bypass
+this check. A corrected export can still conflict with already admitted identities;
+use the existing read-only conflict checks and deliberately choose a separate archive
+when needed. The tool does not move existing messages between conversations or
+promise automatic repair of an earlier misassignment.
+
 ## Malformed known local response records
 
 Both `local` and `local-codex` reject a `response_item` unless `payload` is an

@@ -228,6 +228,11 @@ def _parse_jsonl_records(records, path, source_relative_path, content_profile):
     skipped_content_parts = 0
     for line_number, value in records:
         record_type = value.get("type")
+        # A damaged discriminator can conceal a session boundary and assign
+        # subsequent text to the previous session. Do not guess or silently skip
+        # a supplied malformed tag. Missing/unknown tags retain compatibility.
+        if "type" in value and (not isinstance(record_type, str) or not record_type.strip()):
+            raise LocalImportError(f"invalid local record type: {path}:{line_number}")
         payload = value.get("payload")
         if record_type == "session_meta":
             if not isinstance(payload, dict):

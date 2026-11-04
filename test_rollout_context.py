@@ -43,8 +43,10 @@ class RolloutContextTests(unittest.TestCase):
         self.assertNotIn('PRIVATE_', json.dumps(rows))
 
     def test_fixed_unknown_categories_and_unsupported_roles(self):
+        # Missing tags remain unknown; supplied malformed tags now reject in the
+        # dedicated discriminator tests instead of risking a hidden boundary.
         self.records.extend([dict(type='PRIVATE_TYPE', payload=dict(text='PRIVATE_TEXT')),
-                             dict(type=dict(secret='PRIVATE_SHAPE')),
+                             dict(payload=dict(secret='PRIVATE_SHAPE')),
                              dict(type='response_item', payload=dict(type='function_call', arguments='PRIVATE_ARGS')),
                              dict(type='response_item', payload=dict(type='message', role='developer', content=[]))])
         self.write(); report = inspect_export(self.path, 'local-codex')

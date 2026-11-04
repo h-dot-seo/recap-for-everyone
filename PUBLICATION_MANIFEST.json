@@ -1,12 +1,12 @@
 {
   "project": "recap-for-everyone",
-  "release": "0.81.0-index-inventory-contract",
+  "release": "0.82.0-local-record-tag-validation",
   "date": "2026-11-04",
   "private_history_imported": false,
   "actual_corpora_included": false,
   "synthetic_examples_only": true,
   "license_status": "NOT_SELECTED",
-  "file_count": 168,
+  "file_count": 169,
   "files": [
     {
       "path": ".gitattributes",
@@ -30,8 +30,8 @@
     },
     {
       "path": "README.md",
-      "bytes": 68873,
-      "sha256": "8c2cdc6b4fa392d9e379fe2a4a9f8336a41f3272871c998a4e4d37c1a361758a"
+      "bytes": 69370,
+      "sha256": "df67b75579171b3fd03e20133be3fc760d65496c202d602b072ec4649f1b1e0a"
     },
     {
       "path": "RIGHTS.md",
@@ -50,8 +50,8 @@
     },
     {
       "path": "VALIDATION.md",
-      "bytes": 94740,
-      "sha256": "e5c8795fcbb89e445cb63f20684e3ac89f8b7eb1dc81bb4011e9c8b640bbc63d"
+      "bytes": 97616,
+      "sha256": "f5ad2618d0a724b402f399913a52e9135f1066e94cb987dcd2a4cd97064521a7"
     },
     {
       "path": "attributed_title.py",
@@ -110,8 +110,8 @@
     },
     {
       "path": "docs/INPUT_SCOPE.md",
-      "bytes": 27052,
-      "sha256": "64b2c7d9f5aee393edb7c47c38d3c1ffc8ace0ac47e395564857f200efaea1cb"
+      "bytes": 30578,
+      "sha256": "7436d1cf38f91d0ce26386e25631c3143f052ed70ee2d739047954c4cb194831"
     },
     {
       "path": "docs/INSTALL.md",
@@ -295,8 +295,8 @@
     },
     {
       "path": "local_parser.py",
-      "bytes": 22366,
-      "sha256": "e86f0b4f504375828000eb89c86a8c71e6c0e04c58427b1806d22741cdbbbfb9"
+      "bytes": 22783,
+      "sha256": "d7663e98c9c1be11a8d3d146a858ba4514c038499d89da5d03dedacd5ab9fe8e"
     },
     {
       "path": "prepare_web_export.py",
@@ -469,6 +469,11 @@
       "sha256": "30bf5e586839e57962d01ab59aabb12bfa21d1d3019873dd67b28b5a2bd035cb"
     },
     {
+      "path": "test_local_record_discriminator.py",
+      "bytes": 15212,
+      "sha256": "035b8dd53c115a4709ef1c30c7a0f568783a16fa918fa981731baf8d9a9c26e1"
+    },
+    {
       "path": "test_local_record_shapes.py",
       "bytes": 6369,
       "sha256": "da2dd63453775943487f729306a52fb3deede71ddec93cdf9660b8e69b1c9ef7"
@@ -550,8 +555,8 @@
     },
     {
       "path": "test_rollout_context.py",
-      "bytes": 5182,
-      "sha256": "e8fcd9a6fb78afd390ac8f6a10afe214d39940200a8be5b520dd8774f93b7d06"
+      "bytes": 5344,
+      "sha256": "0728f8cfb6c66c227888e58f51bd86fed6b475d830b1faeee3de4011e57c64b6"
     },
     {
       "path": "test_runtime_check.py",

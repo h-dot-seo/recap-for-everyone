@@ -1019,6 +1019,12 @@ saved titles are not automatically changed. See [web tag boundaries](docs/INPUT_
 
 ### Local metadata validation
 
+Present top-level local record tags must also be nonblank strings. A malformed tag
+can hide a session boundary and incorrectly associate later messages with the prior
+session, so the whole input now rejects instead of skipping that damaged record.
+Absent tags and nonblank unknown strings keep their existing warning/skip policy;
+metadata-only utility inputs remain unchanged. See [record-tag scope and compatibility](docs/INPUT_SCOPE.md#malformed-local-record-tags-can-hide-a-session-boundary).
+
 Both `local` and `local-codex` imports reject malformed session boundaries rather
 than silently assigning subsequent messages to the preceding session. Local
 message timestamps preserve numeric zero and accept missing/null as `unknown`.
