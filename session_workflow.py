@@ -168,6 +168,8 @@ def _normalize_bytes(raw, source_name, kind, include_report=False):
             report['warnings'].append('Some event, nonmessage, unsupported-role or unknown records are not extracted as messages.')
         if report['messages_without_explicit_id']:
             report['warnings'].append('Some message IDs depend on source basename and line number; renaming or rearranging the export changes those identities.')
+        if context.get('content_attribution_records'):
+            report['warnings'].append('Per-content source metadata is present but raw imports do not filter by it; inspect the source-attributed title workflow when supported. Presence does not establish valid or authenticated attribution.')
     if kind == 'local-codex' and report['skipped_content_parts']:
         report['warnings'].append('Nontext or unsupported local content parts were not extracted.')
     if kind == 'web':
@@ -251,7 +253,7 @@ def main():
             result = titles(a.db, a.source, a.conversation, a.set, a.expected_revision)
     except (ValueError, OSError, KeyError, TypeError, sqlite3.Error) as e:
         p.exit(1, str(e) + '\n')
-    print(json.dumps(result, ensure_ascii=a.command in ('inspect', 'import'), indent=2))
+    print(json.dumps(result, ensure_ascii=True, indent=2))
 
 
 if __name__ == '__main__':

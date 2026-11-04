@@ -138,7 +138,8 @@ def _context_counts(records):
     counts = {key + '_records': 0 for key in known}
     counts.update(other_records=0, nonmessage_response_items=0, skipped_role_messages=0,
                   fork_metadata_records=0, referenced_history_records=0,
-                  parent_thread_records=0, paginated_history_records=0, rollback_events=0)
+                  parent_thread_records=0, paginated_history_records=0, rollback_events=0,
+                  content_attribution_records=0)
     for _, value in records:
         kind = value.get('type')
         key = kind + '_records' if kind in known else 'other_records'
@@ -155,6 +156,9 @@ def _context_counts(records):
             counts['nonmessage_response_items'] += int(payload.get('type') != 'message')
             if payload.get('type') == 'message':
                 counts['skipped_role_messages'] += int(payload.get('role') not in ('user', 'assistant'))
+                metadata = payload.get('internal_chat_message_metadata_passthrough')
+                counts['content_attribution_records'] += int(
+                    isinstance(metadata, dict) and metadata.get('content_item_metadata') is not None)
         elif kind == 'event_msg':
             counts['rollback_events'] += int(payload.get('type') == 'thread_rolled_back')
     return tuple(sorted(counts.items()))

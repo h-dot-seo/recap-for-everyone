@@ -54,7 +54,7 @@ def main():
         result = suggest(args.db, args.source, args.conversation)
     except (ValueError, OSError, sqlite3.Error) as exc:
         parser.exit(1, str(exc) + '\n')
-    print(json.dumps(result, ensure_ascii=False, indent=2))
+    print(json.dumps(result, ensure_ascii=True, indent=2))
 
 
 if __name__ == '__main__':

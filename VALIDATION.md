@@ -283,3 +283,23 @@ entering candidates need excerpt/provenance retrieval while the final sample sta
 at three. Coverage is measured on full selected bodies, not visible excerpts, and
 no globally optimal or semantic sample selection is claimed. The complete suite
 passes 325 tests; publication scanning and manifest verification cover 100 files.
+
+
+### 2026-11-04: source-attributed local titles and Unicode writes
+
+Nineteen new synthetic tests cover exact per-content producer attribution, media
+positions, explicit/legacy variants, malformed/unknown labels, fixed coverage
+counts, single-read source bytes, whole-conversation archive consistency, source
+isolation, repeated IDs, renamed fallback identities, duplicate-import ambiguity,
+preview/apply freshness the documented example and LF/CRLF/CR physical line alignment (including embedded Unicode separators and excluded-event locator drift). Raw imports remain unchanged
+and searchable. The pinned official Codex source is documented; labels are not
+authenticated authorship, trust, permission or semantic validation. No private
+conversation, undocumented web schema or external model call is used.
+
+Four replay tests accept absent/null/explicit legacy history mode while retaining
+paginated, unknown and inheritance rejection. Four CLI tests cover Unicode title
+write acknowledgments, suggestion and listing parity under ASCII stdout. This
+prevents a successful title commit from appearing to fail when printing its
+Unicode JSON result. The complete synthetic suite passes 352 tests. Publication
+scanning and byte-manifest verification cover 106 selected files. Remote CI is
+checked separately for the exact pushed commit.

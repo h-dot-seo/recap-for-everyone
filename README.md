@@ -892,3 +892,15 @@ Results also report exact matching-message counts, omitted-sample flags and whic
 body-matched terms are missing from the sample. This is deterministic bounded
 literal coverage, not semantic ranking or a guarantee every term fits in the
 visible excerpt. See [sample selection and coverage fields](docs/SEARCH_EXCERPTS.md#diverse-bounded-body-samples).
+
+## Source-attributed local title proposals
+
+For modern local exports that explicitly label content sources,
+`suggest-attributed-title INPUT --source SOURCE --conversation ID` can exclude
+harness/injected and unknown parts from a proposed local title while preserving
+all raw archived text. It verifies source bytes and archived occurrences, uses
+original content positions including media, and never equates a producer label
+with authenticated human authorship. See the [synthetic walkthrough and strict
+compatibility contract](docs/SOURCE_ATTRIBUTED_TITLES.md). Raw inspection surfaces
+metadata presence without filtering by it. Existing raw/branch/replay title paths
+remain available; the replay grammar also now accepts explicit legacy history mode.

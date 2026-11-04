@@ -32,3 +32,9 @@ use `show --limit N --offset OFFSET` and its `selection.next_offset`. Each call 
 one read snapshot; separate pages can change. The summary `message_count` remains
 the whole-conversation count. Do not mistake the selected view for export-scoped
 provenance or an active-branch reconstruction. See `docs/MESSAGE_SELECTION.md`.
+
+If a local-codex export contains per-content source labels, inspect
+`docs/SOURCE_ATTRIBUTED_TITLES.md` and consider `suggest-attributed-title` against
+that explicit original file. Preserve raw archive text and require normal review.
+Do not infer user authorship from role alone or treat producer labels as trust or
+authorization. Missing attribution must not silently fall back to injected text.

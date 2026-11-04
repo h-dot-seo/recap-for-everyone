@@ -79,9 +79,13 @@ def _project(raw, original_sha256):
             session = payload.get('id')
             _require(isinstance(session, str) and bool(session), 'INVALID_SESSION_ID', line_number)
             _require(not any(payload.get(key) is not None for key in
-                     ('history_base', 'forked_from_id', 'parent_thread_id', 'history_mode',
+                     ('history_base', 'forked_from_id', 'parent_thread_id',
                       'subagent_history_start_ordinal', 'forked_from_ordinal_exclusive',
                       'thread_source')), 'UNRESOLVED_HISTORY', line_number)
+            # Public Codex serializes its default history mode as "legacy".
+            # This is not inherited/paginated history; all other guards still apply.
+            _require(payload.get('history_mode') in (None, 'legacy'),
+                     'UNRESOLVED_HISTORY', line_number)
             _require(payload.get('attached_thread') is None or payload.get('attached_thread') is False,
                      'UNRESOLVED_HISTORY', line_number)
             allowed_meta = {'id', 'session_id', 'source', 'timestamp', 'cwd', 'originator',

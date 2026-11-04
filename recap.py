@@ -130,6 +130,9 @@ def main():
     replay_title = sub.add_parser('suggest-replay-title', help='suggest a checked local title from retained projected turns')
     replay_title.add_argument('input'); replay_title.add_argument('--source', required=True)
     replay_title.add_argument('--conversation', required=True)
+    attributed = sub.add_parser('suggest-attributed-title', help='suggest a title from explicit user-source labels in a verified local-codex export')
+    attributed.add_argument('input'); attributed.add_argument('--source', required=True)
+    attributed.add_argument('--conversation', required=True)
     for name in ('preview-title', 'apply-title'):
         command = sub.add_parser(name, help='review a proposal' if name == 'preview-title' else 'apply a reviewed local display title')
         command.add_argument('input', help='proposal JSON for preview, reviewed preview JSON for apply')
@@ -224,6 +227,9 @@ def main():
         elif args.command == 'suggest-replay-title':
             from replay_title import suggest_replay
             result = suggest_replay(args.db, args.source, args.conversation, args.input)
+        elif args.command == 'suggest-attributed-title':
+            from attributed_title import suggest_attributed
+            result = suggest_attributed(args.db, args.source, args.conversation, args.input)
         elif args.command == 'export-title-plan':
             from title_plan import make_plan
             result = make_plan(args.db, args.source, args.conversation, args.input, args.format)
@@ -273,7 +279,9 @@ def main():
             result = suggest(args.db, args.source, args.conversation)
     except (OSError, ValueError, KeyError, TypeError, sqlite3.Error) as exc:
         p.exit(1, str(exc) + '\n')
-    print(json.dumps(result, ensure_ascii=args.command in ('show', 'inspect-web-zip', 'prepare-web-export', 'find', 'inspect', 'import', 'web-branch', 'suggest-branch-title', 'suggest-replay-title', 'preview-title', 'apply-title', 'review-titles', 'review-state', 'title-adapter-dry-run', 'title-adapter-simulate', 'export-title-plan', 'check-title-plan'), indent=2))
+    # JSON escapes preserve Unicode data even when the terminal is ASCII-only.
+    # In particular, a committed title change must not look failed at print time.
+    print(json.dumps(result, ensure_ascii=True, indent=2))
 
 
 if __name__ == '__main__':
