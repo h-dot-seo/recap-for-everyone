@@ -1,12 +1,12 @@
 {
   "project": "recap-for-everyone",
-  "release": "0.80.0-attributed-message-selection",
+  "release": "0.81.0-index-inventory-contract",
   "date": "2026-11-04",
   "private_history_imported": false,
   "actual_corpora_included": false,
   "synthetic_examples_only": true,
   "license_status": "NOT_SELECTED",
-  "file_count": 167,
+  "file_count": 168,
   "files": [
     {
       "path": ".gitattributes",
@@ -50,8 +50,8 @@
     },
     {
       "path": "VALIDATION.md",
-      "bytes": 92107,
-      "sha256": "0b4bbe52850a183d96903f89492f18a794226cfd6d903c6fb02cef9833fcb1ea"
+      "bytes": 94740,
+      "sha256": "e5c8795fcbb89e445cb63f20684e3ac89f8b7eb1dc81bb4011e9c8b640bbc63d"
     },
     {
       "path": "attributed_title.py",
@@ -95,8 +95,8 @@
     },
     {
       "path": "docs/EXPORT_INVENTORY.md",
-      "bytes": 15810,
-      "sha256": "739cb8307dc606ffd7f2676403ffae080e45a1f089a257b9832b472e60a515c5"
+      "bytes": 18227,
+      "sha256": "baa6148bd7f4b281615aec194c16b3fda8bd5e22b527337de3f7902a64e30423"
     },
     {
       "path": "docs/EXPORT_SCOPED_SEARCH.md",
@@ -110,8 +110,8 @@
     },
     {
       "path": "docs/INPUT_SCOPE.md",
-      "bytes": 26508,
-      "sha256": "691120de9beab52c9a77e1eaf933390780e507fb38e4d029a080650857b87808"
+      "bytes": 27052,
+      "sha256": "64b2c7d9f5aee393edb7c47c38d3c1ffc8ace0ac47e395564857f200efaea1cb"
     },
     {
       "path": "docs/INSTALL.md",
@@ -280,8 +280,8 @@
     },
     {
       "path": "export_inventory.py",
-      "bytes": 9328,
-      "sha256": "b77d38461d8edde29b315e540fcd29472f41dc4b20f4446b99b9e968597506c7"
+      "bytes": 9551,
+      "sha256": "d2e82975bc64a37a930662925429021f30bdf5894b58081ef3a2f278113e8980"
     },
     {
       "path": "import_check.py",
@@ -482,6 +482,11 @@
       "path": "test_manifest_verification.py",
       "bytes": 4433,
       "sha256": "a556cd2f86d064256a48eb1424611174ff8a0ee9e92a0552d926c83430b4d83e"
+    },
+    {
+      "path": "test_metadata_inventory_contract.py",
+      "bytes": 17249,
+      "sha256": "ca2d118f45b4ed166cc2cd2a3965af38edfe7d7b281ccfcd58afeaa03959a3d7"
     },
     {
       "path": "test_normalized_byte_ingest.py",

@@ -1422,3 +1422,42 @@ scoped selection, native output, review evidence and offline adapter bundle pass
 122 tests. Public audit and byte manifest cover 168 files. No actual personal data,
 model transmission, source rewrite, automatic approval, live title mutation or merge
 occurs. Exact-commit Ubuntu/Windows Python 3.10/3.12 CI is checked after push.
+
+### 2026-11-04: respect metadata-only admission in export inventory
+
+A synthetic audit reproduced a parser/inventory disagreement. The exact basename
+session_index.jsonl is intentionally validated as index metadata, but list-export
+then reparsed additional type:session_meta fields as rollout envelopes. A missing
+payload could fail with KeyError; a valid extra payload could instead invent a
+conversation ID unrelated to the validated index entry.
+
+Inventory now skips rollout interpretation when the parser already admitted the
+input as accepted_metadata_only. It preserves the established zero-conversation
+inventory rather than exposing index IDs/titles or inferring messages. Whole-file
+validation, byte hashes, filtering, warnings and original source bytes remain
+unchanged. Genuine zero-message rollouts still report their actual session ID and
+NO_EXTRACTED_TEXT because their admission status is accepted_zero_message.
+
+Sixteen independently authored synthetic tests cover both local formats, missing
+and malformed extra payloads, misleading rollout/body fields, metadata/text filters,
+canonical matching, malformed required fields and duplicate JSON keys, hash leases,
+exactly one source read without database access, empty/BOM/blank indexes, exact
+basename behavior, ordinary zero-message rollouts and both CLI entry points.
+Whitespace-only required index strings retain the existing nonempty-string contract.
+A renamed hybrid with valid rollout fields can legitimately have a different parser
+interpretation; a renamed plain or empty index still rejects. In-memory restoration
+of the old inventory branch produced 38 failing and 34 erroring subtests, confirming
+that the tests detect the regression without modifying production for that check.
+
+Separate tests and documentation preserve the existing zero-record import policy:
+it can create schema and an empty normalized-input artifact, but does not persist
+index IDs, names, timestamps or original metadata. The coverage receipt still
+contains the original hash. This is not a metadata backup, new index inventory,
+automatic session collection, title inference or change to import admission.
+
+The final full suite passes 884 tests in 221.931 seconds; the focused metadata,
+inventory/filter, byte-snapshot and selected-import bundle passes 95. Public audit
+and byte manifest cover 169 files. All data is synthetic, SQLite test handles close
+explicitly, and CLI tests normalize platform newlines via text mode. No real data,
+model transmission, source rewrite, remote title mutation or merge occurs.
+Exact-commit Ubuntu/Windows Python 3.10/3.12 CI is checked after push.

@@ -57,6 +57,42 @@ It is not narrowed to the current page. `selectable_conversations` is likewise a
 whole-file count. Nontext, tool or unsupported records retain the existing
 format-specific extraction boundaries.
 
+## Session index metadata is not a message export
+
+A file named exactly `session_index.jsonl` follows the existing local parser's
+metadata-only contract in both local formats. Its `id`, `thread_name` and
+`updated_at` fields are validated as nonempty strings, but it contains no imported
+rollout messages under this contract. `list-export` therefore returns zero
+conversations, no selectable IDs and no inferred local titles. This does **not**
+mean the index has no session entries. Coverage reports
+`parser_admission_status: accepted_metadata_only`, `reason_code:
+session_index_metadata`, the observed record count and a zero-extraction warning.
+
+Additional rollout-looking fields in an index record, such as `type: session_meta`
+and `payload`, remain extra metadata. Inventory does not reinterpret those fields
+as a second format, crash on a missing payload or return an unrelated payload ID.
+Metadata and body filters still return no matches. Whole-file JSON/core-field
+validation and the original-byte hash lease still run before the empty inventory.
+A malformed required field in any record rejects even when a filter would match
+nothing. This is consistency with the existing parser, not a new index importer.
+
+Use an explicitly chosen supported rollout export for message search and title
+evidence. No file is located or read automatically from an index ID, working
+directory or filename. Renaming a file changes the filename-based parser contract;
+it is not a conversion or repair. A renamed ordinary index lacks rollout session
+metadata and rejects, while a deliberately hybrid record with valid rollout fields
+can be interpreted differently under that ordinary rollout contract.
+
+Import keeps its existing **zero-message** behavior for accepted metadata-only
+input. It can create an empty archive/schema and artifact record, but does not
+persist the index IDs, names, timestamps or original metadata. Its coverage receipt
+reports the original file hash; the archive artifact represents the empty normalized
+message input. Do not treat a successful zero-record receipt as an indexed list of
+sessions or a metadata backup. Selected import rejects because there is no extracted
+text for the requested ID. This change does not modify that import policy or remove
+archives created previously. Ordinary zero-message rollout sessions still appear in
+inventory with their actual session ID and `NO_EXTRACTED_TEXT`.
+
 ## Find a known title or session ID before importing
 
 If you remember part of a web title or session ID, use `--contains` to narrow the

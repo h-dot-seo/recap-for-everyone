@@ -50,7 +50,9 @@ def list_export(path, kind, limit=50, offset=0, expected_export_sha256=None, *,
     if kind == 'web':
         for record in loads(decode_source(raw)):
             register(aliased_identity(record, 'conversation_id'), record.get('title') or '')
-    else:
+    elif coverage.get('parser_admission_status') != 'accepted_metadata_only':
+        # Respect the parser's metadata-only utility contract. Extra fields in
+        # an index entry are not rollout envelopes and must not invent IDs.
         # Mirror local_parser's universal newlines, not Unicode splitlines.
         for line in physical_lines(raw):
             if not line.strip():

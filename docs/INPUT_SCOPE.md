@@ -400,3 +400,12 @@ change. Other database, provenance, permission or I/O failures retain their exis
 behavior; this is not a guarantee that every failed operation leaves no filesystem
 artifact. Existing empty databases from older failures are not removed. Nothing
 is automatically repaired, merged, retried or renamed.
+
+## Index metadata versus rollout messages
+
+The special local basename `session_index.jsonl` is a metadata-only utility input,
+not a source of message evidence or inferred display titles. Inventory respects that
+classification, even when index entries contain additional rollout-looking fields.
+See [index inventory and zero-record import limits](EXPORT_INVENTORY.md#session-index-metadata-is-not-a-message-export)
+before treating a successful receipt as archived sessions. No index-driven file
+collection or new metadata persistence is added.
