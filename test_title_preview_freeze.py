@@ -39,12 +39,12 @@ class TitlePreviewFreezeTests(unittest.TestCase):
 
     def test_preview_freezes_before_reading_database(self):
         original = copy.deepcopy(self.proposal)
-        real_snapshot = title_proposal.snapshot
+        real_snapshot = title_proposal._snapshot_rows
         def mutate(*args):
             self.proposal['title'] = 'Changed during snapshot read'
             self.proposal['evidence_message_ids'].clear()
             return real_snapshot(*args)
-        with patch.object(title_proposal, 'snapshot', mutate):
+        with patch.object(title_proposal, '_snapshot_rows', mutate):
             reviewed = preview(self.db, self.proposal)
         self.assertEqual(reviewed['proposal'], original)
 
@@ -80,7 +80,7 @@ class TitlePreviewFreezeTests(unittest.TestCase):
         before = self.db.read_bytes()
         for value in self.invalid_values():
             proposal = dict(self.proposal, extra=value)
-            with self.subTest(kind=type(value).__name__), patch.object(title_proposal, 'snapshot') as read:
+            with self.subTest(kind=type(value).__name__), patch.object(title_proposal, 'readonly') as read:
                 with self.assertRaises(ValueError) as caught:
                     preview(self.db, proposal)
                 read.assert_not_called()

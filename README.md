@@ -68,6 +68,10 @@ titles and text; the original `search` command still performs message-level FTS.
 `--expected-revision`. `suggest-title` produces a proposal only; continue through
 `recap.py --db ... preview-title proposal.json` then
 `recap.py --db ... apply-title reviewed.json` for reviewed proposal application.
+Add `preview-title --with-evidence` for an explicitly requested private view of
+up to five cited user-message excerpts and bounded original provenance.
+[Evidence review](docs/TITLE_REVIEW_EVIDENCE.md) explains truncation and why raw
+excerpts are not automatically the exact passages used by scoped generation.
 The standalone scripts remain supported with equivalent behavior. `inspect`,
 `list-export`, `web-branch`, `replay-local`, `prepare-web-export` and `inspect-web-zip` can omit `--db`.
 

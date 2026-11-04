@@ -103,3 +103,9 @@ callers must use valid finite JSON and exact text identities; preview/apply deta
 inputs but do not authenticate editable review files. Re-preview changed wording
 and retain content/revision checks. See `docs/INPUT_SCOPE.md` and
 `docs/TITLE_REVIEW_HINTS.md`.
+
+If the user wants to see cited content while deciding on a title, use the explicit
+preview-only `--with-evidence` option. Respect the added private-text exposure and
+read the message/provenance truncation counts. Raw archived prefixes are not proof
+of the exact scoped generation passage or semantic support. Keep apply separate
+and explicit. See `docs/TITLE_REVIEW_EVIDENCE.md`.

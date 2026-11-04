@@ -1,12 +1,12 @@
 {
   "project": "recap-for-everyone",
-  "release": "0.59.0-safe-input-snapshots",
+  "release": "0.60.0-title-review-evidence",
   "date": "2026-11-04",
   "private_history_imported": false,
   "actual_corpora_included": false,
   "synthetic_examples_only": true,
   "license_status": "NOT_SELECTED",
-  "file_count": 131,
+  "file_count": 134,
   "files": [
     {
       "path": ".gitattributes",
@@ -30,8 +30,8 @@
     },
     {
       "path": "README.md",
-      "bytes": 60414,
-      "sha256": "3ab0a7a53b9159a65f0a17f8f757de5b51ae4d6fbf99450e40bf4772cfb8915d"
+      "bytes": 60724,
+      "sha256": "bf7818c699c8b275f7afd3cd7385d119fa69e46df6b9691421ad8f42ddd2ca3b"
     },
     {
       "path": "RIGHTS.md",
@@ -45,13 +45,13 @@
     },
     {
       "path": "SKILL.md",
-      "bytes": 7112,
-      "sha256": "75850ec7c7152c8b9a61d1020c824fbab0450d1c9d28d57b68d37095883ef935"
+      "bytes": 7493,
+      "sha256": "9c5aea82b1c44b76ecae7e01712a0bd8d60e82ce063aead7206a92dbf18b955d"
     },
     {
       "path": "VALIDATION.md",
-      "bytes": 35011,
-      "sha256": "67f5c2c907e91fa3ec8d721911d9a5f3bc7b40823ea631cddd46196b0add95ba"
+      "bytes": 36892,
+      "sha256": "da79763165ff41ef068592c8bc19d3cd9975add52097a4bf9c0a49c3604a08dc"
     },
     {
       "path": "attributed_title.py",
@@ -150,8 +150,8 @@
     },
     {
       "path": "docs/SUPPLIED_TITLE_REVIEW.md",
-      "bytes": 8843,
-      "sha256": "3ed07bcb257caecfa0d3c26ac6ca18afc9cf8d82e7d9b68f0be84e75aaf7c2b3"
+      "bytes": 9150,
+      "sha256": "6a9e204332a2eeb2756c607e26b0d4d59e49b951311a779d85060cd4b86591b9"
     },
     {
       "path": "docs/TITLE_ADAPTER.md",
@@ -164,9 +164,14 @@
       "sha256": "770a9819d93778934e83be6bcdbb327b708f115bfc16bedcfdfe2b09850e9540"
     },
     {
+      "path": "docs/TITLE_REVIEW_EVIDENCE.md",
+      "bytes": 6050,
+      "sha256": "40b8943417a14e1e56c89150a6bc6bbbf64c95333b16f381289351e3f28785aa"
+    },
+    {
       "path": "docs/TITLE_REVIEW_HINTS.md",
-      "bytes": 7533,
-      "sha256": "5244bb78499d2db7d86ee60fade7a5e29499524b6c2cfe3b59be37f5bed5324e"
+      "bytes": 7818,
+      "sha256": "c3d6f70d91556b796b202326e204aebfcfa6d7e79267d0680f593668c5ab6393"
     },
     {
       "path": "docs/TITLE_REVIEW_QUEUE.md",
@@ -255,8 +260,8 @@
     },
     {
       "path": "recap.py",
-      "bytes": 22457,
-      "sha256": "380a2e58ca54aa66558fa9ddf4668a70f299cccf7a8b3de88486d46ce7b7b156"
+      "bytes": 22634,
+      "sha256": "41f41b821f372f1f2f39643b6a355cd4e11b99007cb6fea711f2f889c6fea403"
     },
     {
       "path": "replay_local.py",
@@ -520,8 +525,8 @@
     },
     {
       "path": "test_title_preview_freeze.py",
-      "bytes": 11059,
-      "sha256": "6c7d130c9d572e816a4a05972095dfe173863d0e3a9d178a42e0d69a44576743"
+      "bytes": 11071,
+      "sha256": "0f068bcc086c12c959c7bd114105a1ee81bb731e1c507338ba10dac41744b8f5"
     },
     {
       "path": "test_title_proposal.py",
@@ -542,6 +547,11 @@
       "path": "test_title_review.py",
       "bytes": 6590,
       "sha256": "b599f83c0fa848768339de4aa3748d5c452de94956966a4dfb10e6601acdfabb"
+    },
+    {
+      "path": "test_title_review_evidence.py",
+      "bytes": 17322,
+      "sha256": "970d73a0d650fac31defb08690af654b7a51f5ca8dd1cac9b04c41cd025f49a5"
     },
     {
       "path": "test_title_review_state.py",
@@ -609,6 +619,11 @@
       "sha256": "e55431bbd277a901c4f80bde922575743c26c746420c06a797dbf5881dbc054a"
     },
     {
+      "path": "title_evidence.py",
+      "bytes": 3382,
+      "sha256": "5e6714254410a84773d4c90317b9e9806e9ffe61b8c2ee8ae1b36d19af9431bb"
+    },
+    {
       "path": "title_excerpt.py",
       "bytes": 1413,
       "sha256": "a2308b1a3d8a74f841957fe9ca3174a0c99705d1ab49ad4aada2bf52ef85b4e6"
@@ -620,8 +635,8 @@
     },
     {
       "path": "title_proposal.py",
-      "bytes": 5873,
-      "sha256": "6031081cf529279eb0cdeaff75daeed5b0f7e79c4ab216b1d6334b77de4c60e7"
+      "bytes": 6839,
+      "sha256": "acb54cdb60e4d4cd0901d4f05e7f7e3d86983d4f52a8984b95763d756d903063"
     },
     {
       "path": "title_review.py",

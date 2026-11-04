@@ -127,3 +127,8 @@ and a saved file is not proof of human approval. Inspect the complete current
 preview and use a fresh preview for changed wording. Transactional content-hash
 and revision checks remain the final stale-write protection; no title is changed
 by preview, and no remote service is contacted.
+
+For optional raw user-message excerpts beside the title, use
+[`preview-title --with-evidence`](TITLE_REVIEW_EVIDENCE.md). The added view is
+bounded and private, comes from the same archive snapshot as the title revision,
+and does not make the title semantically verified or approved.

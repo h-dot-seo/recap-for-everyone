@@ -146,6 +146,7 @@ def main():
         command = sub.add_parser(name, help='review a proposal' if name == 'preview-title' else 'apply a reviewed local display title')
         command.add_argument('input', help='proposal JSON for preview, reviewed preview JSON for apply')
         if name == 'preview-title':
+            command.add_argument('--with-evidence', action='store_true', help='include bounded raw user-message excerpts and provenance for private review')
             command.add_argument('--conversation', help='select exactly one READY item from a title review queue')
             command.add_argument('--title', help='explicit replacement title; reclassified as operator wording')
     state = sub.add_parser('review-state', help='read or explicitly record a local open/skipped/deferred review decision')
@@ -248,7 +249,7 @@ def main():
             if args.command == 'preview-title' and args.conversation is not None:
                 from title_batch import select_proposal
                 value = select_proposal(value, args.conversation)
-            result = preview(args.db, value, args.title) if args.command == 'preview-title' else apply_preview(args.db, value)
+            result = preview(args.db, value, args.title, args.with_evidence) if args.command == 'preview-title' else apply_preview(args.db, value)
         elif args.command == 'suggest-replay-title':
             from replay_title import suggest_replay
             result = suggest_replay(args.db, args.source, args.conversation, args.input)

@@ -561,3 +561,33 @@ suite passes 563 tests; publication scanning and byte-manifest verification cove
 132 files. No new signature/approval claim, partial import, repair, real corpus,
 model transmission or merge is introduced. Remote matrix CI is checked separately
 for the exact pushed commit.
+
+
+### 2026-11-04: opt-in evidence at the title review step
+
+Thirteen independent synthetic regressions cover `preview-title --with-evidence`
+and its standalone/Python equivalents. Default response structure remains unchanged.
+Opt-in output selects the first five distinct cited user messages, preserves raw
+2,000-code-point prefix slices, and reports duplicate/omitted/truncated counts.
+It excludes uncited and nonuser messages, keeps exact original offsets, and does
+not treat scoped proposal metadata as a verified passage selection.
+
+Provenance sampling unions legacy/additive ledgers, returns at most three sorted
+occurrences per selected message with exact counts, and preserves source/conversation
+isolation. Tests cover absent/single ledgers, Unicode/controls/whitespace, exact
+excerpt boundaries, empty legacy bodies, invalid/stale evidence, strict boolean
+validation, detached inputs, ASCII CLIs and preview-only flag rejection on apply.
+
+One read transaction now covers validated content, current title/revision and
+optional provenance. A WAL writer changes body/artifact metadata/title/provenance
+mid-preview; all returned evidence remains from the earlier consistent snapshot,
+and subsequent preview/apply rejects the stale proposal. Explicit apply and repeat
+rejection remain intact. Both shipped synthetic web-branch and attributed-local
+fixtures run import through reviewed title application/search without source changes;
+the local preview explicitly retains the raw harness prefix omitted by generation.
+
+The complete suite passes 576 tests. Publication scanning and byte-manifest
+verification cover 135 files. Body caps are not a total document/memory/work bound;
+raw excerpts are not semantic support or privacy clearance. No real corpus, model
+call, transmission, automatic approval or merge is added. Exact-commit four-job
+CI is checked separately after push.

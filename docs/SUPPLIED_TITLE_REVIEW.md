@@ -140,3 +140,8 @@ Select one `READY` item, generate a fresh preview and inspect it before applying
 Normal apply still rechecks the current content fingerprint and title revision
 under a write lock. A stale queue is not a permanent lease. There is no apply-all,
 automatic retry, remote rename or background transmission.
+
+When reviewing a selected supplied proposal, `preview-title --with-evidence`
+can add [bounded raw evidence](TITLE_REVIEW_EVIDENCE.md). It remains opt-in and
+may show raw message parts excluded by branch/replay/attribution generation.
+Check the source-specific workflow when exact selected passages matter.
