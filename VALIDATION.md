@@ -909,3 +909,24 @@ and runtime checks pass 39 tests. Publication audit and byte-manifest checks cov
 152 public files. All fixtures remain synthetic; no real session, account access,
 model transmission, remote rename or merge occurs. Exact-commit Ubuntu/Windows
 Python 3.10/3.12 CI is checked separately after push.
+
+### 2026-11-04: portable staging-directory identity test
+
+CI for 66f4bb5 passed both Ubuntu jobs but failed one test assertion on both Windows
+3.10 and 3.12. The temporary directory used a Windows 8.3 parent alias while the
+writer resolved it to the full spelling. The test compared path text, not directory
+identity. The real native-file and web/local walkthrough tests passed; no production
+writer change is needed or made for this failure. That commit is not claimed to have
+four-platform CI success.
+
+The test now verifies that both staging and output parents identify the requested
+filesystem directory and that the destination basename remains exact. It also runs
+through an existing nested-directory/.. alias on every platform, checks saved
+content and retains the closed-stage, private POSIX mode, no-replace/no-rename and
+staging-cleanup assertions. The correction does not skip Windows or weaken the
+same-directory requirement.
+
+All 709 local tests pass again, including 18 native-output tests; final publication
+and manifest checks cover 152 files. Exact-commit four-platform CI is rechecked after
+publishing this test-only correction. No real data or additional runtime behavior
+is introduced.

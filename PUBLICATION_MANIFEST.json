@@ -1,6 +1,6 @@
 {
   "project": "recap-for-everyone",
-  "release": "0.69.0-native-title-files",
+  "release": "0.69.1-portable-title-stage-tests",
   "date": "2026-11-04",
   "private_history_imported": false,
   "actual_corpora_included": false,
@@ -50,8 +50,8 @@
     },
     {
       "path": "VALIDATION.md",
-      "bytes": 57593,
-      "sha256": "2f926b2334f41cb408f606e0abcbd2d2715f02ea2b671e8ebf15a0a61c948f66"
+      "bytes": 58800,
+      "sha256": "a6e1371972f4a06c50fcb2671c77cca555cd39c4509e19f218bcc9ae23edfcf8"
     },
     {
       "path": "attributed_title.py",
@@ -575,8 +575,8 @@
     },
     {
       "path": "test_title_document_output.py",
-      "bytes": 22274,
-      "sha256": "2476f5b12b59ae901393f9fbccb0e25cbaa525ff81ed87b096a2959ac331b535"
+      "bytes": 22894,
+      "sha256": "48799f759480663cc07fa24d48fe103c82149214c858e3320c6d6ed1f9533fa2"
     },
     {
       "path": "test_title_history_view.py",

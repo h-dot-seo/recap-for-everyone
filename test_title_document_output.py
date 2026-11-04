@@ -140,19 +140,28 @@ class TitleDocumentOutputTests(unittest.TestCase):
     def test_closed_private_same_parent_stage_and_no_replace_fallback(self):
         actual_link = output.os.link
         factory = output.tempfile.NamedTemporaryFile; streams = []
+        nested = self.root / 'nested'; nested.mkdir()
+        # A lexical alias exercises the identity check on every OS. Windows
+        # TemporaryDirectory can independently use an 8.3 parent alias.
+        destinations = [self.destination, nested / '..' / 'aliased-target.json']
         def staged(*args, **kwargs):
             stream = factory(*args, **kwargs); streams.append(stream); return stream
         def checked_link(source, destination):
-            self.assertTrue(streams[0].closed)
-            self.assertEqual(Path(source).parent, self.destination.parent)
+            self.assertTrue(streams[-1].closed)
+            self.assertTrue(Path(source).parent.samefile(expected.parent))
+            self.assertTrue(Path(destination).parent.samefile(expected.parent))
+            self.assertEqual(Path(destination).name, expected.name)
             if os.name == 'posix': self.assertEqual(stat.S_IMODE(Path(source).stat().st_mode), 0o600)
             return actual_link(source, destination)
-        with patch.object(output.tempfile, 'NamedTemporaryFile', side_effect=staged), \
-             patch.object(output.os, 'link', side_effect=checked_link), \
-             patch.object(output.os, 'replace', side_effect=AssertionError('must never replace')), \
-             patch.object(output.os, 'rename', side_effect=AssertionError('must never rename')):
-            output.write_title_json(self.document, self.destination, 'proposal')
-        self.assertEqual(self.stages(), [])
+        for expected in destinations:
+            with self.subTest(destination=expected), \
+                 patch.object(output.tempfile, 'NamedTemporaryFile', side_effect=staged), \
+                 patch.object(output.os, 'link', side_effect=checked_link), \
+                 patch.object(output.os, 'replace', side_effect=AssertionError('must never replace')), \
+                 patch.object(output.os, 'rename', side_effect=AssertionError('must never rename')):
+                output.write_title_json(self.document, expected, 'proposal')
+            self.assertEqual(json.loads(expected.read_bytes()), self.document)
+            self.assertEqual(self.stages(), [])
 
     def test_post_publication_cleanup_failure_reports_saved_and_private_leftover(self):
         unlink = Path.unlink
