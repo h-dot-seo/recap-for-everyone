@@ -34,6 +34,10 @@ Want only one conversation? Use [the export inventory](EXPORT_INVENTORY.md) to
 find its exact ID before import. It lists existing web titles and extraction counts
 without printing message-body fields or creating a database. Titles and IDs can
 still be private. Follow the selected-import steps in [input scope](INPUT_SCOPE.md).
+If you know part of an existing web title or local session ID, add
+`--contains "remembered text"` to `list-export` to filter metadata before paging.
+This does not search message bodies or reduce full-file validation. Select the
+returned exact ID and hash deliberately; a title match does not authorize import.
 
 ## Try the entire journey with 24 invented conversations
 

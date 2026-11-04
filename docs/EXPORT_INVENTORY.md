@@ -57,6 +57,75 @@ It is not narrowed to the current page. `selectable_conversations` is likewise a
 whole-file count. Nontext, tool or unsupported records retain the existing
 format-specific extraction boundaries.
 
+## Find a known title or session ID before importing
+
+If you remember part of a web title or session ID, use `--contains` to narrow the
+metadata inventory instead of scanning every page or importing everything first:
+
+```sh
+python recap.py list-export examples/web-export.json --format web --contains "New chat" --limit 1
+python recap.py list-export examples/source-attributed-session.jsonl --format local-codex --contains attributed
+python export_inventory.py examples/web-export.json --format web --contains "new CHAT" --canonical-unicode
+```
+
+The web example matches `synthetic-chat`; the local example matches
+`synthetic-attributed`. Use the returned **exact conversation ID**, not the title
+or filter text, for a later selected import. A common title can match many IDs.
+Filtering does not select or import a conversation automatically and is not
+permission to read data. Keep the same original-file hash for the later command.
+
+`--contains` is **one literal substring** matched independently within the
+conversation ID or any existing web title. Matching ignores case using Unicode
+case folding. It does not split words, join fields, interpret regex/wildcards/SQL,
+rank relevance or search message bodies. For example, `orchard plan` requires that
+whole substring within one ID or title, not one word in each field. Local formats
+match IDs only: metadata fields resembling titles, working directories and user
+messages are not searched or turned into guessed titles.
+
+The filter must be non-whitespace text of at most 256 Unicode code points, with
+no surrogate code points. Meaningful leading/trailing spaces are retained, not
+trimmed for matching. Invalid filter arguments fail before reading the input.
+Use `--contains=VALUE` if a literal value begins with a hyphen. Both CLIs support
+the same flags. Python callers use the keyword-only `contains=` and
+`canonical_unicode=` options after the existing `list_export` arguments.
+
+By default, Unicode normalization is not performed. Add `--canonical-unicode`
+when composed/decomposed spelling should match, for example NFC and decomposed
+Korean or accented text. It requires `--contains` and uses the existing
+`NFC(NFD(text).casefold())` search-copy rule. The receipt records the normalization
+and runtime Unicode version. It is not accent removal, compatibility-width folding,
+transliteration or fuzzy matching. Original IDs, titles, source bytes and hashes
+are returned unchanged; canonically matching identities remain distinct records.
+
+### Filtered counts, pages and validation
+
+The optional `filter` object reports the exact `contains` value, matching fields,
+mode, `matched_conversations` and `matched_selectable_conversations`. These are
+totals across all matches, not only the returned page. Existing top-level
+`total_conversations`, `selectable_conversations`, `coverage`, byte count and hash
+still describe the **whole file**. Without the filter, output shape and behavior
+are unchanged. A zero-match page has no conversations and a null `next_offset`;
+it does not prove the source lacks relevant message content.
+
+Grouping and validation happen before filtering. If only a repeated web ID's
+second title matches, the returned item still includes all its original titles,
+counts and `AMBIGUOUS_WEB_ID` blocker. Empty/media-only matches retain
+`NO_EXTRACTED_TEXT`. Filtering never makes an ambiguous or unsupported selected
+import safe. Malformed unmatched or off-page content still rejects the whole file,
+even if the requested substring would match nothing.
+
+`limit`, `offset` and `next_offset` now apply to the matching identities, in the
+same Unicode-code-point ID order. Use the same filter and canonical mode on every
+page, and pass `--expected-export-sha256` from the first page to require the same
+source bytes. Changing a filter means starting at offset zero, not continuing the
+previous offset. There is no opaque cursor or automatic cross-call filter lease.
+
+This reduces returned metadata and the need to manually scan pages, **not** the
+source-reading scope. Every call still reads and validates the full file and
+extracts supported text internally before building the body-free inventory.
+Filtering is not a streaming, memory-bound, redaction or completeness guarantee.
+The echoed query, IDs and titles may be private, even when no body field appears.
+
 ## Pages, privacy and unchanged source bytes
 
 ```sh

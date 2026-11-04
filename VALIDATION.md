@@ -1081,3 +1081,47 @@ make all SQLite/schema or filesystem failures atomic, remove older empty databas
 or change title review, source content, Unicode spelling or valid import hashes.
 No real sessions, automatic discovery, external model calls, remote title changes
 or merge occurs. Exact-commit Ubuntu/Windows Python 3.10/3.12 CI is checked after push.
+
+### 2026-11-04: find export titles and IDs before choosing an import
+
+A synthetic 1,050-conversation web export demonstrated a first-use gap: a known
+late-sorted title required 21 default metadata pages, or two maximum-size pages,
+with the full source parsed again on each call. The inventory now accepts optional
+--contains text in both CLIs and a keyword-only Python argument, filtering existing
+web titles or exact session/conversation IDs before pagination. It still creates
+no database, prints no message-body fields and imports nothing automatically.
+
+Matching is one case-folded literal substring within a single metadata field, not
+split-term, regex, wildcard, fuzzy or body search. Local formats match IDs only.
+Optional --canonical-unicode uses the existing canonical search-copy function and
+records the runtime Unicode version. Original spelling, distinct composed/decomposed
+IDs, source bytes and hashes remain unchanged. The filter requires valid Unicode,
+non-whitespace text up to 256 code points; meaningful spaces are preserved. Invalid
+options reject before reading. Omitting the filter preserves existing output.
+
+Whole-file parsing, grouping and validation precede filtering. An alternate title
+matching a repeated web ID retains all that ID's titles/counts and ambiguity
+blocker; media-only records keep their no-text blocker. Malformed unmatched content
+still fails, including zero-result searches. Top-level totals and coverage retain
+whole-file meanings. The optional filter summary supplies matching totals, and
+next_offset indexes only the matching ID-sorted list. Operators must keep the same
+filter/mode and expected source hash across pages; no cursor or automatic lease is
+added. Filtering does not reduce full-file read/extraction scope or bound memory.
+Queries and returned metadata can be private.
+
+Eighteen independently authored tests cover the late 1,050th match, sparse/empty
+pages, exact counts, literal punctuation/spaces, casefold expansions, canonical
+Korean/accented spelling, separate canonical-equivalent IDs, local metadata/body
+exclusions, duplicate/empty-text blockers, invalid unmatched data, option validation,
+one source read, original hash checks and no database calls. Tests execute the
+three exact documented filter commands, compare both CLIs with the API, and follow
+all three formats through filtered discovery, exact-ID/hash-bound selected import,
+preview, explicit title apply and title search. A prepublication regression caught
+next_offset still using the whole-file count; it was corrected to the matching
+count and the final tests pass.
+
+The final full local suite passes 777 tests in 110.638 seconds; 78 focused inventory,
+hash, selected-import, Unicode and CLI tests pass. Publication audit and byte manifest
+cover 157 public files. No real conversation data, automatic collection, external
+model call, remote rename or merge occurs. Exact-commit Ubuntu/Windows Python
+3.10/3.12 CI is checked after push.

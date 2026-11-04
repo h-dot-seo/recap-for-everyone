@@ -38,8 +38,11 @@ For your own export, use its exact conversation ID, not its title. There is no
 fuzzy ID selection. Use [the read-only export inventory](EXPORT_INVENTORY.md),
 `recap.py list-export INPUT --format FORMAT`, to find IDs and existing web titles
 without creating a database or printing message bodies. IDs/titles may still be
-private. Do not import the whole file merely to learn an ID if that exceeds your
-intended scope. Local formats use the session ID:
+private. The inventory's optional `--contains` filter can find part of an existing
+web title or ID before paging, without searching message bodies or relaxing
+full-file validation. Use its exact returned ID for selection. Do not import the
+whole file merely to learn an ID if that exceeds your intended scope. Local formats
+use the session ID:
 
 ```sh
 python recap.py inspect examples/rollback-session.jsonl --format local-codex --conversation synthetic-rollout
