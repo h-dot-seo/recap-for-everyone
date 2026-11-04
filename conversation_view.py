@@ -5,7 +5,9 @@ import sqlite3
 from recap import readonly
 
 
-def _inventory(connection, source=None, conversation_id=None, limit=50, offset=0, unrenamed_only=False):
+def _inventory(connection, source=None, conversation_id=None, limit=50, offset=0, unrenamed_only=False, after_conversation=None):
+    if after_conversation is not None and (source is None or not isinstance(after_conversation, str)):
+        raise ValueError('conversation continuation requires one explicit source and a text cursor')
     history_exists = connection.execute(
         "SELECT 1 FROM sqlite_master WHERE type='table' AND name='title_history'"
     ).fetchone()
@@ -16,6 +18,8 @@ def _inventory(connection, source=None, conversation_id=None, limit=50, offset=0
         filters.append('source_id=?'); params.append(source)
     if conversation_id is not None:
         filters.append('conversation_id=?'); params.append(conversation_id)
+    if after_conversation is not None:
+        filters.append('conversation_id COLLATE BINARY > ?'); params.append(after_conversation)
     where = 'WHERE ' + ' AND '.join(filters) if filters else ''
     # Paginate in SQLite before constructing Python rows or looking up titles.
     rows = connection.execute(

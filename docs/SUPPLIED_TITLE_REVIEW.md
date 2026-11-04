@@ -23,7 +23,7 @@ python recap.py --db ../recap-supplied-demo/archive.sqlite import examples/web-e
 python recap.py --db ../recap-supplied-demo/archive.sqlite import examples/source-attributed-session.jsonl --format local-codex --source demo
 python recap.py --db ../recap-supplied-demo/archive.sqlite suggest-branch-title examples/web-export.json --source demo --conversation synthetic-chat --node m2 > ../recap-supplied-demo/web-proposal.json
 python recap.py --db ../recap-supplied-demo/archive.sqlite suggest-attributed-title examples/source-attributed-session.jsonl --source demo --conversation synthetic-attributed > ../recap-supplied-demo/local-proposal.json
-python recap.py --db ../recap-supplied-demo/archive.sqlite review-titles --source demo --proposal ../recap-supplied-demo/web-proposal.json --proposal ../recap-supplied-demo/local-proposal.json > ../recap-supplied-demo/queue.json
+python recap.py --db ../recap-supplied-demo/archive.sqlite review-titles --source demo --proposal ../recap-supplied-demo/web-proposal.json --proposal ../recap-supplied-demo/local-proposal.json --supplied-only > ../recap-supplied-demo/queue.json
 ```
 
 Open all three output files. The queue has two `READY` candidates: the orchard
@@ -83,9 +83,31 @@ existing default queue behavior and output shape.
 
 ## Pages and limits
 
-Supplied candidates do not change archive ordering or pagination. The page still
-covers eligible conversations in the source, not just conversations in the files.
-Use the existing `--limit`, `--offset`, state and rename-history filters.
+Without `--supplied-only`, supplied candidates do not change archive ordering or
+pagination: the page still covers all eligible source conversations. A candidate
+late in the archive may therefore be outside the default first page. Add
+`--supplied-only` when you intend to review just the explicit candidate identities,
+as in the walkthrough above. The subset is applied **before pagination**, still
+in database identity order, alongside the state and rename-history filters.
+
+`--supplied-only` requires at least one `--proposal` option. Unknown candidate IDs
+produce no archive item, and stale/invalid candidates for existing IDs remain
+visible as `UNAVAILABLE`, rather than disappearing. Omit the flag to inspect the
+whole source's missing-candidate coverage. Neither mode generates raw fallbacks.
+
+Subset mode adds `supplied_only:true` and `excluded_unsupplied_conversations`.
+Counts distinguish rename-history exclusions across the source, unsupplied IDs
+remaining after that filter, then review-state exclusions within the supplied
+intersection. These exclusions plus `total_conversations` equal
+`source_total_conversations`. `total_conversations` and `next_offset` describe the
+filtered subset. Existing-title collision checks still inspect the entire source,
+including conversations outside the supplied subset.
+
+The subset scan reads source metadata in chunks to preserve database ordering,
+continuing after the last identity rather than repeatedly scanning earlier pages.
+It does not read excluded message bodies. A state filter needs content fingerprints
+for eligible supplied identities, so it can read their full bodies before paging.
+Returned proposals still hash each selected conversation's full raw content.
 
 `proposal_mode` is `supplied`. The `supplied_proposals` summary reports `total`,
 `on_page` and `not_on_page` candidate counts. `on_page` includes invalid or stale

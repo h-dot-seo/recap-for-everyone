@@ -390,3 +390,22 @@ regression exercises Windows and POSIX paths containing spaces, redirection and
 a quoted multiword query. This is a test-harness fix, not an application path
 rewrite. The full local suite passes 431 tests; 117-file publication and manifest
 checks pass. The corrected commit's Windows/Linux CI is checked separately.
+
+
+### 2026-11-04: review explicit candidates before pagination
+
+Sixteen independent synthetic tests cover the opt-in supplied-only title queue:
+a late identity otherwise absent from the first 20 items, database ordering and
+chunk boundaries, disjoint rename/unsupplied/state counts, empty/unknown/invalid
+candidates, source isolation, outside-subset title collisions, effective review
+state and snapshot consistency. SQL tracing verifies excluded message bodies are
+not loaded even with a state filter. A 241-identity regression covers quoted/Unicode
+chunk boundaries and last-identity continuation without repeated OFFSET scans.
+CLI coverage preserves fresh individual
+preview/apply and no-write review behavior. The mixed web/local documented flow
+now uses this explicit subset option and retains the verified Windows path fix.
+
+The complete suite passes 447 tests; publication and manifest checks cover 118
+files. Default behavior is unchanged. Subset mode scans metadata and preserves
+whole-source current-title collision checks; it is not an archive-memory bound
+or authorization to apply candidates. No real corpus or model call is used.

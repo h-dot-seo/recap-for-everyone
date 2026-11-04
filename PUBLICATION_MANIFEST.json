@@ -1,12 +1,12 @@
 {
   "project": "recap-for-everyone",
-  "release": "0.52.1-windows-walkthrough",
+  "release": "0.53.0-supplied-review-subset",
   "date": "2026-11-04",
   "private_history_imported": false,
   "actual_corpora_included": false,
   "synthetic_examples_only": true,
   "license_status": "NOT_SELECTED",
-  "file_count": 116,
+  "file_count": 117,
   "files": [
     {
       "path": ".gitattributes",
@@ -30,8 +30,8 @@
     },
     {
       "path": "README.md",
-      "bytes": 57903,
-      "sha256": "e096b6f53a529aa334205805982e2b5620b889d4112555bd21ea109e5b05e1cf"
+      "bytes": 58086,
+      "sha256": "18b3c6d36816b348ba90d31e91f7e3bbc593713872cd2732141b71c1f776cb89"
     },
     {
       "path": "RIGHTS.md",
@@ -45,13 +45,13 @@
     },
     {
       "path": "SKILL.md",
-      "bytes": 4280,
-      "sha256": "be9ebca1513216c7010eb020c8a02c72f58bf9ff258d425e2b77b772f3406452"
+      "bytes": 4520,
+      "sha256": "e5955826e9348afb124c176a5490c7a8710cf577a384cb9df55551f902862caa"
     },
     {
       "path": "VALIDATION.md",
-      "bytes": 24332,
-      "sha256": "565220a2676af5be72d7157315b9a14cbb60988f09295410ab487ca096673955"
+      "bytes": 25476,
+      "sha256": "37f3e059fcd6ceafc7d496afe65bad62e34fcbf5fd36722a1b57636a9f837c09"
     },
     {
       "path": "attributed_title.py",
@@ -75,8 +75,8 @@
     },
     {
       "path": "conversation_view.py",
-      "bytes": 8454,
-      "sha256": "c035a75f3c685be40bbc1593601ce65de499ca64f9d0a8a9323210151dc1bdb7"
+      "bytes": 8818,
+      "sha256": "dd6fb27ed9bc17ab40e45401bc8751be966a342f34a3aa4048fd8b24ac60843a"
     },
     {
       "path": "docs/ARCHITECTURE.md",
@@ -130,8 +130,8 @@
     },
     {
       "path": "docs/SUPPLIED_TITLE_REVIEW.md",
-      "bytes": 7341,
-      "sha256": "54d10295a6bc98f02659c8e63bc45487eecca6e072f56d2752f73817594d372b"
+      "bytes": 8843,
+      "sha256": "3ed07bcb257caecfa0d3c26ac6ca18afc9cf8d82e7d9b68f0be84e75aaf7c2b3"
     },
     {
       "path": "docs/TITLE_ADAPTER.md",
@@ -230,8 +230,8 @@
     },
     {
       "path": "recap.py",
-      "bytes": 21907,
-      "sha256": "5b549b009c6ccbcd7a289f2cc9a4401166fe00ed31c8eb24330b6966815cc6a0"
+      "bytes": 22077,
+      "sha256": "df96dc7906446d1a4e7b4333bfb82f6495fc9984b012ef7a025064fa20981211"
     },
     {
       "path": "replay_local.py",
@@ -434,6 +434,11 @@
       "sha256": "bd3972729f90758ea84f68b1df8e533151efd69522f3864a3f9a9699cb2a60b2"
     },
     {
+      "path": "test_supplied_queue_subset.py",
+      "bytes": 18790,
+      "sha256": "073b930bff881b800db09d8cc6b2f7f90cf62d9188963e43bcccd6d52e88c409"
+    },
+    {
       "path": "test_supplied_title_queue.py",
       "bytes": 22893,
       "sha256": "489f71a48b9aa6c6b2772e6be15c625f730c85335d45a4e21b548f6fea79dc0b"
@@ -535,8 +540,8 @@
     },
     {
       "path": "title_batch.py",
-      "bytes": 13882,
-      "sha256": "c5f957238fc6d3c5db7b4c22ff427ba2288b2e722dcc6aa89438b6ca465ff1be"
+      "bytes": 15135,
+      "sha256": "e55431bbd277a901c4f80bde922575743c26c746420c06a797dbf5881dbc054a"
     },
     {
       "path": "title_excerpt.py",

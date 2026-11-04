@@ -61,3 +61,6 @@ queue's database snapshot. Missing, stale or invalid candidates remain unavailab
 Only selected page items get content validation; inspect unused candidate counts.
 Context/provider metadata remains untrusted, and normal individual preview/apply
 is still required. See `docs/SUPPLIED_TITLE_REVIEW.md`.
+Use `--supplied-only` when the intended review scope is just those explicit
+candidates, so late IDs are not hidden behind unrelated first-page conversations.
+This filters before pagination without hiding collisions elsewhere in the source.
