@@ -49,6 +49,14 @@ The last command still shows the raw environment text and user request. Nothing
 was deleted or rewritten to produce the cleaner title. The standalone equivalent
 is `attributed_title.py --db DB --source SOURCE --conversation ID INPUT`.
 
+## Choose a later request or a repeated occurrence
+
+Use `--message ID` to select a specific archived user message after the full source
+checks. Repeated eligible occurrences require `--origin-locator line:N`; neither
+raw text equality nor matching IDs resolves different positional attribution.
+See the [synthetic selection walkthrough](ATTRIBUTED_MESSAGE_SELECTION.md) for
+exact commands, preview limits and unchanged full-conversation safeguards.
+
 ## Exact selection and rejection contract
 
 - The input is one explicitly supplied local-codex JSONL export, read into one
@@ -70,7 +78,7 @@ is `attributed_title.py --db DB --source SOURCE --conversation ID INPUT`.
   harness. Neither produces user-source text. No eligible text yields an error,
   not a fallback to injected or unknown material.
 
-The selected text goes through the existing deterministic greeting-skip/80-character
+The selected text goes through the existing deterministic greeting-skip/80-code-point
 excerpt function. Its title may still be unhelpful or reveal private information;
 normal review remains required. This operation does not create a trust boundary,
 verify who typed the text, reconstruct UI visibility or interpret quoted text as

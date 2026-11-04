@@ -89,6 +89,10 @@ matter; do not treat this flag as equivalent. No model, remote rename, automatic
 relevance score or approval is added. Review before sharing: IDs, text and titles
 can be private.
 
+For the local source-attributed workflow, [choose a specific labeled occurrence](ATTRIBUTED_MESSAGE_SELECTION.md)
+with `--message` and, when repeated, `--origin-locator`. This keeps its positional
+user-source filtering instead of reverting to the broader raw excerpt.
+
 ## Choose a later message inside a verified branch or retained history
 
 A meaningful request can occur after a generic opener even within the correct web

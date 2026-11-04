@@ -1,6 +1,7 @@
 """Propose a local title from explicitly source-labeled user text in a pinned export."""
 import argparse
 import json
+import re
 import sqlite3
 from pathlib import Path
 
@@ -151,8 +152,26 @@ def attributed_evidence(db, source, conversation, path):
     return rows, content_fingerprint(content), context
 
 
-def suggest_attributed(db, source, conversation, path):
+def suggest_attributed(db, source, conversation, path, message_id=None, origin_locator=None):
+    if message_id is not None and (not isinstance(message_id, str) or not message_id):
+        raise ValueError('selected message ID must be nonempty text')
+    if origin_locator is not None:
+        if message_id is None:
+            raise ValueError('selected origin locator requires a message ID')
+        if not isinstance(origin_locator, str) or not re.fullmatch(r'line:[1-9][0-9]*', origin_locator):
+            raise ValueError('selected origin locator must be line followed by a positive physical line number')
     rows, digest, context = attributed_evidence(db, source, conversation, path)
+    if message_id is not None:
+        # Select only after the full raw conversation's source and archive checks.
+        # A repeated archive ID may have different attributed parts at each line;
+        # neither matching text nor the first occurrence resolves that ambiguity.
+        rows = [row for row in rows if row['message_id'] == message_id and
+                (origin_locator is None or row['origin_locator'] == origin_locator)]
+        if len(rows) != 1:
+            raise ValueError('selected message must identify exactly one user-attributed source occurrence; use its origin locator when repeated')
+        context['evidence_selection'] = dict(mode='explicit_source_attributed_occurrence',
+            message_id=message_id, origin_locator=rows[0]['origin_locator'],
+            scope='verified user-labeled text occurrence in the selected raw conversation')
     # Excerpt selection must distinguish occurrences before resolving archive IDs.
     candidates = [dict(message_id=row['origin_locator'], role=row['role'], text=row['text'])
                   for row in rows]
@@ -173,10 +192,12 @@ def main():
     parser.add_argument('--source', required=True)
     parser.add_argument('--conversation', required=True)
     parser.add_argument('input')
+    parser.add_argument('--message', help='select one archived user message with explicit user-labeled text')
+    parser.add_argument('--origin-locator', help='select the exact line:N occurrence of --message in this verified export')
     add_output_argument(parser)
     args = parser.parse_args()
     try:
-        result = suggest_attributed(args.db, args.source, args.conversation, args.input)
+        result = suggest_attributed(args.db, args.source, args.conversation, args.input, args.message, args.origin_locator)
         result = save_if_requested(result, args, 'proposal')
     except (ValueError, OSError, KeyError, TypeError, sqlite3.Error) as error:
         parser.exit(1, str(error) + '\n')

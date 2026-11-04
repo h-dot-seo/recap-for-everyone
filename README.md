@@ -1066,6 +1066,9 @@ compatibility contract](docs/SOURCE_ATTRIBUTED_TITLES.md). Raw inspection surfac
 metadata presence without filtering by it. Existing raw/branch/replay title paths
 remain available; the replay grammar also now accepts explicit legacy history mode.
 
+To choose a later user-labeled request without injected parts, see the
+[source-attributed message and occurrence selection walkthrough](docs/ATTRIBUTED_MESSAGE_SELECTION.md).
+
 ## Find a session by remembered text before import
 
 `list-export --text-contains "remembered phrase"` can find opaque local session IDs

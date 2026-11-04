@@ -178,6 +178,8 @@ def main():
     attributed = sub.add_parser('suggest-attributed-title', help='suggest a title from explicit user-source labels in a verified local-codex export')
     attributed.add_argument('input'); attributed.add_argument('--source', required=True)
     attributed.add_argument('--conversation', required=True)
+    attributed.add_argument('--message', help='select one archived user message with explicit user-labeled text')
+    attributed.add_argument('--origin-locator', help='select the exact line:N occurrence of --message in this verified export')
     for name in ('preview-title', 'apply-title'):
         command = sub.add_parser(name, help='review a proposal' if name == 'preview-title' else 'apply a reviewed local display title')
         command.add_argument('input', help='proposal JSON for preview, reviewed preview JSON for apply')
@@ -307,7 +309,7 @@ def main():
             result = suggest_replay(args.db, args.source, args.conversation, args.input, args.message)
         elif args.command == 'suggest-attributed-title':
             from attributed_title import suggest_attributed
-            result = suggest_attributed(args.db, args.source, args.conversation, args.input)
+            result = suggest_attributed(args.db, args.source, args.conversation, args.input, args.message, args.origin_locator)
         elif args.command == 'export-title-plan':
             from title_plan import make_plan
             result = make_plan(args.db, args.source, args.conversation, args.input, args.format)

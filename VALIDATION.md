@@ -1375,3 +1375,50 @@ cursor and title-selection bundle passes 61. Public audit and byte manifest cove
 165 files. No real source data, model transmission, automatic approval, remote title
 mutation or merge occurs. Exact-commit Ubuntu/Windows Python 3.10/3.12 CI is checked
 after push.
+
+### 2026-11-04: select meaningful source-attributed occurrences
+
+A synthetic audit reproduced a generic first user-labeled request hiding a later
+specific request in source-attributed title generation. Raw, branch and replay
+generators already allowed explicit message selection, but the attributed path did
+not. Repeated identical raw messages can also label different content positions as
+user text, so an archive ID alone does not always identify the intended evidence.
+
+The attributed API and both CLI entry points now accept an optional exact archived
+message ID and physical origin locator. A locator requires a message ID and strict
+positive ASCII line:N syntax. Argument-shape failures precede source/database I/O.
+Selection occurs only after existing attribution and full selected-conversation
+source/archive verification. Exactly one eligible occurrence must match; missing,
+non-user, unattributed, empty and ambiguous choices reject without fallback. Equal
+raw text or equal candidate excerpts do not resolve duplicate occurrences.
+
+The chosen evidence retains the complete raw-conversation fingerprint, original
+file hash, extraction warnings and full user-role coverage, while evidence parts
+narrow to its physical occurrence. Default output and behavior remain unchanged;
+a direct comparison with the previously published standalone command also matched.
+The existing deterministic 80-code-point excerpt rules, unsigned metadata limits,
+raw preview text and explicit checked apply remain unchanged. Source labels are not
+verified human authorship, and no retained-history reconstruction is added.
+
+Twenty-six independently authored synthetic tests cover exact IDs, early argument
+validation, duplicated positional labels, absent/noneligible/unusable selections,
+BOM/blank/mixed-newline physical locators, renamed ID-less source association,
+malformed other attribution, changed source bytes, missing or altered nonselected
+archive content/provenance, stale content/title previews and fixed non-leaking
+errors. Both CLI entry points match the API and save native UTF-8 output.
+
+The new fixture has six records, five message occurrences and four archived
+messages. Its ten documented commands select a meaningful later request, save and
+review it, then apply explicitly. A second repeated-occurrence proposal is previewed
+but not applied. Tests verify revision zero before the first apply, revision one
+afterward, exact saved receipt hashes, unchanged source bytes and immutable raw
+message/provenance rows. Test SQLite connections close explicitly, CLI text mode
+handles native newlines, and documentation tokens are split before substituting
+platform paths. The guide warns that preview evidence still shows raw text and
+that attribution fields are not independently authenticated at apply time.
+
+The full final suite passes 868 tests in 130.635 seconds; the focused attribution,
+scoped selection, native output, review evidence and offline adapter bundle passes
+122 tests. Public audit and byte manifest cover 168 files. No actual personal data,
+model transmission, source rewrite, automatic approval, live title mutation or merge
+occurs. Exact-commit Ubuntu/Windows Python 3.10/3.12 CI is checked after push.
