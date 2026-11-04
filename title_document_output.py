@@ -12,7 +12,7 @@ def add_output_argument(parser):
 
 
 def write_title_json(value, output, kind):
-    if kind not in ('proposal', 'preview', 'queue') or not isinstance(value, dict):
+    if kind not in ('proposal', 'preview', 'queue', 'request') or not isinstance(value, dict):
         raise ValueError('title output requires a document object and supported kind')
     try:
         raw = (json.dumps(value, ensure_ascii=False, allow_nan=False, indent=2) + '\n').encode('utf-8')
@@ -49,7 +49,9 @@ def write_title_json(value, output, kind):
                 staging_cleanup_complete=cleanup_complete,
                 remaining_staging_file=temporary.name if not cleanup_complete else None,
                 scope='new local JSON file only; no archive mutation or approval',
-                warning='PRIVATE FILE. Review the saved document, not this receipt, before a separate explicit apply. If staging cleanup failed, the complete output already exists; inspect the leftover file rather than blindly retrying.')
+                warning=('PRIVATE REQUEST FILE. This receipt is not the request or permission to send data. Review the saved request before separately authorized use. Saving does not run a provider or transmit data. If staging cleanup failed, the complete output already exists; inspect the leftover file rather than blindly retrying.'
+                         if kind == 'request' else
+                         'PRIVATE FILE. Review the saved document, not this receipt, before a separate explicit apply. If staging cleanup failed, the complete output already exists; inspect the leftover file rather than blindly retrying.'))
 
 
 def save_if_requested(value, args, kind):

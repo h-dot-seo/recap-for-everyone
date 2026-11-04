@@ -12,22 +12,32 @@ Run from the repository root with Python 3.10+ and SQLite FTS5. Choose a **new**
 private directory outside the repository. The commands below use
 `../recap-response-demo`; replace it consistently if needed. Its parent must exist.
 Stop if directory creation or any command fails. Do not reuse an existing folder.
-Redirection overwrites its target, so use a UTF-8-capable shell and inspect each
-exit status. POSIX shells and PowerShell 7 are suitable; Windows PowerShell 5's
-default UTF-16 redirection is not.
+The read-only adapter commands now save directly with `--output NEW_JSON`, using
+UTF-8 without a BOM and the existing atomic no-overwrite writer. No shell `>` or
+special shell encoding is needed. Use new filenames whose parent exists in an
+operator-controlled private directory. Filesystems must support hard links.
+Inspect each exit status and stop on failure.
 
 The provider, model and `example.invalid` endpoint below are invented configuration
 labels. The response in `examples/` is also invented, not actual model output.
-None of these commands contacts the endpoint. Preparation prints private user text
+None of these commands contacts the endpoint. Preparation saves private user text
 to a local file even though the default external execution setting is disabled.
 
 ```sh
 mkdir ../recap-response-demo
 python recap.py --db ../recap-response-demo/archive.sqlite import examples/web-export.json --format web --source demo
-python title_adapter.py --db ../recap-response-demo/archive.sqlite --source demo --conversation synthetic-chat --kind external --provider-id synthetic-provider --model synthetic-title-v1 --endpoint https://example.invalid/title --evidence-scope web-branch --input examples/web-export.json --node m2 prepare > ../recap-response-demo/prepared.json
-python title_adapter.py --db ../recap-response-demo/archive.sqlite --source demo --conversation synthetic-chat --kind external --provider-id synthetic-provider --model synthetic-title-v1 --endpoint https://example.invalid/title --evidence-scope web-branch --input examples/web-export.json --node m2 complete-response ../recap-response-demo/prepared.json examples/synthetic-title-response.json > ../recap-response-demo/proposal.json
-python recap.py --db ../recap-response-demo/archive.sqlite preview-title ../recap-response-demo/proposal.json > ../recap-response-demo/reviewed.json
+python title_adapter.py --db ../recap-response-demo/archive.sqlite --source demo --conversation synthetic-chat --kind external --provider-id synthetic-provider --model synthetic-title-v1 --endpoint https://example.invalid/title --evidence-scope web-branch --input examples/web-export.json --node m2 prepare --output ../recap-response-demo/prepared.json
+python title_adapter.py --db ../recap-response-demo/archive.sqlite --source demo --conversation synthetic-chat --kind external --provider-id synthetic-provider --model synthetic-title-v1 --endpoint https://example.invalid/title --evidence-scope web-branch --input examples/web-export.json --node m2 complete-response ../recap-response-demo/prepared.json examples/synthetic-title-response.json --output ../recap-response-demo/proposal.json
+python recap.py --db ../recap-response-demo/archive.sqlite preview-title ../recap-response-demo/proposal.json --output ../recap-response-demo/reviewed.json
 ```
+
+With `--output`, stdout is a metadata-only `SAVED` receipt, not the saved document.
+The adapter's prepare receipt has `document_kind: request`; completion has
+`document_kind: proposal`. The preview command reports `document_kind: preview`.
+Each receipt gives exact saved-file bytes/hash and staging cleanup status, but no
+payload or destination path. It does not grant permission to transmit data or apply
+a title. If cleanup is incomplete, the complete output already exists: inspect the
+reported staging basename rather than retrying blindly. See [native saving limits](TITLE_DOCUMENT_FILES.md).
 
 **Stop and open `prepared.json`, `proposal.json` and `reviewed.json`.** Check the
 selected user payload, original export hash and scope. In the reviewed document,
@@ -46,6 +56,36 @@ bytes are unchanged; no ChatGPT or Codex title changed remotely. The proposal al
 works with `review-titles --proposal FILE --supplied-only` before fresh individual
 preview/apply. Completion itself is read-only and repeatable; applying the same
 reviewed preview twice remains a stale-revision error.
+
+## Native saving keeps the same offline contract
+
+Only adapter `prepare` and `complete-response` accept this option. `generate`,
+consent processing, external execution and transfer simulation are unchanged;
+`generate --output` rejects at argument parsing. No network or credential transport
+is added. The Python preparation/completion APIs remain read-only and return the
+same objects. Without `--output`, both commands still print their original JSON.
+
+The saved request contains the exact same logical preparation envelope, not a
+receipt wrapper or newly approved consent. Its canonical `payload_sha256` still
+binds the model payload; the receipt's `sha256` instead describes the pretty-printed
+saved file. These hashes have different purposes and need not match. Completion
+reads the actual request file, never its receipt. Formatting a file does not bypass
+canonical freshness, evidence, selected scope or provider configuration checks.
+
+Existing destinations, including inputs, archive files, hard links and symlinks,
+are refused without replacement. A missing parent is not created. Output is staged,
+synced, closed and linked only after successful preparation/completion. A stale or
+invalid request produces no new output. Ordinary save failures use fixed
+`OUTPUT_FAILED`, without echoing private paths or contents. Check the destination,
+parent and filesystem capabilities instead of changing source hashes or bypassing
+validation. A successful `SAVED` with incomplete cleanup is not a failed save.
+
+Native files remain UTF-8 without a BOM. This feature does not change input-decoding
+rules: adapter prepared-request, response, mock and consent readers still require
+UTF-8 without a BOM, even though separate proposal/preview readers tolerate one
+initial signature. No conversion or repair is performed. Legacy redirection remains
+possible but has shell encoding/overwrite hazards; do not combine it with native
+`--output` or use it on an input path.
 
 ## Use a separately obtained response
 

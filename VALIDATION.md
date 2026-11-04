@@ -1503,3 +1503,47 @@ moved, and the stricter replay path can reject under its own earlier grammar.
 No actual personal data, model transmission, source rewriting, guessed boundary,
 remote title mutation or merge occurs. Exact-commit Ubuntu/Windows Python 3.10/3.12
 CI is checked after push.
+
+### 2026-11-04: save offline adapter requests and responses natively
+
+A workflow audit identified a deliberate capability gap rather than a parser
+regression: the separate provider-neutral adapter's prepare and complete-response
+commands still required shell redirection, although the downstream title workflow
+already supported native no-overwrite UTF-8 documents. The saved-response guide
+therefore retained shell truncation and Windows encoding hazards on its first steps.
+
+Those two offline/read-only commands now accept --output. Preparation saves the
+same logical request envelope with a request-kind receipt; completion saves the
+same validated proposal with a proposal-kind receipt. The shared writer retains
+same-directory closed/synced staging, atomic hard-link publication, existing-target
+refusal and truthful SAVED status when post-publication staging cleanup fails.
+Request receipts explicitly deny transmission permission and contain no payload,
+source identity or destination path. Older receipt kinds are unchanged. Native
+save failures return fixed OUTPUT_FAILED, including the RuntimeError raised by
+looping output parents on supported Python versions, without private diagnostics.
+
+The seven-command saved-response walkthrough now uses native saving for request,
+proposal and preview. Its existing regression executes the exact commands, verifies
+all three receipt byte hashes/kinds, forbids shell redirection, keeps the archive
+unchanged until explicit apply and checks the final searchable display title.
+Documentation distinguishes saved-file hashes from canonical payload hashes and
+retains existing input-encoding, source freshness, evidence and consent boundaries.
+The adapter's request/response/consent readers have not gained BOM tolerance.
+
+Fifteen independently authored synthetic tests cover fresh-archive raw, web-branch,
+local-replay and local-attributed flows; local/mock preparation parity; private
+Unicode files and ASCII-safe receipts; protected database/export/request/response
+paths and aliases; missing or looping parents; invalid/stale input; receipt misuse;
+source read-once behavior; no generation or transport; link/fsync failures; and
+post-publication cleanup status. SQLite handles close explicitly and Windows
+canonical-parent comparisons use samefile plus filename. Independent production
+review found no substantive blocker and identified the now-covered parent-loop
+error refinement. Four no-option preparation/completion cases also match the prior
+published stdout byte-for-byte, with no archive changes.
+
+The final full suite passes 914 tests in 287.426 seconds. The focused adapter,
+completion, scoped evidence and document-output bundle passes 99 tests. Public audit
+and byte manifest cover 171 files. External generate remains disabled/unconfigured,
+does not accept --output, and transfer simulation remains unchanged. No actual user
+data, model execution/transmission, automatic title approval, remote mutation or
+merge occurs. Exact-commit Ubuntu/Windows Python 3.10/3.12 CI is checked after push.

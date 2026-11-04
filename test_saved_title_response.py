@@ -403,6 +403,7 @@ class SavedTitleResponseTests(unittest.TestCase):
         response = ROOT / 'examples/synthetic-title-response.json'
         originals = {path: path.read_bytes() for path in (source, response)}
         review_checked = applied = searched = False
+        native_saved = 0
         for line in '\n'.join(blocks).splitlines():
             if not line.strip():
                 continue
@@ -414,13 +415,7 @@ class SavedTitleResponseTests(unittest.TestCase):
             self.assertEqual(args[0], 'python')
             self.assertIn(args[1], ('recap.py', 'title_adapter.py'))
             args[0] = sys.executable
-            target = None
-            if '>' in args:
-                position = args.index('>')
-                self.assertEqual(len(args), position + 2)
-                target = Path(args[position + 1])
-                args = args[:position]
-                self.assertFalse(target.exists())
+            self.assertNotIn('>', args, 'documented flow must use native saving')
             if 'apply-title' in args:
                 prepared = json.loads((scratch / 'prepared.json').read_bytes())
                 reviewed = json.loads((scratch / 'reviewed.json').read_bytes())
@@ -440,12 +435,24 @@ class SavedTitleResponseTests(unittest.TestCase):
                 self.assertEqual(reviewed['expected_revision'], 0)
                 self.assertEqual(titles(scratch / 'archive.sqlite', 'demo', 'synthetic-chat')['revision'], 0)
                 review_checked = True
+            native_output = Path(args[args.index('--output') + 1]) if '--output' in args else None
+            before_db = (scratch / 'archive.sqlite').read_bytes() if (scratch / 'archive.sqlite').exists() else None
             result = subprocess.run(args, cwd=ROOT, capture_output=True, timeout=30,
                                     env=dict(os.environ, PYTHONIOENCODING='ascii'))
             self.assertEqual(result.returncode, 0, result.stderr)
             value = json.loads(result.stdout)
-            if target is not None:
-                target.write_bytes(result.stdout)
+            if native_output is not None:
+                native_saved += 1
+                raw = native_output.read_bytes()
+                expected_kind = ('request' if 'prepare' in args else 'preview' if 'preview-title' in args else 'proposal')
+                self.assertEqual(value['status'], 'SAVED')
+                self.assertEqual(value['document_kind'], expected_kind)
+                self.assertEqual(value['sha256'], hashlib.sha256(raw).hexdigest())
+                self.assertEqual(value['bytes'], len(raw))
+                self.assertEqual(value['encoding'], 'UTF-8')
+                self.assertFalse(raw.startswith(b'\xef\xbb\xbf'))
+                self.assertNotIn(str(native_output), json.dumps(value))
+                self.assertEqual((scratch / 'archive.sqlite').read_bytes(), before_db)
             if 'apply-title' in args:
                 self.assertTrue(review_checked)
                 self.assertEqual(value['display_title'], 'Synthetic orchard experimental design')
@@ -455,6 +462,7 @@ class SavedTitleResponseTests(unittest.TestCase):
                 self.assertEqual(value['total_matches'], 1)
                 searched = True
         self.assertTrue(review_checked and applied and searched)
+        self.assertEqual(native_saved, 3)
         for path, before in originals.items():
             self.assertEqual(path.read_bytes(), before)
 

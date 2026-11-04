@@ -158,3 +158,14 @@ CLI handles this. Tests use synthetic responses and do not access external servi
 
 Adapter CLI JSON uses ASCII escapes for non-ASCII characters so titles remain
 parseable even under a non-UTF-8 terminal encoding. Escaping is not redaction.
+
+## Save offline adapter documents without shell redirection
+
+`prepare --output NEW_JSON` saves the preparation envelope as native UTF-8;
+`complete-response PREPARED RESPONSE --output NEW_JSON` saves the locally validated
+proposal. Both refuse existing targets and return metadata-only receipts instead
+of printing private document contents. No-option stdout and all freshness/evidence
+checks are unchanged. `generate` does not accept the option and external execution
+remains disabled/unconfigured. See [the native saved-response workflow](SAVED_TITLE_RESPONSE.md)
+for explicit review, receipt meaning and fixed `OUTPUT_FAILED` handling. Saving a
+request is not permission to send it, and saving a proposal is not title approval.

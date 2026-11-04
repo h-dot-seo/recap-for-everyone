@@ -32,11 +32,13 @@ The unified `recap.py` commands supporting this option are:
 The standalone `title_suggestion.py`, `branch_title.py`, `replay_title.py`,
 `attributed_title.py` and `title_proposal.py preview` support the same option.
 It is a command option, not a global switch for arbitrary output. It is deliberately
-absent from import, apply, manual title writes, review-state writes and the separate
-provider adapter. A save failure must not make a committed mutation look unsuccessful.
+absent from import, apply, manual title writes and review-state writes. A save
+failure must not make a committed mutation look unsuccessful. The separate provider
+adapter now supports it only on offline `prepare` and `complete-response`, not
+`generate` or transfer simulation. See the [saved-response walkthrough](SAVED_TITLE_RESPONSE.md).
 `prepare-web-export --output` retains its separate existing ZIP-member behavior.
 
-The saved file contains the **same proposal, queue or preview object** that the
+The saved file contains the **same proposal, queue, preview or prepared-request object** that the
 command normally prints. No receipt envelope is inserted. Evidence selection,
 full-content fingerprints, revision checks, advisory hints and unsigned metadata
 keep their existing meanings. Queue files still require an explicit conversation
@@ -46,7 +48,7 @@ authenticity, human review or arbitrary caller-provided document schemas.
 With `--output`, stdout contains only a receipt with:
 
 - `schema: "recap.saved-title-json.v1"` and `status: "SAVED"`.
-- `document_kind`: `proposal`, `queue` or `preview`.
+- `document_kind`: `proposal`, `queue`, `preview` or `request` (adapter preparation).
 - `encoding: "UTF-8"`, the exact byte count and SHA-256 of the saved bytes.
 - Staging cleanup status and, if needed, the leftover staging basename.
 
@@ -54,6 +56,10 @@ The receipt does not print the saved title/body, source/conversation ID or outpu
 path. It is not a proposal or reviewed document and cannot replace one at the next
 step. Hashes and metadata are not anonymization, authenticity or approval. Apply
 still checks the saved preview's content fingerprint and revision, not this receipt.
+A `request` receipt is not the prepared payload or permission to send it; it
+cannot replace the preparation file in `complete-response`. Native request saving
+does not execute a provider. Its saved-file hash differs in purpose from the
+canonical model-payload hash inside that file.
 Without `--output`, stdout behavior and JSON shapes remain unchanged.
 
 ## Encoding and no-overwrite publication
