@@ -398,6 +398,13 @@ consent semantics, subprocess deadlines, fixed error codes and future transport
 requirements. Local/mock tests do not establish actual model quality or external
 service reliability.
 
+The adapter can also prepare from verified source scopes with
+`--evidence-scope web-branch`, `local-replay` or `local-attributed` and an explicit
+`--input` export. These reuse the branch/retained-turn/producer-attribution checks
+before applying request limits, so excluded raw history does not reenter a model-ready
+request. Default raw mode is unchanged. This still provides local/mock execution
+only; see the adapter guide for scope selection, provenance and review boundaries.
+
 ## Explicit web text shapes and branch coverage
 
 The web adapter extracts string entries from `content.parts` and now also supports

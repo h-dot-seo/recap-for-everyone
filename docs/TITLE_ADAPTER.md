@@ -32,6 +32,69 @@ reread the database, append hidden context, change the model, or serialize a mod
 request after consent. Message content is untrusted quoted evidence, not instructions
 to change application behavior.
 
+## Choose verified evidence before request limits
+
+The default `--evidence-scope raw` retains the existing archive-wide behavior.
+It can include abandoned web branches, rolled-back local turns and harness text
+carried in user-role records. User role alone is not proof of human authorship.
+For narrower evidence, explicitly name an original export and one scope:
+
+- `web-branch`: the selected mapping node's parent path, or the file's valid
+  `current_node`. Optional `--node` selects an exact node. No node is guessed.
+- `local-replay`: verified retained text turns under the existing fail-closed
+  replay grammar. Unsupported or unresolved history remains an error.
+- `local-attributed`: typed text parts explicitly labeled with producer
+  provenance `user`. Missing, malformed or unknown attribution is not a reason
+  to fall back to harness/unknown text. Labels remain unsigned, not authenticated
+  authorship or authorization. This scope does not also apply replay filtering.
+
+These modes use the same source-occurrence checks as the existing branch, replay
+and attributed title commands. They read the explicitly named file once and match
+its immutable bytes to imported provenance and current archive evidence. Web scope
+checks the selected path; local scopes check all extracted raw messages in the
+selected conversation. They do not reconstruct a selection from a saved proposal's
+unsigned context. Changed or unimported source bytes, ambiguous occurrences and
+unsupported shapes fail without raw fallback.
+
+All eligible selected user texts, not just the first excerpt's evidence, feed the
+existing recent-user limits. Selection occurs **before** the 20-message, 4,000-character
+per-message and 12,000-character total bounds. Repeated selected occurrences with
+one archive ID and identical text collapse at their most recent position. If the
+same ID selects different text, preparation rejects rather than choosing an
+attribution variant. The full raw archive fingerprint still guards preview/apply,
+including excluded branches, discarded turns and harness content.
+
+For the already imported synthetic web example in the walkthrough:
+
+```sh
+python title_adapter.py --db ../recap-demo/archive.sqlite --source web-demo --conversation synthetic-chat --evidence-scope web-branch --input examples/web-export.json --node m2 prepare
+python title_adapter.py --db ../recap-demo/archive.sqlite --source web-demo --conversation synthetic-chat --evidence-scope web-branch --input examples/web-export.json --node m2 generate > ../recap-demo/adapter-proposal.json
+```
+
+For an imported local file, use `--evidence-scope local-replay --input INPUT` or
+`--evidence-scope local-attributed --input INPUT` and its exact source/conversation.
+The flags precede `prepare` or `generate`. Nonraw scopes require `--input`; raw
+scope rejects it, and `--node` is only valid with `web-branch`. The local/mock
+generation choices and external-disabled boundary are otherwise unchanged.
+Each CLI invocation prepares a fresh request; `generate` does not load an earlier
+`prepare` result. If the archive or an intentionally reimported export changes
+between commands, inspect the new proposal and scope again before applying it.
+
+Scoped preparation and proposals add local-only `evidence_context`: the mode,
+descriptive selection details, and counts for input user occurrences, unique user
+messages, included/omitted messages and truncated messages. Selection details cover
+the eligible source scope, which can be larger than the bounded provider payload;
+returned title evidence must still name IDs actually in that payload. Context is
+frozen separately and limited to 1 MiB. It is private, unsigned and not reauthenticated
+by preview/apply. Neither context, source hash nor source/conversation labels are
+added to outbound payload bytes. Only a changed outbound payload changes the
+consent hash. No actual transmission is implemented.
+
+Review the resulting proposal through `preview-title`, then explicitly apply one
+reviewed title, or supply it to `review-titles --proposal FILE --supplied-only`.
+Do not mistake a narrower excerpt for a semantic summary. Existing raw output
+shapes remain unchanged, and no source text or remote title is modified.
+
 ## Explicit external consent contract
 
 External settings identify provider ID, HTTPS endpoint and model. Endpoints cannot

@@ -1,12 +1,12 @@
 {
   "project": "recap-for-everyone",
-  "release": "0.53.0-supplied-review-subset",
+  "release": "0.54.0-scoped-title-adapter",
   "date": "2026-11-04",
   "private_history_imported": false,
   "actual_corpora_included": false,
   "synthetic_examples_only": true,
   "license_status": "NOT_SELECTED",
-  "file_count": 117,
+  "file_count": 118,
   "files": [
     {
       "path": ".gitattributes",
@@ -30,8 +30,8 @@
     },
     {
       "path": "README.md",
-      "bytes": 58086,
-      "sha256": "18b3c6d36816b348ba90d31e91f7e3bbc593713872cd2732141b71c1f776cb89"
+      "bytes": 58567,
+      "sha256": "ae18446e17af4a87bff904332c438d314218d111866661ace9840a640bbd49c1"
     },
     {
       "path": "RIGHTS.md",
@@ -45,18 +45,18 @@
     },
     {
       "path": "SKILL.md",
-      "bytes": 4520,
-      "sha256": "e5955826e9348afb124c176a5490c7a8710cf577a384cb9df55551f902862caa"
+      "bytes": 5097,
+      "sha256": "ec7cea6a80951b1e47abfa92ff8e7d75917dfe13f09516b792cb61178eb57a69"
     },
     {
       "path": "VALIDATION.md",
-      "bytes": 25476,
-      "sha256": "37f3e059fcd6ceafc7d496afe65bad62e34fcbf5fd36722a1b57636a9f837c09"
+      "bytes": 27084,
+      "sha256": "42b2fd26f264a940909c50bffba34f5fec752f0f717964f7f50159cc7f285d1d"
     },
     {
       "path": "attributed_title.py",
-      "bytes": 9020,
-      "sha256": "67d744311f40b1aa7aca798f8c2b1d354c4fd44e552fef11a89896706379c825"
+      "bytes": 10202,
+      "sha256": "7290db2d0fcf0a1fa6f91a9660d1dedae19b9d0138057210a7fe25aa5638ad6d"
     },
     {
       "path": "audit_publication.py",
@@ -65,8 +65,8 @@
     },
     {
       "path": "branch_title.py",
-      "bytes": 3194,
-      "sha256": "8d2f4794d436dc2cc86b784d1515dac1cd3c59600338cc38eadc173a6e873616"
+      "bytes": 3604,
+      "sha256": "e4abbe27915f22341069d943309f48c3839ebc4629abb6f2e1cd9688a700b9b8"
     },
     {
       "path": "conversation_search.py",
@@ -135,8 +135,8 @@
     },
     {
       "path": "docs/TITLE_ADAPTER.md",
-      "bytes": 5291,
-      "sha256": "2d93841079f3ff9db853debcf06905d7e3c5035d025c003a3ac82a128af2f1f5"
+      "bytes": 9518,
+      "sha256": "fd13a942ec5249a891fd4da5f45fabaf637f98144484d0b3bb8cc0fb6799d48e"
     },
     {
       "path": "docs/TITLE_HISTORY_SEARCH.md",
@@ -165,8 +165,8 @@
     },
     {
       "path": "docs/TITLE_WALKTHROUGH.md",
-      "bytes": 6842,
-      "sha256": "9e85e02003724f383983d429e0a1a0df134f63111461af12a4439f0185d964a6"
+      "bytes": 7591,
+      "sha256": "22657d0c961391f4ec9b779f60ceeec5315c3770ccec34cdd1e767e09f15b80c"
     },
     {
       "path": "docs/WEB_ZIP_INVENTORY.md",
@@ -240,8 +240,8 @@
     },
     {
       "path": "replay_title.py",
-      "bytes": 4987,
-      "sha256": "b3bb500f98f6d2aa5a52817b257706da967657a8482d5c7aef6887b4e23f5774"
+      "bytes": 5422,
+      "sha256": "7fd495d9fd362cef19850c92904a2d98ceea0cc3292da78b8ec7ef4e831463e0"
     },
     {
       "path": "session_workflow.py",
@@ -404,6 +404,11 @@
       "sha256": "e8fcd9a6fb78afd390ac8f6a10afe214d39940200a8be5b520dd8774f93b7d06"
     },
     {
+      "path": "test_scoped_title_adapter.py",
+      "bytes": 26489,
+      "sha256": "35d69079028d4cd4724b02b129494336d08a84973aa67aca16aa06e5460aed6a"
+    },
+    {
       "path": "test_search_excerpts.py",
       "bytes": 6910,
       "sha256": "2165e7e5599b383d13ba03dd8ad0ceec2ae5457fcc6652f3d43acf9a176de950"
@@ -535,8 +540,8 @@
     },
     {
       "path": "title_adapter.py",
-      "bytes": 13901,
-      "sha256": "b3a7e17f720f42fec2638d2dd2d1a59254095a5e0326051e3faae35529ab17da"
+      "bytes": 18299,
+      "sha256": "1222da3f3311e43091de6d365a68dbe8c67b14cce4ab28e11ba2a619a171152d"
     },
     {
       "path": "title_batch.py",

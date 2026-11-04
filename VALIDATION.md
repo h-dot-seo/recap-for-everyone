@@ -409,3 +409,29 @@ The complete suite passes 447 tests; publication and manifest checks cover 118
 files. Default behavior is unchanged. Subset mode scans metadata and preserves
 whole-source current-title collision checks; it is not an archive-memory bound
 or authorization to apply candidates. No real corpus or model call is used.
+
+
+### 2026-11-04: verified source scopes for title requests
+
+Twenty-seven independent synthetic tests exercise provider-neutral preparation
+from pinned web branches, retained local turns and explicitly source-attributed
+local text. They reproduce and prevent abandoned paths, rolled-back requests and
+harness parts reentering the bounded user payload. Selection precedes message and
+character limits; all eligible evidence, not just a first excerpt, is considered.
+Repeated identical attributed occurrences collapse at the most recent position,
+while different selected text for one archive ID rejects as ambiguous.
+
+Existing suggestion builders share the verified selection paths without changing
+their supported outputs. Tests cover complete raw fingerprints, source/occurrence
+changes, no fallback, readonly single source reads, malformed and capped local
+context, consent hashes, Unicode CLI behavior for all three scopes, supplied-only
+queue review, individual preview/apply and searchable local titles. Existing raw
+adapter response shapes remain unchanged. No actual external transport, semantic
+quality validation, source rewriting or remote title mutation is added.
+
+The complete suite passes 474 tests; publication and manifest checks cover 119
+files. Selection context remains private, descriptive and unsigned. Local replay
+and attribution are separate alternatives, not a combined effective-human-history
+reconstruction. Full source/archive reads remain necessary; outbound bounds do
+not establish an archive memory bound. Exact-commit cross-platform CI is checked
+separately after publication.

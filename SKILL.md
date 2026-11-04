@@ -64,3 +64,11 @@ is still required. See `docs/SUPPLIED_TITLE_REVIEW.md`.
 Use `--supplied-only` when the intended review scope is just those explicit
 candidates, so late IDs are not hidden behind unrelated first-page conversations.
 This filters before pagination without hiding collisions elsewhere in the source.
+
+For provider-neutral title preparation, select an explicit adapter evidence scope
+when raw user-role content includes alternate branches, discarded turns or harness
+text. `title_adapter.py --evidence-scope web-branch|local-replay|local-attributed`
+requires the original `--input` file and verifies its archive association before
+bounding user evidence. These scopes are alternatives, not a combined filter.
+Inspect the actual prepared payload and local coverage, not just a first excerpt.
+No external transport is supplied, and source labels/context are not trust or consent.

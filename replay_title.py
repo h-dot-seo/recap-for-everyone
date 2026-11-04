@@ -12,7 +12,8 @@ from title_rules import validate_title
 from strict_json import loads
 
 
-def suggest_replay(db, source, conversation, path):
+def replay_evidence(db, source, conversation, path):
+    """Return verified retained rows, the whole archive digest, and descriptive context."""
     path = Path(path)
     raw = path.read_bytes()
     projection = reconstruct_bytes(raw)
@@ -56,17 +57,26 @@ def suggest_replay(db, source, conversation, path):
             selected.append(dict(message_id=stored['message_id'], role=stored['role'], text=stored['text']))
             mappings.append(dict(projection_id=message['projection_id'], archive_message_id=stored['message_id'],
                                  source_message_id=message['message_id'], origin_locator=message['origin_locator']))
-    suggestion = excerpt(selected)
-    validate_title(suggestion['title'])
     rows = [dict(message_id=m['message_id'], role=m['role'], text=m['text']) for m in archive['messages']]
-    return dict(source=source, conversation=conversation, provider='local-extractive',
-                content_sha256=content_fingerprint(rows), **suggestion,
-                projection_context=dict(contract=projection['contract'], original_sha256=projection['original_sha256'],
+    context = dict(projection_context=dict(contract=projection['contract'], original_sha256=projection['original_sha256'],
                     retained_turns=projection['retained_turns'], rolled_back_turns=projection['rolled_back_turns'],
-                    evidence_mappings=[m for m in mappings if m['archive_message_id'] in suggestion['evidence_message_ids']],
+                    evidence_mappings=mappings,
                     full_model_history_reconstructed=False),
                 scope='one conversation-wide local display title, selected from verified retained text turns',
                 warning='Pinned source snapshot; review before apply. Projection context is descriptive, not authenticated. Raw archive history remains unchanged.')
+
+    return selected, content_fingerprint(rows), context
+
+
+def suggest_replay(db, source, conversation, path):
+    selected, digest, context = replay_evidence(db, source, conversation, path)
+    suggestion = excerpt(selected)
+    validate_title(suggestion['title'])
+    projection = context['projection_context']
+    projection['evidence_mappings'] = [m for m in projection['evidence_mappings']
+                                       if m['archive_message_id'] in suggestion['evidence_message_ids']]
+    return dict(source=source, conversation=conversation, provider='local-extractive',
+                content_sha256=digest, **suggestion, **context)
 
 
 def main():

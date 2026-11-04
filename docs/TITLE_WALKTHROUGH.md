@@ -42,6 +42,19 @@ python recap.py --db ../recap-demo/archive.sqlite find orchard --source web-demo
 changes one local display title and increments its revision. It does not rename
 anything in ChatGPT, rewrite the source file, or remove messages.
 
+To reuse the same verified path for bounded provider-neutral preparation, rather
+than return to raw archive text, inspect this read-only request:
+
+```sh
+python title_adapter.py --db ../recap-demo/archive.sqlite --source web-demo --conversation synthetic-chat --evidence-scope web-branch --input examples/web-export.json --node m2 prepare
+```
+
+It contains selected user text for local review, not a transmitted model request.
+The adapter's `generate` command still executes only local excerpts or synthetic
+mocks. [Adapter scope details](TITLE_ADAPTER.md) also cover retained local turns
+and source-attributed parts. Those separate scopes do not combine replay and
+attribution filtering. Any resulting proposal still needs fresh preview and review.
+
 ## Codex local export: retain raw evidence, title retained turns
 
 ```sh

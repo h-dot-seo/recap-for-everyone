@@ -21,17 +21,16 @@ def verify_export_messages(messages, archive):
             raise ValueError('export lacks matching archived export provenance; import the original export first')
 
 
-def suggest_branch(db, source, conversation, path, node=None):
+def branch_evidence(db, source, conversation, path, node=None):
+    """Return verified branch rows, the whole archive digest, and descriptive context."""
     branch = branch_view(path, conversation, node)
     # One archive read transaction covers message contents and both provenance ledgers.
     archive = archive_conversation(db, source, conversation)
     verify_export_messages(branch['messages'], archive)
-    proposal = excerpt(branch['messages'])
-    validate_title(proposal['title'])
     rows = [dict(message_id=m['message_id'], role=m['role'], text=m['text']) for m in archive['messages']]
-    return dict(source=source, conversation=conversation,
-                content_sha256=content_fingerprint(rows), provider='local-extractive', **proposal,
-                branch_context=dict(original_sha256=branch['original_sha256'],
+    selected = [dict(message_id=m['message_id'], role=m['role'], text=m['text'])
+                for m in branch['messages']]
+    context = dict(branch_context=dict(original_sha256=branch['original_sha256'],
                                     selection=branch['selection'], selected_node=branch['selected_node'],
                                     node_ids=branch['node_ids'],
                                     message_ids=[m['message_id'] for m in branch['messages']],
@@ -39,6 +38,16 @@ def suggest_branch(db, source, conversation, path, node=None):
                                     excluded_nodes=branch['excluded_nodes']),
                 scope='proposal for one conversation-wide local display title, selected from a pinned export branch',
                 warning='Review before applying; branch context is descriptive, not authenticated. This does not track later export or current_node changes.')
+
+    return selected, content_fingerprint(rows), context
+
+
+def suggest_branch(db, source, conversation, path, node=None):
+    selected, digest, context = branch_evidence(db, source, conversation, path, node)
+    proposal = excerpt(selected)
+    validate_title(proposal['title'])
+    return dict(source=source, conversation=conversation, content_sha256=digest,
+                provider='local-extractive', **proposal, **context)
 
 
 def main():

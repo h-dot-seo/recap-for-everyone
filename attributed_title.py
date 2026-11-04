@@ -14,6 +14,10 @@ from title_suggestion import excerpt
 SCHEMA = 'recap.source-attributed-title.v1'
 
 
+class NoAttributedEvidence(ValueError):
+    """Supported attribution was inspected but selected no usable user text."""
+
+
 def _part_sources(payload):
     """Conservative subset of positional Codex producer attribution, not trust."""
     content = payload['content']
@@ -61,7 +65,12 @@ def _part_sources(payload):
     return sources
 
 
-def suggest_attributed(db, source, conversation, path):
+def attributed_evidence(db, source, conversation, path):
+    """Return verified user-attributed parts, the whole archive digest, and context.
+
+    Each row retains its physical origin_locator because different occurrences
+    of the same archive message can label different content parts as user text.
+    """
     path = Path(path)
     raw = path.read_bytes()
     normalized, extraction = _normalize_bytes(raw, path.name, 'local-codex', include_report=True)
@@ -103,9 +112,7 @@ def suggest_attributed(db, source, conversation, path):
             candidates.append(dict(message_id=locator, role='user', text=text))
             by_locator[locator] = indices
     if not candidates:
-        raise ValueError('no explicitly user-attributed text for a title proposal')
-    proposed = excerpt(candidates)
-    validate_title(proposed['title'])
+        raise NoAttributedEvidence('no explicitly user-attributed text for a title proposal')
     archive = archive_conversation(db, source, conversation)
     occurrences = {}
     for message in archive['messages']:
@@ -128,18 +135,34 @@ def suggest_attributed(db, source, conversation, path):
             raise ValueError('explicit source ID differs from archived identity')
         resolved[locator] = stored['message_id']
     evidence = [dict(message_id=resolved[locator], origin_locator=locator,
-                     content_indices=by_locator[locator]) for locator in proposed['evidence_message_ids']]
-    proposed['evidence_message_ids'] = [item['message_id'] for item in evidence]
+                     content_indices=by_locator[locator]) for locator in by_locator]
+    rows = [dict(message_id=resolved[row['message_id']], role=row['role'], text=row['text'],
+                 origin_locator=row['message_id']) for row in candidates]
     content = [dict(message_id=m['message_id'], role=m['role'], text=m['text']) for m in archive['messages']]
-    return dict(source=source, conversation=conversation, provider='local-extractive',
-                content_sha256=content_fingerprint(content), **proposed,
-                attribution_context=dict(schema=SCHEMA, original_sha256=extraction['original_sha256'],
+    context = dict(attribution_context=dict(schema=SCHEMA, original_sha256=extraction['original_sha256'],
                     evidence_parts=evidence, coverage=coverage, producer_attribution_authenticated=False,
                     coverage_scope='extracted user-role messages in the selected raw conversation',
                     selection_policy='only typed text parts with explicit producer provenance type user; exact positional metadata alignment'),
                 extraction_warnings=extraction['warnings'],
                 scope='source-labeled user excerpt for one local display title; raw records, not retained replay history',
                 warning='Producer labels and this context are unsigned, not verified human authorship, trust or authorization. Review before apply. No source text is changed or sent externally.')
+
+    return rows, content_fingerprint(content), context
+
+
+def suggest_attributed(db, source, conversation, path):
+    rows, digest, context = attributed_evidence(db, source, conversation, path)
+    # Excerpt selection must distinguish occurrences before resolving archive IDs.
+    candidates = [dict(message_id=row['origin_locator'], role=row['role'], text=row['text'])
+                  for row in rows]
+    proposed = excerpt(candidates)
+    validate_title(proposed['title'])
+    attribution = context['attribution_context']
+    attribution['evidence_parts'] = [part for part in attribution['evidence_parts']
+                                     if part['origin_locator'] in proposed['evidence_message_ids']]
+    proposed['evidence_message_ids'] = [part['message_id'] for part in attribution['evidence_parts']]
+    return dict(source=source, conversation=conversation, provider='local-extractive',
+                content_sha256=digest, **proposed, **context)
 
 
 def main():
