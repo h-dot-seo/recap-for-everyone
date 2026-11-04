@@ -337,8 +337,14 @@ migration is performed. Empty-string timestamps are now rejected explicitly.
 Reviewed title-proposal application requires an explicit nonnegative integer
 `expected_revision`. Missing, null, boolean, string or fractional revisions are
 rejected rather than disabling the stale-preview guard. The lower-level `titles`
-Python API retains its documented optional revision argument for compatibility;
-external adapters should use the checked proposal workflow. Missing/unreadable
+Python API retains its documented optional revision argument for compatibility:
+`None` still omits that lower-level write guard. Supplied revisions must now be
+exact nonnegative Python integers, not booleans or floats that compare equal.
+Its source/conversation identities must be valid Unicode strings, never coerced
+numbers or booleans. Invalid values fail before database access; accepted text
+identities are not trimmed, normalized or case-folded. These checks deliberately
+narrow malformed direct API calls, without retroactively repairing old title writes.
+External adapters should use the checked proposal workflow. Missing/unreadable
 SQLite databases produce clean CLI errors and are not created by preview/snapshot.
 
 ## Generate a local title excerpt for review

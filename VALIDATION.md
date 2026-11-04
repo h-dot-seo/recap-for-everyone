@@ -1585,3 +1585,47 @@ separates input-file framing from source hashes, canonical payloads, budget chec
 and explicit review. No actual private data, external model execution/transmission,
 automatic title approval, remote mutation or merge occurs. Exact-commit
 Ubuntu/Windows Python 3.10/3.12 CI is checked after push.
+
+### 2026-11-04: validate direct title identities and revision types
+
+Independent synthetic reproduction found that the lower-level Python titles API
+could target a literal text identity through SQLite coercion: source=True and
+conversation=1 matched imported source/conversation strings "1"/"1". A supplied
+False revision matched zero, and 1.0 matched integer revision one. CLI identities
+already arrive as strings, and reviewed-proposal revisions were already checked;
+this gap was in direct library calls, not evidence of a live remote rename.
+
+The title entry point now validates source and conversation string identities and
+Unicode scalars before resolving/opening the database. It reuses the existing
+source-label validator, preserves accepted string values exactly, and rejects a
+supplied revision unless its exact Python type is int and it is nonnegative.
+This deliberately narrows malformed direct calls. The documented omitted/None
+lower-level revision compatibility remains; a valid supplied revision on an
+informational read remains ignored. Write comparison still uses the selected
+conversation's latest globally allocated history ID inside the existing immediate
+transaction. It is not a global-maximum guard or per-conversation counter.
+
+Twenty-nine independently authored synthetic regressions cover pre-path/pre-read/
+pre-write validation, boolean/numeric identity coercion, bool/float revision zero
+and one, integer subclasses, invalid Unicode, unchanged database bytes and core
+provenance, existing/absent history, exact numeric-looking and Unicode/NUL/whitespace
+identities, optional None, valid informational reads, stale and very large revisions,
+interleaved history IDs, normal proposal preview/apply, and both title CLI entry
+points. SQLite handles close explicitly. CLI tests use universal newlines and
+code-point-array argument transport to preserve invalid literal surrogate pairs
+without relying on the OS encoding or JSON's surrogate-pair normalization.
+
+Independent review found no blocker and separately reproduced the old coercion,
+34 malformed API cases and 24 malformed CLI cases. The focused new suite passes 29;
+the combined title validation/review/concurrency bundle passes 72. An early test
+harness normalized a surrogate pair and was corrected before final validation.
+Overlapping full runs also produced subprocess timeouts, including unchanged
+inventory/import tests; no production timeout was loosened. After both runs ended,
+the complete final suite was run alone and passed 957 tests in 196.353 seconds.
+Future full-suite runs should not overlap in this workspace.
+
+Public audit and byte manifest cover 173 files. This adds no schema migration,
+automatic repair of existing ledger entries, inferred approval or new title
+semantics. Existing source evidence and the 80-code-point excerpt limit are
+unchanged. No actual personal data, model transmission, remote mutation or merge
+occurs. Exact-commit Ubuntu/Windows Python 3.10/3.12 CI is checked after push.

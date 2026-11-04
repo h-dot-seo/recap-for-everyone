@@ -1,12 +1,12 @@
 {
   "project": "recap-for-everyone",
-  "release": "0.84.0-adapter-file-encoding",
+  "release": "0.85.0-title-api-validation",
   "date": "2026-11-04",
   "private_history_imported": false,
   "actual_corpora_included": false,
   "synthetic_examples_only": true,
   "license_status": "NOT_SELECTED",
-  "file_count": 171,
+  "file_count": 172,
   "files": [
     {
       "path": ".gitattributes",
@@ -30,8 +30,8 @@
     },
     {
       "path": "README.md",
-      "bytes": 69949,
-      "sha256": "c42caabe7237653104b6401082a2afe99483710ddd329c86d44e266680484a33"
+      "bytes": 70432,
+      "sha256": "410bd66a01a6b6ead588b1ee59110a2f6f60b301624e7b3fb470d6e177a237be"
     },
     {
       "path": "RIGHTS.md",
@@ -50,8 +50,8 @@
     },
     {
       "path": "VALIDATION.md",
-      "bytes": 103315,
-      "sha256": "0fe9ccd653b670ca3e5bf6156eb4fbc01a9c2390024778d519a87a1cb32dfb43"
+      "bytes": 106317,
+      "sha256": "90720c4421e63cacf8c393d8a9977f6d8f67ee1be21d62c15fb7eca5201b2f3c"
     },
     {
       "path": "attributed_title.py",
@@ -80,8 +80,8 @@
     },
     {
       "path": "docs/ARCHITECTURE.md",
-      "bytes": 4015,
-      "sha256": "02936f1868912df10d8ae63de8cf23f7ce12d23ce6138136d1cba3922628e310"
+      "bytes": 5729,
+      "sha256": "a9a9c02fc4a7c3b1a876791ac05e160d08c5cf2b67aac43e36d93c423417bbf1"
     },
     {
       "path": "docs/ATTRIBUTED_MESSAGE_SELECTION.md",
@@ -325,8 +325,8 @@
     },
     {
       "path": "session_workflow.py",
-      "bytes": 18245,
-      "sha256": "593701c40fc32968df83618ad61251df646589bd43dcb4a285765387d331349b"
+      "bytes": 19045,
+      "sha256": "d578e5f067b46a7feb1209ef87f9b04b6e725b7d614b9ca82d3d626df84828d8"
     },
     {
       "path": "source_identity.py",
@@ -652,6 +652,11 @@
       "path": "test_title_adapter.py",
       "bytes": 12930,
       "sha256": "e922c17d41095d477828025fa7d9ab01b07ac0c2cdf333ab29cd73f9020fb614"
+    },
+    {
+      "path": "test_title_api_validation.py",
+      "bytes": 25150,
+      "sha256": "8d4fe281e9b6ef308ca5baed27e9f9f2528294a21518546310ce57e642b32a87"
     },
     {
       "path": "test_title_batch.py",

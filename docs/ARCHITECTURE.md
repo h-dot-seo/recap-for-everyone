@@ -69,3 +69,29 @@ For a future remote backup integration: use a clean destination; fetch all decla
 objects; verify expected hashes, sizes and counts; rebuild the index; run read-only
 queries; retain a recovery receipt. Store decryption keys outside backups. Never
 mark remote recovery verified from a local Git ref or a push message alone.
+
+## Lower-level title API input boundary
+
+`session_workflow.titles` validates its identities and optional revision before
+opening or resolving the database. The source must be non-whitespace Unicode text;
+the conversation must be a nonempty Unicode string. Neither is trimmed, normalized
+or case-folded. Text IDs such as `"1"`, `"01"` and `"1.0"` stay distinct. A numeric or
+boolean Python argument is rejected instead of relying on SQLite affinity to match
+a text key. Surrogate code points are rejected rather than sent to SQLite.
+
+A supplied `expected_revision` must have exact Python type `int` and be nonnegative.
+`False`, `True`, `0.0` and `1.0` are not revision tokens even when Python equality
+would match a real revision. This deliberately rejects formerly accepted malformed
+direct calls. On a write, the integer still has to match the selected conversation's
+latest `title_history.id`, allocated from the global history table, under the existing
+immediate transaction. It is not the table's global maximum or a per-conversation
+counter. No revision is guessed or changed after a stale error.
+
+For compatibility, `expected_revision=None` still means no revision guard in this
+lower-level API. An informational read still ignores a valid supplied revision; it
+is not a compare-and-swap read. The CLI continues to require an explicit revision
+for `title --set`, and the proposal workflow requires a checked preview with its
+content fingerprint and integer revision. Prefer that workflow for integrations
+and explicit human review. Type checks are not authentication, proof of approval,
+semantic validation or a remote title permission. No old ledger events are scanned,
+repaired or removed by this change.

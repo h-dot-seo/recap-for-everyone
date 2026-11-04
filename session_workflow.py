@@ -224,6 +224,17 @@ def import_export(db, source, path, kind, conversation=None, expected_export_sha
 
 
 def titles(db, source, conversation, title=None, expected_revision=None, expected_content_sha256=None):
+    # Keep exact text identities: SQLite affinity must not turn booleans/numbers
+    # supplied by Python callers into a different conversation's text key.
+    _validate_source(source)
+    if not isinstance(conversation, str) or not conversation:
+        raise ValueError('conversation must be nonempty text')
+    if any(0xd800 <= ord(character) <= 0xdfff for character in conversation):
+        raise ValueError('conversation must contain valid Unicode text')
+    # None remains the documented lower-level API compatibility option. A
+    # supplied guard is an exact revision, not Python's bool/float equality.
+    if expected_revision is not None and (type(expected_revision) is not int or expected_revision < 0):
+        raise ValueError('expected revision must be a nonnegative integer or None')
     if title is not None:
         validate_title(title)
     c = readonly(db) if title is None else sqlite3.connect(Path(db).resolve().as_uri() + '?mode=rw', uri=True)
