@@ -385,6 +385,11 @@ replaced, dropped or silently repaired. Diagnostics do not echo the bad string.
 This decoder is duplicate-safe and Unicode-safe, not a full RFC-strict or
 resource-limited JSON parser; ordinary Python JSON depth/size behavior still applies.
 
+Import source labels, which arrive separately from JSON, are also checked for
+valid Unicode before reading the export or opening SQLite. Invalid surrogate
+labels fail without creating an empty archive; accepted labels keep their exact
+spelling. See [source-label and byte-ingestion boundaries](docs/INPUT_SCOPE.md#normalized-bytes-and-compatibility).
+
 ## Inspect an export before importing
 
 ```sh

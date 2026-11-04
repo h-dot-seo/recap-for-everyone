@@ -1045,3 +1045,39 @@ parser/title tests and final manifest checks pass. Publication audit and byte
 manifest cover 155 files. New tests were authored in this task, not independently
 reviewed. No real exports, account collection, model transmission, remote rename
 or merge occurs. Exact-commit Ubuntu/Windows Python 3.10/3.12 CI is checked after push.
+
+### 2026-11-04: reject invalid source labels before source or archive access
+
+An independent synthetic reproduction found that a source label containing a
+surrogate code point passed the nonempty-text check, opened SQLite and created the
+archive schema before insertion failed with a Unicode encoding error. Source labels
+come from Python/command arguments rather than decoded JSON, so the existing JSON
+Unicode check did not cover them. This could leave an empty database after a failed
+import, especially for Python callers or Unix arguments decoded from invalid bytes.
+
+The shared source-label check now rejects surrogate code points with a fixed,
+content-free ValueError. Normalized file/byte ingestion, all three export-import
+formats and read-only import diagnostics validate before source reads or SQLite
+access. Invalid source labels also fail before other source parsing/selection
+checks; there is no silent replacement, repair or guessed source identity.
+
+Eight independently authored synthetic tests cover high/low and adjacent surrogate
+values, empty/nontext labels, malformed byte payload precedence, new/existing
+archives and guards denying all source reads and SQLite connections. Korean, emoji,
+combining sequences, padding and previously accepted embedded-NUL labels retain
+exact identities, with idempotent imports and unchanged sources. Distinct Unicode
+normalizations and padded labels remain distinct. A Unicode import/proposal/preview
+roundtrip verifies that only explicit apply creates a searchable Korean display
+title, and stale reapply still fails. The actual invalid-byte argv regression runs
+five unified/standalone commands under UTF-8 mode on POSIX and is explicitly skipped
+on Windows, whose argv does not represent that POSIX input form. The API validation
+and valid-Unicode workflows run on both platforms.
+
+The full local suite passes 759 tests; the focused import/label/CLI suite passes
+60 tests, and the final source-label module passes all eight. Publication audit
+and byte manifest cover 156 public files. The export-inventory and input-scope
+guides also remove two obsolete references to temporary JSONL copies. This does not
+make all SQLite/schema or filesystem failures atomic, remove older empty databases,
+or change title review, source content, Unicode spelling or valid import hashes.
+No real sessions, automatic discovery, external model calls, remote title changes
+or merge occurs. Exact-commit Ubuntu/Windows Python 3.10/3.12 CI is checked after push.

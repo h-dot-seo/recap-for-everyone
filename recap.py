@@ -29,6 +29,11 @@ CREATE TRIGGER IF NOT EXISTS messages_ai AFTER INSERT ON messages BEGIN
 def _validate_source(source):
     if not isinstance(source, str) or not source.strip():
         raise ValueError('source must be nonempty text')
+    # Source labels come from argv/API values, outside the JSON decoder's Unicode
+    # checks. SQLite cannot encode surrogates; reject them before schema creation
+    # or source reads rather than leaving an empty archive after a bad label.
+    if any(0xd800 <= ord(character) <= 0xdfff for character in source):
+        raise ValueError('source must contain valid Unicode text')
 
 
 def ingest(db, source, path, provenance=None):

@@ -30,6 +30,11 @@ Both commands support `local` and `local-codex`, optional `--conversation`, and
 hash validation happen before database access. A missing database is not created;
 use ordinary source inspection when preparing a new archive.
 
+The source label follows the same validation as import: non-whitespace text with
+valid Unicode, preserved exactly rather than trimmed or repaired. Invalid labels
+fail before reading the input or accessing the archive, with a fixed diagnostic
+that does not repeat the label. See [source-label boundaries](INPUT_SCOPE.md#normalized-bytes-and-compatibility).
+
 ## Counts and conflict samples
 
 The comparison follows the importer's exact identity and value rules:

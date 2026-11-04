@@ -3,15 +3,14 @@ import argparse
 import json
 import sqlite3
 
-from recap import readonly
+from recap import _validate_source, readonly
 from session_workflow import normalize
 
 FIELDS = ('role', 'timestamp', 'title', 'text')
 
 
 def check_import(db, source, path, kind, conversation=None, expected_export_sha256=None, limit=20):
-    if not isinstance(source, str) or not source.strip():
-        raise ValueError('source must not be empty')
+    _validate_source(source)
     if type(limit) is not int or not 1 <= limit <= 1000:
         raise ValueError('limit must be an integer in 1..1000')
     rows, coverage = normalize(path, kind, include_report=True, conversation=conversation,

@@ -129,10 +129,20 @@ that a caller-supplied label is a genuine source identity.
 
 `recap.ingest_bytes(db, source, raw, provenance=None)` shares the file-ingest record
 validation, transaction, conflict and provenance rules. It accepts immutable `bytes`
-and an explicit non-whitespace text source label. Labels remain exact, not trimmed,
-normalized or converted from numbers/bytes. Invalid source labels fail before file
-reads in `ingest(...)` and before database access in both entry points. The file
+and an explicit non-whitespace, valid Unicode source label. Labels remain exact, not
+trimmed, normalized or converted from numbers/bytes. Invalid source labels fail
+before file reads in `ingest(...)`, `import_export(...)` and `check_import(...)`,
+and before database access in these and the byte-ingestion entry point. The file
 entry point remains supported and reads its input once before using the byte path.
+
+Source labels arrive separately from decoded JSON. Surrogate code points
+can occur in Python strings or in Unix command arguments decoded from invalid
+bytes; SQLite cannot encode those labels as UTF-8. They now fail with a fixed,
+content-free error before source parsing or archive creation, rather than creating
+an empty schema and then failing on insertion. No replacement character or guessed
+source name is substituted. Correct the supplied label explicitly. Korean, emoji,
+combining sequences and other valid Unicode labels retain their exact identities.
+Previously created empty databases are not automatically removed or repaired.
 
 For export import, in-memory normalization deliberately retains the previous UTF-8
 text-writer behavior, including native Windows CRLF line separators. Existing
@@ -336,7 +346,7 @@ Structural/JSON validation still covers the whole file. Source-only `inspect` an
 [`check-import`](IMPORT_CONFLICTS.md) with an existing archive for conflict detail.
 
 The error's `line` is a physical normalized-input line for direct `ingest`. Export
-adapters produce a temporary normalized message stream, so their conflict line is
+adapters produce an in-memory normalized message stream, so their conflict line is
 the one-based selected normalized occurrence, not the original JSONL line or web
 node. Keep source provenance for the original location. IDs and differing values
 are not echoed.

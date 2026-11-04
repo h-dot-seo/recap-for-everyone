@@ -9,7 +9,7 @@ from contextlib import closing
 from collections import Counter
 from pathlib import Path
 from local_parser import parse_jsonl_bytes
-from recap import ingest_bytes, readonly
+from recap import _validate_source, ingest_bytes, readonly
 from strict_json import loads
 from title_rules import validate_title
 from title_excerpt import excerpt
@@ -210,6 +210,7 @@ def _normalized_bytes(rows):
 
 
 def import_export(db, source, path, kind, conversation=None, expected_export_sha256=None):
+    _validate_source(source)
     rows, report = normalize(path, kind, include_report=True, conversation=conversation,
                              expected_export_sha256=expected_export_sha256)
     # Keep original hash/locator/branch metadata in companion provenance tables.

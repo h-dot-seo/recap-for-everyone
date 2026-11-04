@@ -70,7 +70,8 @@ not bytes, title lengths, metadata records or parsing memory. Each request reads
 validates and parses the entire file, including off-page conversations; malformed
 off-page data still fails. No database is opened or created. There is no account
 access, directory discovery, upload, source modification or automatic import.
-The existing local parser uses a temporary copy of the same bytes for validation.
+The local parser validates the same immutable source bytes directly in memory,
+without a temporary source copy.
 
 Each call reads original bytes once, preserves their SHA-256 and returns
 `original_sha256`. Repeated pages are separate snapshots. To require the same
