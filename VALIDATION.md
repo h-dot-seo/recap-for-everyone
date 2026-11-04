@@ -847,3 +847,22 @@ The complete suite passes 691 tests; publication audit and byte-manifest checks 
 149 files. No actual exports, account collection, model transmission, installation,
 settings changes, remote rename or merge occur. Exact-commit Ubuntu/Windows Python
 3.10/3.12 CI is checked separately after push.
+
+### 2026-11-04: portable in-memory audit assertion
+
+CI for 1fab1fc found one test-only portability assumption: both Ubuntu and Windows
+Python 3.10 reported sqlite3.connect audit arguments as (b':memory:',), while the
+test accepted only the string tuple. Both Python 3.12 jobs passed. The production
+runtime checker still passed its string :memory: argument and made no file database;
+the failed commit is not recorded as four-platform CI success.
+
+The audit test now accepts exactly one built-in str or bytes :memory: argument.
+Its child-process self-check exercises both forms and rejects string/bytes file
+names, memory-style URIs, empty or extra arguments, null, lists, bytearrays and
+memoryviews. Disk, network, process and extension audit guards remain unchanged.
+No production code or installation behavior changes, no arbitrary decoding is
+introduced, and the broad guard is not removed to make CI pass.
+
+The full local suite passes 691 tests after the correction; final focused and
+manifest checks also pass. Publication audit and manifest cover the same 149 files.
+All four jobs for the new exact commit are checked separately after publication.

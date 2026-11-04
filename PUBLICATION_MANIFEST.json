@@ -1,6 +1,6 @@
 {
   "project": "recap-for-everyone",
-  "release": "0.68.0-first-run-runtime",
+  "release": "0.68.1-portable-runtime-audit",
   "date": "2026-11-04",
   "private_history_imported": false,
   "actual_corpora_included": false,
@@ -50,8 +50,8 @@
     },
     {
       "path": "VALIDATION.md",
-      "bytes": 53466,
-      "sha256": "3f2ea5740dec9409adab3001f1515c9b60ec7ad19740b88ac2d9ab9d0dd262cd"
+      "bytes": 54622,
+      "sha256": "b2186bf9847bb2d13f1f381821b41adefa92d6da9d2c6d97d3910102b3db6cbb"
     },
     {
       "path": "attributed_title.py",
@@ -490,8 +490,8 @@
     },
     {
       "path": "test_runtime_check.py",
-      "bytes": 17033,
-      "sha256": "f40994cf6ca129bf18311383157cdeab4a377ae3fc7cd357a5c3abd3151f95d7"
+      "bytes": 17917,
+      "sha256": "72a18a132e054461543d6e1901acaa6c449c35d160baf5bd63e35b56a29b9e38"
     },
     {
       "path": "test_saved_title_response.py",

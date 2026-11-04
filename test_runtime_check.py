@@ -197,11 +197,28 @@ import runtime_check
 seen = []
 def audit(event, args):
     if event == 'sqlite3.connect':
-        assert args == (':memory:',), args
+        # CPython 3.10 can report the encoded filename in this audit event.
+        # Accept only these two exact in-memory representations, never a URI
+        # or filesystem path and never a generalized bytes decode/fallback.
+        assert (type(args) is tuple and len(args) == 1 and
+                (type(args[0]) is str and args[0] == ':memory:' or
+                 type(args[0]) is bytes and args[0] == b':memory:')), args
         seen.append(event)
     if event in ('open', 'os.listdir', 'os.scandir', 'os.system', 'subprocess.Popen',
                  'sqlite3.enable_load_extension', 'sqlite3.load_extension') or event.startswith('socket.'):
         raise AssertionError('unexpected external operation: ' + event)
+for args in ((':memory:',), (b':memory:',)):
+    audit('sqlite3.connect', args)
+for args in (('synthetic.sqlite',), (b'synthetic.sqlite',), ('file::memory:',),
+             (b'file::memory:',), ('',), (None,), (), (':memory:', 'extra'),
+             [':memory:'], (bytearray(b':memory:'),), (memoryview(b':memory:'),)):
+    try:
+        audit('sqlite3.connect', args)
+    except AssertionError:
+        pass
+    else:
+        raise AssertionError('nonliteral memory target accepted')
+seen.clear()
 sys.addaudithook(audit)
 result = runtime_check.check_runtime()
 assert result['status'] == 'READY', result
