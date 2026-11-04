@@ -70,7 +70,8 @@ No later sentence or substring is invented if the selected prefix is unhelpful.
 Use explicit replacement wording at preview when needed. The proposal retains
 the fingerprint of **all messages in this archived conversation**, not only the
 selected one: an import changing other conversation content still makes it stale.
-Generating and previewing remain read-only; title revision checks still run at
+Generating and previewing remain read-only against the archive; optional
+[`--output`](TITLE_DOCUMENT_FILES.md) explicitly saves a new local file. Title revision checks still run at
 apply. Selection reads the full content snapshot, so it is not a bounded-memory
 or private-text minimization option.
 

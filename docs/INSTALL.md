@@ -116,11 +116,16 @@ Keep the database, actual exports, proposals and previews in an operator-control
 directory outside the repository and shared folders. Quote paths containing spaces
 and substitute the same database/source identity consistently.
 
-Guides that save JSON using `>` require UTF-8 redirection, such as a POSIX shell or
-PowerShell 7. Windows PowerShell 5's default UTF-16 output is incompatible with
-those saved review documents. The runtime check does not detect or change this.
-Shell redirection can overwrite a file before the command runs; use fresh output
-paths, check the exit status, and open each preview before explicitly applying it.
+The primary guides now use [native `--output` title JSON saving](TITLE_DOCUMENT_FILES.md):
+UTF-8 files are created without shell redirection, and existing paths are refused.
+This requires hard-link support in the output filesystem; the runtime check does
+not test it. Open the saved document, not just its receipt, before explicit apply.
+
+Older examples or unsupported commands that save JSON with `>` still require UTF-8
+redirection, such as a POSIX shell or PowerShell 7. Windows PowerShell 5's default
+UTF-16 output is incompatible with those saved documents. The runtime check does
+not detect or change this. Redirection can overwrite a file before the command
+runs; do not combine it with native saving to the same input/output path.
 
 An existing web export uses `--format web`; supported typed local sessions use
 `--format local-codex`. Inspect format coverage before import. This tool neither

@@ -45,13 +45,25 @@ already exist; an existing directory is refused, even if empty. If creation fail
 partway, inspect the partial files and choose another new directory. There is no
 all-files atomicity or hostile-directory defense. Use an operator-controlled path.
 
-Commands below require UTF-8 shell redirection, such as a POSIX shell or PowerShell 7,
-not Windows PowerShell 5's default UTF-16. `>` overwrites its output before a command
-runs. Use the new demo directory, check each exit status and stop on failure. Open
-saved JSON in your editor at the review points; do not paste this whole page as an
-unattended script. Regression tests execute these program arguments with the test
-runner's interpreter, synthetic inputs, explicit review assertions and UTF-8 output
-files. They do not test the literal launcher name or every shell's redirection.
+The title commands below save directly with `--output NEW_JSON`: no shell `>` or
+special shell encoding is needed. Files are UTF-8 without a BOM, with readable
+Unicode. Use new filenames in an operator-controlled private directory whose
+parent already exists. Existing files, directories and symlinks are refused,
+not replaced. Publication uses a same-directory staging file and an atomic hard
+link; filesystems without hard-link support fail rather than overwrite.
+See [saved title documents](TITLE_DOCUMENT_FILES.md) for the full contract.
+
+Check each exit status and stop on failure. For title commands with `--output`, stdout is only a
+`recap.saved-title-json.v1` receipt with `status: SAVED`, the `document_kind`, byte
+count and SHA-256, not the saved queue or preview. Check
+`staging_cleanup_complete`: if false, the complete output already exists; inspect
+the `remaining_staging_file` in the output directory rather than blindly retrying.
+Saving is not approval. Open the actual saved JSON at the review points; do not
+paste this whole page as an unattended script. The regression test executes these
+arguments with synthetic inputs and checks the files written by the CLI.
+Legacy examples elsewhere that still use shell `>` require UTF-8 redirection;
+Windows PowerShell 5's default UTF-16 is not compatible, and `>` can overwrite
+before validation.
 
 ### 1. Discover and explicitly prepare the web parts
 
@@ -87,7 +99,7 @@ visible branch or effective model history. Nontext/media extraction is not suppl
 python recap.py --db ../recap-start-demo/archive.sqlite import ../recap-start-demo/part-001.json --format web --source demo
 python recap.py --db ../recap-start-demo/archive.sqlite import ../recap-start-demo/part-002.json --format web --source demo
 python recap.py --db ../recap-start-demo/archive.sqlite import ../recap-start-demo/local.jsonl --format local-codex --source demo
-python recap.py --db ../recap-start-demo/archive.sqlite review-titles --source demo --limit 24 > ../recap-start-demo/queue.json
+python recap.py --db ../recap-start-demo/archive.sqlite review-titles --source demo --limit 24 --output ../recap-start-demo/queue.json
 ```
 
 Open `queue.json`: total 24, including two `UNAVAILABLE` assistant-only conversations
@@ -100,7 +112,7 @@ conversation-derived text: keep it, the database and all previews private.
 ```sh
 python recap.py --db ../recap-start-demo/archive.sqlite show --source demo --conversation web-05
 python recap.py --db ../recap-start-demo/archive.sqlite review-state --source demo --conversation web-05 --set deferred --from-queue ../recap-start-demo/queue.json
-python recap.py --db ../recap-start-demo/archive.sqlite review-titles --source demo --state deferred --limit 24 > ../recap-start-demo/deferred.json
+python recap.py --db ../recap-start-demo/archive.sqlite review-titles --source demo --state deferred --limit 24 --output ../recap-start-demo/deferred.json
 ```
 
 Open `deferred.json`: just `web-05` remains. Deferring changed no title and scheduled
@@ -110,7 +122,7 @@ rename. Filters do not hide anything unless you request them.
 ### 4. Choose your wording, preview, then explicitly apply one local change
 
 ```sh
-python recap.py --db ../recap-start-demo/archive.sqlite preview-title ../recap-start-demo/deferred.json --conversation web-05 --title "Synthetic orchard follow-up" > ../recap-start-demo/reviewed.json
+python recap.py --db ../recap-start-demo/archive.sqlite preview-title ../recap-start-demo/deferred.json --conversation web-05 --title "Synthetic orchard follow-up" --output ../recap-start-demo/reviewed.json
 ```
 
 **Stop and open `reviewed.json`.** Verify the nested `proposal.source: demo`, `proposal.conversation: web-05` and
@@ -122,7 +134,7 @@ This is a fresh preview, not an automatic approval. Only after that review:
 python recap.py --db ../recap-start-demo/archive.sqlite apply-title ../recap-start-demo/reviewed.json
 python recap.py --db ../recap-start-demo/archive.sqlite title --source demo --conversation web-05
 python recap.py --db ../recap-start-demo/archive.sqlite find "orchard follow-up" --source demo
-python recap.py --db ../recap-start-demo/archive.sqlite review-titles --source demo --unrenamed-only --state open --limit 24 > ../recap-start-demo/remaining.json
+python recap.py --db ../recap-start-demo/archive.sqlite review-titles --source demo --unrenamed-only --state open --limit 24 --output ../recap-start-demo/remaining.json
 ```
 
 The chosen local title now appears in `find`: one matching conversation. The remaining

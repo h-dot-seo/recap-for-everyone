@@ -118,6 +118,7 @@ def search(db, query, limit=20):
 
 
 def main():
+    from title_document_output import add_output_argument, save_if_requested
     p = argparse.ArgumentParser(description=__doc__)
     p.add_argument('--db')
     sub = p.add_subparsers(dest='command', required=True)
@@ -154,6 +155,7 @@ def main():
         command = sub.add_parser(name, help='review a proposal' if name == 'preview-title' else 'apply a reviewed local display title')
         command.add_argument('input', help='proposal JSON for preview, reviewed preview JSON for apply')
         if name == 'preview-title':
+            add_output_argument(command)
             command.add_argument('--with-evidence', action='store_true', help='include bounded raw user-message excerpts and provenance for private review')
             command.add_argument('--conversation', help='select exactly one READY item from a title review queue')
             command.add_argument('--title', help='explicit replacement title; reclassified as operator wording')
@@ -169,6 +171,8 @@ def main():
     batch.add_argument('--unrenamed-only', action='store_true', help='exclude conversations with any existing local title history')
     batch.add_argument('--proposal', action='append', help='explicit proposal JSON object file; repeat to review supplied candidates instead of generating raw excerpts')
     batch.add_argument('--supplied-only', action='store_true', help='show only supplied candidate identities before pagination; requires --proposal')
+    for command in (batch, branch_title, replay_title, attributed):
+        add_output_argument(command)
     transfer = sub.add_parser('title-adapter-dry-run', help='validate a mock-only transfer request without executing')
     transfer.add_argument('input'); transfer.add_argument('plan'); transfer.add_argument('target')
     simulation = sub.add_parser('title-adapter-simulate', help='simulate an explicitly approved title transfer in memory only')
@@ -198,6 +202,7 @@ def main():
         command = sub.add_parser(name)
         command.add_argument('--source', required=True); command.add_argument('--conversation', required=True)
         if name == 'suggest-title':
+            add_output_argument(command)
             command.add_argument('--message', help='use exactly this archived user message for the excerpt; no alternate-message fallback')
         if name == 'show':
             command.add_argument('--limit', type=int, help='read at most this many messages (1..1000)')
@@ -326,6 +331,8 @@ def main():
         else:
             from title_suggestion import suggest
             result = suggest(args.db, args.source, args.conversation, args.message)
+        kind = 'queue' if args.command == 'review-titles' else 'preview' if args.command == 'preview-title' else 'proposal'
+        result = save_if_requested(result, args, kind)
     except (OSError, ValueError, KeyError, TypeError, sqlite3.Error) as exc:
         p.exit(1, str(exc) + '\n')
     # JSON escapes preserve Unicode data even when the terminal is ASCII-only.

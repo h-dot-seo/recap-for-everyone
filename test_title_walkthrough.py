@@ -1,4 +1,5 @@
 """Synthetic two-format entry flow and review/apply failure boundaries."""
+import hashlib
 import json
 import os
 import subprocess
@@ -18,7 +19,7 @@ class TitleWalkthroughTests(unittest.TestCase):
         env = dict(os.environ)
         if ascii_output: env['PYTHONIOENCODING'] = 'ascii'
         result = subprocess.run([sys.executable, script, *map(str, args)],
-                                capture_output=True, text=True, timeout=20, env=env)
+                                capture_output=True, encoding='utf-8', timeout=20, env=env)
         self.assertEqual(result.returncode, 0 if ok else 1, result.stderr)
         self.assertNotIn('Traceback', result.stderr)
         return json.loads(result.stdout) if ok else result
@@ -26,6 +27,20 @@ class TitleWalkthroughTests(unittest.TestCase):
     def save(self, value):
         self.saved.write_text(json.dumps(value), encoding='utf-8')
         return self.saved
+
+    def read_saved(self, path, receipt, kind):
+        raw = path.read_bytes()
+        self.assertFalse(raw.startswith(b'\xef\xbb\xbf'))
+        self.assertEqual(receipt['schema'], 'recap.saved-title-json.v1')
+        self.assertEqual(receipt['status'], 'SAVED')
+        self.assertEqual(receipt['document_kind'], kind)
+        self.assertEqual(receipt['bytes'], len(raw))
+        self.assertEqual(receipt['sha256'], hashlib.sha256(raw).hexdigest())
+        self.assertTrue(receipt['staging_cleanup_complete'])
+        self.assertIsNone(receipt['remaining_staging_file'])
+        self.assertNotIn('title', receipt)
+        self.assertNotIn('proposal', receipt)
+        return json.loads(raw.decode('utf-8'))
 
     def test_two_format_walkthrough_and_stale_repeat(self):
         cases = [('web', 'examples/web-export.json', 'synthetic-chat', 'suggest-branch-title',
@@ -43,16 +58,28 @@ class TitleWalkthroughTests(unittest.TestCase):
                     self.call('web-branch', path, '--conversation', conversation, *extra)
                 self.call('--db', self.db, 'import', path, '--format', kind, '--source', kind)
                 before = self.db.read_bytes()
-                proposal = self.call('--db', self.db, command, path, '--source', kind, '--conversation', conversation, *extra)
+                proposal_path = Path(self.tmp.name) / f'{kind}-proposal.json'
+                reviewed_path = Path(self.tmp.name) / f'{kind}-reviewed.json'
+                args = ('--db', self.db, command, path, '--source', kind, '--conversation', conversation, *extra)
+                receipt = self.call(*args, '--output', proposal_path)
+                proposal = self.read_saved(proposal_path, receipt, 'proposal')
+                self.assertEqual(proposal, self.call(*args))
                 self.assertEqual(proposal['title'], title)
-                reviewed = self.call('--db', self.db, 'preview-title', self.save(proposal))
-                self.assertEqual(reviewed, self.call('--db', self.db, 'preview', self.saved, script='title_proposal.py'))
-                self.assertEqual(reviewed['expected_revision'], 0); self.assertEqual(before, self.db.read_bytes())
-                self.call('--db', self.db, 'apply-title', self.save(reviewed))
+                receipt = self.call('--db', self.db, 'preview-title', proposal_path, '--output', reviewed_path)
+                reviewed = self.read_saved(reviewed_path, receipt, 'preview')
+                self.assertEqual(reviewed, self.call('--db', self.db, 'preview-title', proposal_path))
+                self.assertEqual(reviewed, self.call('--db', self.db, 'preview', proposal_path, script='title_proposal.py'))
+                self.assertEqual(reviewed['proposal']['source'], kind)
+                self.assertEqual(reviewed['proposal']['conversation'], conversation)
+                self.assertEqual(reviewed['proposal']['title'], title)
+                self.assertEqual(reviewed['expected_revision'], 0)
+                self.assertEqual(before, self.db.read_bytes())
+                self.assertEqual(original, Path(path).read_bytes())
+                self.call('--db', self.db, 'apply-title', reviewed_path)
                 self.assertEqual(self.call('--db', self.db, 'list', '--source', kind)['conversations'][0]['display_title'], title)
                 self.assertEqual(self.call('--db', self.db, 'find', query, '--source', kind)['total_matches'], 1)
                 after = self.db.read_bytes()
-                self.call('--db', self.db, 'apply-title', self.saved, ok=False)
+                self.call('--db', self.db, 'apply-title', reviewed_path, ok=False)
                 self.assertEqual(after, self.db.read_bytes()); self.assertEqual(original, Path(path).read_bytes())
 
     def test_wrong_documents_and_duplicate_keys_are_clean_failures(self):
@@ -80,5 +107,12 @@ class TitleWalkthroughTests(unittest.TestCase):
         proposal['title'] = '합성 제목'
         reviewed = self.call('--db', self.db, 'preview-title', self.save(proposal), ascii_output=True)
         self.assertEqual(reviewed, self.call('--db', self.db, 'preview', self.saved, script='title_proposal.py', ascii_output=True))
-        applied = self.call('--db', self.db, 'apply-title', self.save(reviewed), ascii_output=True)
+        before = self.db.read_bytes()
+        native_path = Path(self.tmp.name) / 'unicode-reviewed.json'
+        receipt = self.call('--db', self.db, 'preview-title', self.saved,
+                            '--output', native_path, ascii_output=True)
+        self.assertEqual(reviewed, self.read_saved(native_path, receipt, 'preview'))
+        self.assertIn('합성 제목', native_path.read_text(encoding='utf-8'))
+        self.assertEqual(before, self.db.read_bytes())
+        applied = self.call('--db', self.db, 'apply-title', native_path, ascii_output=True)
         self.assertEqual(applied['display_title'], proposal['title'])

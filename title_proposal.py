@@ -120,6 +120,7 @@ def apply_preview(db, reviewed):
 
 
 def main():
+    from title_document_output import add_output_argument, save_if_requested
     p = argparse.ArgumentParser(description=__doc__)
     p.add_argument('--db', required=True)
     s = p.add_subparsers(dest='command', required=True)
@@ -127,6 +128,7 @@ def main():
     for name in ('preview', 'apply'):
         command = s.add_parser(name); command.add_argument('input', type=Path)
         if name == 'preview':
+            add_output_argument(command)
             command.add_argument('--title', help='explicit replacement title; reclassified as operator wording')
             command.add_argument('--with-evidence', action='store_true', help='include bounded raw user-message excerpts and provenance for private review')
     a = p.parse_args()
@@ -138,6 +140,7 @@ def main():
         else:
             value = read_document(a.input)
             result = preview(a.db, value, a.title, a.with_evidence) if a.command == 'preview' else apply_preview(a.db, value)
+        result = save_if_requested(result, a, 'preview')
     except (ValueError, OSError, KeyError, TypeError, sqlite3.Error) as e:
         p.exit(1, str(e) + '\n')
     print(json.dumps(result, ensure_ascii=True, indent=2))

@@ -51,13 +51,16 @@ def suggest_branch(db, source, conversation, path, node=None):
 
 
 def main():
+    from title_document_output import add_output_argument, save_if_requested
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--db', required=True); parser.add_argument('--source', required=True)
     parser.add_argument('--conversation', required=True); parser.add_argument('--node')
     parser.add_argument('input')
+    add_output_argument(parser)
     args = parser.parse_args()
     try:
         result = suggest_branch(args.db, args.source, args.conversation, args.input, args.node)
+        result = save_if_requested(result, args, 'proposal')
     except (ValueError, OSError, KeyError, TypeError, sqlite3.Error) as error:
         parser.exit(1, str(error) + '\n')
     print(json.dumps(result, ensure_ascii=True, indent=2))

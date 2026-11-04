@@ -74,6 +74,11 @@ titles and text; the original `search` command still performs message-level FTS.
 `--expected-revision`. `suggest-title` produces a proposal only; continue through
 `recap.py --db ... preview-title proposal.json` then
 `recap.py --db ... apply-title reviewed.json` for reviewed proposal application.
+Use `--output NEW_JSON` on title suggestions, review queues and previews to create
+UTF-8 files without overwriting existing paths or relying on shell redirection.
+Stdout then contains a receipt; open the saved document before applying.
+[Native title JSON files](docs/TITLE_DOCUMENT_FILES.md) lists supported commands
+and filesystem limits. The default stdout mode remains available.
 Add `preview-title --with-evidence` for an explicitly requested private view of
 up to five cited user-message excerpts and bounded original provenance.
 [Evidence review](docs/TITLE_REVIEW_EVIDENCE.md) explains truncation and why raw
@@ -132,7 +137,8 @@ python session_workflow.py --db ../demo.sqlite title --source demo --conversatio
 python session_workflow.py --db ../demo.sqlite title --source demo --conversation synthetic-chat --set "Orchard experiment plan" --expected-revision 0
 ```
 
-Title preview is read-only. The informational `title` command and `suggest-title`
+Title preview is read-only against the archive; `--output` explicitly creates a
+new local JSON file. The informational `title` command and `suggest-title`
 share the same first-non-greeting user excerpt, with whitespace/control cleanup
 and an 80-code-point limit; they are not semantic summaries. Greeting-only inputs
 retain a greeting fallback. With no usable user text, `title` shows an informational
@@ -316,8 +322,8 @@ SQLite databases produce clean CLI errors and are not created by preview/snapsho
 ## Generate a local title excerpt for review
 
 ```sh
-python title_suggestion.py --db ../demo.sqlite --source demo --conversation synthetic-chat > ../proposal.json
-python title_proposal.py --db ../demo.sqlite preview ../proposal.json > ../reviewed-preview.json
+python title_suggestion.py --db ../demo.sqlite --source demo --conversation synthetic-chat --output ../proposal.json
+python title_proposal.py --db ../demo.sqlite preview ../proposal.json --output ../reviewed-preview.json
 # Inspect the suggested title and evidence before applying:
 python title_proposal.py --db ../demo.sqlite apply ../reviewed-preview.json
 ```
@@ -342,7 +348,7 @@ other format characters, including emoji tags, retain the existing space-replace
 behavior. See [Unicode excerpt boundaries](docs/TITLE_REVIEW_HINTS.md#unicode-excerpt-boundaries).
 
 Output is a `local-extractive` proposal with one user evidence ID and the conversation
-content fingerprint. Generating and previewing are read-only; applying still requires
+content fingerprint. Generating and previewing are read-only against the archive; applying still requires
 the reviewed revision and unchanged content. This is a deterministic excerpt, not a
 semantic summary, intent classifier or model adapter. It can miss the main topic or
 select low-value text, so review remains necessary. No API key, paid service, model
@@ -445,7 +451,7 @@ plus legacy-only rows, or the structured view, rather than only the old table.
 
 ```sh
 python title_adapter.py --db ../demo.sqlite --source demo --conversation synthetic-chat generate > ../proposal.json
-python title_proposal.py --db ../demo.sqlite preview ../proposal.json > ../reviewed-preview.json
+python title_proposal.py --db ../demo.sqlite preview ../proposal.json --output ../reviewed-preview.json
 # Inspect the proposed title and evidence before applying:
 python title_proposal.py --db ../demo.sqlite apply ../reviewed-preview.json
 ```
@@ -553,9 +559,9 @@ fixtures are shipped; no public or private conversation corpus was imported.
 ## Suggest a title from a verified archived branch
 
 ```sh
-python recap.py --db ../demo.sqlite suggest-branch-title ../conversations.json --source demo --conversation synthetic > ../proposal.json
+python recap.py --db ../demo.sqlite suggest-branch-title ../conversations.json --source demo --conversation synthetic --output ../proposal.json
 # Optionally add --node alternate-tip to use another path.
-python title_proposal.py --db ../demo.sqlite preview ../proposal.json > ../reviewed.json
+python title_proposal.py --db ../demo.sqlite preview ../proposal.json --output ../reviewed.json
 # Review title, evidence and branch context before applying:
 python title_proposal.py --db ../demo.sqlite apply ../reviewed.json
 ```
@@ -827,8 +833,8 @@ No archive migration, source rewrite, remote operation or title application is a
 ```sh
 # Preserve the complete raw export in the archive first:
 python recap.py --db ../demo.sqlite import ../rollout.jsonl --format local-codex --source local-demo
-python recap.py --db ../demo.sqlite suggest-replay-title ../rollout.jsonl --source local-demo --conversation synthetic > ../proposal.json
-python title_proposal.py --db ../demo.sqlite preview ../proposal.json > ../reviewed.json
+python recap.py --db ../demo.sqlite suggest-replay-title ../rollout.jsonl --source local-demo --conversation synthetic --output ../proposal.json
+python title_proposal.py --db ../demo.sqlite preview ../proposal.json --output ../reviewed.json
 # Review the retained-turn excerpt and evidence mapping before applying:
 python title_proposal.py --db ../demo.sqlite apply ../reviewed.json
 ```

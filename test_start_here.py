@@ -1,4 +1,5 @@
 """Execute published workflow arguments with this interpreter, not every shell."""
+import hashlib
 import importlib.util
 import json
 from pathlib import Path
@@ -29,14 +30,16 @@ class StartHereTests(unittest.TestCase):
                     tokens = shlex.split(command)
                     self.assertEqual(tokens.pop(0), 'python')
                     tokens = [t.replace('../recap-start-demo', str(destination)) for t in tokens]
-                    output = None
-                    if '>' in tokens:
-                        redirect = tokens.index('>')
-                        self.assertEqual(redirect, len(tokens) - 2)
-                        output = Path(tokens[-1]); tokens = tokens[:redirect]
+                    self.assertNotIn('>', tokens)
+                    title_save = any(t in tokens for t in ('review-titles', 'preview-title'))
+                    output = Path(tokens[tokens.index('--output') + 1]) if title_save else None
+                    database = destination / 'archive.sqlite'
+                    before = database.read_bytes() if title_save else None
+                    if output is not None:
+                        self.assertFalse(output.exists())
                     # Model the guide's explicit human review before this synthetic apply.
                     if 'apply-title' in tokens:
-                        reviewed = json.loads((destination/'reviewed.json').read_text())
+                        reviewed = json.loads((destination/'reviewed.json').read_text(encoding='utf-8'))
                         self.assertEqual(reviewed['proposal']['source'], 'demo')
                         self.assertEqual(reviewed['proposal']['conversation'], 'web-05')
                         self.assertEqual(reviewed['previous_title'], 'New chat')
@@ -47,17 +50,37 @@ class StartHereTests(unittest.TestCase):
                     self.assertEqual(result.returncode, 0, command+'\n'+result.stderr)
                     payload = json.loads(result.stdout); outputs.append((tokens,payload))
                     if output is not None:
-                        output.write_text(result.stdout, encoding='utf-8')
+                        raw = output.read_bytes()
+                        self.assertEqual(payload['schema'], 'recap.saved-title-json.v1')
+                        self.assertEqual(payload['status'], 'SAVED')
+                        self.assertEqual(payload['document_kind'], 'preview' if 'preview-title' in tokens else 'queue')
+                        self.assertEqual(payload['bytes'], len(raw))
+                        self.assertEqual(payload['sha256'], hashlib.sha256(raw).hexdigest())
+                        self.assertTrue(payload['staging_cleanup_complete'])
+                        self.assertIsNone(payload['remaining_staging_file'])
+                        self.assertNotIn('items', payload)
+                        self.assertNotIn('proposal', payload)
+                        self.assertFalse(raw.startswith(b'\xef\xbb\xbf'))
+                        saved = json.loads(raw.decode('utf-8'))
+                        default_tokens = tokens[:]
+                        index = default_tokens.index('--output')
+                        del default_tokens[index:index + 2]
+                        default = subprocess.run([sys.executable, *default_tokens], cwd=ROOT,
+                                                 capture_output=True, encoding='utf-8', timeout=30)
+                        self.assertEqual(default.returncode, 0, default.stderr)
+                        self.assertEqual(saved, json.loads(default.stdout))
+                        self.assertEqual(database.read_bytes(), before)
+                        self.assertEqual(originals, {name: (destination/name).read_bytes() for name in originals})
                     if tokens[0] == 'examples/make_review_demo.py':
                         originals = {name: (destination/name).read_bytes() for name in ('web.zip','local.jsonl')}
                         self.assertFalse((destination/'archive.sqlite').exists())
             self.assertEqual(len(outputs), 21)
-            queue = json.loads((destination/'queue.json').read_text())
+            queue = json.loads((destination/'queue.json').read_text(encoding='utf-8'))
             self.assertEqual(queue['total_conversations'],24)
             self.assertEqual(sum(i['status']=='UNAVAILABLE' for i in queue['items']),2)
-            deferred = json.loads((destination/'deferred.json').read_text())
+            deferred = json.loads((destination/'deferred.json').read_text(encoding='utf-8'))
             self.assertEqual([i['conversation'] for i in deferred['items']],['web-05'])
-            remaining = json.loads((destination/'remaining.json').read_text())
+            remaining = json.loads((destination/'remaining.json').read_text(encoding='utf-8'))
             self.assertEqual(remaining['total_conversations'],23)
             state = next(p for t,p in reversed(outputs) if 'review-state' in t)
             self.assertEqual(state['state'],'open');self.assertEqual(state['recorded_state'],'deferred')

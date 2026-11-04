@@ -866,3 +866,46 @@ introduced, and the broad guard is not removed to make CI pass.
 The full local suite passes 691 tests after the correction; final focused and
 manifest checks also pass. Publication audit and manifest cover the same 149 files.
 All four jobs for the new exact commit are checked separately after publication.
+
+### 2026-11-04: native no-overwrite title documents
+
+An independent synthetic reproduction confirmed that shell redirection to an input
+proposal truncates that file before the CLI can reject it, and a simulated UTF-16
+shell-produced document fails the existing UTF-8 reader. Supported read-only title
+commands now accept an explicit --output path for a new UTF-8 JSON file. Generation,
+validation and serialization happen before a private same-directory staged write;
+flush, fsync and close precede atomic no-overwrite hard-link publication. There is
+no replacement fallback. Existing files, directories and symlinks are refused.
+
+The saved proposal, preview or queue retains the original document shape. Stdout
+becomes an ASCII-safe receipt with byte count, SHA-256 and staging cleanup status,
+without deliberately printing title/body text, source/conversation IDs or the output
+path. The receipt is not a reviewed document or approval. Default stdout behavior,
+archive read-only behavior, explicit apply and stale-preview checks remain intact.
+Only the six documented unified read-only title commands and their existing
+standalone equivalents get this option. Mutation commands and provider adapters do
+not; prepare-web-export keeps its distinct existing --output behavior.
+
+Seventeen independent synthetic tests cover serialization, Unicode/newline/hash,
+POSIX staging permissions, existing and aliased input/database destinations, missing
+parents, competing publishers, write/flush/fsync/link and short-write failures,
+closed-stage publication, cleanup outcomes, invalid input and missing archives,
+all supported CLI forms, queue selection, selected evidence, explicit apply and
+stale rejection. One additional test exercises Unicode, spaces, # and % in native
+output paths under an ASCII CLI, same-target refusal and separate explicit apply.
+The two primary walkthrough suites now test CLI-created files and receipt hashes
+rather than constructing equivalent files from captured stdout. They retain exact
+argument validation with the available test interpreter, not shell certification.
+
+If staging cleanup fails after publication, the complete output is reported SAVED
+with a leftover basename; pre-publication failures remain errors. A crash can leave
+staging/output files. Hard-link support and a controlled private parent directory
+are required. These tests do not establish hostile-directory resistance, universal
+filesystem support, encryption or full power-loss durability. Shell redirection can
+still truncate a file before the program runs if combined with these commands.
+
+The final complete local suite passes 709 tests. Focused native-output, walkthrough
+and runtime checks pass 39 tests. Publication audit and byte-manifest checks cover
+152 public files. All fixtures remain synthetic; no real session, account access,
+model transmission, remote rename or merge occurs. Exact-commit Ubuntu/Windows
+Python 3.10/3.12 CI is checked separately after push.
