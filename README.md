@@ -82,6 +82,11 @@ For a reimport into an existing archive, `check-import INPUT --format FORMAT --s
 with `--db DB` reports title-only, text and metadata identity conflicts without
 changing the archive. [Conflict diagnostics](docs/IMPORT_CONFLICTS.md) explain
 bounded samples, duplicate occurrences and why a clear check is only advisory.
+Use repeatable `review-titles --proposal FILE` options to review existing web-branch,
+local-attributed, operator or model proposal files together. Missing or stale
+candidates remain unavailable rather than reverting to raw excerpts. The
+[web/local walkthrough](docs/SUPPLIED_TITLE_REVIEW.md) connects these proposals
+to current titles, collision checks, one-at-a-time preview/apply and search.
 
 Start with the [two-format title walkthrough](docs/TITLE_WALKTHROUGH.md) for
 copyable synthetic web and Codex local examples, expected results and recovery

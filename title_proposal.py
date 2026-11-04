@@ -29,11 +29,10 @@ def snapshot(db, source, conversation):
     return rows, digest
 
 
-def preview(db, proposal, replacement_title=None):
+def validate_against_snapshot(proposal, rows, digest):
+    """Validate the proposal contract against already-read evidence, without I/O."""
     if not isinstance(proposal, dict):
         raise ValueError('title proposal must be a JSON object')
-    source, conversation = proposal['source'], proposal['conversation']
-    rows, digest = snapshot(db, source, conversation)
     if proposal.get('content_sha256') != digest:
         raise ValueError('proposal refers to a different conversation snapshot')
     title = proposal['title']
@@ -44,6 +43,15 @@ def preview(db, proposal, replacement_title=None):
         raise ValueError('title evidence must reference user messages in this conversation')
     if proposal.get('provider') not in ('operator', 'external-adapter', 'synthetic-mock', 'local-extractive'):
         raise ValueError('explicit proposal provider required')
+
+
+def preview(db, proposal, replacement_title=None):
+    if not isinstance(proposal, dict):
+        raise ValueError('title proposal must be a JSON object')
+    source, conversation = proposal['source'], proposal['conversation']
+    rows, digest = snapshot(db, source, conversation)
+    validate_against_snapshot(proposal, rows, digest)
+    ids = proposal['evidence_message_ids']
     if replacement_title is not None:
         validate_title(replacement_title)
         # Explicit human wording is not an extractive/model-generated label.

@@ -1,15 +1,66 @@
 """Read-only bounded title review pages; no batch application or model calls."""
 import copy
+import json
 import unicodedata
+from pathlib import Path
 from recap import readonly
 from conversation_view import _inventory
-from title_proposal import content_fingerprint
+from title_proposal import content_fingerprint, validate_against_snapshot
 from title_suggestion import excerpt
 from title_rules import validate_title
 from title_review import assess_title
 from title_review_state import state_snapshot
+from strict_json import loads
 
 SCHEMA = 'recap.title-review-queue.v1'
+MAX_SUPPLIED_PROPOSALS = 1000
+MAX_SUPPLIED_BYTES = 1024 * 1024
+
+
+def load_supplied_proposals(paths):
+    """Read only explicit proposal files, with one bounded snapshot per file."""
+    if not isinstance(paths, (list, tuple)) or len(paths) > MAX_SUPPLIED_PROPOSALS:
+        raise ValueError('supply at most 1000 explicit proposal files')
+    proposals, used = [], 0
+    for path in paths:
+        with Path(path).open('rb') as stream:
+            raw = stream.read(MAX_SUPPLIED_BYTES - used + 1)
+        used += len(raw)
+        if used > MAX_SUPPLIED_BYTES:
+            raise ValueError('supplied proposal files exceed the combined 1 MiB limit')
+        try:
+            proposal = loads(raw.decode('utf-8'))
+            # Python's decoder accepts NaN/Infinity and can overflow large JSON
+            # exponents. Reject nonfinite values anywhere in retained metadata.
+            json.dumps(proposal, ensure_ascii=False, allow_nan=False)
+        except (ValueError, RecursionError):
+            raise ValueError('supplied proposal file must contain valid JSON') from None
+        if not isinstance(proposal, dict):
+            raise ValueError('each supplied proposal file must contain one JSON object')
+        proposals.append(proposal)
+    return proposals
+
+
+def _supplied_by_id(proposals, source):
+    if not isinstance(proposals, list) or len(proposals) > MAX_SUPPLIED_PROPOSALS:
+        raise ValueError('supplied proposals must be an array of at most 1000 objects')
+    try:
+        raw = json.dumps(proposals, ensure_ascii=False, allow_nan=False, separators=(',', ':')).encode('utf-8')
+        if len(raw) > MAX_SUPPLIED_BYTES:
+            raise ValueError()
+        frozen = loads(raw.decode('utf-8'))
+    except (ValueError, TypeError, RecursionError):
+        raise ValueError('supplied proposals must be valid JSON within 1 MiB') from None
+    result = {}
+    for proposal in frozen:
+        if (not isinstance(proposal, dict) or proposal.get('source') != source or
+                not isinstance(proposal.get('conversation'), str) or not proposal['conversation']):
+            raise ValueError('each supplied proposal requires this exact source and a nonempty conversation ID')
+        identity = proposal['conversation']
+        if identity in result:
+            raise ValueError('supply exactly one proposal per conversation; duplicate identities are ambiguous')
+        result[identity] = proposal
+    return result
 
 
 def _key(title):
@@ -40,7 +91,7 @@ def _state_filtered_inventory(connection, source, unrenamed_only, state, limit, 
         scan_offset += len(chunk)
 
 
-def review_queue(db, source, limit=20, offset=0, unrenamed_only=False, review_state_filter=None):
+def review_queue(db, source, limit=20, offset=0, unrenamed_only=False, review_state_filter=None, supplied_proposals=None):
     if not isinstance(source, str) or not source.strip():
         raise ValueError('explicit nonempty source required')
     if type(limit) is not int or not 1 <= limit <= 100 or type(offset) is not int or not 0 <= offset <= 2**63-1:
@@ -49,6 +100,7 @@ def review_queue(db, source, limit=20, offset=0, unrenamed_only=False, review_st
         raise ValueError('unrenamed_only must be boolean')
     if review_state_filter is not None and (not isinstance(review_state_filter, str) or review_state_filter not in ('open', 'skipped', 'deferred')):
         raise ValueError('state filter must be open, skipped or deferred')
+    supplied = _supplied_by_id(supplied_proposals, source) if supplied_proposals is not None else None
     connection = readonly(db)
     try:
         connection.execute('BEGIN')
@@ -74,15 +126,32 @@ def review_queue(db, source, limit=20, offset=0, unrenamed_only=False, review_st
             item = dict(conversation=identity, review_state=state_snapshot(connection, source, identity, digest, record['revision']),
                         current_title=record['display_title'],
                         current_revision=record['revision'], previously_renamed=record['revision'] > 0)
-            try:
-                proposed = excerpt(rows)
-                validate_title(proposed['title'])
-            except ValueError:
-                item.update(status='UNAVAILABLE', reason_code='NO_VALID_LOCAL_EXCERPT')
+            proposal = None
+            if supplied is not None:
+                candidate = supplied.get(identity)
+                if candidate is None:
+                    item.update(status='UNAVAILABLE', reason_code='NO_SUPPLIED_PROPOSAL')
+                elif candidate.get('content_sha256') != digest:
+                    item.update(status='UNAVAILABLE', reason_code='SUPPLIED_PROPOSAL_STALE')
+                else:
+                    try:
+                        validate_against_snapshot(candidate, rows, digest)
+                    except (ValueError, TypeError, KeyError):
+                        item.update(status='UNAVAILABLE', reason_code='SUPPLIED_PROPOSAL_INVALID')
+                    else:
+                        proposal = copy.deepcopy(candidate)
             else:
-                item.update(status='READY', action='no_change' if proposed['title'] == record['display_title'] else 'review_rename',
-                            proposal=dict(source=source, conversation=identity, content_sha256=digest,
-                                          provider='local-extractive', **proposed))
+                try:
+                    proposed = excerpt(rows)
+                    validate_title(proposed['title'])
+                except ValueError:
+                    item.update(status='UNAVAILABLE', reason_code='NO_VALID_LOCAL_EXCERPT')
+                else:
+                    proposal = dict(source=source, conversation=identity, content_sha256=digest,
+                                    provider='local-extractive', **proposed)
+            if proposal is not None:
+                item.update(status='READY', action='no_change' if proposal['title'] == record['display_title'] else 'review_rename',
+                            proposal=proposal)
             if item['status'] == 'READY':
                 item['title_advisory'] = assess_title(item['proposal'])
             items.append(item)
@@ -116,7 +185,7 @@ def review_queue(db, source, limit=20, offset=0, unrenamed_only=False, review_st
             item['collisions'] = dict(page_proposal_count=len(peers), page_proposal_conversations=peers[:10],
                                       existing_title_count=count, existing_title_conversations=current,
                                       samples_limited_to=10, normalization='NFKC + casefold + whitespace collapse')
-        return dict(schema=SCHEMA, source=source, limit=limit, offset=offset, total_conversations=total,
+        result = dict(schema=SCHEMA, source=source, limit=limit, offset=offset, total_conversations=total,
                     source_total_conversations=source_total, excluded_renamed_conversations=source_total-before_state_filter,
                     excluded_review_state_conversations=before_state_filter-total,
                     review_state_filter=review_state_filter,
@@ -128,6 +197,14 @@ def review_queue(db, source, limit=20, offset=0, unrenamed_only=False, review_st
                     semantic_validation='NOT_PERFORMED',
                     scope='Raw archive excerpts; all imported web branches/local records, not selected branch or retained replay history.',
                     warning='PRIVATE TITLES AND IDS. Read-only single database snapshot. Collisions are advisory, page proposal comparisons are not global, and this queue is unsigned. Review one proposal before applying.')
+        if supplied is not None:
+            on_page = sum(item['conversation'] in supplied for item in items)
+            result.update(proposal_mode='supplied', supplied_proposals=dict(total=len(supplied), on_page=on_page,
+                not_on_page=len(supplied)-on_page,
+                validation_scope='content, title, provider and evidence checked only for selected page items; off-page or unknown identities are not validated against archive content'),
+                scope='Supplied title wording checked against the raw archive snapshot; source/branch/projection context remains descriptive and unsigned.',
+                warning='PRIVATE PROPOSALS AND IDS: retained supplied metadata may contain other private data. No model call or automatic fallback. Source labels, context and this queue are unsigned. Collision checks remain advisory. Review one fresh preview before applying.')
+        return result
     finally:
         connection.close()
 

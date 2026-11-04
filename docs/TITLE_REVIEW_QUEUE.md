@@ -4,6 +4,9 @@
 suggestions without repeatedly invoking a command for each conversation. It never
 applies titles, sends content to a model or changes a remote platform. It uses the
 same local extractive algorithm as `suggest-title`, not semantic summarization.
+To review previously prepared web-branch, local-attributed, operator or model
+candidates instead, use [supplied title review](SUPPLIED_TITLE_REVIEW.md) with
+repeatable `--proposal` options. That opt-in mode does not generate raw fallbacks.
 
 After deliberately importing your supported web/local files into a private archive:
 

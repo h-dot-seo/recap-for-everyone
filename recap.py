@@ -154,6 +154,7 @@ def main():
     batch.add_argument('--source', required=True); batch.add_argument('--limit', type=int, default=20); batch.add_argument('--offset', type=int, default=0)
     batch.add_argument('--state', choices=['open', 'skipped', 'deferred'], help='filter by current snapshot-bound review state; scans eligible source content')
     batch.add_argument('--unrenamed-only', action='store_true', help='exclude conversations with any existing local title history')
+    batch.add_argument('--proposal', action='append', help='explicit proposal JSON object file; repeat to review supplied candidates instead of generating raw excerpts')
     transfer = sub.add_parser('title-adapter-dry-run', help='validate a mock-only transfer request without executing')
     transfer.add_argument('input'); transfer.add_argument('plan'); transfer.add_argument('target')
     simulation = sub.add_parser('title-adapter-simulate', help='simulate an explicitly approved title transfer in memory only')
@@ -221,8 +222,9 @@ def main():
             else:
                 result = review_state(args.db, args.source, args.conversation, args.set, args.expected_state_revision, args.expected_title_revision, args.expected_content_sha256)
         elif args.command == 'review-titles':
-            from title_batch import review_queue
-            result = review_queue(args.db, args.source, args.limit, args.offset, args.unrenamed_only, args.state)
+            from title_batch import review_queue, load_supplied_proposals
+            supplied = load_supplied_proposals(args.proposal) if args.proposal is not None else None
+            result = review_queue(args.db, args.source, args.limit, args.offset, args.unrenamed_only, args.state, supplied)
         elif args.command in ('title-adapter-dry-run', 'title-adapter-simulate'):
             from title_transfer import dry_run, simulate, MockTitleAdapter
             from strict_json import loads

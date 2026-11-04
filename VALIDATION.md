@@ -359,3 +359,22 @@ still rejects conflicts after a previously clear advisory report. The documented
 commands run against a new synthetic scratch archive. No conflict override,
 repair, title-value output or import policy change is introduced. The complete
 suite passes 414 tests; publication scan and manifest verification cover 115 files.
+
+
+### 2026-11-04: supplied web/local/model candidate review
+
+Sixteen independent synthetic regressions cover explicit supplied proposal files
+in the existing title queue: mixed web-branch/local-attributed evidence, retained
+metadata, operator/mock/external provider labels, unchanged default behavior,
+missing/stale/invalid candidates without fallback, source/duplicate rejection,
+state/history filters, collisions and one-at-a-time fresh preview/apply. Two WAL
+regressions keep metadata and content validation in the queue's single snapshot.
+Loader tests cover bounded single file reads, combined 1 MiB input, Unicode,
+duplicate JSON keys and nonfinite values. The latter revealed a decoder gap that
+was fixed before publication. The exact documented mixed web/local workflow runs
+with explicit review assertions before apply and source-byte preservation.
+
+The complete suite passes 430 tests; publication scan and manifest verification
+cover 117 files. Supplied context/provider labels remain unsigned and unverified;
+only selected page candidates receive archive-content validation. This increment
+adds no semantic model call, automatic fallback, bulk apply or remote mutation.

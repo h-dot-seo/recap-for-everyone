@@ -53,3 +53,11 @@ For repeated imports into an existing archive, consider `check-import` before
 the actual import. Use `docs/IMPORT_CONFLICTS.md` to distinguish source-title,
 text and metadata conflicts without printing their values. A clear check is not
 permission or a guarantee, and a title-only conflict must not be auto-repaired.
+
+When specific web-branch, source-attributed, operator or model proposals already
+exist, supply them with repeatable `review-titles --proposal FILE` options instead
+of regenerating raw excerpts. The same-source candidates are checked against the
+queue's database snapshot. Missing, stale or invalid candidates remain unavailable.
+Only selected page items get content validation; inspect unused candidate counts.
+Context/provider metadata remains untrusted, and normal individual preview/apply
+is still required. See `docs/SUPPLIED_TITLE_REVIEW.md`.
