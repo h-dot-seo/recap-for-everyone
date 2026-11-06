@@ -30,8 +30,8 @@
     },
     {
       "path": "README.md",
-      "bytes": 71643,
-      "sha256": "ee7ff536a19829b529ed61c6d8e05f10290699af70265ed0a59efe2e40afa2a6"
+      "bytes": 71976,
+      "sha256": "0706b77741ea0800018b6bcf6a661f9cd1d61ef201acbfd0eeb8a1e0096275aa"
     },
     {
       "path": "RIGHTS.md",
@@ -70,8 +70,8 @@
     },
     {
       "path": "conversation_search.py",
-      "bytes": 20140,
-      "sha256": "6f2d0545e1e341c67af1fda533ab0a9a5240dc77c9bd9ac5da0b63ffce637379"
+      "bytes": 21153,
+      "sha256": "c195050c6a760e5a33ab4a72a804316663131cd474b24bffe8e60010b90d6290"
     },
     {
       "path": "conversation_view.py",
@@ -320,8 +320,8 @@
     },
     {
       "path": "recap.py",
-      "bytes": 27332,
-      "sha256": "62e88443955d2119ed15b57622e7ede79bf409b13853c554af15798a3d9a3708"
+      "bytes": 27478,
+      "sha256": "68f4494599d1b072f3c78e13fa9fd71620c3bd609707f5036941d7e71b913cf6"
     },
     {
       "path": "replay_local.py",
@@ -415,8 +415,8 @@
     },
     {
       "path": "test_conversation_search.py",
-      "bytes": 2048,
-      "sha256": "6ab6b87cdcbe2e2c0693c1c8031f54a717d9ef049ec3afc4751814a210f0fed6"
+      "bytes": 3988,
+      "sha256": "fcfd359c9a5c5b7bec4c1c441bcf47dbd46e4e5e9eb88fd09c7624b3cfcf3581"
     },
     {
       "path": "test_conversation_selection.py",

@@ -245,6 +245,12 @@ matches composed/decomposed equivalents while preserving original evidence and
 covering snippet offsets. The default remains unchanged; cursor pages must keep
 the same mode and runtime Unicode version.
 
+Use `find --text-role user` (or `assistant`, `system`, `tool`) to search only
+message bodies of that role. Titles remain conversation-wide metadata; a
+conversation must contain a message satisfying the role and any export filter.
+Message counts and samples describe that filtered set. Cursor pages must retain
+the same role filter.
+
 Large result sets support [cursor pagination](docs/SEARCH_PAGINATION.md). Copy
 `next_cursor` into `find --cursor TOKEN` with the same query and filters to continue
 past the first page, including more than 1,000 matches. Title-first ranking and

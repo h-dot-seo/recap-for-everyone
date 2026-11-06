@@ -15,9 +15,11 @@ from strict_json import loads
 MAX_CURSOR_CHARS = 16384
 
 
-def _cursor_scope(terms, source, history, export, canonical_unicode=False):
+def _cursor_scope(terms, source, history, export, canonical_unicode=False, text_role=None):
     value = dict(protocol='recap.find.cursor.v1', terms=terms, source=source,
                  include_title_history=history, export_sha256=export)
+    if text_role is not None:
+        value['text_role'] = text_role
     if canonical_unicode:
         value.update(canonical_unicode='NFC(NFD(text).casefold())',
                      unicode_version=unicodedata.unidata_version)
@@ -126,7 +128,9 @@ def _matching_export_provenance(connection, tables, source, conversation, messag
     return samples,count
 
 
-def find(db, query, source=None, limit=20, include_title_history=False, export_sha256=None, cursor=None, canonical_unicode=False):
+def find(db, query, source=None, limit=20, include_title_history=False, export_sha256=None, cursor=None, canonical_unicode=False, text_role=None):
+    if text_role is not None and text_role not in ('user', 'assistant', 'system', 'tool'):
+        raise ValueError('text_role must be user, assistant, system or tool')
     if not isinstance(query, str) or type(limit) is not int:
         raise ValueError('query must be text and limit must be an integer')
     if type(canonical_unicode) is not bool:
@@ -141,7 +145,7 @@ def find(db, query, source=None, limit=20, include_title_history=False, export_s
         raise ValueError('provide 1..20 search terms and limit 1..1000')
     # Repeating a query term must not give it extra evidence-sampling weight.
     terms = list(dict.fromkeys(terms))
-    scope = _cursor_scope(terms, source, include_title_history, export_sha256, canonical_unicode)
+    scope = _cursor_scope(terms, source, include_title_history, export_sha256, canonical_unicode, text_role)
     after = _decode_cursor(cursor, scope)
     position = (after['rank'], after['source'], after['conversation']) if after is not None else None
     c = readonly(db)
@@ -167,6 +171,8 @@ def find(db, query, source=None, limit=20, include_title_history=False, export_s
         params = []; filters = []; provenance_tables = []
         if source is not None:
             filters.append('source_id=?'); params.append(source)
+        if text_role is not None:
+            filters.append('role=?'); params.append(text_role)
         if export_sha256 is not None:
             provenance_tables = [table for table in ('export_provenance', 'export_occurrences') if c.execute(
                 "SELECT 1 FROM sqlite_master WHERE type='table' AND name=?", (table,)).fetchone()]
@@ -219,7 +225,7 @@ def find(db, query, source=None, limit=20, include_title_history=False, export_s
                 finish()
                 key = next_key
                 original_title = row['title']
-                if export_sha256 is not None:
+                if export_sha256 is not None or text_role is not None:
                     original_title = c.execute('SELECT title FROM messages WHERE source_id=? AND conversation_id=? ORDER BY message_pk LIMIT 1', key).fetchone()[0]
                 # Merge two ordered cursors rather than scanning title history
                 # once per conversation or retaining all overrides in Python.
@@ -237,6 +243,8 @@ def find(db, query, source=None, limit=20, include_title_history=False, export_s
                 body_mask, sample_masks = 0, []
                 if export_sha256 is not None:
                     item.update(matched_export_sha256=export_sha256, message_count_scope='messages linked to this original export only')
+                if text_role is not None:
+                    item['message_count_scope'] = 'messages with the requested role' + (' linked to this original export only' if export_sha256 is not None else '')
                 if include_title_history:
                     item.update(matched_historical_title=False, historical_title_matches=[],
                                 historical_title_match_count=0, historical_title_matches_truncated=False)
@@ -304,6 +312,8 @@ def find(db, query, source=None, limit=20, include_title_history=False, export_s
         if export_sha256 is not None:
             result.update(export_sha256=export_sha256, export_provenance_available=bool(provenance_tables),
                           export_scope='Only message bodies linked by original-export provenance are searched. Current and optional historical titles remain conversation-wide archive metadata, not export-snapshot titles.')
+        if text_role is not None:
+            result.update(text_role=text_role, role_scope='Only message bodies with this role are searched; titles remain conversation-wide metadata. Conversations must contain a message satisfying all selected message filters.')
         if canonical_unicode:
             result.update(canonical_unicode=True, unicode_version=unicodedata.unidata_version,
                 normalization='NFC(NFD(text).casefold())',
@@ -319,10 +329,11 @@ def main():
     p.add_argument('--db',required=True); p.add_argument('query'); p.add_argument('--source'); p.add_argument('--limit',type=int,default=20)
     p.add_argument('--include-title-history', action='store_true')
     p.add_argument('--export-sha256', help='restrict message bodies to one original export provenance hash')
+    p.add_argument('--text-role', choices=['user', 'assistant', 'system', 'tool'], help='restrict message bodies to one role')
     p.add_argument('--cursor', help='continue using the previous result next_cursor with the same query and filters')
     p.add_argument('--canonical-unicode', action='store_true', help='match canonical Unicode equivalents without rewriting evidence')
     a=p.parse_args()
-    try: result=find(a.db,a.query,a.source,a.limit,a.include_title_history,a.export_sha256,a.cursor,a.canonical_unicode)
+    try: result=find(a.db,a.query,a.source,a.limit,a.include_title_history,a.export_sha256,a.cursor,a.canonical_unicode,a.text_role)
     except (ValueError,OSError,sqlite3.Error) as e: p.exit(1,str(e)+'\n')
     print(json.dumps(result,ensure_ascii=True,indent=2))
 

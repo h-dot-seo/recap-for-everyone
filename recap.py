@@ -228,6 +228,7 @@ def main():
     find.add_argument('--export-sha256', help='restrict message bodies to one original export provenance hash')
     find.add_argument('--include-title-history', action='store_true', help='also search prior local display titles; may reveal old private labels')
     find.add_argument('--canonical-unicode', action='store_true', help='match canonical Unicode equivalents without rewriting evidence')
+    find.add_argument('--text-role', choices=['user', 'assistant', 'system', 'tool'], help='restrict message bodies to one role')
     find.add_argument('--cursor', help='continue with the previous search next_cursor and the same query/filters')
     for name in ('show', 'suggest-title', 'title', 'title-history'):
         command = sub.add_parser(name)
@@ -360,7 +361,7 @@ def main():
                                   args.around_message, args.before, args.after)
         elif args.command == 'find':
             from conversation_search import find
-            result = find(args.db, args.query, args.source, args.limit, args.include_title_history, args.export_sha256, args.cursor, args.canonical_unicode)
+            result = find(args.db, args.query, args.source, args.limit, args.include_title_history, args.export_sha256, args.cursor, args.canonical_unicode, args.text_role)
         else:
             from title_suggestion import suggest
             result = suggest(args.db, args.source, args.conversation, args.message)
