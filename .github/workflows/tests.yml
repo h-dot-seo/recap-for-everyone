@@ -1,7 +1,7 @@
 name: Synthetic tests
 on:
   push:
-    branches: ["codex/core-workflows-20261103"]
+    branches: ["main", "codex/core-workflows-20261103"]
   pull_request:
 permissions:
   contents: read

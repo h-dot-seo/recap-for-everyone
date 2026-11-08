@@ -1,7 +1,8 @@
 # recap-for-everyone
 
-대화·에이전트 세션을 출처와 함께 보존하고 검색하는 로컬 도구와 설계입니다.
-Portable, local-first conversation archives with provenance and read-only search.
+대화·에이전트 세션을 출처와 함께 보존·검색하고, 검토를 거친 로컬 표시 제목으로 정리하는 로컬 도구와 설계입니다.
+Portable, local-first conversation archives with provenance, read-only search and
+reviewed local display-title changes.
 
 ## 공개 범위 / Scope
 
@@ -12,13 +13,14 @@ Portable, local-first conversation archives with provenance and read-only search
 |---|---|
 | Normalized JSONL import, SQLite FTS search, source hash/line ledger | Real conversations, archives, databases, logs, user/device configuration |
 | Existing generic local session parser and synthetic tests | Authentication bundles, browser profiles, cookies, credentials |
+| Reviewed local display-title suggestions, preview/apply and title history | Remote or bulk renaming, model calls and semantic summarization inside this repository |
 | Collection/index/publication separation and recovery design | Private service endpoints, account automation, SSH and scheduler setup |
 
 ## Start with your export
 
-First use [installation and runtime checks](docs/INSTALL.md) to get the workflow
-branch, choose your Python launcher and verify in-memory SQLite FTS5. The default
-`main` extraction does not contain all commands described here.
+First use [installation and runtime checks](docs/INSTALL.md) to obtain the code,
+choose your Python launcher and verify in-memory SQLite FTS5. The workflow
+described here is on the default `main` branch since 2026-11-08.
 
 New to this tool? Follow [Start here: ZIP/local file to a findable title](docs/START_HERE.md).
 It chooses the right input path and walks through 24 invented conversations, explicit

@@ -6,7 +6,7 @@ Release preparation date: 2026-11-02 (Asia/Seoul).
 - Limited public-file/type/secret-pattern scan: passed.
 - Manual selected-content review: no actual conversation, researcher corpus, private
   configuration, credential, real experiment or article/book/figure asset selected.
-- Examples: synthetic; no scientific or persona-predictive validation claimed.
+- Examples: synthetic; no real-archive or personal-data validation claimed.
 - Private history import: none; new public repository with a separate initial history.
 
 The scanner is not a complete secret detector, anonymizer or legal clearance tool.
@@ -26,9 +26,9 @@ Second increment: 8 tests passed; failure boundaries and deterministic repeated 
 
 Third increment: 10 tests passed, including supplied-evidence rejection and deterministic output. No external model/search integration tested.
 
-Fourth increment: CLI end-to-end scenarios and failure recovery added. Local tests: 12 passed. Remote CI status is recorded separately in the private development log.
+Fourth increment: CLI end-to-end scenarios and failure recovery added. Local tests: 12 passed. Remote CI status is recorded in the repository's GitHub Actions history.
 
-Fifth increment: 14 local tests passed. New CLI paths, source boundaries, deterministic output and tamper/no-overwrite checks are covered. See private development log for remote matrix CI.
+Fifth increment: 14 local tests passed. New CLI paths, source boundaries, deterministic output and tamper/no-overwrite checks are covered. Remote matrix CI results are in the GitHub Actions history.
 
 Sixth increment: read-only conversation inventory and detail views added. Local
 Python standard-library suite: 20 synthetic tests passed, including CLI list/show,
@@ -1704,3 +1704,16 @@ and passed 67 focused inventory tests. The full suite passes 994 tests in 230.15
 seconds. Publication audit and manifest cover 178 public files. No real source
 corpora, external model calls, remote title changes or merges were performed.
 Exact-commit cross-platform CI is checked after publication.
+
+## 2026-11-08 Public boundary cleanup (0.87.1-public-boundary-cleanup)
+
+Removed references to a private development log from this record; remote CI
+results are the public GitHub Actions history. Rewrote PUBLICATION.md and the
+boundary boilerplate for this project's scope instead of the persona wording that
+had been copied between repositories. The README tagline, scope table, SKILL.md
+description and architecture boundary now state that reviewed local display-title
+changes are in scope while remote renaming stays out. Installation and start-here
+guides point at `main`, and the documented-command regression follows the new
+clone line. The test workflow now also runs on `main`, and this cleanup precedes
+merging the workflow branch into `main`. No code path or fixture changed; the
+manifest was regenerated for the edited text files.

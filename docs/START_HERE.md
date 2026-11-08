@@ -5,10 +5,10 @@ in their original app.** No account, API key, model, network or paid service is
 required. Titles suggested by default are shortened user-text excerpts, not
 semantic summaries. Review their meaning and private details yourself.
 
-For a first run, complete [branch installation and runtime checks](INSTALL.md).
+For a first run, complete [installation and runtime checks](INSTALL.md).
 Use the same working launcher throughout: replace leading `python` with `python3`
-or `py -3` when that is what your installation provides. The default `main` checkout
-does not include all workflow commands shown here.
+or `py -3` when that is what your installation provides. A `main` checkout from
+before 2026-11-08 does not include all workflow commands shown here.
 
 ## Choose the input you actually have
 

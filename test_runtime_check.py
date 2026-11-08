@@ -247,7 +247,7 @@ class DocumentedRuntimeEntryTests(unittest.TestCase):
         commands = [shlex.split(line) for line in self.shell_lines(document)]
         clones = [args for args in commands if args[:2] == ['git', 'clone']]
         self.assertEqual(clones, [[
-            'git', 'clone', '--branch', 'codex/core-workflows-20261103', '--single-branch',
+            'git', 'clone', '--branch', 'main', '--single-branch',
             'https://github.com/h-dot-seo/recap-for-everyone.git', 'recap-for-everyone-workflows']])
         # Clone is inspected as text only. No Git command or network operation runs.
         for expected in (['python', 'runtime_check.py'], ['python', 'recap.py', '--help']):

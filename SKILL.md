@@ -1,6 +1,6 @@
 ---
 name: recap-for-everyone
-description: Import explicitly authorized local conversation exports, search them read-only, and explain provenance and recovery boundaries. Use for local Recap archives, not unapproved online account collection.
+description: Import explicitly authorized local conversation exports, search them read-only, review and apply local display-title changes, and explain provenance and recovery boundaries. Use for local Recap archives, not unapproved online account collection or remote renaming.
 ---
 
 # Recap workflow

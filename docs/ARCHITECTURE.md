@@ -54,6 +54,11 @@ Search and statistics open SQLite using `mode=ro` and `PRAGMA query_only=ON`.
 FTS queries use bound SQL parameters and quoted terms. A local database is still
 private user material: read-only access does not anonymize results.
 
+Local display-title changes are the one deliberate write path. `title --set`,
+reviewed proposal application and explicit restores append to the title history
+under revision checks. They never rewrite archived message bytes, source hashes or
+the original export title, and they never rename a conversation online.
+
 ## Incremental and full organization
 
 An incremental organizer needs a durable verified cutoff and stable IDs/content

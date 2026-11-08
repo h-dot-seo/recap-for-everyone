@@ -1,34 +1,34 @@
-# Get the workflow branch and check your runtime
+# Get the code and check your runtime
 
 Recap runs directly from this source checkout. These instructions do not require
 `pip install`, a model, an account or an API key. Downloading Python or the code
 initially needs network access; the local import/search/title workflow does not.
 
-## 1. Obtain the branch these guides describe
+## 1. Obtain the code these guides describe
 
-The implemented web/local/title workflow is on
-[`codex/core-workflows-20261103`](https://github.com/h-dot-seo/recap-for-everyone/tree/codex/core-workflows-20261103).
-The default `main` branch is an earlier, smaller public extraction and does not
-contain these workflow commands as checked on 2026-11-04. Do not assume a plain
-default-branch download matches this guide.
+The implemented web/local/title workflow is on the default `main` branch of
+[h-dot-seo/recap-for-everyone](https://github.com/h-dot-seo/recap-for-everyone)
+since the workflow branch was merged on 2026-11-08. A `main` checkout downloaded
+before that date is a smaller extraction without these commands; clone or
+download again rather than assuming an old copy matches this guide.
 
 With Git already installed, choose a **new** destination directory:
 
 ```sh
-git clone --branch codex/core-workflows-20261103 --single-branch https://github.com/h-dot-seo/recap-for-everyone.git recap-for-everyone-workflows
+git clone --branch main --single-branch https://github.com/h-dot-seo/recap-for-everyone.git recap-for-everyone-workflows
 cd recap-for-everyone-workflows
 ```
 
-Without Git, open the linked workflow branch, download that branch's source ZIP
-and extract it locally. Open a terminal in the extracted directory containing
+Without Git, open the repository page, download the `main` source ZIP and
+extract it locally. Open a terminal in the extracted directory containing
 `recap.py`, `runtime_check.py` and `PUBLICATION_MANIFEST.json`. Folder names can
 differ; do not guess the extracted path. This code ZIP is **not** your conversation
 export ZIP. It contains synthetic examples, not your account history.
 
 Do not replace an existing checkout or private data directory to follow this
-example. If you already have another branch, a separate new checkout avoids
-changing its files. The workflow branch can advance; its manifest identifies the
-downloaded file set, not a permanently pinned release or an authenticity signature.
+example. If you already have another checkout, a separate new checkout avoids
+changing its files. `main` can advance; its manifest identifies the downloaded
+file set, not a permanently pinned release or an authenticity signature.
 
 ## 2. Choose one working Python launcher
 
