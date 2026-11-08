@@ -1,0 +1,525 @@
+# Command reference
+
+Every script and subcommand in this repository, with the exact usage line that its
+`--help` prints (joined onto one line), a one-line purpose and the guide that
+explains it. Run from the repository root with your chosen Python launcher in
+place of `python` ([installation and runtime checks](INSTALL.md)). Every command
+works on explicitly supplied local files and an operator-selected SQLite archive:
+none contacts a network service, calls a model, discovers files in private
+folders or renames a conversation in its original application. JSON output can
+contain private text, titles and IDs; keep it outside the public repository.
+
+## recap.py
+
+```text
+usage: recap.py [-h] [--db DB] {ingest,search,stats,inspect,list-export,inspect-web-zip,prepare-web-export,replay-local,web-branch,suggest-branch-title,suggest-replay-title,suggest-attributed-title,preview-title,apply-title,review-state,review-titles,title-adapter-dry-run,title-adapter-simulate,export-title-plan,check-title-plan,import,check-import,declare-recovery,rehearse-recovery,list,find,show,suggest-title,title,title-history} ...
+```
+
+The global `--db DB` precedes the subcommand and is required except for `inspect`,
+`list-export`, `web-branch`, `replay-local`, `prepare-web-export`, `inspect-web-zip`
+and `rehearse-recovery`; `rehearse-recovery` rejects a global `--db`. Commands that
+accept `--output NEW_JSON` create a UTF-8 file without overwriting an existing path
+and print only a receipt ([saved title documents](TITLE_DOCUMENT_FILES.md)).
+
+### Normalized JSONL archive
+
+#### `ingest`
+
+```text
+usage: recap.py ingest [-h] --source SOURCE input
+```
+
+Import one already-normalized UTF-8 JSONL file into the archive, hashing its
+original bytes and retaining a line locator per message. Guide: README quick start
+and [workflows](WORKFLOWS.md#normalized-jsonl-ingest-and-the-generic-session-parser).
+
+#### `search`
+
+```text
+usage: recap.py search [-h] [--limit LIMIT] query
+```
+
+Message-level FTS5 search with literal AND-connected terms; returns original
+message titles. Guide: [workflows](WORKFLOWS.md#search-and-read-the-archive).
+
+#### `stats`
+
+```text
+usage: recap.py stats [-h]
+```
+
+Read-only counts for the selected archive.
+
+### Choose and inspect an export
+
+#### `inspect-web-zip`
+
+```text
+usage: recap.py inspect-web-zip [-h] [--limit LIMIT] [--offset OFFSET] [--expected-archive-sha256 EXPECTED_ARCHIVE_SHA256] input
+```
+
+List conventionally named conversation JSON members of a downloaded ZIP with
+metadata-only eligibility, without decompression. Guide: [ZIP inventory](WEB_ZIP_INVENTORY.md).
+
+#### `prepare-web-export`
+
+```text
+usage: recap.py prepare-web-export [-h] --member MEMBER --output OUTPUT [--expected-archive-sha256 EXPECTED_ARCHIVE_SHA256] input
+```
+
+Validate one explicitly selected ZIP JSON member and copy its bytes to a new local
+file. Guide: [prepare a web export](PREPARE_WEB_EXPORT.md).
+
+#### `list-export`
+
+```text
+usage: recap.py list-export [-h] --format {web,local,local-codex} [--limit LIMIT] [--offset OFFSET] [--expected-export-sha256 EXPECTED_EXPORT_SHA256] [--contains CONTAINS | --text-contains TEXT_CONTAINS] [--text-role {user,assistant,system,tool}] [--canonical-unicode] input
+```
+
+List exact IDs, existing web titles, extraction counts and selection blockers
+without a database or message bodies; `--contains` filters metadata and
+`--text-contains` finds IDs by remembered message text. Guide: [export inventory](EXPORT_INVENTORY.md).
+
+#### `inspect`
+
+```text
+usage: recap.py inspect [-h] --format {web,local,local-codex} [--conversation CONVERSATION] [--expected-export-sha256 EXPECTED_EXPORT_SHA256] input
+```
+
+Validate and extract in memory, reporting hash, counts, coverage and warnings
+without opening or creating a database. Guide: [input scope](INPUT_SCOPE.md).
+
+### Import
+
+#### `import`
+
+```text
+usage: recap.py import [-h] --format {web,local,local-codex} --source SOURCE [--conversation CONVERSATION] [--expected-export-sha256 EXPECTED_EXPORT_SHA256] input
+```
+
+Import an explicitly selected web, generic local or typed Codex local export, or
+only one conversation of it, retaining all text branches and raw records with
+original hashes and locators. Guide: [input scope](INPUT_SCOPE.md).
+
+#### `check-import`
+
+```text
+usage: recap.py check-import [-h] --format {web,local,local-codex} --source SOURCE [--conversation CONVERSATION] [--expected-export-sha256 EXPECTED_EXPORT_SHA256] [--limit LIMIT] input
+```
+
+Diagnose title-only, text and metadata identity conflicts against an existing
+archive without importing. Guide: [import conflicts](IMPORT_CONFLICTS.md).
+
+### Search and read
+
+#### `list`
+
+```text
+usage: recap.py list [-h] [--source SOURCE] [--limit LIMIT] [--offset OFFSET]
+```
+
+Inventory of conversations with original title, current display title, revision
+and message count. Guide: [message selection](MESSAGE_SELECTION.md).
+
+#### `find`
+
+```text
+usage: recap.py find [-h] [--source SOURCE] [--limit LIMIT] [--export-sha256 EXPORT_SHA256] [--include-title-history] [--canonical-unicode] [--text-role {user,assistant,system,tool}] [--cursor CURSOR] query
+```
+
+Read-only search across current display titles and message text with bounded
+samples and cursor pages. Guides: [search excerpts](SEARCH_EXCERPTS.md),
+[search pagination](SEARCH_PAGINATION.md), [canonical Unicode search](CANONICAL_UNICODE_SEARCH.md),
+[title history search](TITLE_HISTORY_SEARCH.md), [export-scoped search](EXPORT_SCOPED_SEARCH.md).
+
+#### `show`
+
+```text
+usage: recap.py show [-h] --source SOURCE --conversation CONVERSATION [--limit LIMIT] [--offset OFFSET] [--message MESSAGE] [--around-message AROUND_MESSAGE] [--before BEFORE] [--after AFTER]
+```
+
+Read one conversation, one exact message, a bounded page or neighbors around a
+message, with provenance. Guides: [message selection](MESSAGE_SELECTION.md),
+[omitted search messages](OMITTED_SEARCH_MESSAGES.md).
+
+#### `title-history`
+
+```text
+usage: recap.py title-history [-h] --source SOURCE --conversation CONVERSATION [--limit LIMIT] [--offset OFFSET] [--expected-revision EXPECTED_REVISION]
+```
+
+Bounded local title-change events without message-body columns. Guide:
+[title history view](TITLE_HISTORY_VIEW.md).
+
+### Propose a local title
+
+#### `suggest-title`
+
+```text
+usage: recap.py suggest-title [-h] --source SOURCE --conversation CONVERSATION [--output NEW_JSON] [--message MESSAGE]
+```
+
+Deterministic user-text excerpt proposal from the raw archive, optionally from one
+exact message. Guide: [title review hints](TITLE_REVIEW_HINTS.md#choose-a-more-informative-user-message).
+
+#### `suggest-branch-title`
+
+```text
+usage: recap.py suggest-branch-title [-h] --source SOURCE --conversation CONVERSATION [--node NODE] [--message MESSAGE] [--output NEW_JSON] input
+```
+
+Proposal from the verified path of an archived web export (default endpoint
+`current_node`). Guide: [title walkthrough](TITLE_WALKTHROUGH.md).
+
+#### `suggest-replay-title`
+
+```text
+usage: recap.py suggest-replay-title [-h] --source SOURCE --conversation CONVERSATION [--message MESSAGE] [--output NEW_JSON] input
+```
+
+Proposal from the retained turns of a narrow local replay projection, matched to
+archived occurrences. Guide: [title walkthrough](TITLE_WALKTHROUGH.md).
+
+#### `suggest-attributed-title`
+
+```text
+usage: recap.py suggest-attributed-title [-h] --source SOURCE --conversation CONVERSATION [--message MESSAGE] [--origin-locator ORIGIN_LOCATOR] [--output NEW_JSON] input
+```
+
+Proposal from explicitly user-labeled parts of a verified local-codex export.
+Guides: [source-attributed titles](SOURCE_ATTRIBUTED_TITLES.md),
+[attributed message selection](ATTRIBUTED_MESSAGE_SELECTION.md).
+
+### Review, decide, apply
+
+#### `review-titles`
+
+```text
+usage: recap.py review-titles [-h] --source SOURCE [--limit LIMIT] [--offset OFFSET] [--state {open,skipped,deferred}] [--unrenamed-only] [--proposal PROPOSAL] [--supplied-only] [--output NEW_JSON]
+```
+
+Read-only page of proposals with current titles, advisory hints and collision
+counts, optionally from supplied proposal files. Guides: [title review queue](TITLE_REVIEW_QUEUE.md),
+[supplied title review](SUPPLIED_TITLE_REVIEW.md).
+
+#### `review-state`
+
+```text
+usage: recap.py review-state [-h] --source SOURCE --conversation CONVERSATION [--set {open,skipped,deferred}] [--expected-state-revision EXPECTED_STATE_REVISION] [--expected-title-revision EXPECTED_TITLE_REVISION] [--expected-content-sha256 EXPECTED_CONTENT_SHA256] [--from-queue FROM_QUEUE]
+```
+
+Read or explicitly record an open, skipped or deferred decision under revision and
+content checks. Guide: [title review state](TITLE_REVIEW_STATE.md).
+
+#### `preview-title`
+
+```text
+usage: recap.py preview-title [-h] [--output NEW_JSON] [--with-evidence] [--conversation CONVERSATION] [--title TITLE] input
+```
+
+Read-only preview of a proposal or of one queue item, optionally with explicit
+replacement wording or cited evidence; returns the expected revision. Guides:
+[title review hints](TITLE_REVIEW_HINTS.md), [title review evidence](TITLE_REVIEW_EVIDENCE.md).
+
+#### `apply-title`
+
+```text
+usage: recap.py apply-title [-h] input
+```
+
+Apply a reviewed preview as one local display-title change under content and
+revision checks. Guide: [title walkthrough](TITLE_WALKTHROUGH.md).
+
+#### `title`
+
+```text
+usage: recap.py title [-h] --source SOURCE --conversation CONVERSATION [--set SET] [--expected-revision EXPECTED_REVISION]
+```
+
+Read current, original and suggested titles with history; `--set` with the
+preview's `--expected-revision` writes one checked change. Guide:
+[workflows](WORKFLOWS.md#export-and-title-workflow).
+
+### Branch and replay views without a database
+
+#### `web-branch`
+
+```text
+usage: recap.py web-branch [-h] --conversation CONVERSATION [--node NODE] input
+```
+
+Read one path of a web export from root to `current_node` or an explicit node.
+Guide: [workflows](WORKFLOWS.md#read-one-web-conversation-branch-without-importing-it).
+
+#### `replay-local`
+
+```text
+usage: recap.py replay-local [-h] input
+```
+
+Fail-closed completed-turn text projection of a narrow local grammar. Guide:
+[workflows](WORKFLOWS.md#opt-in-completed-turn-text-projection).
+
+### Manual title transfer
+
+#### `export-title-plan`
+
+```text
+usage: recap.py export-title-plan [-h] --format {web,local,local-codex} --source SOURCE --conversation CONVERSATION input
+```
+
+Export a versioned manual title-change plan after at least one local revision;
+always `NOT_EXECUTED`. Guide: [workflows](WORKFLOWS.md#export-a-manual-title-change-plan-for-web-or-local-sessions).
+
+#### `check-title-plan`
+
+```text
+usage: recap.py check-title-plan [-h] input plan
+```
+
+Recreate the plan from the current archive snapshot and require an exact match.
+Guide: [workflows](WORKFLOWS.md#export-a-manual-title-change-plan-for-web-or-local-sessions).
+
+#### `title-adapter-dry-run`
+
+```text
+usage: recap.py title-adapter-dry-run [-h] input plan target
+```
+
+Validate a mock-only transfer request against a checked plan without executing.
+Guide: [title transfer](TITLE_TRANSFER.md).
+
+#### `title-adapter-simulate`
+
+```text
+usage: recap.py title-adapter-simulate [-h] input request approval target
+```
+
+Simulate an explicitly approved transfer in memory only; nothing is persisted or
+sent. Guide: [title transfer](TITLE_TRANSFER.md).
+
+### Recovery
+
+#### `declare-recovery`
+
+```text
+usage: recap.py declare-recovery [-h] --output OUTPUT [--declared-at DECLARED_AT] [--text]
+```
+
+Write a `recap.recovery-manifest.v1` manifest describing the live archive
+read-only. Guide: [recovery rehearsal](RECOVERY_REHEARSAL.md).
+
+#### `rehearse-recovery`
+
+```text
+usage: recap.py rehearse-recovery [-h] --restored-db RESTORED_DB --output OUTPUT [--objects OBJECTS] [--text] input
+```
+
+Verify a restored copy against a manifest, optionally hash fetched objects, and
+write a `recap.recovery-receipt.v1` receipt; exit status 1 means
+`RECOVERY_REHEARSAL_FAILED`. Guide: [recovery rehearsal](RECOVERY_REHEARSAL.md).
+
+## Standalone scripts
+
+Each script is the standalone equivalent of the `recap.py` command named beside it
+and behaves the same way.
+
+### `session_workflow.py` (`import`, `inspect`, `title`)
+
+```text
+usage: session_workflow.py [-h] [--db DB] {import,inspect,title} ...
+usage: session_workflow.py import [-h] --format {web,local,local-codex} --source SOURCE [--conversation CONVERSATION] [--expected-export-sha256 EXPECTED_EXPORT_SHA256] path
+usage: session_workflow.py inspect [-h] --format {web,local,local-codex} [--conversation CONVERSATION] [--expected-export-sha256 EXPECTED_EXPORT_SHA256] path
+usage: session_workflow.py title [-h] --source SOURCE --conversation CONVERSATION [--set SET] [--expected-revision EXPECTED_REVISION]
+```
+
+Explicit export adapters and reversible local title organization. Guide:
+[workflows](WORKFLOWS.md#export-and-title-workflow).
+
+### `export_inventory.py` (`list-export`)
+
+```text
+usage: export_inventory.py [-h] --format {web,local,local-codex} [--limit LIMIT] [--offset OFFSET] [--expected-export-sha256 EXPECTED_EXPORT_SHA256] [--contains CONTAINS | --text-contains TEXT_CONTAINS] [--text-role {user,assistant,system,tool}] [--canonical-unicode] input
+```
+
+Guide: [export inventory](EXPORT_INVENTORY.md).
+
+### `import_check.py` (`check-import`)
+
+```text
+usage: import_check.py [-h] --db DB --source SOURCE --format {web,local,local-codex} [--conversation CONVERSATION] [--expected-export-sha256 EXPECTED_EXPORT_SHA256] [--limit LIMIT] input
+```
+
+Guide: [import conflicts](IMPORT_CONFLICTS.md).
+
+### `conversation_search.py` (`find`)
+
+```text
+usage: conversation_search.py [-h] --db DB [--source SOURCE] [--limit LIMIT] [--include-title-history] [--export-sha256 EXPORT_SHA256] [--text-role {user,assistant,system,tool}] [--cursor CURSOR] [--canonical-unicode] query
+```
+
+Guides: [search excerpts](SEARCH_EXCERPTS.md), [search pagination](SEARCH_PAGINATION.md).
+
+### `conversation_view.py` (`list`, `show`)
+
+```text
+usage: conversation_view.py [-h] --db DB {list,show} ...
+usage: conversation_view.py --db DB list [-h] [--source SOURCE] [--limit LIMIT] [--offset OFFSET]
+usage: conversation_view.py --db DB show [-h] --source SOURCE --conversation CONVERSATION [--limit LIMIT] [--offset OFFSET] [--message MESSAGE] [--around-message AROUND_MESSAGE] [--before BEFORE] [--after AFTER]
+```
+
+Guide: [message selection](MESSAGE_SELECTION.md).
+
+### `title_history.py` (`title-history`)
+
+```text
+usage: title_history.py [-h] --db DB --source SOURCE --conversation CONVERSATION [--limit LIMIT] [--offset OFFSET] [--expected-revision EXPECTED_REVISION]
+```
+
+Guide: [title history view](TITLE_HISTORY_VIEW.md).
+
+### `title_suggestion.py` (`suggest-title`)
+
+```text
+usage: title_suggestion.py [-h] --db DB --source SOURCE --conversation CONVERSATION [--message MESSAGE] [--output NEW_JSON]
+```
+
+Guide: [workflows](WORKFLOWS.md#generate-a-local-title-excerpt-for-review).
+
+### `title_proposal.py` (`preview-title`, `apply-title`)
+
+```text
+usage: title_proposal.py [-h] --db DB {snapshot,preview,apply} ...
+usage: title_proposal.py --db DB snapshot [-h] --source SOURCE --conversation CONVERSATION
+usage: title_proposal.py --db DB preview [-h] [--output NEW_JSON] [--title TITLE] [--with-evidence] input
+usage: title_proposal.py --db DB apply [-h] input
+```
+
+Operator or external-adapter proposal contract: `snapshot` returns the content
+fingerprint a proposal must cite; no model is called. Guide:
+[workflows](WORKFLOWS.md#external-title-proposal-contract).
+
+### `web_branch.py` (`web-branch`)
+
+```text
+usage: web_branch.py [-h] --conversation CONVERSATION [--node NODE] input
+```
+
+Guide: [workflows](WORKFLOWS.md#read-one-web-conversation-branch-without-importing-it).
+
+### `branch_title.py` (`suggest-branch-title`)
+
+```text
+usage: branch_title.py [-h] --db DB --source SOURCE --conversation CONVERSATION [--node NODE] [--message MESSAGE] [--output NEW_JSON] input
+```
+
+Guide: [workflows](WORKFLOWS.md#suggest-a-title-from-a-verified-archived-branch).
+
+### `replay_local.py` (`replay-local`)
+
+```text
+usage: replay_local.py [-h] input
+```
+
+Guide: [workflows](WORKFLOWS.md#opt-in-completed-turn-text-projection).
+
+### `replay_title.py` (`suggest-replay-title`)
+
+```text
+usage: replay_title.py [-h] --db DB --source SOURCE --conversation CONVERSATION [--message MESSAGE] [--output NEW_JSON] input
+```
+
+Guide: [workflows](WORKFLOWS.md#propose-a-title-from-verified-retained-local-turns).
+
+### `attributed_title.py` (`suggest-attributed-title`)
+
+```text
+usage: attributed_title.py [-h] --db DB --source SOURCE --conversation CONVERSATION [--message MESSAGE] [--origin-locator ORIGIN_LOCATOR] [--output NEW_JSON] input
+```
+
+Guide: [source-attributed titles](SOURCE_ATTRIBUTED_TITLES.md).
+
+### `title_plan.py` (`export-title-plan`, `check-title-plan`)
+
+```text
+usage: title_plan.py [-h] --db DB {export,check} ...
+usage: title_plan.py --db DB export [-h] --format {web,local,local-codex} --source SOURCE --conversation CONVERSATION input
+usage: title_plan.py --db DB check [-h] input plan
+```
+
+Guide: [workflows](WORKFLOWS.md#export-a-manual-title-change-plan-for-web-or-local-sessions).
+
+### `title_adapter.py` (no `recap.py` equivalent)
+
+```text
+usage: title_adapter.py [-h] --db DB --source SOURCE --conversation CONVERSATION [--kind {local,mock,external}] [--provider-id PROVIDER_ID] [--model MODEL] [--endpoint ENDPOINT] [--allow-external] [--timeout TIMEOUT] [--evidence-scope {raw,web-branch,local-replay,local-attributed}] [--input INPUT] [--node NODE] [--message MESSAGE] [--origin-locator ORIGIN_LOCATOR] {prepare,generate,complete-response} ...
+usage: title_adapter.py --db DB --source SOURCE --conversation CONVERSATION prepare [-h] [--output NEW_JSON]
+usage: title_adapter.py --db DB --source SOURCE --conversation CONVERSATION generate [-h] [--response RESPONSE] [--consent CONSENT]
+usage: title_adapter.py --db DB --source SOURCE --conversation CONVERSATION complete-response [-h] [--output NEW_JSON] prepared response
+```
+
+Provider-neutral title generation contract: `prepare` freezes a bounded request,
+`generate` runs only the local excerpt or a deterministic mock (the external kind
+returns `EXTERNAL_NOT_CONFIGURED` without sending anything), and
+`complete-response` validates a separately obtained response against the unchanged
+preparation. Guides: [title adapter](TITLE_ADAPTER.md), [saved title response](SAVED_TITLE_RESPONSE.md),
+[adapter message selection](ADAPTER_MESSAGE_SELECTION.md).
+
+### `recovery.py` (`declare-recovery`, `rehearse-recovery`)
+
+```text
+usage: recovery.py [-h] {declare,rehearse} ...
+usage: recovery.py declare [-h] --db DB --output OUTPUT [--declared-at DECLARED_AT] [--text]
+usage: recovery.py rehearse [-h] --restored-db RESTORED_DB --output OUTPUT [--objects OBJECTS] [--text] manifest
+```
+
+Guide: [recovery rehearsal](RECOVERY_REHEARSAL.md).
+
+## Checks, tests and examples
+
+### `runtime_check.py`
+
+```text
+usage: runtime_check.py [-h]
+```
+
+Check the Python version and an in-memory SQLite FTS5 probe; exit 0 for `READY`.
+Guide: [install](INSTALL.md).
+
+### `verify_manifest.py` and `audit_publication.py`
+
+```text
+python verify_manifest.py
+python audit_publication.py
+```
+
+Both take no arguments. The first verifies every published file's bytes against
+`PUBLICATION_MANIFEST.json` and rejects unlisted files; the second runs the
+limited prohibited-type and secret-pattern scan. Neither is proof of anonymity or
+legal clearance. Guides: [publication boundary](../PUBLICATION.md), [security](../SECURITY.md).
+
+### `python -m unittest discover -v`
+
+Runs the synthetic standard-library test suite from the repository root; set
+`TMP`/`TEMP` to a writable scratch directory on restricted Windows hosts. Record:
+[validation](../VALIDATION.md).
+
+### `examples/make_review_demo.py`
+
+```text
+usage: make_review_demo.py [-h] destination
+```
+
+Create the invented two-part web ZIP and local JSONL used by [Start here](START_HERE.md)
+in a new directory whose parent exists; it reads no conversation files.
+
+## Library modules without a command line
+
+`local_parser.py` (generic normalized session parser and manifest utilities),
+`prepare_web_export.py` and `inspect_web_zip.py` (ZIP preparation and inventory
+behind the `recap.py` commands), `title_batch.py` (review pages), `title_transfer.py`
+(mock transfer contract), `title_document_output.py` (exclusive `--output` saving),
+`title_evidence.py`, `title_excerpt.py`, `title_review.py`, `title_review_state.py`,
+`title_rules.py`, `source_identity.py`, `source_text.py`, `strict_json.py`,
+`text_summary.py` and `unicode_search.py` are imported by the commands above and
+have no entry point of their own. Design notes: [architecture](ARCHITECTURE.md).

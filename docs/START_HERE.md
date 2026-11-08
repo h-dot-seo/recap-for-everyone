@@ -184,7 +184,7 @@ Old titles can still be private. It is a read-only review aid, not an undo actio
 - **No useful suggestion:** `UNAVAILABLE` or a weak excerpt is not a summary. Inspect
   the conversation; select a more useful [exact user message](TITLE_REVIEW_HINTS.md#choose-a-more-informative-user-message),
   provide explicit wording at preview for a valid proposal, or skip/defer. An unavailable queue item cannot be passed
-  to `preview-title` as a generated proposal. See the operator proposal contract in README.
+  to `preview-title` as a generated proposal. See the [operator proposal contract](WORKFLOWS.md#external-title-proposal-contract).
 - **Stale preview or saved queue:** refresh at offset 0, re-read and decide again.
   Do not auto-apply the new snapshot. [Review-state details](TITLE_REVIEW_STATE.md).
 - **Where did my remote title change go?** It did not: local display history only.

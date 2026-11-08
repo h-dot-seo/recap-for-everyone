@@ -1,12 +1,12 @@
 {
   "project": "recap-for-everyone",
-  "release": "0.88.0-recovery-rehearsal",
+  "release": "0.88.1-documentation-restructure",
   "date": "2026-11-08",
   "private_history_imported": false,
   "actual_corpora_included": false,
   "synthetic_examples_only": true,
   "license_status": "NOT_SELECTED",
-  "file_count": 181,
+  "file_count": 185,
   "files": [
     {
       "path": ".gitattributes",
@@ -30,8 +30,8 @@
     },
     {
       "path": "README.md",
-      "bytes": 73714,
-      "sha256": "3fcee2282376db8c941c9c28ae929f1833c906ecf175d8f4960d132ecd7ae0c7"
+      "bytes": 11760,
+      "sha256": "b9675eec18b06f1715e05057ec74a81997b372bc37b67a1542e296bfaf9b116b"
     },
     {
       "path": "RIGHTS.md",
@@ -45,13 +45,13 @@
     },
     {
       "path": "SKILL.md",
-      "bytes": 10421,
-      "sha256": "225011f875b9fac3b9281d4a08128a7dbd24295119cb25014513723977d532c9"
+      "bytes": 10504,
+      "sha256": "6ca8f3508685c87122fc1e6e6582fe3fad4f135550a0f2f45b2dff73bf4ebcb6"
     },
     {
       "path": "VALIDATION.md",
-      "bytes": 116805,
-      "sha256": "cb2951accd95f6e404589d7b73c91f4506f333148acd563758cf2172deafef3a"
+      "bytes": 3093,
+      "sha256": "c699dd7e58db19616c1b585193364a517f472014ed267b2864b4aa2246459b44"
     },
     {
       "path": "attributed_title.py",
@@ -99,6 +99,11 @@
       "sha256": "1dcb318d72f939e659f749bb74b5b90355e6c69d544a73b7078221a7d9f56e3f"
     },
     {
+      "path": "docs/COMMANDS.md",
+      "bytes": 20598,
+      "sha256": "3bc25ffca73634c262b8df8c14651eccfdd86b433fb709b6a4c0b61c26e6369f"
+    },
+    {
       "path": "docs/EXPORT_INVENTORY.md",
       "bytes": 19852,
       "sha256": "53e087c997d90ad90476044afbbbe73cf697301f847ecf66d4784643dea031d1"
@@ -115,8 +120,8 @@
     },
     {
       "path": "docs/INPUT_SCOPE.md",
-      "bytes": 30578,
-      "sha256": "7436d1cf38f91d0ce26386e25631c3143f052ed70ee2d739047954c4cb194831"
+      "bytes": 30617,
+      "sha256": "756e2b29500e8503f68bcbb659df24ac843f4433bbb2e3391c35f91961880a8d"
     },
     {
       "path": "docs/INSTALL.md",
@@ -137,6 +142,11 @@
       "path": "docs/PREPARE_WEB_EXPORT.md",
       "bytes": 6609,
       "sha256": "289dd71e0fb2c91be67f817c4d507a761e24f6dbdddf01fd79aee5a78d54f22b"
+    },
+    {
+      "path": "docs/README.ko.md",
+      "bytes": 14569,
+      "sha256": "a2ac33f9140ae12cda4206ea18cbcf2fe45eb3bc6461d6930eaebbe08d5972b7"
     },
     {
       "path": "docs/RECOVERY_REHEARSAL.md",
@@ -170,8 +180,8 @@
     },
     {
       "path": "docs/START_HERE.md",
-      "bytes": 12523,
-      "sha256": "8023e95ef283bca15cf5efde846d2dd3cae3c619886ebc29815490338d05d77a"
+      "bytes": 12562,
+      "sha256": "55bbff0a93c11b2c3718e2e8e8b5e96f46c672250150796975d937717ee4120b"
     },
     {
       "path": "docs/SUPPLIED_TITLE_REVIEW.md",
@@ -225,13 +235,23 @@
     },
     {
       "path": "docs/TITLE_WALKTHROUGH.md",
-      "bytes": 9413,
-      "sha256": "4b0e5aa2b23c733f5610de963d7d4d4dc938524d4300ad60b78b170f143935df"
+      "bytes": 9458,
+      "sha256": "ed8d473b7b961d5502e49af20990c9ebe8e99191ce731bbacf1d8adee30b598c"
+    },
+    {
+      "path": "docs/VALIDATION_HISTORY.md",
+      "bytes": 120769,
+      "sha256": "2a26bcaa011ef628ef1248168b7c2267f5c293ecbe94124755cdec7cba1255a1"
     },
     {
       "path": "docs/WEB_ZIP_INVENTORY.md",
       "bytes": 6720,
       "sha256": "7d4d8090589ea875d8bc1164f4f7e19b0cacdd77c717a10daa6ab11dfea641db"
+    },
+    {
+      "path": "docs/WORKFLOWS.md",
+      "bytes": 74147,
+      "sha256": "d6e539f0a49d6898e8fa6358b3937a8340a8e85d5b837edd05c36a057e197793"
     },
     {
       "path": "examples/adapter-message-focus.jsonl",
