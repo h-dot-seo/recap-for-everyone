@@ -1717,3 +1717,64 @@ guides point at `main`, and the documented-command regression follows the new
 clone line. The test workflow now also runs on `main`, and this cleanup precedes
 merging the workflow branch into `main`. No code path or fixture changed; the
 manifest was regenerated for the edited text files.
+
+## 2026-11-08 Recovery rehearsal (0.88.0-recovery-rehearsal)
+
+Added `recovery.py` behind two read-only `recap.py` commands with standalone entry
+points. `declare-recovery` reads the live archive in one `mode=ro`/`query_only`
+snapshot and writes a `recap.recovery-manifest.v1` file by exclusive creation: the
+exact `artifacts` rows, per-source message and conversation counts, a logical
+`messages_sha256` over canonical identity-ordered rows, the export-occurrence count
+with sorted distinct original hashes per source, the title-history count and digest,
+the FTS index row count read from its docsize shadow table, `declared_at` as supplied
+text, and boundary text. It also lists `optional_artifacts`: normalized artifacts whose
+message rows are all covered by original-export occurrences, because the adapters
+derive those bytes in memory and only the original exports exist as files.
+`rehearse-recovery` hashes the restored file, opens it read-only and reports
+`integrity_check`, expected tables, exact artifact rows, per-source counts, the
+messages digest, both optional ledgers (match or both absent), the FTS row count and a
+quoted `MATCH` on the first token of the restored archive's own first message. With
+`--objects DIR` it hashes at most 10,000 regular files of at most 1 GiB each and
+reports every declared hash `PRESENT` or `MISSING`, refusing symlinks and recording
+unreadable entries as refusals rather than aborting. The receipt
+(`recap.recovery-receipt.v1`) is written by exclusive creation and records the
+manifest digest, the supplied restored path with its size and SHA-256, every check
+and fixed negative claims; exit status 1 means `RECOVERY_REHEARSAL_FAILED`, and a
+corrupt or non-SQLite file yields a FAILED receipt rather than a traceback. The new
+shared `text_summary.py` renders `--text` summaries as quoted ASCII so archive data
+cannot spoof labels or lines. No import, ingest or title write path changed.
+
+Seventeen synthetic tests cover the declaration and a passing rehearsal with objects,
+a tampered message row (digest only), a stale FTS index, a removed row, missing and
+unexpected artifact rows, changed title history, both-absent and one-sided ledgers,
+missing required objects with the file-count, size and symlink refusals, unreadable
+or vanished object files and an unlistable object directory recorded as refusals in
+a FAILED receipt instead of aborting the run, garbage, truncated and empty restored
+files, exclusive outputs and dangling symlinks, byte-identical restored copies with
+no sidecar files, ASCII CLI parity with the standalone script and exit codes, control
+and format characters in `--text`, manifest validation including an unknown schema
+label, `declared_at` validation, and the guide's sh block executed exactly with
+`OUTPUT` replaced by a space-named directory. With the available Python 3.15
+interpreter on Windows (SQLite 3.53.4) the full suite ran 1012 tests in
+297.924 seconds with TMP and TEMP in a scratch directory: every new test and
+every other module passed, with the one existing Windows-only skip in
+`test_source_label_validation`, while 15 failures and 1 error remained in three existing
+deep-JSON-nesting tests (`test_import_failure_boundaries`,
+`test_title_file_encoding`, `test_title_preview_freeze`) that fail identically on the
+unchanged `main` tree under that interpreter, whose json module no longer raises the
+recursion errors those tests expect; the supported runtimes remain the CI
+interpreters. The new module also passed under Python 3.13 with SQLite 3.50.4, where
+a lost FTS5 index is reported as `malformed inverted index for FTS5 table` rather
+than the `fts5: corruption found` row of SQLite 3.53; the test accepts either
+wording. `python -m compileall`, the publication audit and manifest verification
+pass: 181 manifest entries, 182 audited files. The documented rehearsal was also run
+by hand once, and `VACUUM INTO` and plain file copies of a synthetic archive were
+rehearsed successfully.
+
+Not claimed: no remote backup, fetch, decryption, key custody or scheduling exists;
+a passing rehearsal verifies one restored copy against one manifest and cannot tell a
+restored copy from the live archive; the FTS checks are not a complete FTS5 audit and
+older bundled SQLite versions report index loss through the FTS checks rather than
+`integrity_check`; the legacy `export_provenance` ledger and review-state tables are
+not declared; no real archive, account export or backup system was used. Exact-commit
+Ubuntu/Windows Python 3.10/3.12 CI is checked after publication.

@@ -1,12 +1,12 @@
 {
   "project": "recap-for-everyone",
-  "release": "0.87.1-public-boundary-cleanup",
+  "release": "0.88.0-recovery-rehearsal",
   "date": "2026-11-08",
   "private_history_imported": false,
   "actual_corpora_included": false,
   "synthetic_examples_only": true,
   "license_status": "NOT_SELECTED",
-  "file_count": 177,
+  "file_count": 181,
   "files": [
     {
       "path": ".gitattributes",
@@ -30,8 +30,8 @@
     },
     {
       "path": "README.md",
-      "bytes": 72228,
-      "sha256": "def03b9cfe6abe44931808f7d09f377566c79612605e4a38cfd91a43603eff4e"
+      "bytes": 73714,
+      "sha256": "3fcee2282376db8c941c9c28ae929f1833c906ecf175d8f4960d132ecd7ae0c7"
     },
     {
       "path": "RIGHTS.md",
@@ -45,13 +45,13 @@
     },
     {
       "path": "SKILL.md",
-      "bytes": 9539,
-      "sha256": "e54f300bf184ab6d32c5f6190b60e12b7d350ca4347198bb95507912fe738068"
+      "bytes": 10421,
+      "sha256": "225011f875b9fac3b9281d4a08128a7dbd24295119cb25014513723977d532c9"
     },
     {
       "path": "VALIDATION.md",
-      "bytes": 112249,
-      "sha256": "6591de095dee7a9b982fd94a59c6ff3e587ad4768781f4fa5c21851ecef5e0d3"
+      "bytes": 116805,
+      "sha256": "cb2951accd95f6e404589d7b73c91f4506f333148acd563758cf2172deafef3a"
     },
     {
       "path": "attributed_title.py",
@@ -85,8 +85,8 @@
     },
     {
       "path": "docs/ARCHITECTURE.md",
-      "bytes": 6043,
-      "sha256": "a149ff110abaddbfba042fdd3d9e36fdf7f37ae383b9a27b32087d6ba9e71b7d"
+      "bytes": 6915,
+      "sha256": "f2251355b9bbcd0ab639f09e4ade358c9a0eb1149c5000f4b70d9a99220d87e7"
     },
     {
       "path": "docs/ATTRIBUTED_MESSAGE_SELECTION.md",
@@ -137,6 +137,11 @@
       "path": "docs/PREPARE_WEB_EXPORT.md",
       "bytes": 6609,
       "sha256": "289dd71e0fb2c91be67f817c4d507a761e24f6dbdddf01fd79aee5a78d54f22b"
+    },
+    {
+      "path": "docs/RECOVERY_REHEARSAL.md",
+      "bytes": 13690,
+      "sha256": "0af9b00aab3324f16d8faa39f0922a9b02998bcc1bf56a2afd84721298449fec"
     },
     {
       "path": "docs/SAVED_TITLE_RESPONSE.md",
@@ -320,8 +325,13 @@
     },
     {
       "path": "recap.py",
-      "bytes": 27478,
-      "sha256": "68f4494599d1b072f3c78e13fa9fd71620c3bd609707f5036941d7e71b913cf6"
+      "bytes": 29587,
+      "sha256": "7374e391dcead8a722272c1c3e5e729bf94497c185cb9575459a635ceb79d1d4"
+    },
+    {
+      "path": "recovery.py",
+      "bytes": 37142,
+      "sha256": "9e4a5c0188a4dc8475098026ed198faf2dbb6881a850df78655a5ea231f23b62"
     },
     {
       "path": "replay_local.py",
@@ -552,6 +562,11 @@
       "path": "test_recap.py",
       "bytes": 3127,
       "sha256": "28cdd3cd60f48d3b72c4f6b8869eb1ffa1864fd393a3392584efab69360df6d1"
+    },
+    {
+      "path": "test_recovery_rehearsal.py",
+      "bytes": 41329,
+      "sha256": "b9f731e60eecb0680109653f3e7133ef7b2248d199ac0b21bf393ce5b9d2310d"
     },
     {
       "path": "test_replay_coverage.py",
@@ -812,6 +827,11 @@
       "path": "test_web_zip_hash_lease.py",
       "bytes": 13111,
       "sha256": "08214fbe0e9191d93f6b9f026cef214a394455f27e0b181daa143d409841e399"
+    },
+    {
+      "path": "text_summary.py",
+      "bytes": 1018,
+      "sha256": "5d96db9b481229994336a9ed5eba22de01228136d1d285ebebe5c8edeaa9cc5f"
     },
     {
       "path": "title_adapter.py",

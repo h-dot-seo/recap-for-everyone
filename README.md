@@ -14,7 +14,7 @@ reviewed local display-title changes.
 | Normalized JSONL import, SQLite FTS search, source hash/line ledger | Real conversations, archives, databases, logs, user/device configuration |
 | Existing generic local session parser and synthetic tests | Authentication bundles, browser profiles, cookies, credentials |
 | Reviewed local display-title suggestions, preview/apply and title history | Remote or bulk renaming, model calls and semantic summarization inside this repository |
-| Collection/index/publication separation and recovery design | Private service endpoints, account automation, SSH and scheduler setup |
+| Collection/index/publication separation and recovery design; `declare-recovery` manifest plus `rehearse-recovery` of a restored copy with a retained receipt | Private service endpoints, account automation, SSH and scheduler setup, remote backup fetch and decryption |
 
 ## Start with your export
 
@@ -126,6 +126,26 @@ checks remain active.
 Start with the [two-format title walkthrough](docs/TITLE_WALKTHROUGH.md) for
 copyable synthetic web and Codex local examples, expected results and recovery
 steps. No account, API key or network connection is needed.
+
+### Declare and rehearse recovery
+
+```sh
+python recap.py --db ../demo.sqlite declare-recovery --output ../demo-backup/recovery-manifest.json --declared-at 2026-11-08
+python recap.py rehearse-recovery ../demo-backup/recovery-manifest.json --restored-db ../restored/demo.sqlite --output ../restored/recovery-receipt.json --objects ../demo-backup/objects
+```
+
+`declare-recovery` reads the live archive once and writes a manifest of its artifact
+rows, per-source message and conversation counts, logical message and title-history
+digests, export-occurrence hashes and FTS row count. Store it with the backup, not
+inside the archive. After a restore, `rehearse-recovery` opens the restored copy
+read-only, reports every check as PASS or FAIL (`PRAGMA integrity_check`, expected
+tables, exact artifact rows, counts, digests, ledgers, FTS row count and a sampled
+`MATCH`), optionally hashes a directory of fetched objects for every declared hash,
+and writes a receipt; exit status 1 means `RECOVERY_REHEARSAL_FAILED`. Both accept
+`--text` for an ASCII summary. A passing rehearsal verifies that restored copy against
+the manifest only: it does not prove the remote backup is complete, that keys are
+safe or that a future restore will succeed, and it must never be inferred from a Git
+ref or push message. See [recovery rehearsal](docs/RECOVERY_REHEARSAL.md).
 
 ## Design
 

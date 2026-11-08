@@ -221,6 +221,16 @@ def main():
     admission.add_argument('input'); admission.add_argument('--format', choices=['web', 'local', 'local-codex'], required=True)
     admission.add_argument('--source', required=True); admission.add_argument('--conversation')
     admission.add_argument('--expected-export-sha256'); admission.add_argument('--limit', type=int, default=20)
+    declare = sub.add_parser('declare-recovery', help='write a recovery manifest describing the live archive without changing it')
+    declare.add_argument('--output', required=True, help='new manifest JSON path outside the archive; existing paths are refused')
+    declare.add_argument('--declared-at', help='YYYY-MM-DD recorded as supplied text; no clock is read')
+    rehearse = sub.add_parser('rehearse-recovery', help='verify a restored archive copy against a declared manifest and write a receipt')
+    rehearse.add_argument('input', help='recovery manifest JSON written by declare-recovery')
+    rehearse.add_argument('--restored-db', required=True, help='restored SQLite copy; opened read-only and never written')
+    rehearse.add_argument('--output', required=True, help='new receipt JSON path; existing paths are refused')
+    rehearse.add_argument('--objects', help='directory of fetched backup objects to hash for every declared artifact and original export hash')
+    for command in (declare, rehearse):
+        command.add_argument('--text', action='store_true', help='print an ASCII text summary instead of JSON')
     listing = sub.add_parser('list', help='list conversations and current display titles')
     listing.add_argument('--source'); listing.add_argument('--limit', type=int, default=50); listing.add_argument('--offset', type=int, default=0)
     find = sub.add_parser('find', help='search current titles and conversation text')
@@ -251,8 +261,10 @@ def main():
             command.add_argument('--expected-revision', type=int,
                                  help='reject title history changed since an earlier page')
     args = p.parse_args()
-    if args.command not in ('inspect', 'list-export', 'web-branch', 'replay-local', 'prepare-web-export', 'inspect-web-zip') and not args.db:
-        p.error('--db is required except for inspect, list-export, web-branch, replay-local, prepare-web-export and inspect-web-zip')
+    if args.command not in ('inspect', 'list-export', 'web-branch', 'replay-local', 'prepare-web-export', 'inspect-web-zip', 'rehearse-recovery') and not args.db:
+        p.error('--db is required except for inspect, list-export, web-branch, replay-local, prepare-web-export, inspect-web-zip and rehearse-recovery')
+    if args.command == 'rehearse-recovery' and args.db:
+        p.error('rehearse-recovery opens --restored-db only; do not pass --db')
     try:
         if args.command == 'list-export':
             from export_inventory import list_export
@@ -362,17 +374,33 @@ def main():
         elif args.command == 'find':
             from conversation_search import find
             result = find(args.db, args.query, args.source, args.limit, args.include_title_history, args.export_sha256, args.cursor, args.canonical_unicode, args.text_role)
+        elif args.command == 'declare-recovery':
+            from recovery import declare_recovery
+            result = declare_recovery(args.db, args.output, args.declared_at)
+        elif args.command == 'rehearse-recovery':
+            from recovery import rehearse_recovery
+            result = rehearse_recovery(args.input, args.restored_db, args.output, args.objects)
         else:
             from title_suggestion import suggest
             result = suggest(args.db, args.source, args.conversation, args.message)
         kind = 'queue' if args.command == 'review-titles' else 'preview' if args.command == 'preview-title' else 'proposal'
         result = save_if_requested(result, args, kind)
+        rendered = None
+        if getattr(args, 'text', False):
+            from recovery import render_text
+            rendered = render_text(result)
     except (OSError, ValueError, KeyError, TypeError, sqlite3.Error) as exc:
         p.exit(1, str(exc) + '\n')
     # JSON escapes preserve Unicode data even when the terminal is ASCII-only.
     # In particular, a committed title change must not look failed at print time.
-    print(json.dumps(result, ensure_ascii=True, indent=2))
+    # The optional recovery text summary is quoted ASCII for the same reason.
+    if rendered is not None:
+        print(rendered, end='')
+    else:
+        print(json.dumps(result, ensure_ascii=True, indent=2))
     if args.command == 'check-import' and result['conflicts_found']:
+        raise SystemExit(1)
+    if args.command == 'rehearse-recovery' and result['status'] != 'RECOVERY_REHEARSAL_PASSED':
         raise SystemExit(1)
 
 
