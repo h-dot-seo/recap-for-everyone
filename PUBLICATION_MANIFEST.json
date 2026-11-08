@@ -1,7 +1,7 @@
 {
   "project": "recap-for-everyone",
-  "release": "0.89.0-package-layout",
-  "date": "2026-11-08",
+  "release": "0.89.1-environment-hints-removed",
+  "date": "2026-11-09",
   "private_history_imported": false,
   "actual_corpora_included": false,
   "synthetic_examples_only": true,
@@ -50,8 +50,8 @@
     },
     {
       "path": "VALIDATION.md",
-      "bytes": 3407,
-      "sha256": "6bca537b67503c694927a51571ffb9e9010d5f5a623b08c0f67e0ba0d2572709"
+      "bytes": 4094,
+      "sha256": "0bb95bb6ef9c2edca0b8d514a4f27dfd3eb0676c482aeba0d12c98756a1660df"
     },
     {
       "path": "attributed_title.py",
@@ -240,8 +240,8 @@
     },
     {
       "path": "docs/VALIDATION_HISTORY.md",
-      "bytes": 125914,
-      "sha256": "c15c9fa862562fa15daf42d7f92c41f03affbeefc76d77bfc4cc2a28ca8e8d7d"
+      "bytes": 127564,
+      "sha256": "008c6867b397f41f61b43de6cbbd412881ca7795872911b8ae2640ff38850fd9"
     },
     {
       "path": "docs/WEB_ZIP_INVENTORY.md",
@@ -380,8 +380,8 @@
     },
     {
       "path": "recaplib/local_parser.py",
-      "bytes": 22810,
-      "sha256": "df18cccef33abef4c9685ea0973af3eb33614600578bd241c3739baf0f370bb7"
+      "bytes": 22809,
+      "sha256": "86c8c40799344ecb9f4e522d5fb1bb7462c53aef88793d0b0a7b46b40937733f"
     },
     {
       "path": "recaplib/prepare_web_export.py",
@@ -671,7 +671,7 @@
     {
       "path": "tests/test_local_byte_snapshot.py",
       "bytes": 16584,
-      "sha256": "43155ac9b3622f2d160620a7d02c0028ea4f0be9954c1146ba61da2f33649040"
+      "sha256": "1b6c0d4d37e663580cf21272994334e2e3c2d2515a707d87595c5de41c9557e5"
     },
     {
       "path": "tests/test_local_codex.py",
@@ -680,8 +680,8 @@
     },
     {
       "path": "tests/test_local_record_discriminator.py",
-      "bytes": 15297,
-      "sha256": "b0b5a6db86f3b903006f8c27013081db19a00c629564dfb5755d0f3d356cecdf"
+      "bytes": 15290,
+      "sha256": "a9efca6a7b5430de9216b248e41f55c5b257f70a6d0fd6254553062ff23d56ae"
     },
     {
       "path": "tests/test_local_record_shapes.py",
@@ -946,7 +946,7 @@
     {
       "path": "tests/test_typed_content_shapes.py",
       "bytes": 14190,
-      "sha256": "66f72e8aeb212047ab0db57d063d79ecd5486a768bc4b7abbc5e9848df577394"
+      "sha256": "bd0c54c3e08a0cc9fda604cc4fc502599d59dd371c8427a6275d520c6fe0f46c"
     },
     {
       "path": "tests/test_unicode_cli_titles.py",

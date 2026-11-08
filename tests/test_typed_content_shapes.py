@@ -180,7 +180,7 @@ class TypedContentShapeTests(unittest.TestCase):
 
     def test_metadata_only_utility_paths_keep_their_own_validation_contract(self):
         self.write([self.message([dict(type=None, text='SYNTHETIC_PRIVATE')])])
-        parsed = parse_artifact(self.path, 'agents/claude/raw/synthetic.jsonl', content_profile='codex')
+        parsed = parse_artifact(self.path, 'agents/tool-a/raw/synthetic.jsonl', content_profile='codex')
         self.assertEqual(parsed.admission_status, 'accepted_metadata_only')
         self.assertEqual(parsed.messages, ())
         row = dict(id='index', thread_name='Synthetic title', updated_at='synthetic',
