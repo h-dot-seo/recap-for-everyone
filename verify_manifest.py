@@ -3,7 +3,7 @@ import hashlib
 import json
 import re
 from pathlib import Path, PurePosixPath
-from strict_json import loads
+from recaplib.strict_json import loads
 
 
 def _portable_component(part):

@@ -75,7 +75,7 @@ objects; verify expected hashes, sizes and counts; rebuild the index; run read-o
 queries; retain a recovery receipt. Store decryption keys outside backups. Never
 mark remote recovery verified from a local Git ref or a push message alone.
 
-`declare-recovery` and `rehearse-recovery` (`recovery.py`) implement the archive-side
+`declare-recovery` and `rehearse-recovery` (`recaplib/recovery.py`) implement the archive-side
 part of this list. The declaration records the live archive's artifact rows, counts,
 logical digests, ledgers and FTS row count in a manifest stored with the backup. The
 rehearsal opens a restored copy read-only and checks integrity, expected tables,
@@ -112,3 +112,14 @@ content fingerprint and integer revision. Prefer that workflow for integrations
 and explicit human review. Type checks are not authentication, proof of approval,
 semantic validation or a remote title permission. No old ledger events are scanned,
 repaired or removed by this change.
+
+## Code layout
+
+The repository root holds the entry points: `recap.py` (the unified CLI), the
+standalone scripts (thin compatibility entry points that import `main` from the module
+of the same name in `recaplib/`), `runtime_check.py`, `verify_manifest.py` and
+`audit_publication.py`. The implementation is the `recaplib/` package;
+`recaplib/archive.py` holds the schema, the import transaction, the read-only
+connection and the FTS search described above and is re-exported by `recap.py`. The
+synthetic test suite is the `tests/` package. The layout changes no documented command
+and is a reading aid, not a stability promise for importing `recaplib` from other code.

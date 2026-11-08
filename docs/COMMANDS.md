@@ -9,6 +9,17 @@ none contacts a network service, calls a model, discovers files in private
 folders or renames a conversation in its original application. JSON output can
 contain private text, titles and IDs; keep it outside the public repository.
 
+## Layout
+
+The repository root holds only the entry points: `recap.py`, the standalone scripts
+listed below, `runtime_check.py`, `verify_manifest.py` and `audit_publication.py`. Each
+standalone script at the root is a thin compatibility entry point that imports `main`
+from the implementation module of the same name in `recaplib/`, so every command in
+this reference runs exactly as written. The implementation lives in the `recaplib/`
+package (the archive core behind `recap.py` is `recaplib/archive.py`, re-exported by
+`recap.py`), and the synthetic test suite is the `tests/` package. Both are found
+through the repository root, which is why the commands run from there.
+
 ## recap.py
 
 ```text
@@ -322,7 +333,8 @@ write a `recap.recovery-receipt.v1` receipt; exit status 1 means
 ## Standalone scripts
 
 Each script is the standalone equivalent of the `recap.py` command named beside it
-and behaves the same way.
+and behaves the same way. The root file is a compatibility entry point; the
+implementation is the module of the same name in `recaplib/`.
 
 ### `session_workflow.py` (`import`, `inspect`, `title`)
 
@@ -500,7 +512,8 @@ legal clearance. Guides: [publication boundary](../PUBLICATION.md), [security](.
 
 ### `python -m unittest discover -v`
 
-Runs the synthetic standard-library test suite from the repository root; set
+Runs the synthetic standard-library test suite, the `tests/` package, from the
+repository root; one module runs as `python -m unittest tests.test_recap`. Set
 `TMP`/`TEMP` to a writable scratch directory on restricted Windows hosts. Record:
 [validation](../VALIDATION.md).
 
@@ -515,11 +528,16 @@ in a new directory whose parent exists; it reads no conversation files.
 
 ## Library modules without a command line
 
-`local_parser.py` (generic normalized session parser and manifest utilities),
-`prepare_web_export.py` and `inspect_web_zip.py` (ZIP preparation and inventory
-behind the `recap.py` commands), `title_batch.py` (review pages), `title_transfer.py`
-(mock transfer contract), `title_document_output.py` (exclusive `--output` saving),
-`title_evidence.py`, `title_excerpt.py`, `title_review.py`, `title_review_state.py`,
-`title_rules.py`, `source_identity.py`, `source_text.py`, `strict_json.py`,
-`text_summary.py` and `unicode_search.py` are imported by the commands above and
-have no entry point of their own. Design notes: [architecture](ARCHITECTURE.md).
+All of these live in the `recaplib/` package. `recaplib/archive.py` (schema, normalized
+JSONL ingest, read-only connections and FTS search behind `recap.py`),
+`recaplib/local_parser.py` (generic normalized session parser and manifest utilities),
+`recaplib/prepare_web_export.py` and `recaplib/inspect_web_zip.py` (ZIP preparation and
+inventory behind the `recap.py` commands), `recaplib/title_batch.py` (review pages),
+`recaplib/title_transfer.py` (mock transfer contract), `recaplib/title_document_output.py`
+(exclusive `--output` saving), `recaplib/title_evidence.py`, `recaplib/title_excerpt.py`,
+`recaplib/title_review.py`, `recaplib/title_review_state.py`, `recaplib/title_rules.py`,
+`recaplib/source_identity.py`, `recaplib/source_text.py`, `recaplib/strict_json.py`,
+`recaplib/text_summary.py` and `recaplib/unicode_search.py` are imported by the commands
+above and have no entry point of their own; the implementation of every standalone
+script is likewise the module of the same name in `recaplib/`. Design notes:
+[architecture](ARCHITECTURE.md).

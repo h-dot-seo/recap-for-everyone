@@ -1,144 +1,15 @@
 #!/usr/bin/env python3
 """Local-only archive import, inspection, search and checked title workflows."""
 import argparse
-import hashlib
 import json
 import sqlite3
 from pathlib import Path
-from strict_json import loads
-from source_text import BOM_UTF8, physical_lines
-
-SCHEMA = '''
-CREATE TABLE IF NOT EXISTS artifacts (
- source_id TEXT NOT NULL, sha256 TEXT NOT NULL, bytes INTEGER NOT NULL,
- record_count INTEGER NOT NULL, PRIMARY KEY(source_id, sha256));
-CREATE TABLE IF NOT EXISTS messages (
- message_pk INTEGER PRIMARY KEY, source_id TEXT NOT NULL,
- conversation_id TEXT NOT NULL, message_id TEXT NOT NULL, role TEXT NOT NULL,
- timestamp TEXT NOT NULL, title TEXT NOT NULL, text TEXT NOT NULL,
- source_sha256 TEXT NOT NULL, source_line INTEGER NOT NULL,
- UNIQUE(source_id, conversation_id, message_id),
- FOREIGN KEY(source_id, source_sha256) REFERENCES artifacts(source_id,sha256));
-CREATE VIRTUAL TABLE IF NOT EXISTS messages_fts USING fts5(
- text, content='messages', content_rowid='message_pk');
-CREATE TRIGGER IF NOT EXISTS messages_ai AFTER INSERT ON messages BEGIN
- INSERT INTO messages_fts(rowid,text) VALUES(new.message_pk,new.text); END;
-'''
-
-
-def _validate_source(source):
-    if not isinstance(source, str) or not source.strip():
-        raise ValueError('source must be nonempty text')
-    # Source labels come from argv/API values, outside the JSON decoder's Unicode
-    # checks. SQLite cannot encode surrogates; reject them before schema creation
-    # or source reads rather than leaving an empty archive after a bad label.
-    if any(0xd800 <= ord(character) <= 0xdfff for character in source):
-        raise ValueError('source must contain valid Unicode text')
-
-
-def ingest(db, source, path, provenance=None):
-    _validate_source(source)
-    return ingest_bytes(db, source, Path(path).read_bytes(), provenance)
-
-
-def ingest_bytes(db, source, raw, provenance=None):
-    """Validate and ingest one immutable normalized JSONL byte snapshot.
-
-    Uses the same transaction, identity and provenance rules as file ingestion.
-    This writes the explicitly selected SQLite archive, not a temporary input file.
-    """
-    _validate_source(source)
-    if not isinstance(raw, bytes):
-        raise ValueError('normalized input must be immutable bytes')
-    digest = hashlib.sha256(raw).hexdigest()
-    records = []
-    incoming = {}
-    for line_no, line in enumerate(physical_lines(raw), 1):
-        if not line.strip():
-            continue
-        try:
-            row = loads(line)
-        except ValueError as error:
-            raise ValueError(f'invalid JSON record at line {line_no}') from error
-        required = ('conversation_id', 'message_id', 'role', 'timestamp', 'text')
-        if not isinstance(row, dict) or any(not isinstance(row.get(k), str) or not row[k] for k in required):
-            raise ValueError(f'invalid record at line {line_no}')
-        if row['role'] not in ('user', 'assistant', 'system', 'tool'):
-            raise ValueError(f'unsupported role at line {line_no}')
-        title = row.get('title', '')
-        if not isinstance(title, str):
-            raise ValueError(f'invalid title at line {line_no}')
-        key = (row['conversation_id'], row['message_id'])
-        values = (row['role'], row['timestamp'], title, row['text'])
-        if key in incoming and incoming[key] != values:
-            # Input-only contradictions must not create an empty archive/schema.
-            # Archive comparisons still run under the write lock below.
-            raise ValueError(f'conflicting message identity at line {line_no}')
-        incoming[key] = values
-        records.append((row, title, line_no))
-    conn = sqlite3.connect(db)
-    try:
-        conn.execute('PRAGMA foreign_keys=ON')
-        conn.executescript(SCHEMA)
-        inserted = 0
-        with conn:
-            conn.execute('BEGIN IMMEDIATE')
-            if provenance is not None:
-                conn.execute('CREATE TABLE IF NOT EXISTS export_provenance (source TEXT, conversation TEXT, message TEXT, original_hash TEXT, locator TEXT, parent TEXT, PRIMARY KEY(source,conversation,message,original_hash))')
-                occurrence_table = conn.execute("SELECT 1 FROM sqlite_master WHERE type='table' AND name='export_occurrences'").fetchone()
-                conn.execute('CREATE TABLE IF NOT EXISTS export_occurrences (source TEXT, conversation TEXT, message TEXT, original_hash TEXT, locator TEXT, parent TEXT, PRIMARY KEY(source,conversation,message,original_hash,locator))')
-                if occurrence_table is None:
-                    # Additive upgrade: preserve the legacy table and its schema.
-                    conn.execute('INSERT OR IGNORE INTO export_occurrences SELECT source,conversation,message,original_hash,locator,parent FROM export_provenance')
-            conn.execute('INSERT OR IGNORE INTO artifacts VALUES(?,?,?,?)',
-                         (source, digest, len(raw), len(records)))
-            for row, title, line_no in records:
-                key = (source, row['conversation_id'], row['message_id'])
-                values = (row['role'], row['timestamp'], title, row['text'])
-                existing = conn.execute('SELECT role,timestamp,title,text FROM messages '
-                                        'WHERE source_id=? AND conversation_id=? AND message_id=?', key).fetchone()
-                if existing is not None:
-                    if existing != values:
-                        raise ValueError(f'conflicting message identity at line {line_no}')
-                    continue
-                conn.execute('INSERT INTO messages(source_id,conversation_id,message_id,role,timestamp,title,text,source_sha256,source_line) '
-                             'VALUES(?,?,?,?,?,?,?,?,?)', (*key, *values, digest, line_no))
-                inserted += 1
-            if provenance is not None:
-                occurrences = [(source, r['conversation_id'], r['message_id'], r['origin_sha256'], r['origin_locator'], r.get('parent_id')) for r in provenance]
-                conn.executemany('INSERT OR IGNORE INTO export_provenance VALUES(?,?,?,?,?,?)',
-                                 occurrences)
-                conn.executemany('INSERT OR IGNORE INTO export_occurrences VALUES(?,?,?,?,?,?)', occurrences)
-        result = {'source_sha256': digest, 'records': len(records), 'inserted': inserted}
-        if raw.startswith(BOM_UTF8):
-            result['utf8_bom_present'] = True
-        return result
-    finally:
-        conn.close()
-
-
-def readonly(db):
-    conn = sqlite3.connect(Path(db).resolve().as_uri() + '?mode=ro', uri=True)
-    conn.row_factory = sqlite3.Row
-    conn.execute('PRAGMA query_only=ON')
-    return conn
-
-
-def search(db, query, limit=20):
-    if not query.strip() or not 1 <= limit <= 1000:
-        raise ValueError('query required; limit must be 1..1000')
-    match = ' AND '.join('"' + term.replace('"', '""') + '"' for term in query.split())
-    conn = readonly(db)
-    try:
-        return [dict(r) for r in conn.execute('SELECT m.* FROM messages_fts f JOIN messages m '
-                    'ON m.message_pk=f.rowid WHERE messages_fts MATCH ? ORDER BY bm25(messages_fts),m.message_pk LIMIT ?',
-                    (match, limit))]
-    finally:
-        conn.close()
+# The archive core lives in recaplib/archive.py; these names stay importable from recap.
+from recaplib.archive import SCHEMA, _validate_source, ingest, ingest_bytes, readonly, search
 
 
 def main():
-    from title_document_output import add_output_argument, save_if_requested
+    from recaplib.title_document_output import add_output_argument, save_if_requested
     p = argparse.ArgumentParser(description=__doc__)
     p.add_argument('--db')
     sub = p.add_subparsers(dest='command', required=True)
@@ -267,44 +138,44 @@ def main():
         p.error('rehearse-recovery opens --restored-db only; do not pass --db')
     try:
         if args.command == 'list-export':
-            from export_inventory import list_export
+            from recaplib.export_inventory import list_export
             result = list_export(args.input, args.format, args.limit, args.offset, args.expected_export_sha256,
                                  contains=args.contains, canonical_unicode=args.canonical_unicode,
                                  text_contains=args.text_contains, text_role=args.text_role)
         elif args.command == 'inspect-web-zip':
-            from inspect_web_zip import inspect_web_zip
+            from recaplib.inspect_web_zip import inspect_web_zip
             result = inspect_web_zip(args.input, args.limit, args.offset, args.expected_archive_sha256)
         elif args.command == 'check-import':
-            from import_check import check_import
+            from recaplib.import_check import check_import
             result = check_import(args.db, args.source, args.input, args.format, args.conversation,
                                   args.expected_export_sha256, args.limit)
         elif args.command == 'prepare-web-export':
-            from prepare_web_export import prepare_web_export
+            from recaplib.prepare_web_export import prepare_web_export
             result = prepare_web_export(args.input, args.member, args.output, args.expected_archive_sha256)
         elif args.command == 'replay-local':
-            from replay_local import reconstruct
+            from recaplib.replay_local import reconstruct
             result = reconstruct(args.input)
             print(json.dumps(result, ensure_ascii=True, indent=2))
             if not result['supported']:
                 raise SystemExit(1)
             return
         elif args.command == 'review-state':
-            from title_review_state import review_state, review_state_from_queue
+            from recaplib.title_review_state import review_state, review_state_from_queue
             if args.from_queue is not None:
                 if args.set is None or any(value is not None for value in (args.expected_state_revision, args.expected_title_revision, args.expected_content_sha256)):
                     raise ValueError('--from-queue requires --set and cannot be combined with explicit expected values')
-                from title_proposal import read_document
+                from recaplib.title_proposal import read_document
                 queue = read_document(args.from_queue)
                 result = review_state_from_queue(args.db, args.source, args.conversation, args.set, queue)
             else:
                 result = review_state(args.db, args.source, args.conversation, args.set, args.expected_state_revision, args.expected_title_revision, args.expected_content_sha256)
         elif args.command == 'review-titles':
-            from title_batch import review_queue, load_supplied_proposals
+            from recaplib.title_batch import review_queue, load_supplied_proposals
             supplied = load_supplied_proposals(args.proposal) if args.proposal is not None else None
             result = review_queue(args.db, args.source, args.limit, args.offset, args.unrenamed_only, args.state, supplied, args.supplied_only)
         elif args.command in ('title-adapter-dry-run', 'title-adapter-simulate'):
-            from title_transfer import dry_run, simulate, MockTitleAdapter
-            from strict_json import loads
+            from recaplib.title_transfer import dry_run, simulate, MockTitleAdapter
+            from recaplib.strict_json import loads
             def document(path):
                 return loads(Path(path).read_text(encoding='utf-8'))
             target = document(args.target)
@@ -313,30 +184,30 @@ def main():
             else:
                 result = simulate(args.db, args.input, document(args.request), document(args.approval), MockTitleAdapter(target))
         elif args.command in ('preview-title', 'apply-title'):
-            from title_proposal import preview, apply_preview, read_document
+            from recaplib.title_proposal import preview, apply_preview, read_document
             value = read_document(args.input)
             if args.command == 'preview-title' and args.conversation is not None:
-                from title_batch import select_proposal
+                from recaplib.title_batch import select_proposal
                 value = select_proposal(value, args.conversation)
             result = preview(args.db, value, args.title, args.with_evidence) if args.command == 'preview-title' else apply_preview(args.db, value)
         elif args.command == 'suggest-replay-title':
-            from replay_title import suggest_replay
+            from recaplib.replay_title import suggest_replay
             result = suggest_replay(args.db, args.source, args.conversation, args.input, args.message)
         elif args.command == 'suggest-attributed-title':
-            from attributed_title import suggest_attributed
+            from recaplib.attributed_title import suggest_attributed
             result = suggest_attributed(args.db, args.source, args.conversation, args.input, args.message, args.origin_locator)
         elif args.command == 'export-title-plan':
-            from title_plan import make_plan
+            from recaplib.title_plan import make_plan
             result = make_plan(args.db, args.source, args.conversation, args.input, args.format)
         elif args.command == 'check-title-plan':
-            from title_plan import check_plan
-            from strict_json import loads
+            from recaplib.title_plan import check_plan
+            from recaplib.strict_json import loads
             result = check_plan(args.db, args.input, loads(Path(args.plan).read_text(encoding='utf-8')))
         elif args.command == 'suggest-branch-title':
-            from branch_title import suggest_branch
+            from recaplib.branch_title import suggest_branch
             result = suggest_branch(args.db, args.source, args.conversation, args.input, args.node, args.message)
         elif args.command == 'web-branch':
-            from web_branch import branch_view
+            from recaplib.web_branch import branch_view
             result = branch_view(args.input, args.conversation, args.node)
         elif args.command == 'ingest':
             result = ingest(args.db, args.source, args.input)
@@ -351,7 +222,7 @@ def main():
                 c.close()
         elif args.command in ('inspect', 'import', 'title'):
             # Lazy adapter imports keep the core library free of import cycles.
-            from session_workflow import inspect_export, import_export, titles
+            from recaplib.session_workflow import inspect_export, import_export, titles
             if args.command == 'inspect':
                 result = inspect_export(args.input, args.format, args.conversation, args.expected_export_sha256)
             elif args.command == 'import':
@@ -361,33 +232,33 @@ def main():
                     raise ValueError('--set requires --expected-revision from a title preview')
                 result = titles(args.db, args.source, args.conversation, args.set, args.expected_revision)
         elif args.command == 'title-history':
-            from title_history import history
+            from recaplib.title_history import history
             result = history(args.db, args.source, args.conversation,
                              args.limit, args.offset, args.expected_revision)
         elif args.command == 'list':
-            from conversation_view import conversations
+            from recaplib.conversation_view import conversations
             result = conversations(args.db, args.source, args.limit, args.offset)
         elif args.command == 'show':
-            from conversation_view import conversation
+            from recaplib.conversation_view import conversation
             result = conversation(args.db, args.source, args.conversation, args.limit, args.offset, args.message,
                                   args.around_message, args.before, args.after)
         elif args.command == 'find':
-            from conversation_search import find
+            from recaplib.conversation_search import find
             result = find(args.db, args.query, args.source, args.limit, args.include_title_history, args.export_sha256, args.cursor, args.canonical_unicode, args.text_role)
         elif args.command == 'declare-recovery':
-            from recovery import declare_recovery
+            from recaplib.recovery import declare_recovery
             result = declare_recovery(args.db, args.output, args.declared_at)
         elif args.command == 'rehearse-recovery':
-            from recovery import rehearse_recovery
+            from recaplib.recovery import rehearse_recovery
             result = rehearse_recovery(args.input, args.restored_db, args.output, args.objects)
         else:
-            from title_suggestion import suggest
+            from recaplib.title_suggestion import suggest
             result = suggest(args.db, args.source, args.conversation, args.message)
         kind = 'queue' if args.command == 'review-titles' else 'preview' if args.command == 'preview-title' else 'proposal'
         result = save_if_requested(result, args, kind)
         rendered = None
         if getattr(args, 'text', False):
-            from recovery import render_text
+            from recaplib.recovery import render_text
             rendered = render_text(result)
     except (OSError, ValueError, KeyError, TypeError, sqlite3.Error) as exc:
         p.exit(1, str(exc) + '\n')

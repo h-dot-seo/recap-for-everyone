@@ -106,6 +106,12 @@ python recap.py --db ../demo.sqlite title --source demo --conversation synthetic
 덮어쓰지 않고 거부합니다. 적용된 변경은 제목 이력에 남고, 원문 메시지와 원본
 해시는 바뀌지 않습니다.
 
+저장소 루트에는 진입점만 있습니다: `recap.py`, 위 표와 [명령 참조](COMMANDS.md)의
+독립 스크립트, `runtime_check.py`, `verify_manifest.py`, `audit_publication.py`. 루트의
+독립 스크립트는 같은 이름의 `recaplib/` 모듈을 불러오는 호환 진입점이므로 문서의 명령은
+그대로 동작합니다. 구현 모듈은 `recaplib/` 패키지에, 테스트는 `tests/` 패키지에 있고,
+테스트는 루트에서 `python -m unittest discover -v`로 실행합니다.
+
 ## 경계와 하지 않는 것
 
 - **원본 앱의 이름을 바꾸지 않습니다.** 제목은 로컬 표시 제목입니다. ChatGPT나 Codex

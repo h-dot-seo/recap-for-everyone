@@ -1830,3 +1830,72 @@ Not claimed: no behavior, limit or boundary changed and none was re-verified aga
 code beyond the guides that tests execute; the Korean guide is a translation of the English
 documentation, not an independent specification; no real archive, export or backup system
 was used. Exact-commit Ubuntu/Windows Python 3.10/3.12 CI is checked after publication.
+
+## 2026-11-08 Package layout (0.89.0-package-layout)
+
+Moved the code into packages without changing any documented command, CI command,
+fixture, usage line or behavior. The 32 implementation modules moved from the repository
+root into the new `recaplib/` package (`recaplib/__init__.py` plus the modules, bytes
+unchanged except their import lines, which became `from recaplib.<name> import ...`). The
+archive core of `recap.py` (`SCHEMA`, `_validate_source`, `ingest`, `ingest_bytes`,
+`readonly`, `search`) moved verbatim into `recaplib/archive.py`; `recap.py` stays at the
+root as the unified CLI, imports the core from `recaplib.archive` and re-exports those
+names, so `from recap import ingest` keeps working and no `recaplib` module imports a
+root script. The 92 `test_*.py` modules moved into the `tests/` package
+(`tests/__init__.py`); their imports of moved modules, cross-test imports
+(`from tests.test_x import ...`), `unittest.mock.patch` targets
+(`recaplib.<name>.<attribute>`, including the three targets built from module-name
+strings) and repository-root references (`Path(__file__).resolve().parents[1]` in all 28
+`Path(__file__)` occurrences, each of which named a script, `docs/` or `examples/` at the
+root; the three `runtime_check.__file__` uses in `tests/test_runtime_check.py` were already
+root-relative and are unchanged) were updated, and the embedded `-c` program of
+`tests/test_title_adapter.py` imports `recaplib.title_adapter`. Sixteen thin
+compatibility entry points stay at the root for
+every script that has a `__main__` block and is documented in a guide or executed by a
+test: `attributed_title.py`, `branch_title.py`, `conversation_search.py`,
+`conversation_view.py`, `export_inventory.py`, `import_check.py`, `recovery.py`
+(executed by `tests/test_recovery_rehearsal.py`), `replay_local.py`, `replay_title.py`,
+`session_workflow.py`, `title_adapter.py`, `title_history.py`, `title_plan.py`,
+`title_proposal.py`, `title_suggestion.py` and `web_branch.py`; each imports `main` from
+the module of the same name in `recaplib/`, which keeps its own `main()` and `__main__`
+block, so `--help` usage lines and behavior are unchanged. Deliberately not moved:
+`recap.py`, `runtime_check.py`, `verify_manifest.py` (now importing
+`recaplib.strict_json`) and `audit_publication.py` remain real modules at the root because
+they are the documented and CI entry points and `tests/test_runtime_check.py` locates the
+root through `runtime_check.__file__`; `examples/make_review_demo.py` stays where
+`docs/START_HERE.md` executes it. `.github/workflows/tests.yml` is unchanged:
+`python -m unittest discover -v` from the root loads the `tests` package.
+
+Documentation: README "Commands at a glance", `docs/COMMANDS.md` (a layout section, the
+standalone-script introduction, the test-runner entry and the library-module list),
+`docs/README.ko.md`, `docs/ARCHITECTURE.md` (a code-layout section and
+`recaplib/recovery.py`) and `docs/WORKFLOWS.md` (`recaplib/local_parser.py`,
+`tests/test_replay_coverage.py`) describe the layout; VALIDATION.md names
+`python -m unittest tests.test_recap` as the single-module form. No guide named
+`python -m unittest test_x`, so no such prose needed rewriting, and no fenced sh block of
+any guide changed (checked block by block against the previous tree).
+
+Verification: with the available Python 3.15 interpreter on Windows and TMP/TEMP in a
+scratch directory, `python -m unittest discover -q` ran 1012 tests before the move
+(407.568 s) and 1012 tests after it (309.485 s); the unittest loader reported no
+failed module load, all 92 modules loaded as `tests.<name>`, and the same 15 failures and
+1 error remained in the three existing deep-JSON-nesting tests
+(`tests.test_import_failure_boundaries`, `tests.test_title_preview_freeze`,
+`tests.test_title_file_encoding`) with identical assertion messages; they fail the same way
+on the unchanged `main` tree under that interpreter, as recorded in the previous entries.
+No test was added, removed or newly failing, and the documented-command tests
+(`tests.test_start_here`, `tests.test_runtime_check`, `tests.test_recovery_rehearsal`,
+`tests.test_export_hash_lease`, `tests.test_title_walkthrough` and the guide-reading tests)
+passed through the root entry points. For all 18 root scripts the `--help` usage block,
+joined onto one line, equals the usage line recorded in `docs/COMMANDS.md`, and each script
+also ran by absolute path from a foreign working directory without creating a file there.
+A local link checker resolved every local Markdown link and anchor in the 41 Markdown
+files. `python -m compileall -q .`, the publication audit and manifest
+verification pass: 204 manifest entries, 205 audited files.
+
+Not claimed: no behavior, limit, boundary or output format changed and none was
+re-verified beyond the test suite and the `--help` comparison; the package layout is a
+reading aid, not an import-compatibility promise for code outside this repository; the
+supported runtimes remain the CI interpreters, and exact-commit Ubuntu/Windows Python
+3.10/3.12 CI is checked after publication; no real archive, export or backup system was
+used.
