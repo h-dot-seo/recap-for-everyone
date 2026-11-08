@@ -75,6 +75,18 @@ objects; verify expected hashes, sizes and counts; rebuild the index; run read-o
 queries; retain a recovery receipt. Store decryption keys outside backups. Never
 mark remote recovery verified from a local Git ref or a push message alone.
 
+`declare-recovery` and `rehearse-recovery` (`recovery.py`) implement the archive-side
+part of this list. The declaration records the live archive's artifact rows, counts,
+logical digests, ledgers and FTS row count in a manifest stored with the backup. The
+rehearsal opens a restored copy read-only and checks integrity, expected tables,
+exact artifact rows, counts, digests, ledgers and the FTS index in place, optionally
+confirms that every declared object hash is present in a fetched-object directory,
+and writes a receipt with `RECOVERY_REHEARSAL_PASSED` or `RECOVERY_REHEARSAL_FAILED`.
+The clean destination remains the operator's responsibility and is recorded as not
+established; the index is verified, not rebuilt. Remote fetch, decryption, key custody
+and backup scheduling stay outside the repository. See
+[the recovery rehearsal guide](RECOVERY_REHEARSAL.md).
+
 ## Lower-level title API input boundary
 
 `session_workflow.titles` validates its identities and optional revision before

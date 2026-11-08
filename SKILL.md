@@ -139,3 +139,16 @@ source errors, not permission to choose a target or invent a fallback identity.
 Missing/null/empty fallback compatibility does not authenticate an ID. Keep literal
 identities and original hashes; do not edit aliases to force title generation.
 See `docs/INPUT_SCOPE.md#source-identities-must-resolve-without-guessing`.
+
+Before an operator backs up an archive, run
+`recap.py --db ARCHIVE.sqlite declare-recovery --output MANIFEST.json` on the live
+archive (the global `--db` precedes the subcommand) and store the manifest with the
+backup, never inside the archive. After every restore, run
+`recap.py rehearse-recovery MANIFEST.json --restored-db RESTORED.sqlite --output RECEIPT.json`
+without `--db`, adding `--objects DIR` when the fetched backup objects are available,
+and read `status` and `failed_checks` in the receipt. The rehearsal only reads the
+restored copy; it cannot tell it from the live archive, so point it at a clean
+restored copy and treat a run against the live archive as a self-check. Never report
+recovery as verified from a Git ref, a push message or a passing declaration; remote
+fetch, decryption and key custody stay outside this repository. See
+`docs/RECOVERY_REHEARSAL.md`.
