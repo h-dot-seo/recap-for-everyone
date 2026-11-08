@@ -126,8 +126,8 @@ to bypass a failure. JSON must be UTF-8 and duplicate keys are rejected.
   evidence to force a match. Importing a renamed ID-less file twice under the same
   source can create ambiguity and is deliberately rejected by the title bridge.
 - **Unsupported replay:** `replay-local` prints `supported: false`, a fixed
-  `reason_code`, and no partial transcript; it exits 1. Read the README's narrow
-  supported grammar. Raw `local-codex` inspection/import may still be useful, but
+  `reason_code`, and no partial transcript; it exits 1. Read the
+  [narrow supported grammar](WORKFLOWS.md#opt-in-completed-turn-text-projection). Raw `local-codex` inspection/import may still be useful, but
   `suggest-title` on the raw archive is not a retained-history substitute. Never
   describe tools, media, compaction or inherited histories as reconstructed.
 

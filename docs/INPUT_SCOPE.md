@@ -17,7 +17,7 @@ are authorized to read. Current formats are deliberately limited:
 | `local-codex` | Local JSONL, explicitly typed input/output text items from supported response messages | No tools/media, inherited-history resolution or complete model-context recovery; context markers are warnings |
 
 `replay-local` is a separate opt-in, fail-closed completed-turn text projection,
-not the default importer. See the README for its narrower grammar. Title proposals
+not the default importer. See [its narrower grammar](WORKFLOWS.md#opt-in-completed-turn-text-projection). Title proposals
 are local excerpts, not semantic model summaries. Local display-title changes do
 not rename a live ChatGPT/Codex thread. Mock transfer simulation is not a service
 connection. Do not describe this tool as a deployment-ready remote renaming app.

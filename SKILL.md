@@ -23,7 +23,8 @@ and review title proposals before applying them.
 
 ## Executable increment
 
-See the README workflow section for the new local CLI and explicit limitations.
+See `docs/COMMANDS.md` for every command and `docs/WORKFLOWS.md` for the workflow
+narratives and explicit limitations; the README keeps the scope and quick start.
 Use only authorized inputs; shipped examples are entirely synthetic.
 
 For a search hit, prefer `show --source SOURCE --conversation CONVERSATION --message MESSAGE_ID`
