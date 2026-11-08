@@ -3,11 +3,15 @@ from __future__ import annotations
 
 import hashlib
 import json
+import math
 import re
 import sqlite3
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
+from strict_json import loads
+from source_text import physical_lines
+from source_identity import aliased_identity, optional_message_identity
 
 
 class LocalImportError(ValueError):
@@ -79,6 +83,8 @@ class ParsedArtifact:
     observed_record_count: int | None
     sessions: tuple[SessionOccurrence, ...]
     messages: tuple[MessageOccurrence, ...]
+    skipped_content_parts: int = 0
+    context_counts: tuple[tuple[str, int], ...] = ()
 
 
 def _text(value: Any, field: str) -> str:
@@ -87,30 +93,44 @@ def _text(value: Any, field: str) -> str:
     return value
 
 
-def _message_text(payload: dict[str, Any]) -> str:
+def _message_text(payload: dict[str, Any], content_profile: str = "legacy") -> str:
     content = payload.get("content")
     if not isinstance(content, list):
+        if content_profile == "codex":
+            raise LocalImportError("typed message content must be an array")
         return ""
     text: list[str] = []
     for item in content:
         if not isinstance(item, dict):
+            if content_profile == "codex":
+                raise LocalImportError("typed content item must be an object")
             continue
+        if content_profile == "codex":
+            kind = item.get("type")
+            # Missing tags remain the deliberate untyped-content compatibility
+            # skip. A supplied malformed tag is not a valid unsupported variant:
+            # silently dropping it can erase the actual user request.
+            if "type" in item and (not isinstance(kind, str) or not kind.strip()):
+                raise LocalImportError("typed content item type must be nonempty text")
+            if kind not in ("input_text", "output_text"):
+                continue
         value = item.get("text")
+        if content_profile == "codex" and not isinstance(value, str):
+            raise LocalImportError("typed text content requires a string")
         if isinstance(value, str):
             text.append(value)
-    return "\n".join(text).strip()
+    joined = "\n".join(text)
+    return joined if content_profile == "codex" and joined.strip() else joined.strip()
 
 
-def _records(path: Path) -> list[tuple[int, dict[str, Any]]]:
+def _records(raw: bytes, path: Path | str) -> list[tuple[int, dict[str, Any]]]:
     records: list[tuple[int, dict[str, Any]]] = []
-    for line_number, line in enumerate(path.read_text(encoding="utf-8").split("\n"), 1):
-        if line.endswith("\r"):
-            line = line[:-1]
+    for line_number, line in enumerate(physical_lines(raw), 1):
         if not line.strip():
             continue
         try:
-            value = json.loads(line)
-        except json.JSONDecodeError as error:
+            value = loads(line)
+        except ValueError as error:
             raise LocalImportError(f"invalid JSONL record: {path}:{line_number}") from error
         if not isinstance(value, dict):
             raise LocalImportError(f"JSONL record is not an object: {path}:{line_number}")
@@ -118,7 +138,43 @@ def _records(path: Path) -> list[tuple[int, dict[str, Any]]]:
     return records
 
 
-def parse_artifact(path: Path, source_relative_path: str, artifact_kind: str = "jsonl") -> ParsedArtifact:
+
+def _context_counts(records):
+    # Fixed keys only: arbitrary event/type values and metadata never enter reports.
+    known = ('session_meta', 'response_item', 'event_msg', 'compacted', 'turn_context')
+    counts = {key + '_records': 0 for key in known}
+    counts.update(other_records=0, nonmessage_response_items=0, skipped_role_messages=0,
+                  fork_metadata_records=0, referenced_history_records=0,
+                  parent_thread_records=0, paginated_history_records=0, rollback_events=0,
+                  content_attribution_records=0)
+    for _, value in records:
+        kind = value.get('type')
+        key = kind + '_records' if kind in known else 'other_records'
+        counts[key] += 1
+        payload = value.get('payload')
+        if not isinstance(payload, dict):
+            continue
+        if kind == 'session_meta':
+            counts['fork_metadata_records'] += int(payload.get('forked_from_id') is not None)
+            counts['referenced_history_records'] += int(payload.get('history_base') is not None)
+            counts['parent_thread_records'] += int(payload.get('parent_thread_id') is not None)
+            counts['paginated_history_records'] += int(payload.get('history_mode') == 'paginated')
+        elif kind == 'response_item':
+            counts['nonmessage_response_items'] += int(payload.get('type') != 'message')
+            if payload.get('type') == 'message':
+                counts['skipped_role_messages'] += int(payload.get('role') not in ('user', 'assistant'))
+                metadata = payload.get('internal_chat_message_metadata_passthrough')
+                counts['content_attribution_records'] += int(
+                    isinstance(metadata, dict) and metadata.get('content_item_metadata') is not None)
+        elif kind == 'event_msg':
+            counts['rollback_events'] += int(payload.get('type') == 'thread_rolled_back')
+    return tuple(sorted(counts.items()))
+
+
+def parse_artifact(path: Path, source_relative_path: str, artifact_kind: str = "jsonl",
+                   content_profile: str = "legacy") -> ParsedArtifact:
+    if content_profile not in ("legacy", "codex"):
+        raise LocalImportError("unsupported local content profile")
     if artifact_kind == "sqlite":
         connection: sqlite3.Connection | None = None
         try:
@@ -137,7 +193,27 @@ def parse_artifact(path: Path, source_relative_path: str, artifact_kind: str = "
         return ParsedArtifact("not_applicable", "accepted_metadata_only", "sqlite_backup", None, (), ())
     if artifact_kind != "jsonl":
         raise LocalImportError(f"unsupported local artifact kind: {artifact_kind}")
-    records = _records(path)
+    return _parse_jsonl_records(_records(path.read_bytes(), path), path, source_relative_path, content_profile)
+
+
+def parse_jsonl_bytes(raw: bytes, source_relative_path: str,
+                      content_profile: str = "legacy") -> ParsedArtifact:
+    """Parse one immutable JSONL snapshot without filesystem access or staging.
+
+    source_relative_path is an exact identity/diagnostic label, not a file to open.
+    It retains the existing metadata-only utility and fallback-message-ID rules.
+    """
+    if not isinstance(raw, bytes):
+        raise LocalImportError("JSONL snapshot must be immutable bytes")
+    if not isinstance(source_relative_path, str) or not source_relative_path:
+        raise LocalImportError("source-relative label must be nonempty text")
+    if content_profile not in ("legacy", "codex"):
+        raise LocalImportError("unsupported local content profile")
+    return _parse_jsonl_records(_records(raw, source_relative_path), source_relative_path,
+                               source_relative_path, content_profile)
+
+
+def _parse_jsonl_records(records, path, source_relative_path, content_profile):
     if re.fullmatch(r"agents/(claude|antigravity|opencode)/raw/.+", source_relative_path):
         return ParsedArtifact("parsed", "accepted_metadata_only", "agent_raw_evidence", len(records), (), ())
     if source_relative_path == "session_index.jsonl":
@@ -149,33 +225,70 @@ def parse_artifact(path: Path, source_relative_path: str, artifact_kind: str = "
     sessions: list[SessionOccurrence] = []
     messages: list[MessageOccurrence] = []
     current_session = ""
+    skipped_content_parts = 0
     for line_number, value in records:
         record_type = value.get("type")
+        # A damaged discriminator can conceal a session boundary and assign
+        # subsequent text to the previous session. Do not guess or silently skip
+        # a supplied malformed tag. Missing/unknown tags retain compatibility.
+        if "type" in value and (not isinstance(record_type, str) or not record_type.strip()):
+            raise LocalImportError(f"invalid local record type: {path}:{line_number}")
         payload = value.get("payload")
-        if record_type == "session_meta" and isinstance(payload, dict):
-            session_id = _text(payload.get("id") or payload.get("session_id"), "session id")
+        if record_type == "session_meta":
+            if not isinstance(payload, dict):
+                raise LocalImportError(f"invalid session metadata payload: {path}:{line_number}")
+            try:
+                session_id = aliased_identity(payload, "session_id")
+            except ValueError as error:
+                raise LocalImportError(f"invalid session metadata identity: {path}:{line_number}") from error
             sessions.append(SessionOccurrence(session_id, line_number, payload.get("cwd"), payload.get("originator")))
             current_session = session_id
             continue
-        if record_type != "response_item" or not isinstance(payload, dict) or payload.get("type") != "message":
+        if record_type != "response_item":
+            continue
+        # A malformed known response cannot safely be classified as an omitted
+        # tool or unsupported message. Reject before extracting any archive rows.
+        if not isinstance(payload, dict):
+            raise LocalImportError(f"invalid response item payload: {path}:{line_number}")
+        item_type = payload.get("type")
+        if not isinstance(item_type, str) or not item_type.strip():
+            raise LocalImportError(f"invalid response item type: {path}:{line_number}")
+        if item_type != "message":
             continue
         role = payload.get("role")
+        if not isinstance(role, str) or not role.strip():
+            raise LocalImportError(f"invalid response message role: {path}:{line_number}")
         if role not in {"user", "assistant"}:
             continue
-        text = _message_text(payload)
+        try:
+            raw_key = optional_message_identity(payload)
+        except ValueError as error:
+            raise LocalImportError(f"invalid response message identity: {path}:{line_number}") from error
+        timestamp = value.get("timestamp")
+        if timestamp is not None and (timestamp == "" or isinstance(timestamp, bool) or
+                not isinstance(timestamp, (str, int, float)) or
+                isinstance(timestamp, float) and not math.isfinite(timestamp)):
+            raise LocalImportError(f"message timestamp must be text or a finite number: {path}:{line_number}")
+        try:
+            text = _message_text(payload, content_profile)
+        except LocalImportError as error:
+            # _message_text diagnostics contain fixed labels, never content.
+            raise LocalImportError(f"{error}: {path}:{line_number}") from error
+        if content_profile == "codex":
+            skipped_content_parts += sum(item.get("type") not in ("input_text", "output_text")
+                                         for item in payload["content"])
         if not text:
             continue
         if not current_session:
             raise LocalImportError(f"JSONL message has no session metadata: {path}:{line_number}")
-        raw_key = payload.get("id")
-        explicit_id = isinstance(raw_key, str) and bool(raw_key)
+        explicit_id = raw_key is not None
         message_key = raw_key if explicit_id else f"{source_relative_path}:{line_number}"
         variant_sha256 = hashlib.sha256(json.dumps(
             value, ensure_ascii=True, sort_keys=True, separators=(",", ":"),
         ).encode("ascii")).hexdigest()
         messages.append(MessageOccurrence(
             current_session, str(message_key), explicit_id, role, text,
-            str(value.get("timestamp") or ""), line_number,
+            "" if timestamp is None else str(timestamp), line_number,
             hashlib.sha256(text.encode("utf-8")).hexdigest(),
             variant_sha256,
         ))
@@ -183,7 +296,7 @@ def parse_artifact(path: Path, source_relative_path: str, artifact_kind: str = "
         raise LocalImportError(f"JSONL has no session metadata: {path}")
     status = "imported" if messages else "accepted_zero_message"
     reason = None if messages else "no_response_messages"
-    return ParsedArtifact("parsed", status, reason, len(records), tuple(sessions), tuple(messages))
+    return ParsedArtifact("parsed", status, reason, len(records), tuple(sessions), tuple(messages), skipped_content_parts, _context_counts(records))
 
 
 def message_decisions(

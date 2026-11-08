@@ -1,0 +1,54 @@
+[
+  {
+    "id": "synthetic-title-focus",
+    "title": "New chat",
+    "current_node": "u2",
+    "mapping": {
+      "u1": {
+        "parent": null,
+        "message": {
+          "author": {
+            "role": "user"
+          },
+          "create_time": 1,
+          "content": {
+            "content_type": "text",
+            "parts": [
+              "Can you help with my project?"
+            ]
+          }
+        }
+      },
+      "a1": {
+        "parent": "u1",
+        "message": {
+          "author": {
+            "role": "assistant"
+          },
+          "create_time": 2,
+          "content": {
+            "content_type": "text",
+            "parts": [
+              "Which synthetic task should we explore?"
+            ]
+          }
+        }
+      },
+      "u2": {
+        "parent": "a1",
+        "message": {
+          "author": {
+            "role": "user"
+          },
+          "create_time": 3,
+          "content": {
+            "content_type": "text",
+            "parts": [
+              "Compare synthetic orchard irrigation schedules"
+            ]
+          }
+        }
+      }
+    }
+  }
+]

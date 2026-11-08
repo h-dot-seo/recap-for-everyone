@@ -1,0 +1,17 @@
+{"type": "session_meta", "payload": {"id": "synthetic-local-focus"}}
+{"type": "event_msg", "payload": {"type": "task_started", "turn_id": "opening"}}
+{"type": "event_msg", "payload": {"type": "user_message", "message": "Can you help with my project?"}}
+{"type": "response_item", "payload": {"type": "message", "id": "opening-user", "role": "user", "content": [{"type": "input_text", "text": "Can you help with my project?"}]}}
+{"type": "response_item", "payload": {"type": "message", "id": "opening-assistant", "role": "assistant", "content": [{"type": "output_text", "text": "Synthetic response for opening"}]}}
+{"type": "event_msg", "payload": {"type": "task_complete", "turn_id": "opening"}}
+{"type": "event_msg", "payload": {"type": "task_started", "turn_id": "focus"}}
+{"type": "event_msg", "payload": {"type": "user_message", "message": "Compare synthetic orchard watering schedules"}}
+{"type": "response_item", "payload": {"type": "message", "id": "focus-user", "role": "user", "content": [{"type": "input_text", "text": "Compare synthetic orchard watering schedules"}]}}
+{"type": "response_item", "payload": {"type": "message", "id": "focus-assistant", "role": "assistant", "content": [{"type": "output_text", "text": "Synthetic response for focus"}]}}
+{"type": "event_msg", "payload": {"type": "task_complete", "turn_id": "focus"}}
+{"type": "event_msg", "payload": {"type": "task_started", "turn_id": "discarded"}}
+{"type": "event_msg", "payload": {"type": "user_message", "message": "Explore a different synthetic topic"}}
+{"type": "response_item", "payload": {"type": "message", "id": "discarded-user", "role": "user", "content": [{"type": "input_text", "text": "Explore a different synthetic topic"}]}}
+{"type": "response_item", "payload": {"type": "message", "id": "discarded-assistant", "role": "assistant", "content": [{"type": "output_text", "text": "Synthetic response for discarded"}]}}
+{"type": "event_msg", "payload": {"type": "task_complete", "turn_id": "discarded"}}
+{"type": "event_msg", "payload": {"type": "thread_rolled_back", "num_turns": 1}}

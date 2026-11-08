@@ -1,10 +1,12 @@
 #!/usr/bin/env python3
-"""Local-only normalized conversation ingestion and read-only search."""
+"""Local-only archive import, inspection, search and checked title workflows."""
 import argparse
 import hashlib
 import json
 import sqlite3
 from pathlib import Path
+from strict_json import loads
+from source_text import BOM_UTF8, physical_lines
 
 SCHEMA = '''
 CREATE TABLE IF NOT EXISTS artifacts (
@@ -24,16 +26,40 @@ CREATE TRIGGER IF NOT EXISTS messages_ai AFTER INSERT ON messages BEGIN
 '''
 
 
-def ingest(db, source, path):
-    if not source or not source.strip():
-        raise ValueError('source must not be empty')
-    raw = Path(path).read_bytes()
+def _validate_source(source):
+    if not isinstance(source, str) or not source.strip():
+        raise ValueError('source must be nonempty text')
+    # Source labels come from argv/API values, outside the JSON decoder's Unicode
+    # checks. SQLite cannot encode surrogates; reject them before schema creation
+    # or source reads rather than leaving an empty archive after a bad label.
+    if any(0xd800 <= ord(character) <= 0xdfff for character in source):
+        raise ValueError('source must contain valid Unicode text')
+
+
+def ingest(db, source, path, provenance=None):
+    _validate_source(source)
+    return ingest_bytes(db, source, Path(path).read_bytes(), provenance)
+
+
+def ingest_bytes(db, source, raw, provenance=None):
+    """Validate and ingest one immutable normalized JSONL byte snapshot.
+
+    Uses the same transaction, identity and provenance rules as file ingestion.
+    This writes the explicitly selected SQLite archive, not a temporary input file.
+    """
+    _validate_source(source)
+    if not isinstance(raw, bytes):
+        raise ValueError('normalized input must be immutable bytes')
     digest = hashlib.sha256(raw).hexdigest()
     records = []
-    for line_no, line in enumerate(raw.decode('utf-8').split('\n'), 1):
+    incoming = {}
+    for line_no, line in enumerate(physical_lines(raw), 1):
         if not line.strip():
             continue
-        row = json.loads(line)
+        try:
+            row = loads(line)
+        except ValueError as error:
+            raise ValueError(f'invalid JSON record at line {line_no}') from error
         required = ('conversation_id', 'message_id', 'role', 'timestamp', 'text')
         if not isinstance(row, dict) or any(not isinstance(row.get(k), str) or not row[k] for k in required):
             raise ValueError(f'invalid record at line {line_no}')
@@ -42,6 +68,13 @@ def ingest(db, source, path):
         title = row.get('title', '')
         if not isinstance(title, str):
             raise ValueError(f'invalid title at line {line_no}')
+        key = (row['conversation_id'], row['message_id'])
+        values = (row['role'], row['timestamp'], title, row['text'])
+        if key in incoming and incoming[key] != values:
+            # Input-only contradictions must not create an empty archive/schema.
+            # Archive comparisons still run under the write lock below.
+            raise ValueError(f'conflicting message identity at line {line_no}')
+        incoming[key] = values
         records.append((row, title, line_no))
     conn = sqlite3.connect(db)
     try:
@@ -49,6 +82,14 @@ def ingest(db, source, path):
         conn.executescript(SCHEMA)
         inserted = 0
         with conn:
+            conn.execute('BEGIN IMMEDIATE')
+            if provenance is not None:
+                conn.execute('CREATE TABLE IF NOT EXISTS export_provenance (source TEXT, conversation TEXT, message TEXT, original_hash TEXT, locator TEXT, parent TEXT, PRIMARY KEY(source,conversation,message,original_hash))')
+                occurrence_table = conn.execute("SELECT 1 FROM sqlite_master WHERE type='table' AND name='export_occurrences'").fetchone()
+                conn.execute('CREATE TABLE IF NOT EXISTS export_occurrences (source TEXT, conversation TEXT, message TEXT, original_hash TEXT, locator TEXT, parent TEXT, PRIMARY KEY(source,conversation,message,original_hash,locator))')
+                if occurrence_table is None:
+                    # Additive upgrade: preserve the legacy table and its schema.
+                    conn.execute('INSERT OR IGNORE INTO export_occurrences SELECT source,conversation,message,original_hash,locator,parent FROM export_provenance')
             conn.execute('INSERT OR IGNORE INTO artifacts VALUES(?,?,?,?)',
                          (source, digest, len(raw), len(records)))
             for row, title, line_no in records:
@@ -63,7 +104,15 @@ def ingest(db, source, path):
                 conn.execute('INSERT INTO messages(source_id,conversation_id,message_id,role,timestamp,title,text,source_sha256,source_line) '
                              'VALUES(?,?,?,?,?,?,?,?,?)', (*key, *values, digest, line_no))
                 inserted += 1
-        return {'source_sha256': digest, 'records': len(records), 'inserted': inserted}
+            if provenance is not None:
+                occurrences = [(source, r['conversation_id'], r['message_id'], r['origin_sha256'], r['origin_locator'], r.get('parent_id')) for r in provenance]
+                conn.executemany('INSERT OR IGNORE INTO export_provenance VALUES(?,?,?,?,?,?)',
+                                 occurrences)
+                conn.executemany('INSERT OR IGNORE INTO export_occurrences VALUES(?,?,?,?,?,?)', occurrences)
+        result = {'source_sha256': digest, 'records': len(records), 'inserted': inserted}
+        if raw.startswith(BOM_UTF8):
+            result['utf8_bom_present'] = True
+        return result
     finally:
         conn.close()
 
@@ -89,28 +138,242 @@ def search(db, query, limit=20):
 
 
 def main():
+    from title_document_output import add_output_argument, save_if_requested
     p = argparse.ArgumentParser(description=__doc__)
-    p.add_argument('--db', required=True)
+    p.add_argument('--db')
     sub = p.add_subparsers(dest='command', required=True)
     imp = sub.add_parser('ingest'); imp.add_argument('input'); imp.add_argument('--source', required=True)
     find = sub.add_parser('search'); find.add_argument('query'); find.add_argument('--limit', type=int, default=20)
     sub.add_parser('stats')
+    check = sub.add_parser('inspect', help='inspect export coverage without a database')
+    check.add_argument('input'); check.add_argument('--format', choices=['web', 'local', 'local-codex'], required=True)
+    check.add_argument('--conversation', help='inspect an explicit conversation selection without writing')
+    check.add_argument('--expected-export-sha256', help='require the exact original whole-file hash from earlier inspection')
+    inventory = sub.add_parser('list-export', help='list export IDs, titles and selection support without importing')
+    inventory.add_argument('input'); inventory.add_argument('--format', choices=['web', 'local', 'local-codex'], required=True)
+    inventory.add_argument('--limit', type=int, default=50); inventory.add_argument('--offset', type=int, default=0)
+    inventory.add_argument('--expected-export-sha256', help='require the same original whole-file hash as an earlier page')
+    filters = inventory.add_mutually_exclusive_group()
+    filters.add_argument('--contains', help='filter IDs or existing web titles by one literal case-insensitive substring before pagination')
+    filters.add_argument('--text-contains', help='find IDs by one literal substring in extracted message text; return metadata and match counts, not bodies')
+    inventory.add_argument('--text-role', choices=['user', 'assistant', 'system', 'tool'],
+                           help='restrict text matches to one extracted role; requires --text-contains')
+    inventory.add_argument('--canonical-unicode', action='store_true', help='match canonical Unicode equivalents; requires --contains or --text-contains')
+    zip_info = sub.add_parser('inspect-web-zip', help='list conventional conversation JSON member metadata without decompression')
+    zip_info.add_argument('input'); zip_info.add_argument('--limit', type=int, default=50); zip_info.add_argument('--offset', type=int, default=0)
+    zip_info.add_argument('--expected-archive-sha256', help='require the same whole ZIP byte snapshot as an earlier candidate page')
+    prepare = sub.add_parser('prepare-web-export', help='validate one explicit ZIP JSON member and publish a new no-overwrite local file')
+    prepare.add_argument('input'); prepare.add_argument('--member', required=True); prepare.add_argument('--output', required=True)
+    prepare.add_argument('--expected-archive-sha256', help='reject a ZIP whose bytes changed since metadata inspection')
+    replay = sub.add_parser('replay-local', help='validate and project a narrow completed-turn text grammar')
+    replay.add_argument('input')
+    branch = sub.add_parser('web-branch', help='read one path from an explicit web export without a database')
+    branch.add_argument('input'); branch.add_argument('--conversation', required=True); branch.add_argument('--node')
+    branch_title = sub.add_parser('suggest-branch-title', help='suggest a local title from an archived export branch')
+    branch_title.add_argument('input'); branch_title.add_argument('--source', required=True)
+    branch_title.add_argument('--conversation', required=True); branch_title.add_argument('--node')
+    branch_title.add_argument('--message', help='use exactly this archived user message inside the verified selected branch')
+    replay_title = sub.add_parser('suggest-replay-title', help='suggest a checked local title from retained projected turns')
+    replay_title.add_argument('input'); replay_title.add_argument('--source', required=True)
+    replay_title.add_argument('--conversation', required=True)
+    replay_title.add_argument('--message', help='use exactly this archived user message inside the verified retained turns, not a projection ID')
+    attributed = sub.add_parser('suggest-attributed-title', help='suggest a title from explicit user-source labels in a verified local-codex export')
+    attributed.add_argument('input'); attributed.add_argument('--source', required=True)
+    attributed.add_argument('--conversation', required=True)
+    attributed.add_argument('--message', help='select one archived user message with explicit user-labeled text')
+    attributed.add_argument('--origin-locator', help='select the exact line:N occurrence of --message in this verified export')
+    for name in ('preview-title', 'apply-title'):
+        command = sub.add_parser(name, help='review a proposal' if name == 'preview-title' else 'apply a reviewed local display title')
+        command.add_argument('input', help='proposal JSON for preview, reviewed preview JSON for apply')
+        if name == 'preview-title':
+            add_output_argument(command)
+            command.add_argument('--with-evidence', action='store_true', help='include bounded raw user-message excerpts and provenance for private review')
+            command.add_argument('--conversation', help='select exactly one READY item from a title review queue')
+            command.add_argument('--title', help='explicit replacement title; reclassified as operator wording')
+    state = sub.add_parser('review-state', help='read or explicitly record a local open/skipped/deferred review decision')
+    state.add_argument('--source', required=True); state.add_argument('--conversation', required=True)
+    state.add_argument('--set', choices=['open', 'skipped', 'deferred'])
+    state.add_argument('--expected-state-revision', type=int); state.add_argument('--expected-title-revision', type=int)
+    state.add_argument('--expected-content-sha256')
+    state.add_argument('--from-queue', help='use the selected saved queue item lease; requires --set and excludes explicit expected flags')
+    batch = sub.add_parser('review-titles', help='build a read-only page of local title proposals and collision warnings')
+    batch.add_argument('--source', required=True); batch.add_argument('--limit', type=int, default=20); batch.add_argument('--offset', type=int, default=0)
+    batch.add_argument('--state', choices=['open', 'skipped', 'deferred'], help='filter by current snapshot-bound review state; scans eligible source content')
+    batch.add_argument('--unrenamed-only', action='store_true', help='exclude conversations with any existing local title history')
+    batch.add_argument('--proposal', action='append', help='explicit proposal JSON object file; repeat to review supplied candidates instead of generating raw excerpts')
+    batch.add_argument('--supplied-only', action='store_true', help='show only supplied candidate identities before pagination; requires --proposal')
+    for command in (batch, branch_title, replay_title, attributed):
+        add_output_argument(command)
+    transfer = sub.add_parser('title-adapter-dry-run', help='validate a mock-only transfer request without executing')
+    transfer.add_argument('input'); transfer.add_argument('plan'); transfer.add_argument('target')
+    simulation = sub.add_parser('title-adapter-simulate', help='simulate an explicitly approved title transfer in memory only')
+    simulation.add_argument('input'); simulation.add_argument('request'); simulation.add_argument('approval'); simulation.add_argument('target')
+    plan = sub.add_parser('export-title-plan', help='export metadata for a manual title change')
+    plan.add_argument('input'); plan.add_argument('--format', choices=['web', 'local', 'local-codex'], required=True)
+    plan.add_argument('--source', required=True); plan.add_argument('--conversation', required=True)
+    check_plan = sub.add_parser('check-title-plan', help='recheck a manual title plan without executing it')
+    check_plan.add_argument('input'); check_plan.add_argument('plan')
+    export = sub.add_parser('import', help='import an explicitly selected web/local export')
+    export.add_argument('input'); export.add_argument('--format', choices=['web', 'local', 'local-codex'], required=True); export.add_argument('--source', required=True)
+    export.add_argument('--conversation', help='import only this explicit conversation after validating the whole file')
+    export.add_argument('--expected-export-sha256', help='require the exact original whole-file hash from earlier inspection')
+    admission = sub.add_parser('check-import', help='diagnose identity conflicts against an existing archive without importing')
+    admission.add_argument('input'); admission.add_argument('--format', choices=['web', 'local', 'local-codex'], required=True)
+    admission.add_argument('--source', required=True); admission.add_argument('--conversation')
+    admission.add_argument('--expected-export-sha256'); admission.add_argument('--limit', type=int, default=20)
+    listing = sub.add_parser('list', help='list conversations and current display titles')
+    listing.add_argument('--source'); listing.add_argument('--limit', type=int, default=50); listing.add_argument('--offset', type=int, default=0)
+    find = sub.add_parser('find', help='search current titles and conversation text')
+    find.add_argument('query'); find.add_argument('--source'); find.add_argument('--limit', type=int, default=20)
+    find.add_argument('--export-sha256', help='restrict message bodies to one original export provenance hash')
+    find.add_argument('--include-title-history', action='store_true', help='also search prior local display titles; may reveal old private labels')
+    find.add_argument('--canonical-unicode', action='store_true', help='match canonical Unicode equivalents without rewriting evidence')
+    find.add_argument('--text-role', choices=['user', 'assistant', 'system', 'tool'], help='restrict message bodies to one role')
+    find.add_argument('--cursor', help='continue with the previous search next_cursor and the same query/filters')
+    for name in ('show', 'suggest-title', 'title', 'title-history'):
+        command = sub.add_parser(name)
+        command.add_argument('--source', required=True); command.add_argument('--conversation', required=True)
+        if name == 'suggest-title':
+            add_output_argument(command)
+            command.add_argument('--message', help='use exactly this archived user message for the excerpt; no alternate-message fallback')
+        if name == 'show':
+            command.add_argument('--limit', type=int, help='read at most this many messages (1..1000)')
+            command.add_argument('--offset', type=int, default=0, help='message offset; requires --limit')
+            command.add_argument('--message', help='read exactly this message ID; excludes --limit/--offset')
+            command.add_argument('--around-message', help='read bounded raw archive neighbors around this exact message ID')
+            command.add_argument('--before', type=int, help='earlier archive neighbors, 0..50; default 2 with --around-message')
+            command.add_argument('--after', type=int, help='later archive neighbors, 0..50; default 2 with --around-message')
+        if name == 'title':
+            command.add_argument('--set'); command.add_argument('--expected-revision', type=int)
+        if name == 'title-history':
+            command.add_argument('--limit', type=int, default=20)
+            command.add_argument('--offset', type=int, default=0)
+            command.add_argument('--expected-revision', type=int,
+                                 help='reject title history changed since an earlier page')
     args = p.parse_args()
+    if args.command not in ('inspect', 'list-export', 'web-branch', 'replay-local', 'prepare-web-export', 'inspect-web-zip') and not args.db:
+        p.error('--db is required except for inspect, list-export, web-branch, replay-local, prepare-web-export and inspect-web-zip')
     try:
-        if args.command == 'ingest':
+        if args.command == 'list-export':
+            from export_inventory import list_export
+            result = list_export(args.input, args.format, args.limit, args.offset, args.expected_export_sha256,
+                                 contains=args.contains, canonical_unicode=args.canonical_unicode,
+                                 text_contains=args.text_contains, text_role=args.text_role)
+        elif args.command == 'inspect-web-zip':
+            from inspect_web_zip import inspect_web_zip
+            result = inspect_web_zip(args.input, args.limit, args.offset, args.expected_archive_sha256)
+        elif args.command == 'check-import':
+            from import_check import check_import
+            result = check_import(args.db, args.source, args.input, args.format, args.conversation,
+                                  args.expected_export_sha256, args.limit)
+        elif args.command == 'prepare-web-export':
+            from prepare_web_export import prepare_web_export
+            result = prepare_web_export(args.input, args.member, args.output, args.expected_archive_sha256)
+        elif args.command == 'replay-local':
+            from replay_local import reconstruct
+            result = reconstruct(args.input)
+            print(json.dumps(result, ensure_ascii=True, indent=2))
+            if not result['supported']:
+                raise SystemExit(1)
+            return
+        elif args.command == 'review-state':
+            from title_review_state import review_state, review_state_from_queue
+            if args.from_queue is not None:
+                if args.set is None or any(value is not None for value in (args.expected_state_revision, args.expected_title_revision, args.expected_content_sha256)):
+                    raise ValueError('--from-queue requires --set and cannot be combined with explicit expected values')
+                from title_proposal import read_document
+                queue = read_document(args.from_queue)
+                result = review_state_from_queue(args.db, args.source, args.conversation, args.set, queue)
+            else:
+                result = review_state(args.db, args.source, args.conversation, args.set, args.expected_state_revision, args.expected_title_revision, args.expected_content_sha256)
+        elif args.command == 'review-titles':
+            from title_batch import review_queue, load_supplied_proposals
+            supplied = load_supplied_proposals(args.proposal) if args.proposal is not None else None
+            result = review_queue(args.db, args.source, args.limit, args.offset, args.unrenamed_only, args.state, supplied, args.supplied_only)
+        elif args.command in ('title-adapter-dry-run', 'title-adapter-simulate'):
+            from title_transfer import dry_run, simulate, MockTitleAdapter
+            from strict_json import loads
+            def document(path):
+                return loads(Path(path).read_text(encoding='utf-8'))
+            target = document(args.target)
+            if args.command == 'title-adapter-dry-run':
+                result = dry_run(args.db, args.input, document(args.plan), target)
+            else:
+                result = simulate(args.db, args.input, document(args.request), document(args.approval), MockTitleAdapter(target))
+        elif args.command in ('preview-title', 'apply-title'):
+            from title_proposal import preview, apply_preview, read_document
+            value = read_document(args.input)
+            if args.command == 'preview-title' and args.conversation is not None:
+                from title_batch import select_proposal
+                value = select_proposal(value, args.conversation)
+            result = preview(args.db, value, args.title, args.with_evidence) if args.command == 'preview-title' else apply_preview(args.db, value)
+        elif args.command == 'suggest-replay-title':
+            from replay_title import suggest_replay
+            result = suggest_replay(args.db, args.source, args.conversation, args.input, args.message)
+        elif args.command == 'suggest-attributed-title':
+            from attributed_title import suggest_attributed
+            result = suggest_attributed(args.db, args.source, args.conversation, args.input, args.message, args.origin_locator)
+        elif args.command == 'export-title-plan':
+            from title_plan import make_plan
+            result = make_plan(args.db, args.source, args.conversation, args.input, args.format)
+        elif args.command == 'check-title-plan':
+            from title_plan import check_plan
+            from strict_json import loads
+            result = check_plan(args.db, args.input, loads(Path(args.plan).read_text(encoding='utf-8')))
+        elif args.command == 'suggest-branch-title':
+            from branch_title import suggest_branch
+            result = suggest_branch(args.db, args.source, args.conversation, args.input, args.node, args.message)
+        elif args.command == 'web-branch':
+            from web_branch import branch_view
+            result = branch_view(args.input, args.conversation, args.node)
+        elif args.command == 'ingest':
             result = ingest(args.db, args.source, args.input)
         elif args.command == 'search':
             result = search(args.db, args.query, args.limit)
-        else:
+        elif args.command == 'stats':
             c = readonly(args.db)
             try:
                 result = {'messages': c.execute('SELECT count(*) FROM messages').fetchone()[0],
                           'artifacts': c.execute('SELECT count(*) FROM artifacts').fetchone()[0]}
             finally:
                 c.close()
-    except (OSError, ValueError, sqlite3.Error) as exc:
+        elif args.command in ('inspect', 'import', 'title'):
+            # Lazy adapter imports keep the core library free of import cycles.
+            from session_workflow import inspect_export, import_export, titles
+            if args.command == 'inspect':
+                result = inspect_export(args.input, args.format, args.conversation, args.expected_export_sha256)
+            elif args.command == 'import':
+                result = import_export(args.db, args.source, args.input, args.format, args.conversation, args.expected_export_sha256)
+            else:
+                if args.set is not None and args.expected_revision is None:
+                    raise ValueError('--set requires --expected-revision from a title preview')
+                result = titles(args.db, args.source, args.conversation, args.set, args.expected_revision)
+        elif args.command == 'title-history':
+            from title_history import history
+            result = history(args.db, args.source, args.conversation,
+                             args.limit, args.offset, args.expected_revision)
+        elif args.command == 'list':
+            from conversation_view import conversations
+            result = conversations(args.db, args.source, args.limit, args.offset)
+        elif args.command == 'show':
+            from conversation_view import conversation
+            result = conversation(args.db, args.source, args.conversation, args.limit, args.offset, args.message,
+                                  args.around_message, args.before, args.after)
+        elif args.command == 'find':
+            from conversation_search import find
+            result = find(args.db, args.query, args.source, args.limit, args.include_title_history, args.export_sha256, args.cursor, args.canonical_unicode, args.text_role)
+        else:
+            from title_suggestion import suggest
+            result = suggest(args.db, args.source, args.conversation, args.message)
+        kind = 'queue' if args.command == 'review-titles' else 'preview' if args.command == 'preview-title' else 'proposal'
+        result = save_if_requested(result, args, kind)
+    except (OSError, ValueError, KeyError, TypeError, sqlite3.Error) as exc:
         p.exit(1, str(exc) + '\n')
-    print(json.dumps(result, ensure_ascii=False, indent=2))
+    # JSON escapes preserve Unicode data even when the terminal is ASCII-only.
+    # In particular, a committed title change must not look failed at print time.
+    print(json.dumps(result, ensure_ascii=True, indent=2))
+    if args.command == 'check-import' and result['conflicts_found']:
+        raise SystemExit(1)
 
 
 if __name__ == '__main__':

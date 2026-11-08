@@ -24,19 +24,40 @@ This release rejects that conflict; it does not silently choose a newer record.
 
 ## Import transaction
 
-Read the explicitly selected file, validate records, hash original bytes, insert its
-artifact record and message rows in one transaction. The FTS insert trigger runs in
-that transaction. Reimporting a file inserts no duplicate messages. An artifact
-record may still capture a new source-file version whose messages were all seen.
-Messages retain their first accepted provenance locator; the small CLI does not
-maintain every later duplicate occurrence. The separate parser utilities support
-richer occurrence bookkeeping for a future integration.
+The normalized-file CLI reads its explicitly selected input once; the byte API
+accepts an immutable snapshot. Both validate all normalized records and incoming
+identity conflicts before opening SQLite, then use the same archive write path.
+Artifact, message, original-export provenance and FTS changes share the data
+transaction. Schema initialization remains a separate earlier step: this is not a
+promise that every possible failure leaves no new database file or schema.
+
+Web/local export adapters hash the exact original source bytes, normalize their
+selected messages in memory and pass the generated JSONL bytes to that same writer.
+They do not create temporary source or normalized JSONL files. The normalized
+artifact hash retains the prior platform-native text newline behavior; it is not
+the original export's hash or a cross-platform canonical identity. Original export
+hashes and physical mapping/line locators are retained separately in the coverage
+receipt and companion provenance ledgers. SQLite still writes the selected archive
+and may use its own journal or internal temporary storage.
+
+Reimporting unchanged identities inserts no duplicate messages. A new artifact may
+record a later input whose messages were already accepted. Messages keep their first
+accepted normalized artifact hash and line. Export imports additionally retain
+original hash/locator/parent occurrences in the additive export_occurrences ledger,
+with the legacy export_provenance ledger supported for compatibility. Query views
+combine these ledgers without inventing missing historical evidence. No message or
+original title is overwritten to reconcile a conflicting export.
 
 ## Read-only query boundary
 
 Search and statistics open SQLite using `mode=ro` and `PRAGMA query_only=ON`.
 FTS queries use bound SQL parameters and quoted terms. A local database is still
 private user material: read-only access does not anonymize results.
+
+Local display-title changes are the one deliberate write path. `title --set`,
+reviewed proposal application and explicit restores append to the title history
+under revision checks. They never rewrite archived message bytes, source hashes or
+the original export title, and they never rename a conversation online.
 
 ## Incremental and full organization
 
@@ -53,3 +74,29 @@ For a future remote backup integration: use a clean destination; fetch all decla
 objects; verify expected hashes, sizes and counts; rebuild the index; run read-only
 queries; retain a recovery receipt. Store decryption keys outside backups. Never
 mark remote recovery verified from a local Git ref or a push message alone.
+
+## Lower-level title API input boundary
+
+`session_workflow.titles` validates its identities and optional revision before
+opening or resolving the database. The source must be non-whitespace Unicode text;
+the conversation must be a nonempty Unicode string. Neither is trimmed, normalized
+or case-folded. Text IDs such as `"1"`, `"01"` and `"1.0"` stay distinct. A numeric or
+boolean Python argument is rejected instead of relying on SQLite affinity to match
+a text key. Surrogate code points are rejected rather than sent to SQLite.
+
+A supplied `expected_revision` must have exact Python type `int` and be nonnegative.
+`False`, `True`, `0.0` and `1.0` are not revision tokens even when Python equality
+would match a real revision. This deliberately rejects formerly accepted malformed
+direct calls. On a write, the integer still has to match the selected conversation's
+latest `title_history.id`, allocated from the global history table, under the existing
+immediate transaction. It is not the table's global maximum or a per-conversation
+counter. No revision is guessed or changed after a stale error.
+
+For compatibility, `expected_revision=None` still means no revision guard in this
+lower-level API. An informational read still ignores a valid supplied revision; it
+is not a compare-and-swap read. The CLI continues to require an explicit revision
+for `title --set`, and the proposal workflow requires a checked preview with its
+content fingerprint and integer revision. Prefer that workflow for integrations
+and explicit human review. Type checks are not authentication, proof of approval,
+semantic validation or a remote title permission. No old ledger events are scanned,
+repaired or removed by this change.

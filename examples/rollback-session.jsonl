@@ -1,0 +1,12 @@
+{"type": "session_meta", "payload": {"id": "synthetic-rollout"}}
+{"type": "event_msg", "payload": {"type": "task_started", "turn_id": "discarded"}}
+{"type": "event_msg", "payload": {"type": "user_message", "message": "Synthetic question discarded"}}
+{"type": "response_item", "payload": {"type": "message", "role": "user", "content": [{"type": "input_text", "text": "Synthetic question discarded"}]}}
+{"type": "response_item", "payload": {"type": "message", "role": "assistant", "content": [{"type": "output_text", "text": "Synthetic answer discarded"}]}}
+{"type": "event_msg", "payload": {"type": "task_complete", "turn_id": "discarded"}}
+{"type": "event_msg", "payload": {"type": "thread_rolled_back", "num_turns": 1}}
+{"type": "event_msg", "payload": {"type": "task_started", "turn_id": "retained"}}
+{"type": "event_msg", "payload": {"type": "user_message", "message": "Synthetic question retained"}}
+{"type": "response_item", "payload": {"type": "message", "role": "user", "content": [{"type": "input_text", "text": "Synthetic question retained"}]}}
+{"type": "response_item", "payload": {"type": "message", "role": "assistant", "content": [{"type": "output_text", "text": "Synthetic answer retained"}]}}
+{"type": "event_msg", "payload": {"type": "task_complete", "turn_id": "retained"}}
