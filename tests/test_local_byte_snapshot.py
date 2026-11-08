@@ -88,7 +88,7 @@ class LocalByteSnapshotTests(unittest.TestCase):
 
     def test_metadata_only_utility_labels_keep_existing_policies(self):
         cases = [('session_index.jsonl', jsonl([dict(id='synthetic', thread_name='Synthetic', updated_at='synthetic')]), 'session_index_metadata'),
-                 ('agents/claude/raw/synthetic.jsonl', jsonl([dict(type='response_item', payload=False)]), 'agent_raw_evidence')]
+                 ('agents/tool-a/raw/synthetic.jsonl', jsonl([dict(type='response_item', payload=False)]), 'agent_raw_evidence')]
         for label, raw, reason in cases:
             with self.subTest(label=label):
                 self.path.write_bytes(raw)

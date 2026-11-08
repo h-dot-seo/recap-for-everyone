@@ -214,7 +214,7 @@ def parse_jsonl_bytes(raw: bytes, source_relative_path: str,
 
 
 def _parse_jsonl_records(records, path, source_relative_path, content_profile):
-    if re.fullmatch(r"agents/(claude|antigravity|opencode)/raw/.+", source_relative_path):
+    if re.fullmatch(r"agents/[A-Za-z0-9_.-]+/raw/.+", source_relative_path):
         return ParsedArtifact("parsed", "accepted_metadata_only", "agent_raw_evidence", len(records), (), ())
     if source_relative_path == "session_index.jsonl":
         for line_number, value in records:
@@ -370,7 +370,7 @@ def ensure_local_schema(connection: sqlite3.Connection) -> None:
     connection.execute("CREATE INDEX IF NOT EXISTS idx_local_occurrences_session ON local_occurrences(source_id, snapshot_run_id, session_id, occurrence_kind)")
     connection.execute("CREATE INDEX IF NOT EXISTS idx_local_occurrences_message ON local_occurrences(source_id, snapshot_run_id, message_key, occurrence_status)")
     # Foreign-key children need their own index: without it every deleted local message scanned all
-    # occurrences (a nightly re-ingest spent ~6 minutes there).
+    # occurrences (a full re-ingest of a large archive spent minutes there).
     connection.execute("CREATE INDEX IF NOT EXISTS idx_local_occurrences_canonical ON local_occurrences(canonical_local_message_pk)")
     connection.execute("CREATE INDEX IF NOT EXISTS idx_local_occurrences_file ON local_occurrences(source_id, source_relative_path)")
     connection.execute("CREATE INDEX IF NOT EXISTS idx_local_sessions_file ON local_sessions(source_id, source_relative_path)")

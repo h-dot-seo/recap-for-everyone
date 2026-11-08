@@ -7,7 +7,7 @@ what the record does not claim) is [VALIDATION.md](../VALIDATION.md); new entrie
 appended here. Test counts, runtimes and file counts in older entries describe the
 tree at that time, not the current one.
 
-Release preparation date: 2026-11-02 (Asia/Seoul).
+Release preparation date: 2026-11-02.
 
 - Python standard-library unittest: 5 synthetic tests passed.
 - Limited public-file/type/secret-pattern scan: passed.
@@ -44,7 +44,7 @@ source isolation, pagination, byte-for-byte no-write checks, local/web provenanc
 multiple export hashes, and compatibility without optional tables. No real corpus,
 online collection, semantic title quality or active-branch reconstruction tested.
 
-Integrated fifth/sixth increment: 22 synthetic tests passed in the cloud workspace.
+Integrated fifth/sixth increment: 22 synthetic tests passed in a separate workspace.
 Both conversation title search and structured read-only list/detail views preserved.
 Publication scanning and manifest verification passed for the exact selected files.
 
@@ -838,7 +838,7 @@ Tests cover ASCII JSON, status/usage exit codes, temporary working directories a
 an audit hook that rejects disk/network/process/extension operations during the
 probe after standard-library imports are preloaded. This is not a claim that Python
 startup/module loading performs no filesystem reads. The real memory probe also
-passed with the available Python 3.13 launcher; the complete suite ran with the
+passed with a second available interpreter; the complete suite ran with the
 primary interpreter, not every possible runtime.
 
 The explicit clone branch/repository are checked as documentation, without a network
@@ -1293,8 +1293,8 @@ creation remain failures. No production behavior or diagnostic is changed.
 A deterministic twelfth module test executes the two original failure workflows
 under an idempotent CRLF stderr adapter. It runs five actual CLI failures, retains
 stdout and return codes, and checks nested temporary-resource cleanup explicitly.
-Before the two assertion changes, this test reproduced both Windows failures on
-Linux. The corrected module passes 12 tests; the final complete suite passes 817
+Before the two assertion changes, this test reproduced both failures on a second
+platform. The corrected module passes 12 tests; the final complete suite passes 817
 tests in 103.746 seconds. Public audit and manifest still cover 161 files. A new
 exact-commit four-platform CI run is required after this correction is pushed;
 the earlier failed run remains recorded as failed.
@@ -1770,7 +1770,7 @@ deep-JSON-nesting tests (`test_import_failure_boundaries`,
 `test_title_file_encoding`, `test_title_preview_freeze`) that fail identically on the
 unchanged `main` tree under that interpreter, whose json module no longer raises the
 recursion errors those tests expect; the supported runtimes remain the CI
-interpreters. The new module also passed under Python 3.13 with SQLite 3.50.4, where
+interpreters. The new module also passed under a second interpreter with SQLite 3.50.4, where
 a lost FTS5 index is reported as `malformed inverted index for FTS5 table` rather
 than the `fts5: corruption found` row of SQLite 3.53; the test accepts either
 wording. `python -m compileall`, the publication audit and manifest verification
@@ -1899,3 +1899,29 @@ reading aid, not an import-compatibility promise for code outside this repositor
 supported runtimes remain the CI interpreters, and exact-commit Ubuntu/Windows Python
 3.10/3.12 CI is checked after publication; no real archive, export or backup system was
 used.
+
+## 2026-11-09 Environment hints removed (0.89.1-environment-hints-removed)
+
+A public review of this repository for information about the maintainer's own
+environment found no host name, user name, path, address or account anywhere in the
+tree or its history, and five low-severity hints. This release removes them without
+changing any documented behavior:
+
+- `recaplib/local_parser.py` classified raw agent session files by a fixed list of
+  tool directory names under `agents/<tool>/raw/`. It now accepts any tool directory
+  name made of letters, digits, `_`, `.` or `-` at that position; the classification
+  of such files as retained raw evidence is unchanged.
+- The comment on the `local_occurrences` canonical-message index no longer states how
+  often or how long a private re-ingest ran.
+- Three fixtures (`tests/test_local_record_discriminator.py`,
+  `tests/test_local_byte_snapshot.py`, `tests/test_typed_content_shapes.py`) use the
+  neutral tool names `tool-a`, `tool-b` and `tool-c`.
+- Five sentences of this history no longer name a time zone, an operating-system
+  pairing, a local interpreter version or a workspace; the facts they recorded (which
+  checks ran and passed) are otherwise unchanged. The snapshot file drops its time zone.
+
+Verification: the full suite ran on Ubuntu with Python 3.12 before publication
+(1012 tests, unchanged count); `verify_manifest.py` and `audit_publication.py` pass
+after the manifest was regenerated. Not claimed: the review was a reading of this
+repository's text, not a guarantee that no inference about the maintainer is possible;
+commit metadata and the public GitHub account remain as they are.

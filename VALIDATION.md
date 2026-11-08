@@ -1,12 +1,21 @@
 # Validation record
 
-Current release: `0.89.0-package-layout`, dated 2026-11-08 (Asia/Seoul).
+Current release: `0.89.1-environment-hints-removed`, dated 2026-11-09.
 This file is the current snapshot. Every dated entry since the first release is kept
 unchanged and in order in [docs/VALIDATION_HISTORY.md](docs/VALIDATION_HISTORY.md).
 
 ## Latest change
 
-2026-11-08 Package layout (0.89.0-package-layout): the 32 implementation modules moved
+2026-11-09 Environment hints removed (0.89.1-environment-hints-removed): the local
+session parser now accepts any tool directory under `agents/<tool>/raw/` instead of
+a fixed list of tool names, an index comment no longer describes how often or how
+long a private re-ingest ran, three fixtures use neutral tool names, and five
+sentences of the validation history no longer name a time zone, an operating
+system pairing, a local interpreter version or a workspace. No behavior for the
+documented formats changed; 1012 tests before and after. Full entry:
+[validation history](docs/VALIDATION_HISTORY.md#2026-11-09-environment-hints-removed-0891-environment-hints-removed).
+
+Previous change: 2026-11-08 Package layout (0.89.0-package-layout): the 32 implementation modules moved
 into the `recaplib/` package and the 92 test modules into the `tests/` package; the
 archive core of `recap.py` became `recaplib/archive.py` and stays importable from
 `recap`; sixteen thin compatibility entry points keep every documented

@@ -199,9 +199,9 @@ class LocalRecordDiscriminatorTests(unittest.TestCase):
                 updated_at='synthetic-time', type=tag, payload=None)) + '\n').encode()
             for profile in ('legacy', 'codex'):
                 for name, reason in (('session_index.jsonl', 'session_index_metadata'),
-                    ('agents/claude/raw/synthetic.jsonl', 'agent_raw_evidence'),
-                    ('agents/antigravity/raw/synthetic.jsonl', 'agent_raw_evidence'),
-                    ('agents/opencode/raw/synthetic.jsonl', 'agent_raw_evidence')):
+                    ('agents/tool-a/raw/synthetic.jsonl', 'agent_raw_evidence'),
+                    ('agents/tool-b/raw/synthetic.jsonl', 'agent_raw_evidence'),
+                    ('agents/tool-c/raw/synthetic.jsonl', 'agent_raw_evidence')):
                     with self.subTest(tag=tag, profile=profile, name=name):
                         parsed = parse_jsonl_bytes(raw, name, profile)
                         self.assertEqual(parsed.admission_status, 'accepted_metadata_only')
