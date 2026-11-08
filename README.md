@@ -101,7 +101,11 @@ conversation in its original application.
 Every script and subcommand with its exact usage line is in the
 [command reference](docs/COMMANDS.md). The standalone scripts (`session_workflow.py`,
 `conversation_search.py`, `title_proposal.py` and the others listed there) remain
-supported with equivalent behavior.
+supported with equivalent behavior. Layout: the repository root holds the entry points
+only (`recap.py`, the standalone scripts, `runtime_check.py`, `verify_manifest.py`,
+`audit_publication.py`); the implementation modules live in the `recaplib/` package and
+the test suite in the `tests/` package, both reached from the root, where
+`python -m unittest discover -v` still runs the whole suite.
 
 ## Documentation
 

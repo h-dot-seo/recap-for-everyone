@@ -111,7 +111,7 @@ and encoding compatibility in [source text compatibility](SOURCE_TEXT_COMPATIBIL
 The README quick start ingests already-normalized JSONL with `recap.py ingest`.
 The remaining module from the original extraction is described here:
 
-`local_parser.py` retains the generic normalized agent-session parser and manifest
+`recaplib/local_parser.py` retains the generic normalized agent-session parser and manifest
 utilities. It is a library module, not an automatic collector. Its original local
 snapshot schema is separate from the simplified `recap.py` schema; an adapter is
 required to connect them. These are not interchangeable database formats.
@@ -843,7 +843,7 @@ the projection is not a replacement export or an authenticated record.
 
 ### Representative projection coverage and scoped turn context
 
-A deterministic matrix in `test_replay_coverage.py` exercises 13 chosen schema
+A deterministic matrix in `tests/test_replay_coverage.py` exercises 13 chosen schema
 scenarios. Contract v1 supported 2 and rejected 11; contract v2
 supported 3 and rejected 10. **This is a hand-selected synthetic matrix, not a sample of
 user sessions or a measured real-world success rate.** Cases are individual variants,
