@@ -2130,3 +2130,32 @@ No real conversations, database refresh, network, model, remote rename, approval
 authentication, semantic evidence validation or privacy clearance was tested or
 claimed. Browser edits are not review artifacts. Native Windows execution and
 remote publication are left to exact-commit CI and the publishing coordinator.
+
+## 2026-11-10 Normalized text export (0.94.0-normalized-export)
+
+Added `export-normalized --source SOURCE [--conversation ID] --output NEW_JSONL`.
+One explicit read-only snapshot streams original message fields in global
+insertion order to UTF-8 LF JSONL. The existing recovery publisher now delegates
+to a streaming sibling with the same exclusive staging/link/cleanup contract.
+A text-free receipt identifies the private derived file, reports omitted distinct
+modern/legacy provenance rows and explicitly excludes local state and recovery.
+
+Verification on the final production/test tree:
+- `python -m unittest discover -q`: Ran 1078 tests in 78.603s; OK (skipped=1).
+- Normalized-export and recovery focused suites: 29 tests passed (12 new export
+  tests). Golden bytes, interleaved-conversation round trips, Hangul/emoji/control
+  preservation, original per-message titles, modern/legacy occurrence omission,
+  missing/invalid selection, existing/dangling paths, staged-write failure,
+  publication race, damaged rows, cleanup reporting, concurrent-write snapshot
+  consistency and tracemalloc-bounded source streaming are covered.
+- The new guide's exact sh block passed under ASCII stdout and in an independent
+  manual execution. Both archives had four messages; differing artifact counts
+  correctly reflect the new derived input. Existing guide sh blocks are unchanged.
+- Python 3.10 grammar parsing (160 Python files), compileall, whitespace/LF checks,
+  manifest verification and the limited publication audit passed.
+
+No original-export ledger import/export extension, original bytes, local display
+history, review state, active-branch reconstruction, completeness, authentication,
+privacy clearance or source-archive recovery is claimed. Data and licensing remain
+unchanged. Native Windows execution and remote publication remain for exact-commit
+CI and the publishing coordinator.

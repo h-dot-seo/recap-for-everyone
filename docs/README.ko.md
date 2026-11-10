@@ -90,6 +90,7 @@ python recap.py --db ../demo.sqlite title --source demo --conversation synthetic
 | 내려받은 ZIP에서 대화 파일 고르기 | `recap.py inspect-web-zip ZIP`, `recap.py prepare-web-export ZIP --member NAME --output NEW_FILE` | [WEB_ZIP_INVENTORY.md](WEB_ZIP_INVENTORY.md), [PREPARE_WEB_EXPORT.md](PREPARE_WEB_EXPORT.md) |
 | 가져오기 전에 ID와 범위 확인 | `recap.py list-export INPUT --format FORMAT`, `recap.py inspect INPUT --format FORMAT` | [EXPORT_INVENTORY.md](EXPORT_INVENTORY.md), [INPUT_SCOPE.md](INPUT_SCOPE.md) |
 | 내보내기 또는 정규화 JSONL 가져오기 | `recap.py --db DB import INPUT --format FORMAT --source SOURCE`, `ingest`, `check-import` | [IMPORT_CONFLICTS.md](IMPORT_CONFLICTS.md) |
+| 정규화 메시지 내보내기 | `recap.py --db DB export-normalized --source SOURCE --output NEW_JSONL` | [EXPORT_NORMALIZED.md](EXPORT_NORMALIZED.md) |
 | 현재 보관소 구조 확인 | `recap.py --db DB describe-schema` | [SCHEMA.md](SCHEMA.md) |
 | 검색과 읽기 | `recap.py --db DB find QUERY`, `list`, `show --source SOURCE --conversation ID`, `search`, `stats` | [SEARCH_EXCERPTS.md](SEARCH_EXCERPTS.md), [MESSAGE_SELECTION.md](MESSAGE_SELECTION.md) |
 | 로컬 제목 제안 | `recap.py --db DB suggest-title`, `suggest-branch-title`, `suggest-replay-title`, `suggest-attributed-title` | [TITLE_WALKTHROUGH.md](TITLE_WALKTHROUGH.md) |
@@ -209,3 +210,12 @@ python recap.py --db ../demo.sqlite title --source demo --conversation synthetic
 적용이나 최신성 확인을 대신하지 않습니다. 원본 JSON으로 새 preview-title을 검토한
 뒤 별도로 적용하세요. 개인정보가 들어갈 수 있으므로 공개·공유 폴더 밖에 보관하세요.
 [실행 검증한 합성 예제와 경계](RENDER_QUEUE.md)를 참고하세요.
+
+## 정규화 JSONL 내보내기
+
+`recap.py --db DB export-normalized --source SOURCE --output NEW_JSONL`은
+한 소스 전체를 단일 읽기 전용 스냅숏에서 전역 삽입 순서로 내보냅니다.
+`--conversation ID`로 대화 하나를 지정할 수 있습니다. 원제목과 메시지 본문을
+포함하는 개인 파일이며 기존 경로를 덮어쓰지 않습니다. 출처 대장, 부모 트리,
+로컬 제목 이력과 검토 상태는 제외됩니다. 원본 내보내기나 백업을 대체하지
+않습니다. [실행 가능한 안내](EXPORT_NORMALIZED.md)를 참고하세요.

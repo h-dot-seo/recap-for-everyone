@@ -106,6 +106,11 @@ def _reject_existing(output):
 
 
 def _publish_new_file(output, raw, prefix):
+    return _publish_new_chunks(output, (raw,), prefix)
+
+
+def _publish_new_chunks(output, chunks, prefix):
+    """Publish a byte iterator with bounded buffering and no replacement fallback."""
     destination = Path(output)
     parent = destination.parent.resolve(strict=True)
     destination = parent / destination.name
@@ -118,8 +123,9 @@ def _publish_new_file(output, raw, prefix):
         # symlinks already at the destination. Never fall back to replacement.
         with tempfile.NamedTemporaryFile(prefix=prefix, dir=parent, delete=False) as stream:
             temporary = Path(stream.name)
-            if stream.write(raw) != len(raw):
-                raise OSError('incomplete recovery document write')
+            for raw in chunks:
+                if stream.write(raw) != len(raw):
+                    raise OSError('incomplete recovery document write')
             stream.flush()
             os.fsync(stream.fileno())
         os.link(temporary, destination)

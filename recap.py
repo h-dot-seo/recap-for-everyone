@@ -96,6 +96,10 @@ def main():
     admission.add_argument('input'); admission.add_argument('--format', choices=['web', 'local', 'local-codex'], required=True)
     admission.add_argument('--source', required=True); admission.add_argument('--conversation')
     admission.add_argument('--expected-export-sha256'); admission.add_argument('--limit', type=int, default=20)
+    normalized = sub.add_parser('export-normalized', help='export private message text as derived normalized JSONL')
+    normalized.add_argument('--source', required=True)
+    normalized.add_argument('--conversation')
+    normalized.add_argument('--output', required=True)
     declare = sub.add_parser('declare-recovery', help='write a recovery manifest describing the live archive without changing it')
     declare.add_argument('--output', required=True, help='new manifest JSON path outside the archive; existing paths are refused')
     declare.add_argument('--declared-at', help='YYYY-MM-DD recorded as supplied text; no clock is read')
@@ -265,6 +269,9 @@ def main():
         elif args.command == 'find':
             from recaplib.conversation_search import find
             result = find(args.db, args.query, args.source, args.limit, args.include_title_history, args.export_sha256, args.cursor, args.canonical_unicode, args.text_role)
+        elif args.command == 'export-normalized':
+            from recaplib.normalized_export import export_normalized
+            result = export_normalized(args.db, args.source, args.output, args.conversation)
         elif args.command == 'declare-recovery':
             from recaplib.recovery import declare_recovery
             result = declare_recovery(args.db, args.output, args.declared_at)
