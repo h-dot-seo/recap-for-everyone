@@ -90,6 +90,7 @@ python recap.py --db ../demo.sqlite title --source demo --conversation synthetic
 | 내려받은 ZIP에서 대화 파일 고르기 | `recap.py inspect-web-zip ZIP`, `recap.py prepare-web-export ZIP --member NAME --output NEW_FILE` | [WEB_ZIP_INVENTORY.md](WEB_ZIP_INVENTORY.md), [PREPARE_WEB_EXPORT.md](PREPARE_WEB_EXPORT.md) |
 | 가져오기 전에 ID와 범위 확인 | `recap.py list-export INPUT --format FORMAT`, `recap.py inspect INPUT --format FORMAT` | [EXPORT_INVENTORY.md](EXPORT_INVENTORY.md), [INPUT_SCOPE.md](INPUT_SCOPE.md) |
 | 내보내기 또는 정규화 JSONL 가져오기 | `recap.py --db DB import INPUT --format FORMAT --source SOURCE`, `ingest`, `check-import` | [IMPORT_CONFLICTS.md](IMPORT_CONFLICTS.md) |
+| 현재 보관소 구조 확인 | `recap.py --db DB describe-schema` | [SCHEMA.md](SCHEMA.md) |
 | 검색과 읽기 | `recap.py --db DB find QUERY`, `list`, `show --source SOURCE --conversation ID`, `search`, `stats` | [SEARCH_EXCERPTS.md](SEARCH_EXCERPTS.md), [MESSAGE_SELECTION.md](MESSAGE_SELECTION.md) |
 | 로컬 제목 제안 | `recap.py --db DB suggest-title`, `suggest-branch-title`, `suggest-replay-title`, `suggest-attributed-title` | [TITLE_WALKTHROUGH.md](TITLE_WALKTHROUGH.md) |
 | 제안 페이지 검토와 결정 기록 | `recap.py --db DB review-titles --source SOURCE`, `review-state` | [TITLE_REVIEW_QUEUE.md](TITLE_REVIEW_QUEUE.md), [TITLE_REVIEW_STATE.md](TITLE_REVIEW_STATE.md) |
@@ -139,6 +140,8 @@ python recap.py --db ../demo.sqlite title --source demo --conversation synthetic
   [RIGHTS.md](../RIGHTS.md)를 보십시오.
 
 ## 문서 색인
+
+- [현재 보관소 구조와 SQL](SCHEMA.md): 테이블·열·지연 원장과 읽기 전용 metadata 검사.
 
 - [START_HERE.md](START_HERE.md): ZIP 또는 로컬 파일에서 검색 가능한 로컬 제목까지, 테스트되는 첫 실행.
 - [INSTALL.md](INSTALL.md): 코드 받기, Python 실행기 선택, SQLite FTS5 점검.
@@ -190,3 +193,9 @@ python recap.py --db ../demo.sqlite title --source demo --conversation synthetic
 모든 Markdown 뷰어의 안전성이나 동일한 표시를 보장하지 않으며, 대화나 응답의
 완료 여부를 추정하지 않습니다. 정확한 공급 근거는 기존 `show` JSON으로 확인하세요.
 실행 가능한 예제와 경계는 [Markdown 안내](RENDER_MARKDOWN.md)에 있습니다.
+
+## 읽기 전용 구조 검사
+
+직접 SQL을 읽기 전 [현재 SQLite 구조](SCHEMA.md)를 확인하세요. 읽기 전용
+`describe-schema`는 지연 테이블을 생성하지 않으며, 개수와 스키마 이름은
+비공개 정보일 수 있습니다. 무결성 검사나 구조 안정성 보장은 아닙니다.

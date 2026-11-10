@@ -380,7 +380,10 @@ rows are copied into it in the same write transaction as the import. No legacy t
 trigger, index or message is replaced. A failed import rolls back the new ledger and
 its rows. Reimporting retained original exports can recover repeated locations that
 older versions collapsed; missing locations cannot be reconstructed without those
-exports. Direct SQL consumers needing complete occurrences should use the new ledger
+exports. See [the current SQLite schema](SCHEMA.md) and `describe-schema` for lazy-table
+presence and read-only SQL examples. This is not a schema stability promise.
+
+Direct SQL consumers needing complete occurrences should use the new ledger
 plus legacy-only rows, or the structured view, rather than only the old table.
 
 ## Search and read the archive

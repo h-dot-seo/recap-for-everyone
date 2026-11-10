@@ -163,3 +163,9 @@ than any backtick run; this is not a guarantee about every Markdown viewer or a
 byte-exact transcript. Use show JSON for exact supplied evidence. No completion
 or active-branch claim is inferred from a rendered session. See
 `docs/RENDER_MARKDOWN.md`.
+
+For direct SQLite consumers or an archive-layout question, run
+`python recap.py --db DB describe-schema` and consult [SCHEMA.md](docs/SCHEMA.md).
+This reports one read-only metadata snapshot and lazy-ledger presence without
+creating tables. Counts and schema names may be private; it does not establish
+integrity, completeness, authentication or a stable layout contract.

@@ -1,10 +1,18 @@
 # Validation record
 
-Current release: `0.91.1-markdown-newline-tests`, dated 2026-11-10.
+Current release: `0.92.0-archive-schema`, dated 2026-11-10.
 This file is the current snapshot. Every dated entry since the first release is kept
 unchanged and in order in [docs/VALIDATION_HISTORY.md](docs/VALIDATION_HISTORY.md).
 
 ## Latest change
+
+2026-11-10 Archive schema inspection (0.92.0-archive-schema):
+`describe-schema` inventories a single read-only metadata snapshot without lazy
+schema creation. The current-layout reference includes tested SQL and a column
+drift check. See [SCHEMA.md](docs/SCHEMA.md) and the dated validation history.
+No layout stability, integrity, authenticity or completeness claim is made.
+
+Previous change:
 
 2026-11-10 Native stdout compatibility tests (0.91.1-markdown-newline-tests):
 the new show-compatibility assertion now respects native text-stream line endings

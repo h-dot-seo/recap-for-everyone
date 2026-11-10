@@ -23,7 +23,7 @@ through the repository root, which is why the commands run from there.
 ## recap.py
 
 ```text
-usage: recap.py [-h] [--db DB] {ingest,search,stats,inspect,list-export,inspect-web-zip,prepare-web-export,replay-local,web-branch,suggest-branch-title,suggest-replay-title,suggest-attributed-title,preview-title,apply-title,review-state,review-titles,title-adapter-dry-run,title-adapter-simulate,export-title-plan,check-title-plan,import,check-import,declare-recovery,rehearse-recovery,list,find,show,render,suggest-title,title,title-history} ...
+usage: recap.py [-h] [--db DB] {ingest,search,stats,describe-schema,inspect,list-export,inspect-web-zip,prepare-web-export,replay-local,web-branch,suggest-branch-title,suggest-replay-title,suggest-attributed-title,preview-title,apply-title,review-state,review-titles,title-adapter-dry-run,title-adapter-simulate,export-title-plan,check-title-plan,import,check-import,declare-recovery,rehearse-recovery,list,find,show,render,suggest-title,title,title-history} ...
 ```
 
 The global `--db DB` precedes the subcommand and is required except for `inspect`,
@@ -31,6 +31,19 @@ The global `--db DB` precedes the subcommand and is required except for `inspect
 and `rehearse-recovery`; `rehearse-recovery` rejects a global `--db`. Commands that
 accept `--output NEW_JSON` create a UTF-8 file without overwriting an existing path
 and print only a receipt ([saved title documents](TITLE_DOCUMENT_FILES.md)).
+
+### Archive metadata inspection
+
+#### `describe-schema`
+
+```text
+usage: recap.py describe-schema [-h]
+```
+
+Read-only, single-snapshot table/column inventory, counts, lazy-ledger presence,
+FTS docsize count and legacy-only provenance count. Schema object names may be
+private. No content output, mutation, validation or stability promise. See
+[the current SQLite layout and read-only SQL examples](SCHEMA.md).
 
 ### Normalized JSONL archive
 
