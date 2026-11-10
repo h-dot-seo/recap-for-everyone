@@ -150,3 +150,5 @@ names and bounded unknown schema names, and counts legacy-only provenance using
 NULL-safe field equality. It does not create lazy tables or validate the archive.
 [SCHEMA.md](SCHEMA.md) documents the current layout and tested read-only SQL;
 its drift tests are not a database compatibility or stability promise.
+
+`recaplib/render_queue.py` reads one bounded saved queue, validates its current envelope/item shapes and preserves supplied proposal metadata as inert JSON. It reuses the HTML display layer and exclusive byte publisher without changing conversation rendering. The file SHA-256 binds the page to input bytes, not current database truth. No SQL, clock, model or network call is made. See [saved queue views](RENDER_QUEUE.md).

@@ -169,3 +169,5 @@ For direct SQLite consumers or an archive-layout question, run
 This reports one read-only metadata snapshot and lazy-ledger presence without
 creating tables. Counts and schema names may be private; it does not establish
 integrity, completeness, authentication or a stable layout contract.
+
+For a readable saved review page, use `recap.py render-queue QUEUE.json --output NEW_FILE` without `--db`. Keep both files private. The original file hash binds the display to the saved queue, not to current archive content. Preserve the original JSON for a fresh preview before explicit application; HTML edits are not review artifacts. See [the tested guide](docs/RENDER_QUEUE.md).

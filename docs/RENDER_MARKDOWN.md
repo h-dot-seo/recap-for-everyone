@@ -78,4 +78,4 @@ folders. It is local archive rendering, not a vendor export or an active-branch
 reconstruction. Display titles are local only. Edits are not review artifacts or
 a substitute for apply-title. No archive mutation, model call, network,
 authentication, approval or privacy clearance is established. Saved review-queue
-views remain deferred.
+HTML uses the separate [render-queue command](RENDER_QUEUE.md).
