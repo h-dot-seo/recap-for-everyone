@@ -179,6 +179,14 @@ python recap.py --db ../demo.sqlite title --source demo --conversation synthetic
 (공개 범위 기록), [SECURITY.md](../SECURITY.md), [RIGHTS.md](../RIGHTS.md),
 [VALIDATION.md](../VALIDATION.md)(현재 검증 상태).
 
-## 읽기 전용 HTML 보기
+## 읽기 전용 HTML·Markdown 보기
 
 `recap.py --db DB render --source SOURCE --conversation ID --format html --output NEW_FILE`로 한글과 이모지가 읽히는 로컬 HTML을 저장합니다. `show`와 같은 메시지 선택자를 사용하며 기존 파일을 덮어쓰지 않습니다. stdout에는 본문 없는 ASCII 영수증만 표시됩니다. HTML은 제목 적용이나 검토 승인이 아닙니다. [표시 규칙과 경계](RENDER_VIEWS.md)를 확인하고 비공개 출력은 공개 저장소 밖에 보관하세요.
+
+같은 명령에 `--format markdown`을 지정하면 제목·식별자·타임스탬프·선택 범위·출처를
+포함한 모든 공급값과 본문을 코드 펜스 안에 넣은 Markdown을 저장합니다. 펜스 길이는
+각 블록의 가장 긴 연속 백틱보다 길며 정보 문자열은 `text`로 고정됩니다. HTML과
+같은 제어·형식 문자 표시 규칙, 16 MiB 출력 제한과 배타적 생성 규칙을 사용합니다.
+모든 Markdown 뷰어의 안전성이나 동일한 표시를 보장하지 않으며, 대화나 응답의
+완료 여부를 추정하지 않습니다. 정확한 공급 근거는 기존 `show` JSON으로 확인하세요.
+실행 가능한 예제와 경계는 [Markdown 안내](RENDER_MARKDOWN.md)에 있습니다.

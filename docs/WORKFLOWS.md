@@ -385,6 +385,13 @@ plus legacy-only rows, or the structured view, rather than only the old table.
 
 ## Search and read the archive
 
+To save a readable private view, use `recap.py --db DB render --source SOURCE
+--conversation ID --format markdown --output NEW_FILE`, or choose `--format html`.
+Both share the `show` selectors and one read snapshot, retain selected scope and
+provenance, and print only an ASCII saved-view receipt. Existing outputs are refused.
+Markdown fences all supplied metadata and bodies; no viewer-wide safety guarantee
+is made. See [Markdown views](RENDER_MARKDOWN.md) and [HTML views](RENDER_VIEWS.md).
+
 Search and views open the archive read-only (`mode=ro`, `PRAGMA query_only=ON`)
 and never anonymize results. Guides: [search excerpts](SEARCH_EXCERPTS.md),
 [cursor pagination](SEARCH_PAGINATION.md), [canonical Unicode search](CANONICAL_UNICODE_SEARCH.md),

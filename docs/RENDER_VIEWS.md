@@ -3,8 +3,9 @@
 `render --format html --output NEW_FILE` saves a readable UTF-8 local view. It uses
 exactly the `show` single read snapshot and selectors: `--message`, `--limit` with
 `--offset`, or `--around-message` with `--before` / `--after`. Validation and defaults
-are shared, not reimplemented. Only HTML is supported in this first slice. There
-is no standalone render script. Markdown and saved review-queue views are deferred.
+are shared, not reimplemented. [Markdown views](RENDER_MARKDOWN.md) use the same
+command with `--format markdown`; there is no standalone render script. Saved
+review-queue views remain deferred. The HTML behavior is unchanged.
 
 Create an empty directory outside this repository and replace `OUTPUT` below:
 

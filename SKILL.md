@@ -155,3 +155,11 @@ fetch, decryption and key custody stay outside this repository. See
 `docs/RECOVERY_REHEARSAL.md`.
 
 Use `recap.py --db DB render --source SOURCE --conversation ID --format html --output NEW_FILE` when a readable private local conversation view is needed. Reuse show selectors to bound the view, keep output outside shared folders and read the saved-view receipt. This never applies titles or creates review authority. See `docs/RENDER_VIEWS.md`.
+
+Choose `--format markdown` on the same `render` command for readable fenced text
+with self-contained selection and provenance. Supply a new `--output` path and
+retain the saved-view receipt. Metadata and bodies use fixed-info fences longer
+than any backtick run; this is not a guarantee about every Markdown viewer or a
+byte-exact transcript. Use show JSON for exact supplied evidence. No completion
+or active-branch claim is inferred from a rendered session. See
+`docs/RENDER_MARKDOWN.md`.

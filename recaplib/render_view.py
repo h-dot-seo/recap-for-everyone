@@ -1,4 +1,4 @@
-"""Deterministic, inert HTML views of one read-only conversation snapshot."""
+"""Deterministic HTML/Markdown views of one read-only conversation snapshot."""
 import base64
 import hashlib
 import html
@@ -20,9 +20,12 @@ BOUNDARY = ('PRIVATE FILE. Local archive rendering, not the original application
             'Display rule: controls except LF/TAB, format characters except ZWJ/ZWNJ, surrogates and '
             'line/paragraph separators appear as literal Unicode escapes. ZWJ/ZWNJ are preserved. '
             'URLs are plain text. This view is not a byte-exact transcript.')
+MARKDOWN_BOUNDARY = (BOUNDARY + ' PRIVATE MESSAGE TEXT. Supplied values stay inside text fences. '
+                     'Fence isolation follows CommonMark; not all Markdown viewers are guaranteed safe '
+                     'or identical. Use show JSON for exact supplied evidence.')
 
 
-def _display_chunks(value):
+def _plain_display_chunks(value):
     """Escape bounded chunks before UTF-8 encoding, preserving ordinary Unicode."""
     for offset in range(0, len(value), 4096):
         safe = []
@@ -34,7 +37,12 @@ def _display_chunks(value):
                 safe.append(('\\u%04x' if code <= 0xffff else '\\U%08x') % code)
             else:
                 safe.append(char)
-        yield html.escape(''.join(safe), quote=True)
+        yield ''.join(safe)
+
+
+def _display_chunks(value):
+    for chunk in _plain_display_chunks(value):
+        yield html.escape(chunk, quote=True)
 
 
 class _Document:
@@ -94,13 +102,62 @@ def render_html(view):
     return bytes(document.raw)
 
 
+def _markdown_value(document, value):
+    """Fence all data, including metadata, using a bounded two-pass encoding."""
+    def chunks():
+        values = ((value,) if isinstance(value, str) else
+                  json.JSONEncoder(ensure_ascii=False, allow_nan=False,
+                                   sort_keys=True, indent=2).iterencode(value))
+        for part in values:
+            yield from _plain_display_chunks(part)
+
+    longest = run = size = 0
+    for chunk in chunks():
+        size += len(chunk.encode('utf-8'))
+        if len(document.raw) + size > MAX_OUTPUT_BYTES:
+            raise ValueError('render exceeds 16 MiB; narrow the message selection')
+        # A run may cross display or JSON encoder chunk boundaries.
+        for char in chunk:
+            run = run + 1 if char == '`' else 0
+            longest = max(longest, run)
+    length = max(3, longest + 1)
+    # Count both fences and their fixed delimiters before allocating either.
+    if len(document.raw) + size + 2 * length + 8 > MAX_OUTPUT_BYTES:
+        raise ValueError('render exceeds 16 MiB; narrow the message selection')
+    fence = '`' * length
+    document.add(fence + 'text\n')
+    for chunk in chunks():
+        document.add(chunk)
+    document.add('\n' + fence + '\n\n')
+
+
+def render_markdown(view):
+    document = _Document()
+    document.add('# Local conversation view\n\n' + MARKDOWN_BOUNDARY + '\n\n## View metadata\n\n')
+    _markdown_value(document, dict(schema='recap.render.v1', command='render', format='markdown',
+                                   view_sha256=view_sha256(view),
+                                   **{key: value for key, value in view.items() if key != 'messages'}))
+    if 'selection' not in view:
+        document.add('Selection: full conversation; no message selector.\n\n')
+    for index, message in enumerate(view['messages'], 1):
+        document.add('## Message %d\n\n### Metadata\n\n' % index)
+        _markdown_value(document, {key: value for key, value in message.items() if key != 'text'})
+        document.add('### Body\n\n')
+        _markdown_value(document, message['text'])
+    document.add('## Boundary\n\n' + MARKDOWN_BOUNDARY + '\n')
+    return bytes(document.raw)
+
+
 def render_conversation(db, source, conversation_id, output, limit=None, offset=0,
-                        message_id=None, around_message_id=None, before=None, after=None):
+                        message_id=None, around_message_id=None, before=None, after=None,
+                        format='html'):
+    if format not in ('html', 'markdown'):
+        raise ValueError('render format must be html or markdown')
     view = conversation(db, source, conversation_id, limit, offset, message_id,
                         around_message_id, before, after)
-    raw = render_html(view)
+    raw = render_html(view) if format == 'html' else render_markdown(view)
     staging = write_bytes(raw, output, '.recap-view-')
-    return dict(schema='recap.saved-view.v1', status='SAVED', document_kind='html',
+    return dict(schema='recap.saved-view.v1', status='SAVED', document_kind=format,
                 encoding='UTF-8', bytes=len(raw), sha256=hashlib.sha256(raw).hexdigest(),
                 **staging, scope='new local view only; no archive mutation or approval',
                 warning='PRIVATE FILE. No model call, network or authentication. Keep outside public or shared folders. '
