@@ -22,7 +22,7 @@ from recaplib.title_plan import make_plan
 from recaplib.web_branch import branch_view
 
 
-DEEP = '[' * 10000 + '"SYNTHETIC_PRIVATE_VALUE"' + ']' * 10000
+from tests._nesting import deep_json
 
 
 def normalized(**changes):
@@ -69,13 +69,17 @@ class ImportFailureBoundaryTests(unittest.TestCase):
 
     def test_decoder_depth_errors_are_sanitized_and_do_not_raise_limits(self):
         before = sys.getrecursionlimit()
-        with self.assertRaisesRegex(ValueError, '^JSON nesting is too deep$'):
-            loads(DEEP)
         # Do not assume a universal numeric object/array limit across Python
         # versions. Every decoder RecursionError must use the same safe boundary.
         with patch('recaplib.strict_json.json.loads', side_effect=RecursionError('SYNTHETIC_PRIVATE_KEY')):
             with self.assertRaisesRegex(ValueError, '^JSON nesting is too deep$'):
                 loads('{}')
+        self.assertEqual(sys.getrecursionlimit(), before)
+
+    def test_actual_decoder_depth_error_is_sanitized(self):
+        before = sys.getrecursionlimit()
+        with self.assertRaisesRegex(ValueError, '^JSON nesting is too deep$'):
+            loads(deep_json())
         self.assertEqual(sys.getrecursionlimit(), before)
 
     def test_shallow_nesting_and_long_bracket_strings_remain_valid(self):
@@ -89,11 +93,11 @@ class ImportFailureBoundaryTests(unittest.TestCase):
 
     def deep_web(self):
         record = web(); record['metadata'] = 'DEPTH_PLACEHOLDER'
-        self.path.write_text(json.dumps([record]).replace('"DEPTH_PLACEHOLDER"', DEEP), encoding='utf-8')
+        self.path.write_text(json.dumps([record]).replace('"DEPTH_PLACEHOLDER"', deep_json()), encoding='utf-8')
 
     def deep_local(self):
         records = local(); records[1]['metadata'] = 'DEPTH_PLACEHOLDER'
-        text = json.dumps(records[0]) + '\r\n\r\n' + json.dumps(records[1]).replace('"DEPTH_PLACEHOLDER"', DEEP)
+        text = json.dumps(records[0]) + '\r\n\r\n' + json.dumps(records[1]).replace('"DEPTH_PLACEHOLDER"', deep_json())
         self.path.write_bytes(b'\xef\xbb\xbf' + text.encode())
 
     def test_deep_web_metadata_rejects_all_source_readers_without_database_access(self):
@@ -110,7 +114,7 @@ class ImportFailureBoundaryTests(unittest.TestCase):
 
     def test_deep_unselected_web_metadata_still_rejects_whole_file(self):
         extra = web(); extra['id'] = 'other'; extra['metadata'] = 'DEPTH_PLACEHOLDER'
-        self.path.write_text(json.dumps([web(), extra]).replace('"DEPTH_PLACEHOLDER"', DEEP), encoding='utf-8')
+        self.path.write_text(json.dumps([web(), extra]).replace('"DEPTH_PLACEHOLDER"', deep_json()), encoding='utf-8')
         self.assert_preconnection_failure(lambda db: import_export(db, 'demo', self.path, 'web', conversation='chat'), 'nesting')
 
     def test_deep_local_metadata_reports_physical_line_and_replay_json_failure(self):
@@ -129,8 +133,91 @@ class ImportFailureBoundaryTests(unittest.TestCase):
 
     def test_deep_normalized_metadata_rejects_late_row_before_connect(self):
         row = normalized(message_id='v', metadata='DEPTH_PLACEHOLDER')
-        self.path.write_text(json.dumps(normalized()) + '\n' + json.dumps(row).replace('"DEPTH_PLACEHOLDER"', DEEP))
+        self.path.write_text(json.dumps(normalized()) + '\n' + json.dumps(row).replace('"DEPTH_PLACEHOLDER"', deep_json()))
         self.assert_preconnection_failure(lambda db: ingest(db, 'demo', self.path), 'line 2$')
+
+    def assert_local_encoder_failure(self):
+        before = self.db.read_bytes(), self.path.read_bytes()
+        for kind in ('local', 'local-codex'):
+            self.assert_preconnection_failure(
+                lambda db: import_export(db, 'demo', self.path, kind),
+                r'^JSON nesting is too deep: .*:3$')
+            for operation in (lambda: inspect_export(self.path, kind),
+                              lambda: list_export(self.path, kind)):
+                with self.assertRaisesRegex(ValueError, r'^JSON nesting is too deep: .*:3$') as caught:
+                    operation()
+                self.assertNotIn('SYNTHETIC_PRIVATE', str(caught.exception))
+                self.assertTrue(caught.exception.__suppress_context__)
+        self.assertEqual((self.db.read_bytes(), self.path.read_bytes()), before)
+
+    def test_local_encoder_recursion_is_sanitized_before_database_access(self):
+        self.write_rows(local(), separator='\n\n')
+        error = RecursionError('SYNTHETIC_PRIVATE_KEY')
+        # Exception notes (where supported) must not appear in CLI diagnostics.
+        if hasattr(error, 'add_note'):
+            error.add_note('SYNTHETIC_PRIVATE_NOTE')
+        with patch('recaplib.local_parser.json.dumps', side_effect=error):
+            self.assert_local_encoder_failure()
+        code = ("import runpy; from unittest.mock import patch; "
+                "error = RecursionError('SYNTHETIC_PRIVATE_KEY'); "
+                "patch('recaplib.local_parser.json.dumps', side_effect=error).start(); "
+                "runpy.run_path(__import__('sys').argv.pop(1), run_name='__main__')")
+        for kind in ('local', 'local-codex'):
+            commands = [
+                ['recap.py', 'inspect', str(self.path), '--format', kind],
+                ['recap.py', '--db', str(self.missing), 'import', str(self.path),
+                 '--source', 'demo', '--format', kind],
+                ['export_inventory.py', str(self.path), '--format', kind],
+            ]
+            for command in commands:
+                with self.subTest(kind=kind, command=command[0:2]):
+                    result = subprocess.run([sys.executable, '-c', code, *command],
+                                            capture_output=True, text=True, timeout=20)
+                    self.assertNotEqual(result.returncode, 0)
+                    self.assertEqual(result.stdout, '')
+                    self.assertIn('JSON nesting is too deep:', result.stderr)
+                    self.assertIn(':3', result.stderr)
+                    self.assertNotIn('Traceback', result.stderr)
+                    self.assertNotIn('SYNTHETIC_PRIVATE', result.stderr)
+                    self.assertFalse(self.missing.exists())
+
+    def test_actual_local_decoder_encoder_gap_fails_cleanly(self):
+        from tests._nesting import MAX_DEPTH, nested
+        # Probe the encoder independently: constructing lists iteratively does
+        # not first require the decoder to accept the same depth.
+        def encoder_fails(depth):
+            value = 0
+            for _ in range(depth):
+                value = [value]
+            record = local()[1]
+            record['SYNTHETIC_PRIVATE_KEY'] = value
+            try:
+                json.dumps(record, ensure_ascii=True, sort_keys=True, separators=(',', ':'))
+            except RecursionError:
+                return True
+            return False
+        low, high = 0, 10000
+        while not encoder_fails(high):
+            low = high
+            if high == MAX_DEPTH:
+                self.skipTest('encoder accepted every probed depth up to the byte limit')
+            high = min(2 * high, MAX_DEPTH)
+        while high - low > 1:
+            middle = (low + high) // 2
+            if encoder_fails(middle):
+                high = middle
+            else:
+                low = middle
+        # Small margin makes the encoder failure independent of helper frames.
+        depth = high + 32
+        record = local()[1]; record['SYNTHETIC_PRIVATE_KEY'] = 'DEPTH_PLACEHOLDER'
+        raw = json.dumps(record).replace('"DEPTH_PLACEHOLDER"', nested(depth))
+        try:
+            loads(raw)
+        except ValueError:
+            self.skipTest('no decoder/encoder gap with a 32-frame safety margin on this runtime')
+        self.path.write_text(json.dumps(local()[0]) + '\n\n' + raw, encoding='utf-8')
+        self.assert_local_encoder_failure()
 
     def test_incoming_conflicting_fields_fail_before_connect_with_physical_line(self):
         for field, value in [('role', 'assistant'), ('timestamp', 'different'),

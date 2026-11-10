@@ -283,9 +283,14 @@ def _parse_jsonl_records(records, path, source_relative_path, content_profile):
             raise LocalImportError(f"JSONL message has no session metadata: {path}:{line_number}")
         explicit_id = raw_key is not None
         message_key = raw_key if explicit_id else f"{source_relative_path}:{line_number}"
-        variant_sha256 = hashlib.sha256(json.dumps(
-            value, ensure_ascii=True, sort_keys=True, separators=(",", ":"),
-        ).encode("ascii")).hexdigest()
+        try:
+            variant_sha256 = hashlib.sha256(json.dumps(
+                value, ensure_ascii=True, sort_keys=True, separators=(",", ":"),
+            ).encode("ascii")).hexdigest()
+        except RecursionError:
+            # Some runtimes decode deeper objects than they can encode. Preserve
+            # the safe source/line boundary without exposing JSON keys or notes.
+            raise LocalImportError(f"JSON nesting is too deep: {path}:{line_number}") from None
         messages.append(MessageOccurrence(
             current_session, str(message_key), explicit_id, role, text,
             "" if timestamp is None else str(timestamp), line_number,
