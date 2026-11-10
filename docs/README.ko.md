@@ -178,3 +178,7 @@ python recap.py --db ../demo.sqlite title --source demo --conversation synthetic
 설계와 경계 문서: [SKILL.md](../SKILL.md)(에이전트 작업 지침), [PUBLICATION.md](../PUBLICATION.md)
 (공개 범위 기록), [SECURITY.md](../SECURITY.md), [RIGHTS.md](../RIGHTS.md),
 [VALIDATION.md](../VALIDATION.md)(현재 검증 상태).
+
+## 읽기 전용 HTML 보기
+
+`recap.py --db DB render --source SOURCE --conversation ID --format html --output NEW_FILE`로 한글과 이모지가 읽히는 로컬 HTML을 저장합니다. `show`와 같은 메시지 선택자를 사용하며 기존 파일을 덮어쓰지 않습니다. stdout에는 본문 없는 ASCII 영수증만 표시됩니다. HTML은 제목 적용이나 검토 승인이 아닙니다. [표시 규칙과 경계](RENDER_VIEWS.md)를 확인하고 비공개 출력은 공개 저장소 밖에 보관하세요.

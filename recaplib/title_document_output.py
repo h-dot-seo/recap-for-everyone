@@ -1,9 +1,12 @@
 """Save one generated title JSON document without overwriting existing paths."""
 import hashlib
 import json
+# Retain these module aliases for existing failure-injection test patch points.
+# Both modules reference the same os/tempfile objects and Path class.
 import os
 from pathlib import Path
 import tempfile
+from recaplib.document_output import write_bytes
 
 
 def add_output_argument(parser):
@@ -18,36 +21,10 @@ def write_title_json(value, output, kind):
         raw = (json.dumps(value, ensure_ascii=False, allow_nan=False, indent=2) + '\n').encode('utf-8')
     except (ValueError, TypeError, UnicodeError, RecursionError):
         raise ValueError('title output must contain valid finite JSON data') from None
-    destination = Path(output)
-    parent = destination.parent.resolve(strict=True)
-    destination = parent / destination.name
-    temporary = None
-    published = False
-    cleanup_complete = True
-    try:
-        # Close the private same-directory staging file before linking on Windows.
-        # Hard-link publication is atomic and refuses files, directories and
-        # symlinks already at the destination. Never fall back to replacement.
-        with tempfile.NamedTemporaryFile(prefix='.recap-title-', dir=parent, delete=False) as stream:
-            temporary = Path(stream.name)
-            if stream.write(raw) != len(raw):
-                raise OSError('incomplete title document write')
-            stream.flush()
-            os.fsync(stream.fileno())
-        os.link(temporary, destination)
-        published = True
-    finally:
-        if temporary is not None:
-            try:
-                temporary.unlink()
-            except OSError:
-                if not published:
-                    raise
-                cleanup_complete = False
+    staging = write_bytes(raw, output, '.recap-title-')
     return dict(schema='recap.saved-title-json.v1', status='SAVED', document_kind=kind,
                 encoding='UTF-8', bytes=len(raw), sha256=hashlib.sha256(raw).hexdigest(),
-                staging_cleanup_complete=cleanup_complete,
-                remaining_staging_file=temporary.name if not cleanup_complete else None,
+                **staging,
                 scope='new local JSON file only; no archive mutation or approval',
                 warning=('PRIVATE REQUEST FILE. This receipt is not the request or permission to send data. Review the saved request before separately authorized use. Saving does not run a provider or transmit data. If staging cleanup failed, the complete output already exists; inspect the leftover file rather than blindly retrying.'
                          if kind == 'request' else
