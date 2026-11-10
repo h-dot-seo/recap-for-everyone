@@ -1,6 +1,6 @@
 {
   "project": "recap-for-everyone",
-  "release": "0.91.0-markdown-views",
+  "release": "0.91.1-markdown-newline-tests",
   "date": "2026-11-10",
   "private_history_imported": false,
   "actual_corpora_included": false,
@@ -50,8 +50,8 @@
     },
     {
       "path": "VALIDATION.md",
-      "bytes": 4899,
-      "sha256": "962c6600be217c070710a767fbd5fc3b971fb157a99f67cdf97e62153d55e7e1"
+      "bytes": 5286,
+      "sha256": "4396bd4f1620fc3e3f2bdab0fd0902eed1649ca2865f0afa2d598a083620b322"
     },
     {
       "path": "attributed_title.py",
@@ -250,8 +250,8 @@
     },
     {
       "path": "docs/VALIDATION_HISTORY.md",
-      "bytes": 134763,
-      "sha256": "2047e2923c88676bd06eb0b154dda5c1e2aa1503ce09089b3104267a7420ebc6"
+      "bytes": 136770,
+      "sha256": "e7b7ad1904aa0cd40bd848fa4c5dc9cc7c2ab40a21fccefc829d96e594bd5d68"
     },
     {
       "path": "docs/WEB_ZIP_INVENTORY.md",
@@ -770,8 +770,8 @@
     },
     {
       "path": "tests/test_render_markdown.py",
-      "bytes": 16686,
-      "sha256": "86467f3ec7fd6b5463786a8af537b150926de61a9b47ec6c3551e8fa6b03f4c0"
+      "bytes": 18245,
+      "sha256": "aa36752bdc64294620fa0fa8e08b979959b3d36d914075b0397e071ed6526f62"
     },
     {
       "path": "tests/test_render_view.py",

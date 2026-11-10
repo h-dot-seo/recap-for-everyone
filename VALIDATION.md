@@ -1,10 +1,18 @@
 # Validation record
 
-Current release: `0.91.0-markdown-views`, dated 2026-11-10.
+Current release: `0.91.1-markdown-newline-tests`, dated 2026-11-10.
 This file is the current snapshot. Every dated entry since the first release is kept
 unchanged and in order in [docs/VALIDATION_HISTORY.md](docs/VALIDATION_HISTORY.md).
 
 ## Latest change
+
+2026-11-10 Native stdout compatibility tests (0.91.1-markdown-newline-tests):
+the new show-compatibility assertion now respects native text-stream line endings
+(CRLF on Windows, LF on POSIX). A deterministic test exercises both translations.
+No production output, rendering, publication behavior or guide block changed.
+See the dated validation history entry.
+
+Previous change:
 
 2026-11-10 Read-only Markdown views (0.91.0-markdown-views): `render --format
 markdown` extends the existing snapshot, selection and no-overwrite output path.

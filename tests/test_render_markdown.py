@@ -229,7 +229,31 @@ class MarkdownTests(unittest.TestCase):
         self.assertEqual(hashlib.sha256(raw).hexdigest(),
                          '51e16d1e0ee8f73c19b08b1279a0dbe25e706223a42ec7039ba8a0f4b6f04416')
         result = self.cli('--db', self.db, 'show', '--source', 'synthetic', '--conversation', 'fictional')
-        self.assertEqual(result.stdout, (json.dumps(self.view(), ensure_ascii=True, indent=2) + '\n').encode('ascii'))
+        # show still uses the native text stream: CRLF on Windows, LF on POSIX.
+        expected = (json.dumps(self.view(), ensure_ascii=True, indent=2) + '\n')
+        self.assertEqual(result.stdout, expected.replace('\n', os.linesep).encode('ascii'))
+
+    def test_show_stdout_preserves_json_with_explicit_lf_and_crlf_streams(self):
+        before = self.db.read_bytes()
+        view = self.view()
+        expected = json.dumps(view, ensure_ascii=True, indent=2) + '\n'
+        argv = ['recap.py', '--db', str(self.db), 'show', '--source', 'synthetic',
+                '--conversation', 'fictional']
+        for newline in ('\n', '\r\n'):
+            with self.subTest(newline=repr(newline)):
+                # Exercise real text-stream translation on every platform,
+                # rather than changing production output or normalizing evidence.
+                code = ('import runpy, sys; sys.stdout.reconfigure(newline=' + repr(newline) +
+                        '); sys.argv = ' + repr(argv) +
+                        '; runpy.run_path("recap.py", run_name="__main__")')
+                result = subprocess.run([sys.executable, '-c', code], cwd=ROOT,
+                                        capture_output=True, timeout=60,
+                                        env=dict(os.environ, PYTHONIOENCODING='ascii'))
+                self.assertEqual(result.returncode, 0, result.stderr)
+                self.assertEqual(result.stderr, b'')
+                self.assertEqual(result.stdout, expected.replace('\n', newline).encode('ascii'))
+                self.assertEqual(json.loads(result.stdout.decode('ascii')), view)
+        self.assertEqual(self.db.read_bytes(), before)
 
     def test_documented_markdown_commands_ascii_receipts_and_rerun_refusal(self):
         guide = (ROOT / 'docs/RENDER_MARKDOWN.md').read_text(encoding='utf-8')

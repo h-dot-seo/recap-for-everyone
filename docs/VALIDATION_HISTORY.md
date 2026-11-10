@@ -2029,3 +2029,33 @@ reconstruction, privacy clearance, real-data validation, remote CI results,
 model/network calls, authentication or review authority. No Windows or graphical
 viewer run is claimed locally. Saved review-queue views remain deferred. No
 license decision, merge, release tag or branch deletion is part of this change.
+
+## 2026-11-10 Native stdout compatibility tests (0.91.1-markdown-newline-tests)
+
+The [Markdown PR CI run](https://github.com/h-dot-seo/recap-for-everyone/actions/runs/42778716038)
+passed both Ubuntu jobs but failed both Windows jobs solely in the new
+`test_html_bytes_and_show_stdout_remain_compatible` assertion. It expected LF
+bytes even though the unchanged `show` command uses a native text stream, which
+emits CRLF on Windows. The HTML byte-hash assertion passed. This was a test
+portability error, not a renderer or JSON-content regression.
+
+- The compatibility assertion now compares exact expected JSON bytes with the
+  native `os.linesep`, retaining its formatting, field ordering and Unicode-escape
+  checks. Production code and output behavior are unchanged.
+- Added an independent subprocess test that explicitly sets the real stdout text
+  stream to LF and CRLF on every platform, runs the actual show CLI, and checks
+  exact bytes, parsed evidence equality, empty stderr and unchanged archive bytes.
+- Python 3.12.14 full suite: `python -m unittest discover -q` reported
+  `Ran 1041 tests in 75.332s`; `OK (skipped=1)`. No failures or errors. The one
+  inherited skip is the runtime-dependent actual decoder/encoder depth-gap test.
+- Focused render/title-output suite:
+  `python -m unittest tests.test_render_markdown tests.test_render_view tests.test_title_document_output tests.test_adapter_native_output tests.test_title_file_encoding -q`
+  reported `Ran 69 tests in 14.116s`; `OK`.
+- `python -m compileall -q .`, manifest verification, the limited publication
+  audit and whitespace checks passed. Manifest regenerated for 2026-11-10 with
+  213 entries. Every existing guide sh block remains unchanged.
+
+The local explicit-CRLF exercise is not a native Windows run. Exact-commit remote
+matrix results must be checked separately before merging. No production rendering,
+message evidence, file publication, receipt, guide command, CI configuration,
+license or release-tag behavior changed.
