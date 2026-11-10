@@ -125,7 +125,7 @@ def main():
             command.add_argument('--before', type=int, help='earlier archive neighbors, 0..50; default 2 with --around-message')
             command.add_argument('--after', type=int, help='later archive neighbors, 0..50; default 2 with --around-message')
         if name == 'render':
-            command.add_argument('--format', choices=['html'], required=True)
+            command.add_argument('--format', choices=['html', 'markdown'], required=True)
             command.add_argument('--output', required=True, metavar='NEW_FILE')
         if name == 'title':
             command.add_argument('--set'); command.add_argument('--expected-revision', type=int)
@@ -245,7 +245,7 @@ def main():
             from recaplib.render_view import render_conversation
             result = render_conversation(args.db, args.source, args.conversation, args.output,
                                          args.limit, args.offset, args.message,
-                                         args.around_message, args.before, args.after)
+                                         args.around_message, args.before, args.after, args.format)
         elif args.command == 'show':
             from recaplib.conversation_view import conversation
             result = conversation(args.db, args.source, args.conversation, args.limit, args.offset, args.message,

@@ -1987,3 +1987,45 @@ Not claimed: active-branch reconstruction, vendor export, reversible transcript,
 privacy clearance, browser-edit review authority, real-data validation, remote CI
 results, model calls, network calls or authentication. Markdown and saved-queue
 views remain deferred. No Windows or browser visual run is claimed locally.
+
+## 2026-11-10 Read-only Markdown views (0.91.0-markdown-views)
+
+- Added `render --format markdown --output NEW_FILE` as the next slice of the
+  existing HTML command. It uses the same one-snapshot show object and selectors,
+  self-contained metadata/provenance, canonical `view_sha256` and exclusive byte
+  publication. Saved-view receipts identify the format without disclosing data.
+- Every supplied value stays inside a fixed-info `text` fence. Each fence is
+  longer than any consecutive backtick run in its content, including runs across
+  display chunks. Only fixed headings, boundary text and message ordinals appear
+  outside fences. Shared display escapes retain readable Unicode while exposing
+  controls/format characters; no universal Markdown-viewer guarantee is claimed.
+- The 16 MiB encoded-output bound counts Unicode, metadata, both fences and
+  banners before publication. Large fences are checked before allocation. HTML
+  fixture bytes and show JSON stdout are unchanged.
+- Twelve new synthetic tests cover hostile metadata and bodies, long fences,
+  empty/trailing-newline bodies, controls and surrogates, selected scope and every
+  returned provenance occurrence, deterministic bytes, snapshot count, output
+  bounds, no-overwrite/link/cleanup failures and ASCII-only receipts. A synthetic
+  unfinished local-codex rollout also passes import to Markdown, retaining its
+  known messages and provenance without inventing completeness metadata.
+- Python 3.12.14: `python -m unittest discover -q` reported
+  `Ran 1040 tests in 76.012s`; `OK (skipped=1)`. No failures or errors. The only
+  skip is the inherited `test_actual_local_decoder_encoder_gap_fails_cleanly`:
+  no decoder/encoder gap with a 32-frame safety margin on this runtime.
+- Focused render/title-output checks:
+  `python -m unittest tests.test_render_markdown tests.test_render_view tests.test_title_document_output tests.test_adapter_native_output tests.test_title_file_encoding -q`
+  reported `Ran 68 tests in 13.230s`; `OK`.
+- `python -m compileall -q .` passed. The new Markdown guide commands also ran
+  separately with ASCII stdout and readable UTF-8 output. All existing Markdown
+  sh blocks remain byte-identical to the preceding release, including the HTML
+  guide. No protected quick-start, title, install or recovery block was edited.
+- Manifest regenerated with explicit date 2026-11-10 (213 entries); manifest
+  verification and the limited publication audit passed. Standard library only,
+  existing Python 3.10-compatible syntax and CI matrix/triggers retained.
+
+Not claimed: safety or identical display in all Markdown viewers, reversible
+transcripts, completion of a source session or assistant turn, active-branch
+reconstruction, privacy clearance, real-data validation, remote CI results,
+model/network calls, authentication or review authority. No Windows or graphical
+viewer run is claimed locally. Saved review-queue views remain deferred. No
+license decision, merge, release tag or branch deletion is part of this change.

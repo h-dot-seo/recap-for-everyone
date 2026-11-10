@@ -89,7 +89,7 @@ conversation in its original application.
 | Choose a part of a downloaded ZIP | `recap.py inspect-web-zip ZIP`, `recap.py prepare-web-export ZIP --member NAME --output NEW_FILE` | [ZIP inventory](docs/WEB_ZIP_INVENTORY.md) |
 | Find IDs and coverage before importing | `recap.py list-export INPUT --format FORMAT`, `recap.py inspect INPUT --format FORMAT` | [Export inventory](docs/EXPORT_INVENTORY.md) |
 | Import an export or normalized JSONL | `recap.py --db DB import INPUT --format FORMAT --source SOURCE`, `ingest`, `check-import` | [Input scope](docs/INPUT_SCOPE.md) |
-| Save a readable local view | `recap.py --db DB render --source SOURCE --conversation ID --format html --output NEW_FILE` | [HTML views](docs/RENDER_VIEWS.md) |
+| Save a readable local view | `recap.py --db DB render --source SOURCE --conversation ID --format markdown --output NEW_FILE` (or `--format html`) | [Markdown](docs/RENDER_MARKDOWN.md), [HTML](docs/RENDER_VIEWS.md) |
 | Search and read | `recap.py --db DB find QUERY`, `list`, `show --source SOURCE --conversation ID`, `search`, `stats` | [Search excerpts](docs/SEARCH_EXCERPTS.md) |
 | Propose a local title | `recap.py --db DB suggest-title`, `suggest-branch-title`, `suggest-replay-title`, `suggest-attributed-title` | [Title walkthrough](docs/TITLE_WALKTHROUGH.md) |
 | Review a page and record decisions | `recap.py --db DB review-titles --source SOURCE`, `review-state` | [Review queue](docs/TITLE_REVIEW_QUEUE.md) |
@@ -108,10 +108,12 @@ only (`recap.py`, the standalone scripts, `runtime_check.py`, `verify_manifest.p
 the test suite in the `tests/` package, both reached from the root, where
 `python -m unittest discover -v` still runs the whole suite.
 
-See [readable local views](docs/RENDER_VIEWS.md) for selection and display boundaries.
+See [Markdown views](docs/RENDER_MARKDOWN.md) and [HTML views](docs/RENDER_VIEWS.md)
+for selection, provenance and display boundaries.
 
 ## Documentation
 
+- [Markdown views](docs/RENDER_MARKDOWN.md): readable Unicode with fenced metadata and bodies, selected scope and private no-overwrite receipts.
 - [HTML views](docs/RENDER_VIEWS.md): read-only Unicode conversation views with private no-overwrite receipts.
 
 - [Start here](docs/START_HERE.md): tested first run from a ZIP or local file to a findable local title.

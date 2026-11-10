@@ -124,3 +124,10 @@ The output contains private conversation text, titles and identifiers. Keep it
 outside the public repository and review it before sharing. Both CLIs escape
 Unicode for JSON output that remains usable on ASCII terminals; escaping is not
 redaction. No files, database records, titles, remote services or permissions change.
+
+To save these same selections as readable UTF-8, use `render --format markdown`
+or `render --format html` with a required new `--output` path. The saved file keeps
+selection/context warnings and provenance; stdout is only a private saved-view
+receipt. The 16 MiB output cap does not turn a message-count bound into an input
+memory limit. See [Markdown views](RENDER_MARKDOWN.md) and
+[HTML views](RENDER_VIEWS.md).

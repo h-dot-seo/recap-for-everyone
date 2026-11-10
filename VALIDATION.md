@@ -1,10 +1,18 @@
 # Validation record
 
-Current release: `0.90.0-html-views`, dated 2026-11-10.
+Current release: `0.91.0-markdown-views`, dated 2026-11-10.
 This file is the current snapshot. Every dated entry since the first release is kept
 unchanged and in order in [docs/VALIDATION_HISTORY.md](docs/VALIDATION_HISTORY.md).
 
 ## Latest change
+
+2026-11-10 Read-only Markdown views (0.91.0-markdown-views): `render --format
+markdown` extends the existing snapshot, selection and no-overwrite output path.
+All metadata and bodies are fenced, controls follow the shared display rule and
+the encoded cap includes fence bytes. HTML bytes and show JSON remain unchanged.
+See [the Markdown guide](docs/RENDER_MARKDOWN.md) and the dated validation history.
+
+Previous change:
 
 2026-11-10 Read-only HTML views (0.90.0-html-views): `render --format html`
 uses the existing conversation snapshot and selectors, writes an inert Unicode

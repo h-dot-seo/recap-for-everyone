@@ -545,9 +545,14 @@ script is likewise the module of the same name in `recaplib/`. Design notes:
 ### `render`
 
 ```text
-usage: recap.py render [-h] --source SOURCE --conversation CONVERSATION [--limit LIMIT] [--offset OFFSET] [--message MESSAGE] [--around-message AROUND_MESSAGE] [--before BEFORE] [--after AFTER] --format {html} --output NEW_FILE
+usage: recap.py render [-h] --source SOURCE --conversation CONVERSATION [--limit LIMIT] [--offset OFFSET] [--message MESSAGE] [--around-message AROUND_MESSAGE] [--before BEFORE] [--after AFTER] --format {html,markdown} --output NEW_FILE
 ```
 
-Save an inert Unicode HTML view from the same read snapshot and selectors as `show`.
-`--format html` and `--output NEW_FILE` are required. No standalone twin exists.
-stdout is an ASCII `recap.saved-view.v1` receipt. See [HTML views](RENDER_VIEWS.md).
+Save a readable Unicode HTML or Markdown view from the same read snapshot and
+selectors as `show`. Choose `--format html` or `--format markdown`;
+`--output NEW_FILE` is required. No standalone twin exists. stdout is only an ASCII
+`recap.saved-view.v1` receipt with the selected document kind. Existing paths are
+refused and encoded output is capped at 16 MiB before staging. All Markdown data
+is fenced with a fixed `text` info string and fences longer than any contained
+backtick run; not every viewer is guaranteed safe. See [HTML views](RENDER_VIEWS.md)
+and [Markdown views](RENDER_MARKDOWN.md).
