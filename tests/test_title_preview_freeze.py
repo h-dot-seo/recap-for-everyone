@@ -11,6 +11,7 @@ from unittest.mock import patch
 from recaplib import title_proposal
 from recaplib.session_workflow import import_export, titles
 from recap import ingest
+from tests._nesting import deep_json
 from recaplib.title_proposal import apply_preview, preview, snapshot
 from recaplib.title_suggestion import suggest
 
@@ -152,7 +153,7 @@ class TitlePreviewFreezeTests(unittest.TestCase):
 
     def test_deep_title_files_fail_cleanly_in_both_cli_entry_points(self):
         path = Path(self.tmp.name) / 'deep-synthetic.json'
-        path.write_text('{"SYNTHETIC_PRIVATE":' + '[' * 20000 + '0' + ']' * 20000 + '}')
+        path.write_text('{"SYNTHETIC_PRIVATE":' + deep_json() + '}')
         missing = Path(self.tmp.name) / 'missing.sqlite'
         before = self.db.read_bytes()
         for database in (missing, self.db):

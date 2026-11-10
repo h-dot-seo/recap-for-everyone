@@ -123,3 +123,12 @@ of the same name in `recaplib/`), `runtime_check.py`, `verify_manifest.py` and
 connection and the FTS search described above and is re-exported by `recap.py`. The
 synthetic test suite is the `tests/` package. The layout changes no documented command
 and is a reading aid, not a stability promise for importing `recaplib` from other code.
+
+## Runtime-dependent JSON depth
+
+Strict JSON decoding remains the shared input boundary. Local occurrence hashing
+also catches encoder `RecursionError`, because some interpreters decode deeper
+objects than they can serialize. The error retains only the fixed nesting label,
+source path and physical line, before archive creation; exception notes and JSON
+keys are not exposed. Synthetic tests probe bounded depths without changing the
+process recursion limit. See [input scope](INPUT_SCOPE.md#testing-interpreter-dependent-nesting).

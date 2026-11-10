@@ -1,12 +1,19 @@
 # Validation record
 
-Current release: `0.89.1-environment-hints-removed`, dated 2026-11-09.
+Current release: `0.89.2-portable-nesting-tests`, dated 2026-11-10.
 This file is the current snapshot. Every dated entry since the first release is kept
 unchanged and in order in [docs/VALIDATION_HISTORY.md](docs/VALIDATION_HISTORY.md).
 
 ## Latest change
 
-2026-11-09 Environment hints removed (0.89.1-environment-hints-removed): the local
+2026-11-10 Portable nesting tests (0.89.2-portable-nesting-tests): synthetic depth
+fixtures now probe the running decoder within the smallest exercised byte budget.
+Local variant hashing catches encoder recursion errors without leaking private
+metadata or a traceback. Deterministic error-injection checks remain unconditional;
+only runtime-dependent depth cases may skip. Full entry and verification counts:
+[validation history](docs/VALIDATION_HISTORY.md#2026-11-10-portable-nesting-tests-0892-portable-nesting-tests).
+
+Previous change: 2026-11-09 Environment hints removed (0.89.1-environment-hints-removed): the local
 session parser now accepts any tool directory under `agents/<tool>/raw/` instead of
 a fixed list of tool names, an index comment no longer describes how often or how
 long a private re-ingest ran, three fixtures use neutral tool names, and five
@@ -14,16 +21,6 @@ sentences of the validation history no longer name a time zone, an operating
 system pairing, a local interpreter version or a workspace. No behavior for the
 documented formats changed; 1012 tests before and after. Full entry:
 [validation history](docs/VALIDATION_HISTORY.md#2026-11-09-environment-hints-removed-0891-environment-hints-removed).
-
-Previous change: 2026-11-08 Package layout (0.89.0-package-layout): the 32 implementation modules moved
-into the `recaplib/` package and the 92 test modules into the `tests/` package; the
-archive core of `recap.py` became `recaplib/archive.py` and stays importable from
-`recap`; sixteen thin compatibility entry points keep every documented
-`python <script>.py` command at the root; `recap.py`, `runtime_check.py`,
-`verify_manifest.py` and `audit_publication.py` remain real root modules; 1012 tests
-before and after; no documented command, CI command, fixture or executed sh block
-changed. Full entry:
-[validation history](docs/VALIDATION_HISTORY.md#2026-11-08-package-layout-0890-package-layout).
 
 ## What CI runs
 
@@ -34,6 +31,10 @@ false`, ten-minute timeout each), in this order: `python -m unittest discover -v
 token permissions are read-only, checkout does not persist credentials, and no secrets
 or deployment steps are used. Remote results are the public GitHub Actions history;
 this file does not restate or certify them.
+
+This bounded maintenance increment retains Python 3.10 compatibility and the
+existing CI matrix and triggers. A newest-interpreter lane and broader interpreter
+policy are deferred; no local run here establishes Python 3.15 compatibility.
 
 ## How to verify locally
 

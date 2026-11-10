@@ -1925,3 +1925,39 @@ Verification: the full suite ran on Ubuntu with Python 3.12 before publication
 after the manifest was regenerated. Not claimed: the review was a reading of this
 repository's text, not a guarantee that no inference about the maintainer is possible;
 commit metadata and the public GitHub account remain as they are.
+
+## 2026-11-10 Portable nesting tests (0.89.2-portable-nesting-tests)
+
+- Replaced interpreter-specific failure depths in import, title-file encoding and
+  title-preview tests with cached synthetic decoder probes. Twice a failing probe
+  depth fits below the supplied-title 1 MiB budget, including wrapper/BOM headroom.
+  Only the runtime-dependent case skips if no bounded failing depth is available.
+- Kept duplicate-member, surrogate and unconditional injected-RecursionError checks
+  separate from skippable fixtures. The fixed long bracket-string and depth-600
+  queue-copy fixtures remain unchanged. Probe tests cover caching, the accepted-cap
+  skip, byte headroom and unchanged recursion limits.
+- Local/local-codex variant hashing now translates encoder RecursionError into a
+  fixed nesting error with source path and physical line, suppressing the original
+  diagnostic. Deterministic tests cover inspect, inventory and import APIs and CLI
+  failures without private keys, tracebacks, source mutation or database creation.
+  An actual decoder/encoder-gap test runs when a gap with a 32-frame safety margin
+  is available; that case skips on the interpreter used for this validation.
+
+Verification on Python 3.12.14 with synthetic fixtures only:
+
+- `python -m unittest tests.test_nesting tests.test_import_failure_boundaries tests.test_title_file_encoding tests.test_title_preview_freeze -q`:
+  `Ran 49 tests in 5.773s`; `OK (skipped=1)`.
+- `python -m unittest discover -q`: `Ran 1020 tests in 68.153s`;
+  `OK (skipped=1)`. No failures or errors. The one skip is
+  `test_actual_local_decoder_encoder_gap_fails_cleanly`, not the deterministic
+  encoder failure or strict JSON security checks.
+- `python -m compileall -q .`: passed silently. Manifest regenerated with the
+  explicit date 2026-11-10; `verify_manifest.py` and `audit_publication.py` passed.
+- Existing tested guide sh blocks, CI matrix/triggers and Python 3.10 compatibility
+  floor are unchanged. No license decision, release tag or branch deletion.
+
+Not claimed: Python 3.15 or Windows was not run for this entry; adding a newer CI
+lane is deferred. A conditional gap test does not establish that every decoder
+and encoder limit combination has been exercised. No new production depth limit,
+resource exhaustion guarantee, real-data validation, remote CI result, model call,
+network access, remote rename or remote recovery is established by these tests.

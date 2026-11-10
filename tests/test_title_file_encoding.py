@@ -12,6 +12,7 @@ from unittest.mock import patch
 
 from recaplib.session_workflow import import_export, titles
 from recaplib.strict_json import loads
+from tests._nesting import deep_json
 from recaplib.title_batch import load_supplied_proposals, select_queue_item, select_proposal, SCHEMA
 from recaplib.title_proposal import read_document
 
@@ -51,16 +52,26 @@ class TitleFileEncodingTests(unittest.TestCase):
                 with self.assertRaises(ValueError): load_supplied_proposals([self.path])
                 self.assertEqual(self.path.read_bytes(), raw)
 
-    def test_duplicate_members_surrogates_and_excessive_nesting_still_fail(self):
+    def test_duplicate_members_and_surrogates_still_fail(self):
         cases = [b'{"title":"one","title":"two"}', b'{"x":{"a":1,"a":2}}',
-                 b'{"title":"\\ud800"}', b'{"\\udfff":"x"}',
-                 b'{"nested":'+b'['*10000+b'0'+b']'*10000+b'}']
+                 b'{"title":"\\ud800"}', b'{"\\udfff":"x"}']
         for raw in cases:
             for prefix in (b'', BOM_UTF8):
                 with self.subTest(prefix=prefix, raw=raw[:70]):
                     self.path.write_bytes(prefix+raw)
                     with self.assertRaises(ValueError): read_document(self.path)
                     with self.assertRaises(ValueError): load_supplied_proposals([self.path])
+
+    def test_excessive_nesting_fails_as_nesting_not_byte_budget(self):
+        raw = ('{"nested":' + deep_json() + '}').encode()
+        for prefix in (b'', BOM_UTF8):
+            with self.subTest(prefix=prefix):
+                self.path.write_bytes(prefix + raw)
+                with self.assertRaisesRegex(ValueError, 'nesting is too deep'):
+                    read_document(self.path)
+                with self.assertRaisesRegex(ValueError, '^supplied proposal file must contain valid JSON$'):
+                    load_supplied_proposals([self.path])
+                self.assertEqual(self.path.read_bytes(), prefix + raw)
 
     def test_supplied_combined_budget_counts_all_original_signature_bytes(self):
         raw = BOM_UTF8+b'{"title":"Synthetic"}'

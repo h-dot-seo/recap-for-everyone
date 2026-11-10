@@ -413,6 +413,10 @@ reports `INVALID_JSON` at that line with no partial projected text. The whole fi
 still has to parse, including unknown metadata and unselected conversations.
 No recursion limit is increased and no source text is echoed in the diagnostic.
 
+Local/local-codex variant hashing also reports `JSON nesting is too deep` with the
+source path and physical line if the encoder rejects metadata the decoder accepted.
+It does not expose encoder exception notes, metadata keys or a traceback.
+
 This is not a new fixed numeric nesting/byte limit, streaming parser, resource
 budget or repair step. Decoder limits can differ by Python runtime, input shape
 and call stack. Inputs the decoder accepts still follow the normal validation
@@ -461,3 +465,20 @@ classification, even when index entries contain additional rollout-looking field
 See [index inventory and zero-record import limits](EXPORT_INVENTORY.md#session-index-metadata-is-not-a-message-export)
 before treating a successful receipt as archived sessions. No index-driven file
 collection or new metadata persistence is added.
+
+## Testing interpreter-dependent nesting
+
+Synthetic nesting fixtures use a cached, byte-bounded decoder probe rather than
+assuming that every interpreter rejects the same bracket depth. The fixture uses
+twice a failing probe depth, with space reserved for wrappers and BOMs below the
+supplied-title reader's 1 MiB budget. If no safe failing depth is found within that
+budget, only the decoder-dependent case is skipped with an explicit reason.
+Duplicate-key, surrogate, bracket-string and deterministic exception-sanitization
+checks still run. These are test fixture bounds, not a new input-admission policy.
+
+A separate test probes the encoder and exercises an actual decoder/encoder gap
+when a depth with a 32-frame safety margin is accepted by the decoder. It skips
+when no such gap is available on the running interpreter; injected encoder-failure
+tests always exercise the source readers and CLI error boundary, including line
+numbers, hidden private diagnostics and no new database. This is not a resource
+exhaustion guarantee or proof of behavior on an untested interpreter.

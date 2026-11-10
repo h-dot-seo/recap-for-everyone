@@ -1,12 +1,12 @@
 {
   "project": "recap-for-everyone",
-  "release": "0.89.1-environment-hints-removed",
-  "date": "2026-11-09",
+  "release": "0.89.2-portable-nesting-tests",
+  "date": "2026-11-10",
   "private_history_imported": false,
   "actual_corpora_included": false,
   "synthetic_examples_only": true,
   "license_status": "NOT_SELECTED",
-  "file_count": 204,
+  "file_count": 206,
   "files": [
     {
       "path": ".gitattributes",
@@ -50,8 +50,8 @@
     },
     {
       "path": "VALIDATION.md",
-      "bytes": 4094,
-      "sha256": "0bb95bb6ef9c2edca0b8d514a4f27dfd3eb0676c482aeba0d12c98756a1660df"
+      "bytes": 4169,
+      "sha256": "1514ea2e87479023d93a498a2b5c93e5b72bd6d03ec2583d36395e62abed6792"
     },
     {
       "path": "attributed_title.py",
@@ -85,8 +85,8 @@
     },
     {
       "path": "docs/ARCHITECTURE.md",
-      "bytes": 7593,
-      "sha256": "52dc580ef6ce03aad9faac5711ca33ab6f9d0d2d88ac57921b9d1d2d4cf88a4e"
+      "bytes": 8127,
+      "sha256": "1e7d891a91feb78315f89aad7f5b26f13c9a4c80d64ffc97dab3937408019111"
     },
     {
       "path": "docs/ATTRIBUTED_MESSAGE_SELECTION.md",
@@ -120,8 +120,8 @@
     },
     {
       "path": "docs/INPUT_SCOPE.md",
-      "bytes": 30617,
-      "sha256": "756e2b29500e8503f68bcbb659df24ac843f4433bbb2e3391c35f91961880a8d"
+      "bytes": 31942,
+      "sha256": "522e1ffbb5d7f44d46b33fdca859a9b645a6e5e8709a2240d4dd5b385f813014"
     },
     {
       "path": "docs/INSTALL.md",
@@ -240,8 +240,8 @@
     },
     {
       "path": "docs/VALIDATION_HISTORY.md",
-      "bytes": 127564,
-      "sha256": "008c6867b397f41f61b43de6cbbd412881ca7795872911b8ae2640ff38850fd9"
+      "bytes": 129993,
+      "sha256": "ed65c4bdb13ddc80cad58b66e1c28c4bfecae1beba1cae4cf203823e1e6eaa67"
     },
     {
       "path": "docs/WEB_ZIP_INVENTORY.md",
@@ -380,8 +380,8 @@
     },
     {
       "path": "recaplib/local_parser.py",
-      "bytes": 22809,
-      "sha256": "86c8c40799344ecb9f4e522d5fb1bb7462c53aef88793d0b0a7b46b40937733f"
+      "bytes": 23123,
+      "sha256": "d1422899570bad2a10702825f2d2a157ab7e12df1e8a2da38e8b15704c106430"
     },
     {
       "path": "recaplib/prepare_web_export.py",
@@ -534,6 +534,11 @@
       "sha256": "114347f7f8536c1051bba7da18db7dda41fb9e77b8ad2008575e5f0d4ff6de16"
     },
     {
+      "path": "tests/_nesting.py",
+      "bytes": 939,
+      "sha256": "2d34080364b88c7792e6aec6bb6fa27dfb8af7668099ce36f930a364d8228888"
+    },
+    {
       "path": "tests/test_adapter_file_encoding.py",
       "bytes": 16970,
       "sha256": "1a89fcff4c887412bd63c0362ffa3c4f7f18d4f9c38fa47cfe50343249076824"
@@ -655,8 +660,8 @@
     },
     {
       "path": "tests/test_import_failure_boundaries.py",
-      "bytes": 14324,
-      "sha256": "a09c4b3290dcb4393fb01c6b07720702557997e1b4dcc851eb615fdf9e556a98"
+      "bytes": 18885,
+      "sha256": "2baabbcc8a1f293faf676ce31191cd4d91476bbd81f2d49de30caefd0fa4a6e7"
     },
     {
       "path": "tests/test_import_inspection.py",
@@ -702,6 +707,11 @@
       "path": "tests/test_metadata_inventory_contract.py",
       "bytes": 17290,
       "sha256": "cdb2e793d3844682c896d89869482a0432a4c0167eb039c069fa1b6f4a88ee44"
+    },
+    {
+      "path": "tests/test_nesting.py",
+      "bytes": 1890,
+      "sha256": "82d401157c45b9484b09199491636f620be7a30d48b5a4549734c0ffe641489d"
     },
     {
       "path": "tests/test_normalized_byte_ingest.py",
@@ -875,8 +885,8 @@
     },
     {
       "path": "tests/test_title_file_encoding.py",
-      "bytes": 15127,
-      "sha256": "a6642b5aa71191a24a0e9148e237f2a1f38ba171a5e5b971be8cf10d6eb4cdc2"
+      "bytes": 15711,
+      "sha256": "18f653fee40d9bc02cd593740f28ee923f63f4260b9274e813a8329eb93a322c"
     },
     {
       "path": "tests/test_title_history_view.py",
@@ -890,8 +900,8 @@
     },
     {
       "path": "tests/test_title_preview_freeze.py",
-      "bytes": 11112,
-      "sha256": "f1271c116114069e469437a77b4d86b67f2c7ae0e58df12d39e8c3893ff9e42b"
+      "bytes": 11129,
+      "sha256": "b032242b7332e473b92d4c6e11075a4f62270e262b81585ffef70114896d5185"
     },
     {
       "path": "tests/test_title_proposal.py",
