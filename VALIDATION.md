@@ -1,10 +1,19 @@
 # Validation record
 
-Current release: `0.92.0-archive-schema`, dated 2026-11-10.
+Current release: `0.93.0-saved-queue-html`, dated 2026-11-10.
 This file is the current snapshot. Every dated entry since the first release is kept
 unchanged and in order in [docs/VALIDATION_HISTORY.md](docs/VALIDATION_HISTORY.md).
 
 ## Latest change
+
+2026-11-10 Saved queue HTML (0.93.0-saved-queue-html):
+`render-queue QUEUE.json --output NEW_FILE` renders one bounded saved title queue
+without a database. Original-file SHA-256, supplied metadata, order and advisory
+warnings remain visible in inert HTML. See [the tested guide](docs/RENDER_QUEUE.md)
+and the dated validation history. No freshness, approval or privacy clearance is
+claimed. Existing conversation renderers and title JSON output are unchanged.
+
+Previous change:
 
 2026-11-10 Archive schema inspection (0.92.0-archive-schema):
 `describe-schema` inventories a single read-only metadata snapshot without lazy

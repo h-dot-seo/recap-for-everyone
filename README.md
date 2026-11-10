@@ -89,6 +89,7 @@ conversation in its original application.
 | Choose a part of a downloaded ZIP | `recap.py inspect-web-zip ZIP`, `recap.py prepare-web-export ZIP --member NAME --output NEW_FILE` | [ZIP inventory](docs/WEB_ZIP_INVENTORY.md) |
 | Find IDs and coverage before importing | `recap.py list-export INPUT --format FORMAT`, `recap.py inspect INPUT --format FORMAT` | [Export inventory](docs/EXPORT_INVENTORY.md) |
 | Import an export or normalized JSONL | `recap.py --db DB import INPUT --format FORMAT --source SOURCE`, `ingest`, `check-import` | [Input scope](docs/INPUT_SCOPE.md) |
+| Read a saved title queue | `recap.py render-queue QUEUE.json --output NEW_FILE` | [Saved queue HTML](docs/RENDER_QUEUE.md) |
 | Save a readable local view | `recap.py --db DB render --source SOURCE --conversation ID --format markdown --output NEW_FILE` (or `--format html`) | [Markdown](docs/RENDER_MARKDOWN.md), [HTML](docs/RENDER_VIEWS.md) |
 | Inspect the current archive layout | `recap.py --db DB describe-schema` | [Schema reference](docs/SCHEMA.md) |
 | Search and read | `recap.py --db DB find QUERY`, `list`, `show --source SOURCE --conversation ID`, `search`, `stats` | [Search excerpts](docs/SEARCH_EXCERPTS.md) |
@@ -116,7 +117,12 @@ Read-only metadata inspection describes the current archive layout without creat
 lazy tables. See [the schema reference](docs/SCHEMA.md) before direct SQL reads;
 counts and schema names can be private, and this is not a stability guarantee.
 
+See [saved queue views](docs/RENDER_QUEUE.md) for original-file binding, private
+output precautions and a tested synthetic walkthrough.
+
 ## Documentation
+
+- [Saved queue views](docs/RENDER_QUEUE.md): inert HTML without opening a database.
 
 - [Schema reference](docs/SCHEMA.md): read-only metadata inspection and tested SQL for the current layout.
 - [Markdown views](docs/RENDER_MARKDOWN.md): readable Unicode with fenced metadata and bodies, selected scope and private no-overwrite receipts.

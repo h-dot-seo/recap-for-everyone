@@ -68,6 +68,9 @@ def main():
     state.add_argument('--expected-state-revision', type=int); state.add_argument('--expected-title-revision', type=int)
     state.add_argument('--expected-content-sha256')
     state.add_argument('--from-queue', help='use the selected saved queue item lease; requires --set and excludes explicit expected flags')
+    queue_view = sub.add_parser('render-queue', help='render one saved title review queue as read-only HTML; no database')
+    queue_view.add_argument('input', metavar='QUEUE.json')
+    queue_view.add_argument('--output', required=True, metavar='NEW_FILE')
     batch = sub.add_parser('review-titles', help='build a read-only page of local title proposals and collision warnings')
     batch.add_argument('--source', required=True); batch.add_argument('--limit', type=int, default=20); batch.add_argument('--offset', type=int, default=0)
     batch.add_argument('--state', choices=['open', 'skipped', 'deferred'], help='filter by current snapshot-bound review state; scans eligible source content')
@@ -136,12 +139,17 @@ def main():
             command.add_argument('--expected-revision', type=int,
                                  help='reject title history changed since an earlier page')
     args = p.parse_args()
-    if args.command not in ('inspect', 'list-export', 'web-branch', 'replay-local', 'prepare-web-export', 'inspect-web-zip', 'rehearse-recovery') and not args.db:
-        p.error('--db is required except for inspect, list-export, web-branch, replay-local, prepare-web-export, inspect-web-zip and rehearse-recovery')
+    if args.command not in ('inspect', 'list-export', 'web-branch', 'replay-local', 'prepare-web-export', 'inspect-web-zip', 'rehearse-recovery', 'render-queue') and not args.db:
+        p.error('--db is required except for inspect, list-export, web-branch, replay-local, prepare-web-export, inspect-web-zip, rehearse-recovery and render-queue')
+    if args.command == 'render-queue' and args.db:
+        p.error('render-queue reads a saved JSON file only; do not pass --db')
     if args.command == 'rehearse-recovery' and args.db:
         p.error('rehearse-recovery opens --restored-db only; do not pass --db')
     try:
-        if args.command == 'list-export':
+        if args.command == 'render-queue':
+            from recaplib.render_queue import render_queue
+            result = render_queue(args.input, args.output)
+        elif args.command == 'list-export':
             from recaplib.export_inventory import list_export
             result = list_export(args.input, args.format, args.limit, args.offset, args.expected_export_sha256,
                                  contains=args.contains, canonical_unicode=args.canonical_unicode,

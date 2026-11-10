@@ -2098,3 +2098,35 @@ These are synthetic bookkeeping checks, not real conversation or service testing
 No archive integrity, index consistency, authentication, completeness, recovery,
 privacy audit or schema stability claim is made. No license, tag or packaging
 choice was made. Existing fixtures and historical validation entries are preserved.
+
+## 2026-11-10 Saved queue HTML (0.93.0-saved-queue-html)
+
+Added `render-queue QUEUE.json --output NEW_FILE`, a database-free view of one
+explicitly saved title-review queue. The page retains original-file SHA-256,
+metadata, item order, supplied proposals, advisories, collisions and unavailable
+reasons. Current envelope/item shapes and counts are validated; retained proposal
+metadata is displayed, not interpreted. Input and encoded output each have a
+16 MiB bound. Shared escaping/isolation, fixed CSP style hash and exclusive
+publication prevent data-driven markup and overwriting existing paths.
+
+Verification on the final production/test tree:
+- `python -m unittest discover -q`: Ran 1066 tests; OK (skipped=1).
+  The existing runtime-dependent decoder/encoder depth-gap case was skipped.
+- `python -m unittest tests.test_render_queue -q`: 11 tests passed.
+- Queue, conversation HTML and title-document focused suites: 37 tests passed.
+- Adversarial coverage includes Unicode/control/HTML injection in supplied keys
+  and values, JSON duplicates/nonfinite/deep/surrogate failures, exact file/BOM
+  hashes, deterministic bytes, empty/unavailable/supplied/page variants, malformed
+  schemas and identities, input immutability, no-database ASCII CLI, input/output
+  limits, exact output boundary, existing/dangling destinations, publication
+  failure and post-publication staging cleanup failure.
+- The new guide's exact sh block passed in an automated test and a separate manual
+  synthetic execution. Existing changed-guide sh blocks are byte-identical.
+- Python 3.10 syntax parsing, compileall, whitespace checks, manifest verification
+  and the limited publication audit passed. Conversation renderer, title queue
+  producer and shared publication engine bytes are unchanged.
+
+No real conversations, database refresh, network, model, remote rename, approval,
+authentication, semantic evidence validation or privacy clearance was tested or
+claimed. Browser edits are not review artifacts. Native Windows execution and
+remote publication are left to exact-commit CI and the publishing coordinator.

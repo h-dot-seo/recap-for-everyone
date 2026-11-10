@@ -5,7 +5,8 @@ exactly the `show` single read snapshot and selectors: `--message`, `--limit` wi
 `--offset`, or `--around-message` with `--before` / `--after`. Validation and defaults
 are shared, not reimplemented. [Markdown views](RENDER_MARKDOWN.md) use the same
 command with `--format markdown`; there is no standalone render script. Saved
-review-queue views remain deferred. The HTML behavior is unchanged.
+[review-queue views](RENDER_QUEUE.md) use a separate `render-queue` command. The
+conversation HTML behavior is unchanged.
 
 Create an empty directory outside this repository and replace `OUTPUT` below:
 

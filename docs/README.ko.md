@@ -199,3 +199,13 @@ python recap.py --db ../demo.sqlite title --source demo --conversation synthetic
 직접 SQL을 읽기 전 [현재 SQLite 구조](SCHEMA.md)를 확인하세요. 읽기 전용
 `describe-schema`는 지연 테이블을 생성하지 않으며, 개수와 스키마 이름은
 비공개 정보일 수 있습니다. 무결성 검사나 구조 안정성 보장은 아닙니다.
+
+## 저장한 제목 검토 대기열 보기
+
+`recap.py render-queue QUEUE.json --output NEW_FILE`은 저장한 대기열 JSON을
+읽기 전용 HTML로 표시합니다. `--db`는 받지 않으며 원본 파일의 SHA-256, 항목 순서,
+제목 경고, 충돌 수, UNAVAILABLE 사유를 유지합니다. 입력과 출력은 각각 16 MiB
+한도이며 기존 출력 경로를 덮어쓰지 않습니다. 브라우저 편집은 검토 산출물이 아니며
+적용이나 최신성 확인을 대신하지 않습니다. 원본 JSON으로 새 preview-title을 검토한
+뒤 별도로 적용하세요. 개인정보가 들어갈 수 있으므로 공개·공유 폴더 밖에 보관하세요.
+[실행 검증한 합성 예제와 경계](RENDER_QUEUE.md)를 참고하세요.

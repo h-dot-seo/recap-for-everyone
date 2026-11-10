@@ -23,12 +23,12 @@ through the repository root, which is why the commands run from there.
 ## recap.py
 
 ```text
-usage: recap.py [-h] [--db DB] {ingest,search,stats,describe-schema,inspect,list-export,inspect-web-zip,prepare-web-export,replay-local,web-branch,suggest-branch-title,suggest-replay-title,suggest-attributed-title,preview-title,apply-title,review-state,review-titles,title-adapter-dry-run,title-adapter-simulate,export-title-plan,check-title-plan,import,check-import,declare-recovery,rehearse-recovery,list,find,show,render,suggest-title,title,title-history} ...
+usage: recap.py [-h] [--db DB] {ingest,search,stats,describe-schema,inspect,list-export,inspect-web-zip,prepare-web-export,replay-local,web-branch,suggest-branch-title,suggest-replay-title,suggest-attributed-title,preview-title,apply-title,review-state,render-queue,review-titles,title-adapter-dry-run,title-adapter-simulate,export-title-plan,check-title-plan,import,check-import,declare-recovery,rehearse-recovery,list,find,show,render,suggest-title,title,title-history} ...
 ```
 
 The global `--db DB` precedes the subcommand and is required except for `inspect`,
 `list-export`, `web-branch`, `replay-local`, `prepare-web-export`, `inspect-web-zip`
-and `rehearse-recovery`; `rehearse-recovery` rejects a global `--db`. Commands that
+and `rehearse-recovery`, plus `render-queue`; the latter two reject a global `--db`. Commands that
 accept `--output NEW_JSON` create a UTF-8 file without overwriting an existing path
 and print only a receipt ([saved title documents](TITLE_DOCUMENT_FILES.md)).
 
@@ -569,3 +569,16 @@ refused and encoded output is capped at 16 MiB before staging. All Markdown data
 is fenced with a fixed `text` info string and fences longer than any contained
 backtick run; not every viewer is guaranteed safe. See [HTML views](RENDER_VIEWS.md)
 and [Markdown views](RENDER_MARKDOWN.md).
+
+### Saved queue HTML view
+
+#### `render-queue`
+
+```text
+usage: recap.py render-queue [-h] --output NEW_FILE QUEUE.json
+```
+
+Read one saved title-review queue without a database and publish inert HTML to a
+new file. Original file SHA-256, queue order, advisories, collisions and unavailable
+reasons remain visible. No approval or freshness claim. No standalone equivalent.
+See [saved queue views](RENDER_QUEUE.md).
