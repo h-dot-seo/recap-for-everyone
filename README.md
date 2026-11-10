@@ -90,6 +90,7 @@ conversation in its original application.
 | Find IDs and coverage before importing | `recap.py list-export INPUT --format FORMAT`, `recap.py inspect INPUT --format FORMAT` | [Export inventory](docs/EXPORT_INVENTORY.md) |
 | Import an export or normalized JSONL | `recap.py --db DB import INPUT --format FORMAT --source SOURCE`, `ingest`, `check-import` | [Input scope](docs/INPUT_SCOPE.md) |
 | Save a readable local view | `recap.py --db DB render --source SOURCE --conversation ID --format markdown --output NEW_FILE` (or `--format html`) | [Markdown](docs/RENDER_MARKDOWN.md), [HTML](docs/RENDER_VIEWS.md) |
+| Inspect the current archive layout | `recap.py --db DB describe-schema` | [Schema reference](docs/SCHEMA.md) |
 | Search and read | `recap.py --db DB find QUERY`, `list`, `show --source SOURCE --conversation ID`, `search`, `stats` | [Search excerpts](docs/SEARCH_EXCERPTS.md) |
 | Propose a local title | `recap.py --db DB suggest-title`, `suggest-branch-title`, `suggest-replay-title`, `suggest-attributed-title` | [Title walkthrough](docs/TITLE_WALKTHROUGH.md) |
 | Review a page and record decisions | `recap.py --db DB review-titles --source SOURCE`, `review-state` | [Review queue](docs/TITLE_REVIEW_QUEUE.md) |
@@ -111,8 +112,13 @@ the test suite in the `tests/` package, both reached from the root, where
 See [Markdown views](docs/RENDER_MARKDOWN.md) and [HTML views](docs/RENDER_VIEWS.md)
 for selection, provenance and display boundaries.
 
+Read-only metadata inspection describes the current archive layout without creating
+lazy tables. See [the schema reference](docs/SCHEMA.md) before direct SQL reads;
+counts and schema names can be private, and this is not a stability guarantee.
+
 ## Documentation
 
+- [Schema reference](docs/SCHEMA.md): read-only metadata inspection and tested SQL for the current layout.
 - [Markdown views](docs/RENDER_MARKDOWN.md): readable Unicode with fenced metadata and bodies, selected scope and private no-overwrite receipts.
 - [HTML views](docs/RENDER_VIEWS.md): read-only Unicode conversation views with private no-overwrite receipts.
 

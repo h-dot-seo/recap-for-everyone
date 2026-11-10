@@ -2059,3 +2059,42 @@ The local explicit-CRLF exercise is not a native Windows run. Exact-commit remot
 matrix results must be checked separately before merging. No production rendering,
 message evidence, file publication, receipt, guide command, CI configuration,
 license or release-tag behavior changed.
+
+
+## 2026-11-10 Archive schema inspection (0.92.0-archive-schema)
+
+Added `recap.py --db DB describe-schema`, a metadata-only inventory in one explicit
+read-only snapshot. Known table columns and row counts, lazy-ledger presence,
+FTS5 shadow-name classification, docsize-based FTS counts, NULL-safe legacy-only
+provenance counts and bounded index/trigger/unknown names are exposed. Missing
+FTS docsize means null rather than an external-content count. No lazy table is
+created. No SQL definition, default, source label, message body or title is read
+for output. Schema names/types may themselves contain private text; the report
+warns about this and archive-size disclosure. Encoded output is capped at 16 MiB.
+
+`docs/SCHEMA.md` describes the current seven-table layout, nullable columns,
+identity and first-message insertion order, title revision order, external-content
+FTS limitations and three tested read-only SQL examples. It explicitly leaves
+schema stability and a possible user_version mechanism for a future owner decision.
+Existing stats, rendering and title output contracts remain unchanged.
+
+Verification on the final production/test tree:
+- `python -m unittest discover -q`: Ran 1055 tests in 74.317s; OK (skipped=1).
+  The existing runtime-dependent decoder/encoder depth-gap case was skipped.
+- New focused inventory suite: 14 tests in 0.382s; OK. Coverage includes unchanged
+  database bytes, one BEGIN/read trace, no lazy tables, missing/non-SQLite/unrelated
+  input refusal, required-table view impersonation, hostile unknown names, metadata
+  caps, no partial stdout on byte-limit failure, stale/missing FTS docsize, NULL-safe
+  legacy comparison, column drift and executable SQL/sh documentation.
+- A WAL concurrent commit regression proves counts and schema names remain from
+  one snapshot; the next call sees the committed changes. SQL checks preserve empty
+  latest titles by id rather than timestamp and retain legacy-only occurrences.
+- The new guide was also executed manually with synthetic input; all four lazy
+  ledger flags stayed false. Existing Markdown sh blocks were byte-identical.
+- Python 3.10 syntax parsing, compileall, manifest verification, publication audit
+  and whitespace checks passed. Native Windows execution is deferred to exact-head CI.
+
+These are synthetic bookkeeping checks, not real conversation or service testing.
+No archive integrity, index consistency, authentication, completeness, recovery,
+privacy audit or schema stability claim is made. No license, tag or packaging
+choice was made. Existing fixtures and historical validation entries are preserved.

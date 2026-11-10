@@ -141,3 +141,12 @@ A bounded first pass finds the longest backtick run and counts UTF-8 bytes; both
 fences are counted before allocation and publication. Only program text and
 ordinals are emitted outside fences. This follows CommonMark isolation, without
 claiming every viewer is safe. See [Markdown views](RENDER_MARKDOWN.md).
+
+## Reading archive metadata
+
+`recaplib/archive_schema.py` implements `recap.py --db DB describe-schema` with
+one explicit read-only snapshot. It separates known archive tables, FTS5 shadow
+names and bounded unknown schema names, and counts legacy-only provenance using
+NULL-safe field equality. It does not create lazy tables or validate the archive.
+[SCHEMA.md](SCHEMA.md) documents the current layout and tested read-only SQL;
+its drift tests are not a database compatibility or stability promise.

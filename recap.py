@@ -16,6 +16,7 @@ def main():
     imp = sub.add_parser('ingest'); imp.add_argument('input'); imp.add_argument('--source', required=True)
     find = sub.add_parser('search'); find.add_argument('query'); find.add_argument('--limit', type=int, default=20)
     sub.add_parser('stats')
+    sub.add_parser('describe-schema', help='inspect a read-only archive metadata snapshot, not validate it')
     check = sub.add_parser('inspect', help='inspect export coverage without a database')
     check.add_argument('input'); check.add_argument('--format', choices=['web', 'local', 'local-codex'], required=True)
     check.add_argument('--conversation', help='inspect an explicit conversation selection without writing')
@@ -216,6 +217,9 @@ def main():
             result = ingest(args.db, args.source, args.input)
         elif args.command == 'search':
             result = search(args.db, args.query, args.limit)
+        elif args.command == 'describe-schema':
+            from recaplib.archive_schema import describe_schema
+            result = describe_schema(args.db)
         elif args.command == 'stats':
             c = readonly(args.db)
             try:
