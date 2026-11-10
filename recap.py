@@ -111,19 +111,22 @@ def main():
     find.add_argument('--canonical-unicode', action='store_true', help='match canonical Unicode equivalents without rewriting evidence')
     find.add_argument('--text-role', choices=['user', 'assistant', 'system', 'tool'], help='restrict message bodies to one role')
     find.add_argument('--cursor', help='continue with the previous search next_cursor and the same query/filters')
-    for name in ('show', 'suggest-title', 'title', 'title-history'):
+    for name in ('show', 'render', 'suggest-title', 'title', 'title-history'):
         command = sub.add_parser(name)
         command.add_argument('--source', required=True); command.add_argument('--conversation', required=True)
         if name == 'suggest-title':
             add_output_argument(command)
             command.add_argument('--message', help='use exactly this archived user message for the excerpt; no alternate-message fallback')
-        if name == 'show':
+        if name in ('show', 'render'):
             command.add_argument('--limit', type=int, help='read at most this many messages (1..1000)')
             command.add_argument('--offset', type=int, default=0, help='message offset; requires --limit')
             command.add_argument('--message', help='read exactly this message ID; excludes --limit/--offset')
             command.add_argument('--around-message', help='read bounded raw archive neighbors around this exact message ID')
             command.add_argument('--before', type=int, help='earlier archive neighbors, 0..50; default 2 with --around-message')
             command.add_argument('--after', type=int, help='later archive neighbors, 0..50; default 2 with --around-message')
+        if name == 'render':
+            command.add_argument('--format', choices=['html'], required=True)
+            command.add_argument('--output', required=True, metavar='NEW_FILE')
         if name == 'title':
             command.add_argument('--set'); command.add_argument('--expected-revision', type=int)
         if name == 'title-history':
@@ -238,6 +241,11 @@ def main():
         elif args.command == 'list':
             from recaplib.conversation_view import conversations
             result = conversations(args.db, args.source, args.limit, args.offset)
+        elif args.command == 'render':
+            from recaplib.render_view import render_conversation
+            result = render_conversation(args.db, args.source, args.conversation, args.output,
+                                         args.limit, args.offset, args.message,
+                                         args.around_message, args.before, args.after)
         elif args.command == 'show':
             from recaplib.conversation_view import conversation
             result = conversation(args.db, args.source, args.conversation, args.limit, args.offset, args.message,

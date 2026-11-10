@@ -153,3 +153,5 @@ restored copy and treat a run against the live archive as a self-check. Never re
 recovery as verified from a Git ref, a push message or a passing declaration; remote
 fetch, decryption and key custody stay outside this repository. See
 `docs/RECOVERY_REHEARSAL.md`.
+
+Use `recap.py --db DB render --source SOURCE --conversation ID --format html --output NEW_FILE` when a readable private local conversation view is needed. Reuse show selectors to bound the view, keep output outside shared folders and read the saved-view receipt. This never applies titles or creates review authority. See `docs/RENDER_VIEWS.md`.

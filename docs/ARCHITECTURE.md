@@ -132,3 +132,5 @@ objects than they can serialize. The error retains only the fixed nesting label,
 source path and physical line, before archive creation; exception notes and JSON
 keys are not exposed. Synthetic tests probe bounded depths without changing the
 process recursion limit. See [input scope](INPUT_SCOPE.md#testing-interpreter-dependent-nesting).
+
+The render layer consumes the existing single-snapshot conversation object, without SQL changes. It hashes that exact view as `view_sha256`, not a whole-content fingerprint, and emits inert HTML through an incremental 16 MiB encoded-output cap. The shared document byte publisher preserves title JSON receipts and atomic no-overwrite publication; recovery and ZIP preparation retain their existing separate contracts. See [HTML views](RENDER_VIEWS.md).

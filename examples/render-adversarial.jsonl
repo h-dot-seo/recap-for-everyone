@@ -1,0 +1,2 @@
+{"conversation_id": "fictional", "message_id": "one", "role": "user", "timestamp": "Synthetic timestamp", "title": "Fictional <img src=x> \ud569\uc131 \uc81c\ubaa9", "text": "Synthetic adversarial fixture: \ud569\uc131 \ud55c\uad6d\uc5b4\n```\n# Forged\n</pre><script>alert(1)</script>\n[x](https://example.invalid)\n\u202e\u001b\r\u007f\u2028\u2029\u200c\u200d"}
+{"conversation_id": "fictional", "message_id": "two", "role": "assistant", "timestamp": "Synthetic timestamp", "title": "Fictional title", "text": "Fictional second message."}

@@ -1,10 +1,17 @@
 # Validation record
 
-Current release: `0.89.2-portable-nesting-tests`, dated 2026-11-10.
+Current release: `0.90.0-html-views`, dated 2026-11-10.
 This file is the current snapshot. Every dated entry since the first release is kept
 unchanged and in order in [docs/VALIDATION_HISTORY.md](docs/VALIDATION_HISTORY.md).
 
 ## Latest change
+
+2026-11-10 Read-only HTML views (0.90.0-html-views): `render --format html`
+uses the existing conversation snapshot and selectors, writes an inert Unicode
+HTML file exclusively, and emits a private saved-view receipt. See
+[the guide](docs/RENDER_VIEWS.md) and the dated validation history entry.
+
+Previous change:
 
 2026-11-10 Portable nesting tests (0.89.2-portable-nesting-tests): synthetic depth
 fixtures now probe the running decoder within the smallest exercised byte budget.

@@ -1961,3 +1961,29 @@ lane is deferred. A conditional gap test does not establish that every decoder
 and encoder limit combination has been exercised. No new production depth limit,
 resource exhaustion guarantee, real-data validation, remote CI result, model call,
 network access, remote rename or remote recovery is established by these tests.
+
+## 2026-11-10 Read-only HTML views (0.90.0-html-views)
+
+- Added `render --format html --output NEW_FILE`, sharing the existing single-read
+  conversation snapshot and all show selectors without changing show JSON.
+- Extracted exclusive byte publication while preserving title staging prefixes,
+  receipt schema and failure-injection patch points. Recovery and ZIP publishers
+  retain their existing contracts in this slice.
+- Added inert Unicode HTML, hash-bound CSP, no-referrer, isolated escaped values,
+  visible control/format escapes, retained selection and provenance, canonical
+  `view_sha256`, and an incremental 16 MiB encoded-output limit before publication.
+- Eight synthetic tests cover hostile bodies and metadata, Unicode controls,
+  markup, CSP hashes, snapshot selection and determinism, no mutation, exclusive
+  publication and cleanup failures, size boundaries, unchanged show JSON and the
+  executable guide under ASCII stdout. Existing title output tests also pass.
+- `python -m unittest discover -q`: `Ran 1028 tests in 71.398s`;
+  `OK (skipped=1)`. No failures or errors. The inherited skip is the
+  runtime-dependent actual decoder/encoder depth-gap test.
+- `python -m compileall -q .`: passed. New guide commands also executed separately.
+  Manifest regenerated with explicit date 2026-11-10; manifest verification and
+  publication audit passed. Protected executable guide blocks are unchanged.
+
+Not claimed: active-branch reconstruction, vendor export, reversible transcript,
+privacy clearance, browser-edit review authority, real-data validation, remote CI
+results, model calls, network calls or authentication. Markdown and saved-queue
+views remain deferred. No Windows or browser visual run is claimed locally.

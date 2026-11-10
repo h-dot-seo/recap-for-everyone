@@ -23,7 +23,7 @@ through the repository root, which is why the commands run from there.
 ## recap.py
 
 ```text
-usage: recap.py [-h] [--db DB] {ingest,search,stats,inspect,list-export,inspect-web-zip,prepare-web-export,replay-local,web-branch,suggest-branch-title,suggest-replay-title,suggest-attributed-title,preview-title,apply-title,review-state,review-titles,title-adapter-dry-run,title-adapter-simulate,export-title-plan,check-title-plan,import,check-import,declare-recovery,rehearse-recovery,list,find,show,suggest-title,title,title-history} ...
+usage: recap.py [-h] [--db DB] {ingest,search,stats,inspect,list-export,inspect-web-zip,prepare-web-export,replay-local,web-branch,suggest-branch-title,suggest-replay-title,suggest-attributed-title,preview-title,apply-title,review-state,review-titles,title-adapter-dry-run,title-adapter-simulate,export-title-plan,check-title-plan,import,check-import,declare-recovery,rehearse-recovery,list,find,show,render,suggest-title,title,title-history} ...
 ```
 
 The global `--db DB` precedes the subcommand and is required except for `inspect`,
@@ -541,3 +541,13 @@ inventory behind the `recap.py` commands), `recaplib/title_batch.py` (review pag
 above and have no entry point of their own; the implementation of every standalone
 script is likewise the module of the same name in `recaplib/`. Design notes:
 [architecture](ARCHITECTURE.md).
+
+### `render`
+
+```text
+usage: recap.py render [-h] --source SOURCE --conversation CONVERSATION [--limit LIMIT] [--offset OFFSET] [--message MESSAGE] [--around-message AROUND_MESSAGE] [--before BEFORE] [--after AFTER] --format {html} --output NEW_FILE
+```
+
+Save an inert Unicode HTML view from the same read snapshot and selectors as `show`.
+`--format html` and `--output NEW_FILE` are required. No standalone twin exists.
+stdout is an ASCII `recap.saved-view.v1` receipt. See [HTML views](RENDER_VIEWS.md).
