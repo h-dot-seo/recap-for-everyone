@@ -1,10 +1,29 @@
 # Validation record
 
-Current release: `0.93.0-saved-queue-html`, dated 2026-11-10.
+Current release: `0.94.0-normalized-export`, dated 2026-11-10.
 This file is the current snapshot. Every dated entry since the first release is kept
 unchanged and in order in [docs/VALIDATION_HISTORY.md](docs/VALIDATION_HISTORY.md).
 
 ## Latest change
+
+2026-11-10 Normalized-export test connection cleanup correction:
+the first remote Windows Python 3.12 run failed during temporary-directory cleanup
+because seven test SQLite connections were committed but not explicitly closed.
+The test contexts now close handles deterministically while preserving transactions.
+Production code and export behavior are unchanged. Remote validation remains
+pending until the corrected exact commit passes CI; see the validation history.
+
+Previous change:
+
+2026-11-10 Normalized text export (0.94.0-normalized-export):
+`export-normalized` streams whole-source or selected-conversation JSONL from one
+read-only snapshot, with exclusive publication and a private-file receipt.
+Synthetic tests cover round trips, Unicode, global ordering, omitted provenance,
+legacy ledgers, snapshot consistency and bounded buffering. See
+[the guide](docs/EXPORT_NORMALIZED.md). No origin-ledger round trip, backup,
+active-branch reconstruction or privacy clearance is claimed.
+
+Previous change:
 
 2026-11-10 Saved queue HTML (0.93.0-saved-queue-html):
 `render-queue QUEUE.json --output NEW_FILE` renders one bounded saved title queue

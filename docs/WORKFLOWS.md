@@ -1164,3 +1164,12 @@ handoff bundles, private test output and other unlisted working files must remai
 outside that candidate. Do not add private files to the manifest just to make a
 check pass. This inventory check supplements the limited secret/type scanner and
 human content review; it does not establish anonymity or legal clearance.
+
+## Export a portable normalized copy
+
+Use `recap.py --db DB export-normalized --source SOURCE --output NEW_JSONL`,
+optionally with `--conversation ID`, for ingest-shaped text-only JSONL from one
+read-only snapshot. Full message text and per-message original titles remain in
+global insertion order. Keep this PRIVATE FILE and its receipt outside shared
+folders. No origin ledger, local titles, review state or original bytes are carried.
+This is not a source-archive backup; see [the tested guide](EXPORT_NORMALIZED.md).

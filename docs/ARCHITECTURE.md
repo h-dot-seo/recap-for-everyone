@@ -152,3 +152,13 @@ NULL-safe field equality. It does not create lazy tables or validate the archive
 its drift tests are not a database compatibility or stability promise.
 
 `recaplib/render_queue.py` reads one bounded saved queue, validates its current envelope/item shapes and preserves supplied proposal metadata as inert JSON. It reuses the HTML display layer and exclusive byte publisher without changing conversation rendering. The file SHA-256 binds the page to input bytes, not current database truth. No SQL, clock, model or network call is made. See [saved queue views](RENDER_QUEUE.md).
+
+## Derived normalized export
+
+`recaplib/normalized_export.py` streams one source, optionally one conversation,
+in global message insertion order under one read-only BEGIN snapshot. The recovery
+publisher now has a streaming sibling sharing the existing staged hard-link
+publication implementation. Memory is bounded by a message, not source size.
+Only original message fields are exported, never origin ledgers or local state.
+The derived file hash is not an original-export identity or recovery claim; see
+[normalized export](EXPORT_NORMALIZED.md).

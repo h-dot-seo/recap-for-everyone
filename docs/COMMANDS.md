@@ -23,7 +23,7 @@ through the repository root, which is why the commands run from there.
 ## recap.py
 
 ```text
-usage: recap.py [-h] [--db DB] {ingest,search,stats,describe-schema,inspect,list-export,inspect-web-zip,prepare-web-export,replay-local,web-branch,suggest-branch-title,suggest-replay-title,suggest-attributed-title,preview-title,apply-title,review-state,render-queue,review-titles,title-adapter-dry-run,title-adapter-simulate,export-title-plan,check-title-plan,import,check-import,declare-recovery,rehearse-recovery,list,find,show,render,suggest-title,title,title-history} ...
+usage: recap.py [-h] [--db DB] {ingest,search,stats,describe-schema,inspect,list-export,inspect-web-zip,prepare-web-export,replay-local,web-branch,suggest-branch-title,suggest-replay-title,suggest-attributed-title,preview-title,apply-title,review-state,render-queue,review-titles,title-adapter-dry-run,title-adapter-simulate,export-title-plan,check-title-plan,import,check-import,export-normalized,declare-recovery,rehearse-recovery,list,find,show,render,suggest-title,title,title-history} ...
 ```
 
 The global `--db DB` precedes the subcommand and is required except for `inspect`,
@@ -31,6 +31,8 @@ The global `--db DB` precedes the subcommand and is required except for `inspect
 and `rehearse-recovery`, plus `render-queue`; the latter two reject a global `--db`. Commands that
 accept `--output NEW_JSON` create a UTF-8 file without overwriting an existing path
 and print only a receipt ([saved title documents](TITLE_DOCUMENT_FILES.md)).
+`export-normalized` also requires `--db`; its required `--output` writes private
+JSONL, not a title document, and stdout carries a text-free receipt.
 
 ### Archive metadata inspection
 
@@ -56,6 +58,16 @@ usage: recap.py ingest [-h] --source SOURCE input
 Import one already-normalized UTF-8 JSONL file into the archive, hashing its
 original bytes and retaining a line locator per message. Guide: README quick start
 and [workflows](WORKFLOWS.md#normalized-jsonl-ingest-and-the-generic-session-parser).
+
+#### `export-normalized`
+
+```text
+usage: recap.py export-normalized [-h] --source SOURCE [--conversation CONVERSATION] --output OUTPUT
+```
+
+Export one source or conversation in global insertion order from one read-only
+snapshot to exclusive UTF-8 LF JSONL. Full private message text, original titles,
+no origin ledger or local title history. Guide: [normalized export](EXPORT_NORMALIZED.md).
 
 #### `search`
 
