@@ -1,4 +1,5 @@
 """Synthetic normalized export, publication and portability boundaries."""
+from contextlib import closing
 import hashlib
 import json
 import os
@@ -75,11 +76,11 @@ class NormalizedExportTests(unittest.TestCase):
 
     def test_provenance_union_and_legacy_only(self):
         import_export(self.db, 'synthetic', ROOT / 'examples/web-export.json', 'web')
-        with sqlite3.connect(self.db) as c:
+        with closing(sqlite3.connect(self.db)) as c, c:
             count = c.execute('SELECT COUNT(*) FROM export_occurrences').fetchone()[0]
         first = export_normalized(self.db, 'synthetic', self.out)
         self.assertEqual(first['omitted_export_occurrences'], count)
-        with sqlite3.connect(self.db) as c:
+        with closing(sqlite3.connect(self.db)) as c, c:
             c.execute('DROP TABLE export_occurrences')
         second = self.root / 'legacy.jsonl'
         receipt = export_normalized(self.db, 'synthetic', second)
@@ -87,12 +88,12 @@ class NormalizedExportTests(unittest.TestCase):
         self.assertEqual(second.read_bytes(), self.out.read_bytes())
         other = self.root / 'other.sqlite'
         ingest(other, 'moved', self.out)
-        with sqlite3.connect(other) as c:
+        with closing(sqlite3.connect(other)) as c, c:
             self.assertEqual(c.execute("SELECT COUNT(*) FROM sqlite_master WHERE name LIKE 'export_%'").fetchone()[0], 0)
 
     def test_duplicate_occurrences_are_counted_not_exported(self):
         self.seed()
-        with sqlite3.connect(self.db) as c:
+        with closing(sqlite3.connect(self.db)) as c, c:
             c.execute('CREATE TABLE export_provenance (source,conversation,message,original_hash,locator,parent)')
             c.execute('CREATE TABLE export_occurrences (source,conversation,message,original_hash,locator,parent)')
             row = ('synthetic', 'demo-conversation', 'demo-user', 'a'*64, 'line:1', None)
@@ -145,7 +146,7 @@ class NormalizedExportTests(unittest.TestCase):
 
     def test_invalid_archive_row_does_not_publish_partial_file(self):
         self.seed()
-        with sqlite3.connect(self.db) as c:
+        with closing(sqlite3.connect(self.db)) as c, c:
             c.execute("UPDATE messages SET role='unsupported' WHERE message_id='demo-assistant'")
         with self.assertRaises(ValueError):
             export_normalized(self.db, 'synthetic', self.out)
@@ -167,7 +168,7 @@ class NormalizedExportTests(unittest.TestCase):
 
     def test_one_snapshot_under_concurrent_write(self):
         self.seed()
-        with sqlite3.connect(self.db) as c:
+        with closing(sqlite3.connect(self.db)) as c, c:
             c.execute('PRAGMA journal_mode=WAL')
         def concurrent(output, chunks, prefix):
             row = dict(conversation_id='late', message_id='late', role='user', timestamp='synthetic', text='Late fictional message')
@@ -181,7 +182,7 @@ class NormalizedExportTests(unittest.TestCase):
 
     def test_streaming_memory(self):
         self.seed()
-        with sqlite3.connect(self.db) as c:
+        with closing(sqlite3.connect(self.db)) as c, c:
             c.executemany('INSERT INTO messages(source_id,conversation_id,message_id,role,timestamp,title,text,source_sha256,source_line) VALUES(?,?,?,?,?,?,?,?,?)',
                 (('synthetic', 'many', str(i), 'user', 'synthetic', '', 'x'*4096, 'a'*64, i+1) for i in range(4000)))
         tracemalloc.start()

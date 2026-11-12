@@ -6,6 +6,15 @@ unchanged and in order in [docs/VALIDATION_HISTORY.md](docs/VALIDATION_HISTORY.m
 
 ## Latest change
 
+2026-11-10 Normalized-export test connection cleanup correction:
+the first remote Windows Python 3.12 run failed during temporary-directory cleanup
+because seven test SQLite connections were committed but not explicitly closed.
+The test contexts now close handles deterministically while preserving transactions.
+Production code and export behavior are unchanged. Remote validation remains
+pending until the corrected exact commit passes CI; see the validation history.
+
+Previous change:
+
 2026-11-10 Normalized text export (0.94.0-normalized-export):
 `export-normalized` streams whole-source or selected-conversation JSONL from one
 read-only snapshot, with exclusive publication and a private-file receipt.

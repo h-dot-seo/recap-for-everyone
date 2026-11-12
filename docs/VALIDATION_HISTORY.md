@@ -2159,3 +2159,25 @@ history, review state, active-branch reconstruction, completeness, authenticatio
 privacy clearance or source-archive recovery is claimed. Data and licensing remain
 unchanged. Native Windows execution and remote publication remain for exact-commit
 CI and the publishing coordinator.
+
+## 2026-11-10 Normalized-export test connection cleanup correction
+
+The initial PR 11 Windows Python 3.12 job (run 42793812740, job 129753692607,
+head f0d38f64) reported five temporary-directory cleanup errors with WinError 32
+on `archive.sqlite`: duplicate-occurrence counting, invalid-row rejection,
+concurrent-write snapshot, legacy provenance and streaming-memory tests.
+SQLite connection context managers commit or roll back but do not close handles.
+Seven new test connection contexts now use `contextlib.closing` around the
+existing transaction context, so transactions finish before deterministic close.
+No assertions were removed, and production code and documented export semantics
+are unchanged. The release remains `0.94.0-normalized-export`.
+
+The prior local pass did not establish Windows compatibility. The correction
+requires a new exact-head Windows/Ubuntu CI pass before merge; this entry does not
+claim that remote validation has already succeeded.
+
+Local correction verification:
+- `python -m unittest discover -q`: Ran 1078 tests in 73.674s; OK (skipped=1).
+- Normalized-export and recovery focused suites: 29 tests passed.
+- Manifest verification, limited publication audit, compileall, Python 3.10 grammar
+  parsing of 160 files and whitespace checks passed. No production file changed.
