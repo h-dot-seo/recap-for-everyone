@@ -1,12 +1,12 @@
 {
   "project": "recap-for-everyone",
-  "release": "0.95.1-time-search",
+  "release": "0.95.2-time-stats",
   "date": "2026-11-08",
   "private_history_imported": false,
   "actual_corpora_included": false,
   "synthetic_examples_only": true,
   "license_status": "NOT_SELECTED",
-  "file_count": 235,
+  "file_count": 237,
   "files": [
     {
       "path": ".gitattributes",
@@ -45,13 +45,13 @@
     },
     {
       "path": "SKILL.md",
-      "bytes": 13916,
-      "sha256": "87edbb935976df9e761b59d70a9a4092bb1bcbca9527b47ee58bbadee2de791e"
+      "bytes": 14071,
+      "sha256": "884475c502eeffa39ef58b18462fe5d39d56bc069b787362c27aa1ed866be3ca"
     },
     {
       "path": "VALIDATION.md",
-      "bytes": 9976,
-      "sha256": "c116b91cf3f8a9d961e73ea86673700bfca99884c771b10939fab0e29ebec9a4"
+      "bytes": 10577,
+      "sha256": "5f776573bbead8f4f2c32d897c988bef9afa5fb24ffe6d75d00d8353d00c4f15"
     },
     {
       "path": "attributed_title.py",
@@ -100,8 +100,8 @@
     },
     {
       "path": "docs/BROWSE_BY_TIME.md",
-      "bytes": 6717,
-      "sha256": "d982d15a6c140e15b30a54842f5f712ef3cd18c4abf4b95cedb0d61897568051"
+      "bytes": 8284,
+      "sha256": "83f4b38dc226bfc6465346ad4c3aad62d7aca128413d3c30111ac8d7730f3986"
     },
     {
       "path": "docs/CANONICAL_UNICODE_SEARCH.md",
@@ -110,8 +110,8 @@
     },
     {
       "path": "docs/COMMANDS.md",
-      "bytes": 25676,
-      "sha256": "3e26a1366de7b8f990d161be87217b1f78d207acba90f65e6287b46793f03fc6"
+      "bytes": 25887,
+      "sha256": "6d70c8718eac79851baa6c2c0588a9845d5c72d02d1f81c6225727fa5b03c480"
     },
     {
       "path": "docs/EXPORT_INVENTORY.md",
@@ -280,8 +280,8 @@
     },
     {
       "path": "docs/VALIDATION_HISTORY.md",
-      "bytes": 153764,
-      "sha256": "a378e061b773fe91f5ce45078ace0f98776910965281a0a448db03a5cac3552c"
+      "bytes": 154348,
+      "sha256": "8fde753100c4969c3e2e5efd3ac9c2a39ab0377efadd00650b20e83fb42654fb"
     },
     {
       "path": "docs/WEB_ZIP_INVENTORY.md",
@@ -390,8 +390,8 @@
     },
     {
       "path": "recap.py",
-      "bytes": 25518,
-      "sha256": "1df710ea4f48f4cb120816e2e7bd79b06476b0b2ed9e46761fbad00868e2bf3c"
+      "bytes": 25816,
+      "sha256": "24306131aaccbf7125249bc43c8b3afd5ac8f9cfde5c1b82fde55e2cc63807b4"
     },
     {
       "path": "recaplib/__init__.py",
@@ -517,6 +517,11 @@
       "path": "recaplib/time_inventory.py",
       "bytes": 4872,
       "sha256": "c9b49720c5d3aab5e3fe6045f32a4150f1b9bf18ffed6e68747b78ecbe567e13"
+    },
+    {
+      "path": "recaplib/time_stats.py",
+      "bytes": 3132,
+      "sha256": "29938b18db4d3d7b3b4533fcac4955beeb1a298d87691fde1ca385e362228316"
     },
     {
       "path": "recaplib/timestamps.py",
@@ -1007,6 +1012,11 @@
       "path": "tests/test_time_search.py",
       "bytes": 6807,
       "sha256": "00e8cfda689ba67dab1354dbf82820d677dcba1c4c5d485c2668616266f3472d"
+    },
+    {
+      "path": "tests/test_time_stats.py",
+      "bytes": 5407,
+      "sha256": "0f4d8b4daa697e9dce4079f1c969d1d0bd250ea61ad40769feac2bc2964e60ec"
     },
     {
       "path": "tests/test_title_adapter.py",

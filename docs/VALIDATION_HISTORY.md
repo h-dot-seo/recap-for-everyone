@@ -2315,3 +2315,12 @@ Nine synthetic tests cover boundary/offset/epoch behavior, original-title refetc
 role/export intersection, pre-open validation, legacy cursor compatibility,
 window continuation/rejection, read-only bytes and standalone/unified CLI parity.
 See [browse by time](BROWSE_BY_TIME.md).
+
+2026-11-14 Per-source time coverage (0.95.2-time-stats):
+adds stats --by-source while preserving the default two-key stats output.
+Source-union rows expose stored messages, distinct within-source conversations,
+ISO/epoch/unparsed counts and nullable UTC extrema in one read-only snapshot.
+Eight synthetic tests cover empty/artifact-only archives, binary identities,
+repeated imports, numeric policy and extremes, missing artifact records,
+CLI/default/read-only behavior, missing DB and interleaved snapshot consistency.
+No schema, ingestion ledger or source activity claim is added.

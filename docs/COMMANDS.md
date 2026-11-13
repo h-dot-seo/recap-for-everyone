@@ -82,7 +82,7 @@ message titles. Guide: [workflows](WORKFLOWS.md#search-and-read-the-archive).
 #### `stats`
 
 ```text
-usage: recap.py stats [-h]
+usage: recap.py stats [-h] [--by-source]
 ```
 
 Read-only counts for the selected archive.
@@ -618,3 +618,7 @@ list output. See [time interpretation and pagination](BROWSE_BY_TIME.md).
 `find` and standalone `conversation_search.py` accept `--from YYYY-MM-DD` and
 `--until YYYY-MM-DD`: only bodies inside the inclusive UTC calendar-day window
 are searched. Titles remain conversation-wide. See [time browsing](BROWSE_BY_TIME.md).
+
+`stats --by-source` adds stored-row/conversation counts and declared timestamp
+coverage per source in one read-only snapshot. Default `stats` is unchanged.
+See [time browsing](BROWSE_BY_TIME.md).

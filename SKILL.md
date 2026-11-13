@@ -192,3 +192,6 @@ absence from a window as no activity. This is read-only query interpretation.
 
 For time-scoped body search, use `find --from YYYY-MM-DD --until YYYY-MM-DD`.
 Repeat both bounds with a search cursor; list windows instead qualify whole conversations.
+
+Use `stats --by-source` for per-source stored counts and explicit timestamp-rule coverage,
+not source activity, completeness or ingestion-attempt totals.
