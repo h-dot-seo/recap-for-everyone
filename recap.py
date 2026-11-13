@@ -113,6 +113,9 @@ def main():
         command.add_argument('--text', action='store_true', help='print an ASCII text summary instead of JSON')
     listing = sub.add_parser('list', help='list conversations and current display titles')
     listing.add_argument('--source'); listing.add_argument('--limit', type=int, default=50); listing.add_argument('--offset', type=int, default=0)
+    listing.add_argument('--order', choices=['recent', 'oldest'])
+    listing.add_argument('--from', dest='from_date')
+    listing.add_argument('--until', dest='until_date')
     find = sub.add_parser('find', help='search current titles and conversation text')
     find.add_argument('query'); find.add_argument('--source'); find.add_argument('--limit', type=int, default=20)
     find.add_argument('--export-sha256', help='restrict message bodies to one original export provenance hash')
@@ -257,7 +260,8 @@ def main():
                              args.limit, args.offset, args.expected_revision)
         elif args.command == 'list':
             from recaplib.conversation_view import conversations
-            result = conversations(args.db, args.source, args.limit, args.offset)
+            result = conversations(args.db, args.source, args.limit, args.offset,
+                                   order=args.order, from_date=args.from_date, until_date=args.until_date)
         elif args.command == 'render':
             from recaplib.render_view import render_conversation
             result = render_conversation(args.db, args.source, args.conversation, args.output,

@@ -1,0 +1,7 @@
+{"conversation_id": "later", "message_id": "synthetic-0", "role": "user", "timestamp": "2026-02-01T00:00:00Z", "title": "Synthetic later", "text": "Invented time demonstration"}
+{"conversation_id": "later", "message_id": "synthetic-1", "role": "user", "timestamp": "2026-01-15T00:00:00Z", "title": "Synthetic later", "text": "Invented time demonstration"}
+{"conversation_id": "offset", "message_id": "synthetic-2", "role": "user", "timestamp": "2026-01-01T00:00:00+09:00", "title": "Synthetic offset", "text": "Invented time demonstration"}
+{"conversation_id": "epoch", "message_id": "synthetic-3", "role": "user", "timestamp": "1767225600.1234567", "title": "Synthetic epoch", "text": "Invented time demonstration"}
+{"conversation_id": "digit-date", "message_id": "synthetic-4", "role": "user", "timestamp": "20260101", "title": "Synthetic digit-date", "text": "Invented time demonstration"}
+{"conversation_id": "unparsed", "message_id": "synthetic-5", "role": "user", "timestamp": "unknown", "title": "Synthetic unparsed", "text": "Invented time demonstration"}
+{"conversation_id": "unparsed", "message_id": "synthetic-6", "role": "user", "timestamp": "2026-01-01T00:00:00", "title": "Synthetic unparsed", "text": "Invented time demonstration"}

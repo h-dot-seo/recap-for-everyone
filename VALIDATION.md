@@ -1,10 +1,21 @@
 # Validation record
 
-Current release: `0.94.3-adapter-illustration`, dated 2026-11-13.
+Current release: `0.95.0-time-listing`, dated 2026-11-13.
 This file is the current snapshot. Every dated entry since the first release is kept
 unchanged and in order in [docs/VALIDATION_HISTORY.md](docs/VALIDATION_HISTORY.md).
 
 ## Latest change
+
+2026-11-13 Opt-in time listing (0.95.0-time-listing):
+adds a deterministic timestamp rule and list-only UTC windows/recent/oldest order.
+Default inventory SQL/output, stored values and provenance remain unchanged.
+Nineteen synthetic tests cover strict grammar, numeric-policy disclosure, offsets,
+truncation, calendar boundaries, ties, missing times, same-snapshot counts/titles,
+page-only title lookups, read-only behavior, standalone parity and guide execution.
+No find cursor, stats extension, schema migration or ingestion ledger is added.
+See [browse by time](docs/BROWSE_BY_TIME.md).
+
+Previous change:
 
 2026-11-13 Invented adapter illustration (0.94.3-adapter-illustration):
 adds a standalone stdlib converter for one synthetic shape, an exact-byte receipt,

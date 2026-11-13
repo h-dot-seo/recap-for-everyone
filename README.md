@@ -45,7 +45,8 @@ python -m unittest discover -v
 
 Use a writable database path outside this public repository for your own data.
 Input is UTF-8 JSONL: one message per line with `conversation_id`, `message_id`,
-`role`, `timestamp`, `text` and optional `title`. Timestamps are retained as supplied;
+`role`, `timestamp`, `text` and optional `title`. For opt-in time ordering and UTC windows, see [browse by time](docs/BROWSE_BY_TIME.md).
+Timestamps are retained as supplied;
 the importer does not normalize, validate or filter dates. Search uses literal
 AND-connected FTS5 terms rather than raw SQL or a user-supplied FTS expression.
 
@@ -133,6 +134,7 @@ re-ingestible JSONL. This derived copy does not replace original exports or back
 
 ## Documentation
 
+- [Browse by time](docs/BROWSE_BY_TIME.md): opt-in list ordering/UTC windows with explicit timestamp interpretation.
 - [Invented adapter illustration](docs/ADAPTER_GUIDE.md): synthetic conversion, byte receipts, tested walkthrough and maintainer checklist.
 - [Normalized input contract](docs/NORMALIZED_JSONL.md): accepted fields, read-only diagnostics, hash-bound ingest and normalized-file provenance.
 
