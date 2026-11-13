@@ -10,14 +10,17 @@ import unicodedata
 from recaplib.unicode_search import canonical_fold, canonical_span
 from recaplib.archive import readonly
 from recaplib.strict_json import loads
+from recaplib.timestamps import RULE, parse_timestamp, validate_options
 
 
 MAX_CURSOR_CHARS = 16384
 
 
-def _cursor_scope(terms, source, history, export, canonical_unicode=False, text_role=None):
+def _cursor_scope(terms, source, history, export, canonical_unicode=False, text_role=None, from_date=None, until_date=None):
     value = dict(protocol='recap.find.cursor.v1', terms=terms, source=source,
                  include_title_history=history, export_sha256=export)
+    if from_date is not None or until_date is not None:
+        value.update(from_date=from_date, until_date=until_date, timestamp_rule=RULE)
     if text_role is not None:
         value['text_role'] = text_role
     if canonical_unicode:
@@ -128,7 +131,10 @@ def _matching_export_provenance(connection, tables, source, conversation, messag
     return samples,count
 
 
-def find(db, query, source=None, limit=20, include_title_history=False, export_sha256=None, cursor=None, canonical_unicode=False, text_role=None):
+def find(db, query, source=None, limit=20, include_title_history=False, export_sha256=None, cursor=None, canonical_unicode=False, text_role=None, from_date=None, until_date=None):
+    lower, upper = validate_options(None, from_date, until_date)
+    window = from_date is not None or until_date is not None
+    interpretation_counts = dict(parsed_iso=0, parsed_epoch_seconds=0, unparsed=0)
     if text_role is not None and text_role not in ('user', 'assistant', 'system', 'tool'):
         raise ValueError('text_role must be user, assistant, system or tool')
     if not isinstance(query, str) or type(limit) is not int:
@@ -145,7 +151,7 @@ def find(db, query, source=None, limit=20, include_title_history=False, export_s
         raise ValueError('provide 1..20 search terms and limit 1..1000')
     # Repeating a query term must not give it extra evidence-sampling weight.
     terms = list(dict.fromkeys(terms))
-    scope = _cursor_scope(terms, source, include_title_history, export_sha256, canonical_unicode, text_role)
+    scope = _cursor_scope(terms, source, include_title_history, export_sha256, canonical_unicode, text_role, from_date, until_date)
     after = _decode_cursor(cursor, scope)
     position = (after['rank'], after['source'], after['conversation']) if after is not None else None
     c = readonly(db)
@@ -220,12 +226,17 @@ def find(db, query, source=None, limit=20, include_title_history=False, export_s
                 bucket.append(item)
 
         for row in c.execute(sql, params):
+            if window:
+                instant, kind = parse_timestamp(row['timestamp'])
+                interpretation_counts[kind] += 1
+                if instant is None or (lower is not None and instant < lower) or (upper is not None and instant >= upper):
+                    continue
             next_key = (row['source_id'], row['conversation_id'])
             if next_key != key:
                 finish()
                 key = next_key
                 original_title = row['title']
-                if export_sha256 is not None or text_role is not None:
+                if export_sha256 is not None or text_role is not None or window:
                     original_title = c.execute('SELECT title FROM messages WHERE source_id=? AND conversation_id=? ORDER BY message_pk LIMIT 1', key).fetchone()[0]
                 # Merge two ordered cursors rather than scanning title history
                 # once per conversation or retaining all overrides in Python.
@@ -245,6 +256,8 @@ def find(db, query, source=None, limit=20, include_title_history=False, export_s
                     item.update(matched_export_sha256=export_sha256, message_count_scope='messages linked to this original export only')
                 if text_role is not None:
                     item['message_count_scope'] = 'messages with the requested role' + (' linked to this original export only' if export_sha256 is not None else '')
+                if window:
+                    item['message_count_scope'] = 'messages inside the UTC time window' + (' with the requested role' if text_role is not None else '') + (' linked to this original export only' if export_sha256 is not None else '')
                 if include_title_history:
                     item.update(matched_historical_title=False, historical_title_matches=[],
                                 historical_title_match_count=0, historical_title_matches_truncated=False)
@@ -314,6 +327,13 @@ def find(db, query, source=None, limit=20, include_title_history=False, export_s
                           export_scope='Only message bodies linked by original-export provenance are searched. Current and optional historical titles remain conversation-wide archive metadata, not export-snapshot titles.')
         if text_role is not None:
             result.update(text_role=text_role, role_scope='Only message bodies with this role are searched; titles remain conversation-wide metadata. Conversations must contain a message satisfying all selected message filters.')
+        if window:
+            result.update(from_date=from_date, until_date=until_date,
+                timestamp_interpretation=dict(rule=RULE, **interpretation_counts,
+                    scope='query-time only; stored values unchanged; counts cover message rows after source, role and export filters, before the time window',
+                    numeric_policy='every 1..11 digit string is Unix seconds, including date-looking values',
+                    fraction_policy='fractional-second fields truncated to six digits before UTC offset arithmetic'),
+                time_scope='Only message bodies inside the UTC day window are searched; titles remain conversation-wide metadata. Conversations must contain a message satisfying all selected message filters. From is inclusive; until includes the entire UTC day. Unparsed timestamps are excluded; absence is not evidence of no activity. Time filtering scans selected message rows in one read-only snapshot.')
         if canonical_unicode:
             result.update(canonical_unicode=True, unicode_version=unicodedata.unidata_version,
                 normalization='NFC(NFD(text).casefold())',
@@ -332,8 +352,10 @@ def main():
     p.add_argument('--text-role', choices=['user', 'assistant', 'system', 'tool'], help='restrict message bodies to one role')
     p.add_argument('--cursor', help='continue using the previous result next_cursor with the same query and filters')
     p.add_argument('--canonical-unicode', action='store_true', help='match canonical Unicode equivalents without rewriting evidence')
+    p.add_argument('--from', dest='from_date')
+    p.add_argument('--until', dest='until_date')
     a=p.parse_args()
-    try: result=find(a.db,a.query,a.source,a.limit,a.include_title_history,a.export_sha256,a.cursor,a.canonical_unicode,a.text_role)
+    try: result=find(a.db,a.query,a.source,a.limit,a.include_title_history,a.export_sha256,a.cursor,a.canonical_unicode,a.text_role,a.from_date,a.until_date)
     except (ValueError,OSError,sqlite3.Error) as e: p.exit(1,str(e)+'\n')
     print(json.dumps(result,ensure_ascii=True,indent=2))
 

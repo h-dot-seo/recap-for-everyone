@@ -2307,3 +2307,11 @@ The query may scan source-scoped messages multiple times and creates no index.
 Coverage is interpretation, not authenticity or complete activity. Missing a time
 window is not evidence of no activity. Offset pages are not cross-command snapshots.
 No clock, local-zone default, relative window, schema migration or write path is added.
+
+2026-11-14 UTC search windows (0.95.1-time-search):
+adds opt-in find message-row UTC day filters and window-bound cursor scope.
+Default output/cursor scope, stored timestamps, schema and provenance are unchanged.
+Nine synthetic tests cover boundary/offset/epoch behavior, original-title refetch,
+role/export intersection, pre-open validation, legacy cursor compatibility,
+window continuation/rejection, read-only bytes and standalone/unified CLI parity.
+See [browse by time](BROWSE_BY_TIME.md).
