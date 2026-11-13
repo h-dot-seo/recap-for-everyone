@@ -142,6 +142,8 @@ python recap.py --db ../demo.sqlite title --source demo --conversation synthetic
 
 ## 문서 색인
 
+- [시간 기준 조회](BROWSE_BY_TIME.md): `list --order recent|oldest`, UTC `--from/--until`. 원본 시간은 바꾸지 않으며 명시적 해석 규칙과 미해석 개수를 표시합니다.
+
 - [합성 adapter 실행 예제](ADAPTER_GUIDE.md): 가상의 입력 변환, 원본·변환본 해시 영수증, 실행 검증 안내와 유지관리자 체크리스트. 실제 서비스 호환이나 코드 재사용 권한을 뜻하지 않습니다.
 
 - [정규화 JSONL 입력 계약](NORMALIZED_JSONL.md): 필드, 허용·거부 규칙, 변환 파일 기준 출처. `inspect --format normalized`와 `check-import --format normalized`는 읽기 전용으로 충돌 개수를 보여 줍니다. 이후 `ingest --expected-sha256 HASH`로 같은 바이트인지 확인할 수 있습니다. 대화 선택은 지원하지 않습니다. 실제 서비스와 무관한 [합성 adapter 실행 예제](ADAPTER_GUIDE.md)는 별도 가이드에서 확인할 수 있습니다.

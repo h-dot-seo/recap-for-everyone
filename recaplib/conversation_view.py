@@ -42,12 +42,19 @@ def _inventory(connection, source=None, conversation_id=None, limit=50, offset=0
     return result
 
 
-def conversations(db, source=None, limit=50, offset=0):
+def conversations(db, source=None, limit=50, offset=0, *, order=None, from_date=None, until_date=None):
     if type(limit) is not int or not 1 <= limit <= 1000 or type(offset) is not int or not 0 <= offset <= 2**63-1:
         raise ValueError('limit must be 1..1000 and offset must be an integer in 0..9223372036854775807')
+    timed = order is not None or from_date is not None or until_date is not None
+    if timed:
+        from recaplib.timestamps import validate_options
+        lower, upper = validate_options(order, from_date, until_date)
     connection = readonly(db)
     try:
         connection.execute('BEGIN')
+        if timed:
+            from recaplib.time_inventory import timed_conversations
+            return timed_conversations(connection, source, limit, offset, order, from_date, until_date, lower, upper)
         rows = _inventory(connection, source, limit=limit, offset=offset)
         where = 'WHERE source_id=?' if source is not None else ''
         total = connection.execute(
@@ -190,6 +197,9 @@ def main():
     listing.add_argument('--source')
     listing.add_argument('--limit', type=int, default=50)
     listing.add_argument('--offset', type=int, default=0)
+    listing.add_argument('--order', choices=['recent', 'oldest'])
+    listing.add_argument('--from', dest='from_date')
+    listing.add_argument('--until', dest='until_date')
     show = sub.add_parser('show')
     show.add_argument('--source', required=True)
     show.add_argument('--conversation', required=True)
@@ -201,7 +211,8 @@ def main():
     show.add_argument('--after', type=int, help='later archive neighbors, 0..50; default 2 with --around-message')
     args = parser.parse_args()
     try:
-        result = (conversations(args.db, args.source, args.limit, args.offset)
+        result = (conversations(args.db, args.source, args.limit, args.offset,
+                                order=args.order, from_date=args.from_date, until_date=args.until_date)
                   if args.command == 'list' else conversation(args.db, args.source, args.conversation,
                                                              args.limit, args.offset, args.message,
                                                              args.around_message, args.before, args.after))

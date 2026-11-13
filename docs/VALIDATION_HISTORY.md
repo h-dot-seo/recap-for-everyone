@@ -2274,3 +2274,36 @@ The illustration is intentionally non-streaming and not resource bounded. Hash
 linkage does not prove authenticity, completeness, permission or losslessness.
 Original foreign inputs must be kept separately; recovery declarations describe
 normalized artifacts, not those untracked original inputs.
+
+## 2026-11-13 Opt-in time listing (0.95.0-time-listing)
+
+Adds the declared recap.timestamp.v1 interpretation and opt-in list UTC bounds and
+recent/oldest ordering. Stored timestamp strings, message insertion order, hashes,
+physical lines, export provenance and schema are unchanged. The default inventory
+SQL/output and shared _inventory helper remain unchanged; find and stats stay out
+of this first increment. Numeric strings use the explicitly disclosed epoch rule,
+including date-looking 20260101. Fractional fields truncate before UTC arithmetic.
+
+- Full suite: Ran 1149 tests in 67.204s; OK (skipped=1, existing local conditional skip).
+- New focused suite: 19 tests passed. Independent review ran the initial 17 plus
+  25 existing related tests, then the final 19. It also compared 10,000 randomized
+  valid timestamps against datetime arithmetic and checked combined source/window
+  SQL bindings. No blocking findings.
+- Tests cover strict ISO/epoch grammar, UTC offset/calendar extremes, microsecond
+  truncation, numeric-policy disclosure, whole-day bounds, tied/unknown ordering,
+  conversation-level filtering with all-message extrema, source scope, pagination,
+  unchanged database/provenance, page-only title lookup, standalone parity and the
+  documented fresh-copy walkthrough. A concurrent WAL append proves counts and
+  page/title reads retain the same snapshot. Maximum-date filters run end to end.
+- Existing example source bytes and English/Korean quick-start shell blocks are
+  unchanged; _inventory is byte-identical. New guide commands tokenize placeholders
+  before native path substitution and run in paths with spaces. New list help lines
+  match COMMANDS.md. compileall and Python 3.10 grammar for 167 Python files pass.
+- Manifest 234 entries valid; publication audit 235 files pass. Both are refreshed
+  after this history append, with full publication-tree and exact-head/main CI
+  checked separately before remote completion is reported.
+
+The query may scan source-scoped messages multiple times and creates no index.
+Coverage is interpretation, not authenticity or complete activity. Missing a time
+window is not evidence of no activity. Offset pages are not cross-command snapshots.
+No clock, local-zone default, relative window, schema migration or write path is added.

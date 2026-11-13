@@ -489,7 +489,7 @@ python conversation_view.py --db ../demo.sqlite show --source demo --conversatio
 
 The inventory returns the original title, current display title, title revision and
 message count. Sources remain separate even when conversation IDs match. Listing
-uses binary source/conversation ordering and explicit offset pagination, with a
+uses binary source/conversation ordering by default and explicit offset pagination, with a
 maximum page size of 1000. Each command reads one consistent database snapshot;
 separate pages can change if imports occur between requests.
 
@@ -1173,3 +1173,9 @@ read-only snapshot. Full message text and per-message original titles remain in
 global insertion order. Keep this PRIVATE FILE and its receipt outside shared
 folders. No origin ledger, local titles, review state or original bytes are carried.
 This is not a source-archive backup; see [the tested guide](EXPORT_NORMALIZED.md).
+
+### Opt-in time ordering
+
+Conversation listing uses binary ordering by default. Optional `--order` and UTC
+`--from`/`--until` expose the declared `recap.timestamp.v1` query interpretation,
+not rewritten timestamps or a new ingestion order. See [browse by time](BROWSE_BY_TIME.md).

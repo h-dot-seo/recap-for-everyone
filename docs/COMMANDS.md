@@ -152,7 +152,7 @@ archive without importing. Guide: [import conflicts](IMPORT_CONFLICTS.md).
 #### `list`
 
 ```text
-usage: recap.py list [-h] [--source SOURCE] [--limit LIMIT] [--offset OFFSET]
+usage: recap.py list [-h] [--source SOURCE] [--limit LIMIT] [--offset OFFSET] [--order {recent,oldest}] [--from FROM_DATE] [--until UNTIL_DATE]
 ```
 
 Inventory of conversations with original title, current display title, revision
@@ -402,7 +402,7 @@ Guides: [search excerpts](SEARCH_EXCERPTS.md), [search pagination](SEARCH_PAGINA
 
 ```text
 usage: conversation_view.py [-h] --db DB {list,show} ...
-usage: conversation_view.py --db DB list [-h] [--source SOURCE] [--limit LIMIT] [--offset OFFSET]
+usage: conversation_view.py list [-h] [--source SOURCE] [--limit LIMIT] [--offset OFFSET] [--order {recent,oldest}] [--from FROM_DATE] [--until UNTIL_DATE]
 usage: conversation_view.py --db DB show [-h] --source SOURCE --conversation CONVERSATION [--limit LIMIT] [--offset OFFSET] [--message MESSAGE] [--around-message AROUND_MESSAGE] [--before BEFORE] [--after AFTER]
 ```
 
@@ -610,3 +610,7 @@ usage: adapter_illustration.py [-h] --output OUTPUT input
 the invented shape in `examples/foreign-sample.json`, with exclusive UTF-8/LF
 output and a text-free byte-linkage receipt. No database or network access.
 See [the executable walkthrough and rights boundary](ADAPTER_GUIDE.md).
+
+List's opt-in `--order recent|oldest` and strict whole-UTC-day `--from`/`--until`
+use a versioned query-time rule without changing stored timestamps or the default
+list output. See [time interpretation and pagination](BROWSE_BY_TIME.md).

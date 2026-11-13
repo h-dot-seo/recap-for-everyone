@@ -179,3 +179,13 @@ folders and retain the receipt. Explain that insertion order includes all import
 branches and discarded turns, and that origins, parent trees, local display titles
 and review state are omitted. Re-ingest records new file/line provenance; this is
 not a backup of the source archive. See [the guide](docs/EXPORT_NORMALIZED.md).
+
+## Opt-in time listing
+
+For a requested time range, `list --from YYYY-MM-DD --until YYYY-MM-DD` selects
+conversations with any parsed message in whole UTC days. `--order recent|oldest`
+orders parsed extrema; ties retain binary source/conversation order and wholly
+unparsed conversations follow. Read `docs/BROWSE_BY_TIME.md` before interpreting
+numeric strings: any 1..11 digits mean epoch seconds, even date-looking values.
+Stored timestamps, default list, find and stats stay unchanged. Never describe
+absence from a window as no activity. This is read-only query interpretation.
