@@ -121,10 +121,15 @@ counts and schema names can be private, and this is not a stability guarantee.
 See [saved queue views](docs/RENDER_QUEUE.md) for original-file binding, private
 output precautions and a tested synthetic walkthrough.
 
+See [the normalized input contract](docs/NORMALIZED_JSONL.md) before preparing converted JSONL.
+No normalized dry-run or new adapter is added by this contract.
+
 See [normalized export](docs/EXPORT_NORMALIZED.md) for private, text-only,
 re-ingestible JSONL. This derived copy does not replace original exports or backups.
 
 ## Documentation
+
+- [Normalized input contract](docs/NORMALIZED_JSONL.md): accepted fields, silent acceptances, identity conflicts and normalized-file provenance.
 
 - [Normalized export](docs/EXPORT_NORMALIZED.md): deterministic text-only source or conversation copies from one read-only snapshot.
 

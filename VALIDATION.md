@@ -1,10 +1,19 @@
 # Validation record
 
-Current release: `0.94.0-normalized-export`, dated 2026-11-10.
+Current release: `0.94.1-normalized-input-contract`, dated 2026-11-13.
 This file is the current snapshot. Every dated entry since the first release is kept
 unchanged and in order in [docs/VALIDATION_HISTORY.md](docs/VALIDATION_HISTORY.md).
 
 ## Latest change
+
+2026-11-13 Normalized input contract (0.94.1-normalized-input-contract):
+consolidates existing accepted/rejected input, repeated identity behavior, titles
+and normalized-file provenance. Twelve synthetic characterization tests exercise
+these boundaries. Production modules, CLI choices and existing examples are
+unchanged. No dry-run, converter or runtime behavior change is claimed.
+See [the contract](docs/NORMALIZED_JSONL.md).
+
+Previous change:
 
 2026-11-10 Normalized-export test connection cleanup correction:
 the first remote Windows Python 3.12 run failed during temporary-directory cleanup

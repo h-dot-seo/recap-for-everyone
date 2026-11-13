@@ -2181,3 +2181,29 @@ Local correction verification:
 - Normalized-export and recovery focused suites: 29 tests passed.
 - Manifest verification, limited publication audit, compileall, Python 3.10 grammar
   parsing of 160 files and whitespace checks passed. No production file changed.
+
+## 2026-11-13 Normalized input contract (0.94.1-normalized-input-contract)
+
+The contract names the existing ingest shape without requiring a new schema key.
+It documents ignored fields/non-finite unused values, whitespace-only strings,
+empty artifacts, byte/physical-line provenance, duplicate identity behavior,
+per-line titles, insertion order and the distinction from original-export ledgers.
+README/English and Korean indexes, SKILL and input/architecture notes link it.
+Production modules, CLI choices and existing examples are byte-identical.
+
+- Full suite: Ran 1090 tests in 66.337s; OK (skipped=1, existing conditional skip).
+- Twelve new synthetic contract tests passed, including rollback and no-new-database
+  rejection. An initial test assertion used `total` rather than the existing
+  `total_matches` result key; the test was corrected, not the production API.
+- Independent focused tests, manifest verification and publication audit passed.
+  Review corrected an overly broad recovery sentence: only referenced artifacts
+  lacking full export-occurrence coverage must be required; empty/unreferenced
+  and fully covered artifacts may be optional. Existing guide shell blocks and
+  fixture bytes were independently verified unchanged.
+- Python 3.10 grammar parsing of 161 files and compileall passed. Final manifest,
+  audit and exact-head CI are verified separately at publication time.
+
+No converter, normalized dry-run, hash-bound ingest, selection, new license,
+real vendor compatibility, authentication, completeness or privacy clearance is
+claimed. Runtime and archive schemas remain unchanged. This is the first bounded
+contract slice; dry-run and adapter illustration remain later increments.
