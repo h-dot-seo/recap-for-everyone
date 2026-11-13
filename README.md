@@ -124,13 +124,16 @@ output precautions and a tested synthetic walkthrough.
 See [the normalized input contract](docs/NORMALIZED_JSONL.md) before preparing converted JSONL.
 Use `inspect INPUT --format normalized` for a database-free dry run, and
 `check-import INPUT --format normalized --source SOURCE` with an existing archive.
-Bind later `ingest` with `--expected-sha256 HASH`; no converter is added.
+Bind later `ingest` with `--expected-sha256 HASH`.
+The [invented adapter illustration](docs/ADAPTER_GUIDE.md) demonstrates one
+synthetic conversion, not real-vendor compatibility or a reuse license.
 
 See [normalized export](docs/EXPORT_NORMALIZED.md) for private, text-only,
 re-ingestible JSONL. This derived copy does not replace original exports or backups.
 
 ## Documentation
 
+- [Invented adapter illustration](docs/ADAPTER_GUIDE.md): synthetic conversion, byte receipts, tested walkthrough and maintainer checklist.
 - [Normalized input contract](docs/NORMALIZED_JSONL.md): accepted fields, read-only diagnostics, hash-bound ingest and normalized-file provenance.
 
 - [Normalized export](docs/EXPORT_NORMALIZED.md): deterministic text-only source or conversation copies from one read-only snapshot.

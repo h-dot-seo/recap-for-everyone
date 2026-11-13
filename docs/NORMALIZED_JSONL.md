@@ -129,7 +129,9 @@ appears only when true. Silent-acceptance counts are:
 An empty input warns that ingest still records an empty artifact. Differing titles,
 ignored members, whitespace-only text and conflicting repeats also produce warnings.
 Reports omit IDs, titles and message bodies, but hashes and counts can still be
-private. No converter or original-vendor provenance is introduced by this increment.
+private. No original-vendor provenance is introduced. See the separate
+[invented adapter illustration](ADAPTER_GUIDE.md) for a synthetic conversion and
+receipt; it is not a real-vendor adapter.
 
 ### Python validation helper
 

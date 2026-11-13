@@ -2240,3 +2240,37 @@ variation, no normalized selection and the distinction from export-origin ledger
 
 No converter, normalized conversation selection, origin-ledger round trip, schema
 migration, real-dataset testing, license choice or privacy clearance is claimed.
+
+## 2026-11-13 Invented adapter illustration (0.94.3-adapter-illustration)
+
+Completes the bounded bring-your-own-format sequence with an explicit invented
+JSON shape, standalone stdlib conversion, exact source/normalized byte receipt,
+exclusive UTF-8/LF output and a tested guide plus maintainer checklist. No real
+vendor grammar, automatic detection, new core format dispatch or original-export
+provenance is introduced. The rights document remains unchanged; the guide grants
+no reuse license and does not invite contributions.
+
+- Full suite: Ran 1130 tests in 67.153s; OK (skipped=1, existing local conditional skip).
+- New focused suite: 18 tests passed. Independent review ran 52 related tests,
+  manifest verification and audit; no blocking findings.
+- Coverage includes valid conversion and ingest round trip, byte/BOM/hash handling,
+  private receipt/error output, one source read, empty inputs, explicit roles and
+  ordering, duplicate/unknown/malformed fields, identity scope, nonfinite/Unicode
+  rejection, no-overwrite and final-symlink behavior, missing parents, standalone
+  execution without repository imports and a fresh-copy walkthrough.
+- Documentation tokens are parsed before OUTPUT/HASH substitution. Tests preserve
+  spaces and Windows-style backslashes without reparsing native paths as POSIX
+  shell syntax. The actual guide runs with a temporary checkout/output containing
+  spaces and leaves the synthetic fixture unchanged. Host-restricted symlink
+  creation is explicitly skipped only if unavailable.
+- Core modules, existing example source bytes and English/Korean quick-start shell
+  blocks are byte-identical to the previous release. New command usage matches
+  COMMANDS.md. compileall and Python 3.10 grammar parsing of 164 Python files pass.
+- Manifest: 229 entries valid. Publication audit: 230 files pass. Both are refreshed
+  and rechecked after this append; exact publication-tree and post-merge CI are
+  verified separately before remote completion is reported.
+
+The illustration is intentionally non-streaming and not resource bounded. Hash
+linkage does not prove authenticity, completeness, permission or losslessness.
+Original foreign inputs must be kept separately; recovery declarations describe
+normalized artifacts, not those untracked original inputs.
