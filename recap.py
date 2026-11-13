@@ -5,7 +5,7 @@ import json
 import sqlite3
 from pathlib import Path
 # The archive core lives in recaplib/archive.py; these names stay importable from recap.
-from recaplib.archive import SCHEMA, _validate_source, ingest, ingest_bytes, readonly, search
+from recaplib.archive import SCHEMA, _validate_source, ingest, ingest_bytes, readonly, search, validate_normalized
 
 
 def main():
@@ -14,11 +14,12 @@ def main():
     p.add_argument('--db')
     sub = p.add_subparsers(dest='command', required=True)
     imp = sub.add_parser('ingest'); imp.add_argument('input'); imp.add_argument('--source', required=True)
+    imp.add_argument('--expected-sha256', help='require the normalized whole-file hash from inspection before writing')
     find = sub.add_parser('search'); find.add_argument('query'); find.add_argument('--limit', type=int, default=20)
     sub.add_parser('stats')
     sub.add_parser('describe-schema', help='inspect a read-only archive metadata snapshot, not validate it')
     check = sub.add_parser('inspect', help='inspect export coverage without a database')
-    check.add_argument('input'); check.add_argument('--format', choices=['web', 'local', 'local-codex'], required=True)
+    check.add_argument('input'); check.add_argument('--format', choices=['web', 'local', 'local-codex', 'normalized'], required=True)
     check.add_argument('--conversation', help='inspect an explicit conversation selection without writing')
     check.add_argument('--expected-export-sha256', help='require the exact original whole-file hash from earlier inspection')
     inventory = sub.add_parser('list-export', help='list export IDs, titles and selection support without importing')
@@ -93,7 +94,7 @@ def main():
     export.add_argument('--conversation', help='import only this explicit conversation after validating the whole file')
     export.add_argument('--expected-export-sha256', help='require the exact original whole-file hash from earlier inspection')
     admission = sub.add_parser('check-import', help='diagnose identity conflicts against an existing archive without importing')
-    admission.add_argument('input'); admission.add_argument('--format', choices=['web', 'local', 'local-codex'], required=True)
+    admission.add_argument('input'); admission.add_argument('--format', choices=['web', 'local', 'local-codex', 'normalized'], required=True)
     admission.add_argument('--source', required=True); admission.add_argument('--conversation')
     admission.add_argument('--expected-export-sha256'); admission.add_argument('--limit', type=int, default=20)
     normalized = sub.add_parser('export-normalized', help='export private message text as derived normalized JSONL')
@@ -226,7 +227,7 @@ def main():
             from recaplib.web_branch import branch_view
             result = branch_view(args.input, args.conversation, args.node)
         elif args.command == 'ingest':
-            result = ingest(args.db, args.source, args.input)
+            result = ingest(args.db, args.source, args.input, expected_sha256=args.expected_sha256)
         elif args.command == 'search':
             result = search(args.db, args.query, args.limit)
         elif args.command == 'describe-schema':

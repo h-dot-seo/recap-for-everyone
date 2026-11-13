@@ -52,10 +52,11 @@ private. No content output, mutation, validation or stability promise. See
 #### `ingest`
 
 ```text
-usage: recap.py ingest [-h] --source SOURCE input
+usage: recap.py ingest [-h] --source SOURCE [--expected-sha256 EXPECTED_SHA256] input
 ```
 
-Import one already-normalized UTF-8 JSONL file into the archive, hashing its
+Optionally require inspected bytes with `--expected-sha256 HASH` before database
+access. Import one already-normalized UTF-8 JSONL file into the archive, hashing its
 original bytes and retaining a line locator per message. Guide: README quick start
 and [workflows](WORKFLOWS.md#normalized-jsonl-ingest-and-the-generic-session-parser).
 
@@ -119,7 +120,7 @@ without a database or message bodies; `--contains` filters metadata and
 #### `inspect`
 
 ```text
-usage: recap.py inspect [-h] --format {web,local,local-codex} [--conversation CONVERSATION] [--expected-export-sha256 EXPECTED_EXPORT_SHA256] input
+usage: recap.py inspect [-h] --format {web,local,local-codex,normalized} [--conversation CONVERSATION] [--expected-export-sha256 EXPECTED_EXPORT_SHA256] input
 ```
 
 Validate and extract in memory, reporting hash, counts, coverage and warnings
@@ -140,7 +141,7 @@ original hashes and locators. Guide: [input scope](INPUT_SCOPE.md).
 #### `check-import`
 
 ```text
-usage: recap.py check-import [-h] --format {web,local,local-codex} --source SOURCE [--conversation CONVERSATION] [--expected-export-sha256 EXPECTED_EXPORT_SHA256] [--limit LIMIT] input
+usage: recap.py check-import [-h] --format {web,local,local-codex,normalized} --source SOURCE [--conversation CONVERSATION] [--expected-export-sha256 EXPECTED_EXPORT_SHA256] [--limit LIMIT] input
 ```
 
 Diagnose title-only, text and metadata identity conflicts against an existing
@@ -366,7 +367,7 @@ implementation is the module of the same name in `recaplib/`.
 ```text
 usage: session_workflow.py [-h] [--db DB] {import,inspect,title} ...
 usage: session_workflow.py import [-h] --format {web,local,local-codex} --source SOURCE [--conversation CONVERSATION] [--expected-export-sha256 EXPECTED_EXPORT_SHA256] path
-usage: session_workflow.py inspect [-h] --format {web,local,local-codex} [--conversation CONVERSATION] [--expected-export-sha256 EXPECTED_EXPORT_SHA256] path
+usage: session_workflow.py inspect [-h] --format {web,local,local-codex,normalized} [--conversation CONVERSATION] [--expected-export-sha256 EXPECTED_EXPORT_SHA256] path
 usage: session_workflow.py title [-h] --source SOURCE --conversation CONVERSATION [--set SET] [--expected-revision EXPECTED_REVISION]
 ```
 
@@ -384,7 +385,7 @@ Guide: [export inventory](EXPORT_INVENTORY.md).
 ### `import_check.py` (`check-import`)
 
 ```text
-usage: import_check.py [-h] --db DB --source SOURCE --format {web,local,local-codex} [--conversation CONVERSATION] [--expected-export-sha256 EXPECTED_EXPORT_SHA256] [--limit LIMIT] input
+usage: import_check.py [-h] --db DB --source SOURCE --format {web,local,local-codex,normalized} [--conversation CONVERSATION] [--expected-export-sha256 EXPECTED_EXPORT_SHA256] [--limit LIMIT] input
 ```
 
 Guide: [import conflicts](IMPORT_CONFLICTS.md).
@@ -594,3 +595,7 @@ Read one saved title-review queue without a database and publish inert HTML to a
 new file. Original file SHA-256, queue order, advisories, collisions and unavailable
 reasons remain visible. No approval or freshness claim. No standalone equivalent.
 See [saved queue views](RENDER_QUEUE.md).
+
+`--format normalized` is supported only by inspect and check-import, without
+`--conversation`. Conflicting repeats are reported, not inspection failures; use
+ingest for admission. See [the normalized contract](NORMALIZED_JSONL.md).

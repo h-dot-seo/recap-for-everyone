@@ -98,3 +98,13 @@ Samples omit message IDs, title values and message bodies. `coverage.selection`
 can echo an explicitly selected conversation ID, and counts/hashes are metadata.
 Treat reports as private rather than assuming body-free output is anonymized or
 safe to publish. No external service or model is contacted.
+
+## Already-normalized input
+
+`--format normalized` uses the same structural record rules as ingest but reports
+conflicting repeats instead of raising. No conversation selection is supported.
+The archive must already exist, even for empty input. The report's occurrence
+numbers are not physical lines; blank lines count only toward ingest's line locator.
+Use `coverage.original_sha256` with later `ingest --expected-sha256 HASH` to bind
+exact normalized bytes, not original vendor provenance. See
+[normalized inspection](NORMALIZED_JSONL.md#what-inspection-means).

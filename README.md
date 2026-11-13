@@ -122,14 +122,16 @@ See [saved queue views](docs/RENDER_QUEUE.md) for original-file binding, private
 output precautions and a tested synthetic walkthrough.
 
 See [the normalized input contract](docs/NORMALIZED_JSONL.md) before preparing converted JSONL.
-No normalized dry-run or new adapter is added by this contract.
+Use `inspect INPUT --format normalized` for a database-free dry run, and
+`check-import INPUT --format normalized --source SOURCE` with an existing archive.
+Bind later `ingest` with `--expected-sha256 HASH`; no converter is added.
 
 See [normalized export](docs/EXPORT_NORMALIZED.md) for private, text-only,
 re-ingestible JSONL. This derived copy does not replace original exports or backups.
 
 ## Documentation
 
-- [Normalized input contract](docs/NORMALIZED_JSONL.md): accepted fields, silent acceptances, identity conflicts and normalized-file provenance.
+- [Normalized input contract](docs/NORMALIZED_JSONL.md): accepted fields, read-only diagnostics, hash-bound ingest and normalized-file provenance.
 
 - [Normalized export](docs/EXPORT_NORMALIZED.md): deterministic text-only source or conversation copies from one read-only snapshot.
 

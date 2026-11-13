@@ -1,6 +1,7 @@
 """Archive core shared by recap.py and the recaplib modules: schema, normalized JSONL ingest, read-only connections and FTS search."""
 import hashlib
 import sqlite3
+from collections import Counter
 from pathlib import Path
 from recaplib.strict_json import loads
 from recaplib.source_text import BOM_UTF8, physical_lines
@@ -33,23 +34,10 @@ def _validate_source(source):
         raise ValueError('source must contain valid Unicode text')
 
 
-def ingest(db, source, path, provenance=None):
-    _validate_source(source)
-    return ingest_bytes(db, source, Path(path).read_bytes(), provenance)
-
-
-def ingest_bytes(db, source, raw, provenance=None):
-    """Validate and ingest one immutable normalized JSONL byte snapshot.
-
-    Uses the same transaction, identity and provenance rules as file ingestion.
-    This writes the explicitly selected SQLite archive, not a temporary input file.
-    """
-    _validate_source(source)
+def _normalized_records(raw):
+    """Yield structurally valid records in physical order, without admission checks."""
     if not isinstance(raw, bytes):
         raise ValueError('normalized input must be immutable bytes')
-    digest = hashlib.sha256(raw).hexdigest()
-    records = []
-    incoming = {}
     for line_no, line in enumerate(physical_lines(raw), 1):
         if not line.strip():
             continue
@@ -65,6 +53,85 @@ def ingest_bytes(db, source, raw, provenance=None):
         title = row.get('title', '')
         if not isinstance(title, str):
             raise ValueError(f'invalid title at line {line_no}')
+        yield row, title, line_no
+
+
+def validate_normalized(raw):
+    """Return (record tuples, text-free coverage) for one normalized byte snapshot.
+
+    Tuples are (decoded row, effective title, physical line). Rows contain private
+    content; coverage omits it. Repeated identity conflicts are counted, not raised.
+    This structural inspection is not archive admission or import authorization.
+    """
+    records = list(_normalized_records(raw))
+    seen, titles = {}, {}
+    repeated = dict(identical=0, conflicting=0)
+    unknown = whitespace = missing_titles = 0
+    known = {'conversation_id', 'message_id', 'role', 'timestamp', 'text', 'title'}
+    for row, title, _ in records:
+        key = (row['conversation_id'], row['message_id'])
+        values = (row['role'], row['timestamp'], title, row['text'])
+        if key in seen:
+            repeated['identical' if seen[key] == values else 'conflicting'] += 1
+        else:
+            seen[key] = values
+        titles.setdefault(row['conversation_id'], set()).add(title)
+        unknown += bool(set(row) - known)
+        whitespace += not row['text'].strip()
+        missing_titles += 'title' not in row
+    warnings = []
+    if not records:
+        warnings.append('No records; ingest still creates an empty artifact.')
+    if unknown:
+        warnings.append('Unknown members are accepted and ignored, including supplied origin fields.')
+    if whitespace:
+        warnings.append('Whitespace-only text is accepted unchanged.')
+    varied_titles = sum(len(values) > 1 for values in titles.values())
+    if varied_titles:
+        warnings.append('Titles differ within a conversation; the first inserted message supplies its original display title.')
+    if repeated['conflicting']:
+        warnings.append('Conflicting repeated identities will block ingest; inspection is not admission.')
+    report = dict(format='normalized', original_sha256=hashlib.sha256(raw).hexdigest(),
+        original_bytes=len(raw), records=len(records), unique_identities=len(seen),
+        conversations=len(titles), role_counts=dict(sorted(Counter(row['role'] for row, _, _ in records).items())),
+        repeated_input=repeated, records_with_ignored_members=unknown,
+        whitespace_only_text_records=whitespace, records_without_title=missing_titles,
+        conversations_with_multiple_titles=varied_titles, contains_message_text=False,
+        limitations='Structural inspection only, not archive admission. Input order and supplied timestamp strings are retained. Ingest records normalized artifact hash/physical line, not original-export provenance.',
+        warnings=warnings)
+    if raw.startswith(BOM_UTF8):
+        report['utf8_bom_present'] = True
+    return records, report
+
+
+def _check_expected_sha256(raw, expected_sha256):
+    if expected_sha256 is not None:
+        if (not isinstance(expected_sha256, str) or len(expected_sha256) != 64 or
+                any(ch not in '0123456789abcdef' for ch in expected_sha256)):
+            raise ValueError('expected hash must be a lowercase SHA-256 hex digest')
+        if hashlib.sha256(raw).hexdigest() != expected_sha256:
+            raise ValueError('normalized input changed after inspection; inspect again')
+
+
+def ingest(db, source, path, provenance=None, *, expected_sha256=None):
+    _validate_source(source)
+    return ingest_bytes(db, source, Path(path).read_bytes(), provenance, expected_sha256=expected_sha256)
+
+
+def ingest_bytes(db, source, raw, provenance=None, *, expected_sha256=None):
+    """Validate and ingest one immutable normalized JSONL byte snapshot.
+
+    Uses the same transaction, identity and provenance rules as file ingestion.
+    This writes the explicitly selected SQLite archive, not a temporary input file.
+    """
+    _validate_source(source)
+    if not isinstance(raw, bytes):
+        raise ValueError('normalized input must be immutable bytes')
+    digest = hashlib.sha256(raw).hexdigest()
+    _check_expected_sha256(raw, expected_sha256)
+    records = []
+    incoming = {}
+    for row, title, line_no in _normalized_records(raw):
         key = (row['conversation_id'], row['message_id'])
         values = (row['role'], row['timestamp'], title, row['text'])
         if key in incoming and incoming[key] != values:

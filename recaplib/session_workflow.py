@@ -197,9 +197,25 @@ def _normalize_bytes(raw, source_name, kind, include_report=False):
     return (rows, report) if include_report else rows
 
 
+def inspect_normalized(path, conversation=None, expected_export_sha256=None):
+    # Deliberately separate from normalize/_normalize_bytes: import and title
+    # plans must not acquire a new format through a shared dispatcher.
+    from recaplib.archive import validate_normalized
+    if conversation is not None:
+        raise ValueError('normalized format does not support conversation selection')
+    raw = _read_export_bytes(path, expected_export_sha256)
+    records, report = validate_normalized(raw)
+    if expected_export_sha256 is not None:
+        report['expected_export_sha256'] = expected_export_sha256
+    return [row for row, _, _ in records], report
+
+
 def inspect_export(path, kind, conversation=None, expected_export_sha256=None):
-    _, report = normalize(path, kind, include_report=True, conversation=conversation,
-                          expected_export_sha256=expected_export_sha256)
+    if kind == 'normalized':
+        _, report = inspect_normalized(path, conversation, expected_export_sha256)
+    else:
+        _, report = normalize(path, kind, include_report=True, conversation=conversation,
+                              expected_export_sha256=expected_export_sha256)
     return dict(report, mode='inspection only; no database access')
 
 
@@ -279,7 +295,7 @@ def main():
     p.add_argument('--db')
     sub = p.add_subparsers(dest='command', required=True)
     imp = sub.add_parser('import'); imp.add_argument('path'); imp.add_argument('--format', choices=['web', 'local', 'local-codex'], required=True); imp.add_argument('--source', required=True)
-    check = sub.add_parser('inspect'); check.add_argument('path'); check.add_argument('--format', choices=['web', 'local', 'local-codex'], required=True)
+    check = sub.add_parser('inspect'); check.add_argument('path'); check.add_argument('--format', choices=['web', 'local', 'local-codex', 'normalized'], required=True)
     imp.add_argument('--conversation', help='import only this explicit conversation after validating the whole file')
     check.add_argument('--conversation', help='inspect an explicit conversation selection without writing')
     for command in (imp, check):
