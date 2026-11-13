@@ -80,13 +80,66 @@ local display-title history, review state or the source archive.
 
 ## Current commands and adapter boundary
 
-The write path is `recap.py --db DB ingest INPUT --source SOURCE`.
-At this release, `inspect`, `list-export`, `check-import`, `import` and
-`export-title-plan` still accept only `web`, `local`, and `local-codex`. Do not pass
-`--format normalized` or treat rejected CLI choices as successful inspection.
-This increment adds no normalized dry-run, selected-conversation ingest, ingest
-hash guard or converter. Use the existing synthetic
-[quick start](../README.md#quick-start-for-already-normalized-jsonl).
+The write path remains `recap.py --db DB ingest INPUT --source SOURCE`.
+Inspect a converted file without any database:
+
+```text
+python recap.py inspect INPUT --format normalized
+python recap.py --db EXISTING_DB check-import INPUT --format normalized --source SOURCE
+python recap.py --db DB ingest INPUT --source SOURCE --expected-sha256 LOWERCASE_HASH
+```
+
+Use `original_sha256` from inspection as `LOWERCASE_HASH`. Inspection and
+check-import also accept `--expected-export-sha256 LOWERCASE_HASH`. Each command
+reads the file once; the hash covers the exact bytes parsed or ingested, including
+BOM and line endings. A malformed/mismatched ingest guard fails before SQLite
+access. Omitting the guard preserves existing behavior and receipts. A hash binds
+bytes, not provenance, authorization, semantic validity or a conflict-free archive.
+The archive can change after inspection; ingest rechecks conflicts under its lock.
+
+`session_workflow.py inspect` and `import_check.py` provide equivalent standalone
+entry points. `normalized` is accepted **only** by inspect/check-import, not
+`list-export`, `import`, `export-title-plan` or `check-title-plan`. Those still use
+`web`, `local`, and `local-codex`. Normalized inspection rejects `--conversation`;
+there is no selected-conversation ingest or automatic format detection.
+
+### What inspection means
+
+Malformed records fail with the same structural rules as ingest. Conflicting
+repeated identities are instead **reported**, not raised: inspection is not
+admission. It succeeds even when `repeated_input.conflicting` is nonzero, while
+ingest rejects that input. Counts compare each repeat with its first occurrence.
+`check-import` also compares each first incoming identity with the existing archive
+source, reports conflicts and exits 1 if any are found; it never creates an archive.
+Its sample `record`/`first_record` values remain 1-based nonblank message occurrence
+numbers, **not physical line numbers**. See [conflict diagnostics](IMPORT_CONFLICTS.md).
+
+The text-free coverage includes `format`, `original_sha256`, `original_bytes`,
+`records`, `unique_identities`, `conversations`, `role_counts`, `repeated_input`,
+`contains_message_text: false`, `limitations` and `warnings`. `utf8_bom_present`
+appears only when true. Silent-acceptance counts are:
+
+- `records_with_ignored_members`: rows with any unknown member (names/values are
+  never returned); this includes unused nonfinite values and supplied origin fields.
+- `whitespace_only_text_records`: accepted nonempty text that is all whitespace.
+- `records_without_title`: rows whose omitted title becomes the empty string.
+- `conversations_with_multiple_titles`: identities with more than one supplied or
+  defaulted title across incoming records, including repeats.
+
+An empty input warns that ingest still records an empty artifact. Differing titles,
+ignored members, whitespace-only text and conflicting repeats also produce warnings.
+Reports omit IDs, titles and message bodies, but hashes and counts can still be
+private. No converter or original-vendor provenance is introduced by this increment.
+
+### Python validation helper
+
+`from recap import validate_normalized` exposes the structural pass for immutable
+`bytes`, returning `(records, coverage)`. Each record is `(decoded_row,
+effective_title, physical_line_number)`. **Records contain private input**, including
+ignored fields; only coverage is text-free. Repeated identity conflicts are counted,
+not raised. This does not write, open a database, or grant import authorization.
+`ingest` and `ingest_bytes` accept the additive keyword-only `expected_sha256`;
+existing positional provenance and default receipts remain unchanged.
 
 Unsupported formats require explicit, separately reviewed conversion. This page
 does not infer fields, authorize collection, transmit data, select a reuse license

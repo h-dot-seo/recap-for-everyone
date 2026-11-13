@@ -4,7 +4,7 @@ import json
 import sqlite3
 
 from recaplib.archive import _validate_source, readonly
-from recaplib.session_workflow import normalize
+from recaplib.session_workflow import normalize, inspect_normalized
 
 FIELDS = ('role', 'timestamp', 'title', 'text')
 
@@ -13,8 +13,11 @@ def check_import(db, source, path, kind, conversation=None, expected_export_sha2
     _validate_source(source)
     if type(limit) is not int or not 1 <= limit <= 1000:
         raise ValueError('limit must be an integer in 1..1000')
-    rows, coverage = normalize(path, kind, include_report=True, conversation=conversation,
-                               expected_export_sha256=expected_export_sha256)
+    if kind == 'normalized':
+        rows, coverage = inspect_normalized(path, conversation, expected_export_sha256)
+    else:
+        rows, coverage = normalize(path, kind, include_report=True, conversation=conversation,
+                                   expected_export_sha256=expected_export_sha256)
     archive_counts = dict(new=0, identical=0, conflicting=0)
     repeated = dict(identical=0, conflicting=0)
     classes = dict(title_only=0, text_changed=0, metadata_changed=0)
@@ -75,7 +78,7 @@ def main():
     parser.add_argument('--db', required=True)
     parser.add_argument('input')
     parser.add_argument('--source', required=True)
-    parser.add_argument('--format', choices=['web', 'local', 'local-codex'], required=True)
+    parser.add_argument('--format', choices=['web', 'local', 'local-codex', 'normalized'], required=True)
     parser.add_argument('--conversation')
     parser.add_argument('--expected-export-sha256')
     parser.add_argument('--limit', type=int, default=20)

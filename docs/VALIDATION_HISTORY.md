@@ -2207,3 +2207,36 @@ No converter, normalized dry-run, hash-bound ingest, selection, new license,
 real vendor compatibility, authentication, completeness or privacy clearance is
 claimed. Runtime and archive schemas remain unchanged. This is the first bounded
 contract slice; dry-run and adapter illustration remain later increments.
+
+## 2026-11-13 Normalized inspection (0.94.2-normalized-inspection)
+
+Adds normalized inspect/check-import without expanding the shared adapter or title
+plan dispatcher. Inspection reports conflicting repeats as counts, not admission;
+check-import retains its occurrence-number samples and read-only archive snapshot.
+The shared structural iterator preserves ingest's early conflict error order and
+physical lines. Optional ingest/ingest_bytes expected_sha256 binds the one immutable
+byte snapshot before SQLite access; default receipts and provenance stay unchanged.
+Documentation explains ignored fields, whitespace text, empty artifacts, title
+variation, no normalized selection and the distinction from export-origin ledgers.
+
+- Initial full suite: Ran 1110 tests in 68.794s; OK (skipped=1).
+- Final full suite after two additional regressions: Ran 1112 tests in 66.879s;
+  OK (skipped=1, existing conditional skip).
+- New focused suite: 22 tests passed. Independent code review ran 70 related tests,
+  then independently reran the final 22-test set and checked final documentation.
+  No blocking findings; clarified COMMANDS wording to refer to the format option,
+  rather than suggesting normalized ingest itself was unsupported.
+- Tests cover report privacy, silent acceptance counts, empty/BOM/newline input,
+  matching structural rejections, early ingest error order, immutable bytes,
+  archive/input conflicts, missing archives, source separation, selection rejection,
+  closed import/list-export/title-plan dispatchers (including an edited plan),
+  same-byte hash guards, no-write mismatch, one-read behavior and standalone parity.
+- All existing example source bytes and English/Korean quick-start shell blocks
+  remain unchanged. Five affected help usage lines match COMMANDS.md.
+- compileall and Python 3.10 grammar parsing of 162 Python files passed. Manifest
+  225 entries and publication audit 226 files passed before final history refresh;
+  both are rechecked for the publication tree. Exact-head and main CI are checked
+  separately before reporting remote completion.
+
+No converter, normalized conversation selection, origin-ledger round trip, schema
+migration, real-dataset testing, license choice or privacy clearance is claimed.

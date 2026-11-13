@@ -142,7 +142,7 @@ python recap.py --db ../demo.sqlite title --source demo --conversation synthetic
 
 ## 문서 색인
 
-- [정규화 JSONL 입력 계약](NORMALIZED_JSONL.md): 필드, 허용·거부 규칙, 중복과 충돌, 변환 파일 기준 출처. 새로운 변환기나 dry-run 기능은 아닙니다.
+- [정규화 JSONL 입력 계약](NORMALIZED_JSONL.md): 필드, 허용·거부 규칙, 변환 파일 기준 출처. `inspect --format normalized`와 `check-import --format normalized`는 읽기 전용으로 충돌 개수를 보여 줍니다. 이후 `ingest --expected-sha256 HASH`로 같은 바이트인지 확인할 수 있습니다. 변환기나 대화 선택 기능은 추가하지 않습니다.
 
 - [현재 보관소 구조와 SQL](SCHEMA.md): 테이블·열·지연 원장과 읽기 전용 metadata 검사.
 

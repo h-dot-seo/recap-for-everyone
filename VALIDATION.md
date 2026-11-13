@@ -1,10 +1,21 @@
 # Validation record
 
-Current release: `0.94.1-normalized-input-contract`, dated 2026-11-13.
+Current release: `0.94.2-normalized-inspection`, dated 2026-11-13.
 This file is the current snapshot. Every dated entry since the first release is kept
 unchanged and in order in [docs/VALIDATION_HISTORY.md](docs/VALIDATION_HISTORY.md).
 
 ## Latest change
+
+2026-11-13 Normalized inspection (0.94.2-normalized-inspection):
+adds database-free normalized inspection and existing-archive conflict diagnostics,
+plus optional exact-byte ingest hash guards. Twenty-two synthetic regression tests
+cover silent acceptances, conflict counts, preserved early ingest errors, privacy,
+read-only behavior, hash mismatch before writes and standalone CLI parity.
+Shared export/title-plan adapters remain closed to normalized input. No converter,
+selection, origin-ledger change or accepted-input tightening is introduced.
+See [the contract and diagnostics](docs/NORMALIZED_JSONL.md).
+
+Previous change:
 
 2026-11-13 Normalized input contract (0.94.1-normalized-input-contract):
 consolidates existing accepted/rejected input, repeated identity behavior, titles

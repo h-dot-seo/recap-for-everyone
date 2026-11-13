@@ -485,3 +485,15 @@ when no such gap is available on the running interpreter; injected encoder-failu
 tests always exercise the source readers and CLI error boundary, including line
 numbers, hidden private diagnostics and no new database. This is not a resource
 exhaustion guarantee or proof of behavior on an untested interpreter.
+
+### Normalized inspection and optional hash lease
+
+`inspect` and `check-import` now accept `--format normalized` without conversation
+selection. They report repeated-identity conflicts; ingest still rejects them.
+`from recap import validate_normalized` exposes `(records, coverage)` for immutable
+bytes; records are private `(decoded_row, effective_title, physical_line)` tuples.
+Coverage omits content and counts silent acceptances. `ingest`/`ingest_bytes` accept
+keyword-only `expected_sha256=None` and CLI ingest accepts `--expected-sha256`.
+The optional guard checks the exact byte snapshot before database access; default
+behavior is unchanged. Neither shared adapter normalization, list-export nor title
+plans accept normalized input. See [contract and diagnostics](NORMALIZED_JSONL.md).
