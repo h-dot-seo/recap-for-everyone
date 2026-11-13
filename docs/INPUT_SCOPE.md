@@ -134,6 +134,9 @@ that a caller-supplied label is a genuine source identity.
 
 ### Normalized bytes and compatibility
 
+[The normalized input contract](NORMALIZED_JSONL.md) consolidates fields, silent
+acceptances, identity conflicts and the normalized-file provenance boundary.
+
 `recap.ingest_bytes(db, source, raw, provenance=None)` shares the file-ingest record
 validation, transaction, conflict and provenance rules. It accepts immutable `bytes`
 and an explicit non-whitespace, valid Unicode source label. Labels remain exact, not

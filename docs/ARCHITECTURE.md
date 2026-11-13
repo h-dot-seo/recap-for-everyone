@@ -162,3 +162,10 @@ publication implementation. Memory is bounded by a message, not source size.
 Only original message fields are exported, never origin ledgers or local state.
 The derived file hash is not an original-export identity or recovery claim; see
 [normalized export](EXPORT_NORMALIZED.md).
+
+## Normalized input contract
+
+[The input contract](NORMALIZED_JSONL.md) names the existing ingest record shape
+without changing validation or the archive layout. Synthetic characterization
+tests pin ignored members, byte/line provenance, repeated identities and titles.
+Normalized inspection and adapter examples remain separate increments.
