@@ -5,8 +5,8 @@ read-only view. It never changes supplied timestamps, message insertion order,
 normalized-file hashes/lines, export provenance, schema or title history.
 With none of these flags, list retains its exact binary-ID order and output shape.
 `find --from/--until` also supports UTC day windows, with message-level semantics
-described below. Default `stats` remains unchanged; no per-source statistics,
-derived index or ingestion ledger is added.
+described below. `stats --by-source` adds opt-in source summaries, described below. Default
+`stats` remains unchanged; no derived index or ingestion ledger is added.
 
 ## Declared rule: recap.timestamp.v1
 
@@ -104,3 +104,28 @@ Search cursors bind both supplied bounds and the rule id only when a window is
 set. Continue with the exact same bounds and filters. Changing or removing a
 bound requires a fresh first page. Default output and pre-window cursor scope
 remain unchanged. Cursors are not content snapshots; see [pagination](SEARCH_PAGINATION.md).
+
+## Per-source archive statistics
+
+Run `python recap.py --db ARCHIVE stats --by-source` to retain the top-level
+`messages` and `artifacts` totals and add a binary-source-ID ordered `sources`
+array. Every row reports `source`, `conversations`, `messages`,
+`first_parsed_utc`, `last_parsed_utc`, `parsed_iso`, `parsed_epoch_seconds`,
+and `unparsed`. No source selection or time window is applied.
+
+Sources are the union of artifact and message source IDs. A source with only an
+empty normalized artifact is included with zero counts and null extrema. Empty
+archives return an empty array. Conversations are distinct conversation IDs
+**within each source**, compared in binary order; identical IDs in different
+sources are separate. Messages count stored rows, not repeated ingestion attempts
+or provenance occurrences. `parsed_iso + parsed_epoch_seconds + unparsed` equals
+each row's message count. All-unparsed sources have null extrema.
+
+The shared `recap.timestamp.v1` rule is reported in `timestamp_interpretation`.
+Numeric date-looking values are Unix seconds under that rule, not proof of a
+calendar date. Unparsed values contribute counts but not extrema. Counts and
+extrema scan stored messages in a single read-only snapshot. Nothing is rewritten;
+no local time zone or clock is consulted. This is not an ingestion ledger, activity
+report, completeness check or evidence of timestamp authenticity. Source IDs and
+derived timestamps can be private. `stats` without the flag keeps its original
+two-key output exactly.

@@ -1,10 +1,21 @@
 # Validation record
 
-Current release: `0.95.1-time-search`, dated 2026-11-14.
+Current release: `0.95.2-time-stats`, dated 2026-11-14.
 This file is the current snapshot. Every dated entry since the first release is kept
 unchanged and in order in [docs/VALIDATION_HISTORY.md](docs/VALIDATION_HISTORY.md).
 
 ## Latest change
+
+2026-11-14 Per-source time coverage (0.95.2-time-stats):
+adds stats --by-source while preserving the default two-key stats output.
+Source-union rows expose stored messages, distinct within-source conversations,
+ISO/epoch/unparsed counts and nullable UTC extrema in one read-only snapshot.
+Eight synthetic tests cover empty/artifact-only archives, binary identities,
+repeated imports, numeric policy and extremes, missing artifact records,
+CLI/default/read-only behavior, missing DB and interleaved snapshot consistency.
+No schema, ingestion ledger or source activity claim is added.
+
+Previous change:
 
 2026-11-14 UTC search windows (0.95.1-time-search):
 adds opt-in find message-row UTC day filters and window-bound cursor scope.
