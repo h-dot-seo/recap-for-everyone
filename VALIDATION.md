@@ -1,10 +1,21 @@
 # Validation record
 
-Current release: `0.94.2-normalized-inspection`, dated 2026-11-13.
+Current release: `0.94.3-adapter-illustration`, dated 2026-11-13.
 This file is the current snapshot. Every dated entry since the first release is kept
 unchanged and in order in [docs/VALIDATION_HISTORY.md](docs/VALIDATION_HISTORY.md).
 
 ## Latest change
+
+2026-11-13 Invented adapter illustration (0.94.3-adapter-illustration):
+adds a standalone stdlib converter for one synthetic shape, an exact-byte receipt,
+exclusive LF output, a tested walkthrough and maintainer checklist. Eighteen
+synthetic tests cover rejected structure, identity, Unicode, no-overwrite behavior,
+private errors, standalone execution and native-path placeholder handling.
+Core modules and existing examples remain unchanged. No vendor compatibility,
+new format dispatch, rights grant or community contribution invitation is added.
+See [the guide](docs/ADAPTER_GUIDE.md).
+
+Previous change:
 
 2026-11-13 Normalized inspection (0.94.2-normalized-inspection):
 adds database-free normalized inspection and existing-archive conflict diagnostics,

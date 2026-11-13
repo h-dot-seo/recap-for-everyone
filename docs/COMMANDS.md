@@ -599,3 +599,14 @@ See [saved queue views](RENDER_QUEUE.md).
 `--format normalized` is supported only by inspect and check-import, without
 `--conversation`. Conflicting repeats are reported, not inspection failures; use
 ingest for admission. See [the normalized contract](NORMALIZED_JSONL.md).
+
+## Invented adapter illustration
+
+```text
+usage: adapter_illustration.py [-h] --output OUTPUT input
+```
+
+`python examples/adapter_illustration.py INPUT --output NEW_JSONL` converts only
+the invented shape in `examples/foreign-sample.json`, with exclusive UTF-8/LF
+output and a text-free byte-linkage receipt. No database or network access.
+See [the executable walkthrough and rights boundary](ADAPTER_GUIDE.md).

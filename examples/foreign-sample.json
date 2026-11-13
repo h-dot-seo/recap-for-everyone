@@ -1,0 +1,13 @@
+{
+  "format": "invented-chat-demo.v1",
+  "threads": [
+    {
+      "key": "synthetic-orchard",
+      "label": "Invented orchard plan",
+      "entries": [
+        {"key": "question-1", "speaker": "user", "when": "fictional morning", "body": "Plan a synthetic orchard. 가상의 과수원."},
+        {"key": "reply-1", "speaker": "assistant", "when": "fictional noon", "body": "This is invented demonstration text, not research evidence."}
+      ]
+    }
+  ]
+}

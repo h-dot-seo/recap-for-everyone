@@ -1,12 +1,12 @@
 {
   "project": "recap-for-everyone",
-  "release": "0.94.2-normalized-inspection",
+  "release": "0.94.3-adapter-illustration",
   "date": "2026-11-13",
   "private_history_imported": false,
   "actual_corpora_included": false,
   "synthetic_examples_only": true,
   "license_status": "NOT_SELECTED",
-  "file_count": 225,
+  "file_count": 229,
   "files": [
     {
       "path": ".gitattributes",
@@ -30,8 +30,8 @@
     },
     {
       "path": "README.md",
-      "bytes": 14500,
-      "sha256": "8505b026b01397a8e3de14d78acec019bb14e8fa3754e3abe06d3f85062b1c94"
+      "bytes": 14765,
+      "sha256": "295559045b58ce9e59c3746bbe7afb410fc07a47eab66d13020d00cf0f739a53"
     },
     {
       "path": "RIGHTS.md",
@@ -45,13 +45,13 @@
     },
     {
       "path": "SKILL.md",
-      "bytes": 13022,
-      "sha256": "da8fb2c1efef94bf87ad55bc1df9fe8bf924cacc7c8aa7f96e035c28398c88f2"
+      "bytes": 13163,
+      "sha256": "eda2f37507e255a9d058aedd071d6eb554637a97d48b3bae0902e05941d868b2"
     },
     {
       "path": "VALIDATION.md",
-      "bytes": 8249,
-      "sha256": "70027dbc902eaf7f9788df1da38df47a05e5e68050e62188d28be254ebfd8649"
+      "bytes": 8857,
+      "sha256": "7ccf5c7ea73998aa69dfa5f8ee49e6d1eb580363494ede057f190dcf190cdc95"
     },
     {
       "path": "attributed_title.py",
@@ -79,6 +79,11 @@
       "sha256": "60a50c0e57174badc2b0cc9e2bf6136489e6669cfdbe0ea764fba702e27ba985"
     },
     {
+      "path": "docs/ADAPTER_GUIDE.md",
+      "bytes": 7513,
+      "sha256": "348b7ac1a3b1d598f570beaa4f177a191886f3bdca92b1c2b3c25f7cfa805f88"
+    },
+    {
       "path": "docs/ADAPTER_MESSAGE_SELECTION.md",
       "bytes": 9628,
       "sha256": "460cbdb2ffc7cf40854722004538973fc2b894e4e825118706fded150e584ef0"
@@ -100,8 +105,8 @@
     },
     {
       "path": "docs/COMMANDS.md",
-      "bytes": 24575,
-      "sha256": "27531b815d61e9a9a343a4175fb64514c0b0d76a488ef840cd9775ad38af574a"
+      "bytes": 24988,
+      "sha256": "ddba6659df944b547c9417458deced1e83107f56c5e95c0ead3ada9b9212c700"
     },
     {
       "path": "docs/EXPORT_INVENTORY.md",
@@ -140,8 +145,8 @@
     },
     {
       "path": "docs/NORMALIZED_JSONL.md",
-      "bytes": 8802,
-      "sha256": "04516fb723e7f859c6281518c440fe73cc17ac773cef17ab4b965c28a7867b7f"
+      "bytes": 8911,
+      "sha256": "b0283165e0b6c86a9d9228d0882aae2309bf44584fbf51cd5982ffa03e5ae233"
     },
     {
       "path": "docs/OMITTED_SEARCH_MESSAGES.md",
@@ -155,8 +160,8 @@
     },
     {
       "path": "docs/README.ko.md",
-      "bytes": 18836,
-      "sha256": "45671d79660b5a19d05a9dca1d499658653ebd0566d643e1fc54574e93dbe837"
+      "bytes": 19201,
+      "sha256": "7003c4e8f3ef5259f52d0cc0500902536a4e1fb67d5bf0e3f933844d91e396eb"
     },
     {
       "path": "docs/RECOVERY_REHEARSAL.md",
@@ -270,8 +275,8 @@
     },
     {
       "path": "docs/VALIDATION_HISTORY.md",
-      "bytes": 148663,
-      "sha256": "6e8589b77f853598c00fa4fe893b4435a89179cb6a13ab13e4edb405a6ec1d47"
+      "bytes": 150962,
+      "sha256": "4017934fe0a47c8969e1f6d6f1c595cb4d3d924b233c3d6fef46e69c5fa4dc84"
     },
     {
       "path": "docs/WEB_ZIP_INVENTORY.md",
@@ -294,9 +299,19 @@
       "sha256": "18415cef7a15dd29ef0ca31e1a678d7a6a68ef6ace06ff7f7d57d64769632005"
     },
     {
+      "path": "examples/adapter_illustration.py",
+      "bytes": 4768,
+      "sha256": "ae658cc68235cd88e26b47b1672c755755732c7b21755895875495c4a02bc530"
+    },
+    {
       "path": "examples/conversations.jsonl",
       "bytes": 443,
       "sha256": "7b3ad06b959ecea9d39ed485ecd571838e8a1217e8cbf51dc89e3d6de9121dc9"
+    },
+    {
+      "path": "examples/foreign-sample.json",
+      "bytes": 458,
+      "sha256": "77accb94a8f2977314ccaa90854afb09fc78cc25efc3e71153deaca564550b80"
     },
     {
       "path": "examples/local-session.jsonl",
@@ -602,6 +617,11 @@
       "path": "tests/test_adapter_file_encoding.py",
       "bytes": 16970,
       "sha256": "1a89fcff4c887412bd63c0362ffa3c4f7f18d4f9c38fa47cfe50343249076824"
+    },
+    {
+      "path": "tests/test_adapter_illustration.py",
+      "bytes": 11998,
+      "sha256": "a6f854b5714cb49dc3ee0151d84ffeaea1c61cc22f08c48a0c6661fb68222940"
     },
     {
       "path": "tests/test_adapter_message_selection.py",
