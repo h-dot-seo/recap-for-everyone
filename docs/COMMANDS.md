@@ -161,7 +161,7 @@ and message count. Guide: [message selection](MESSAGE_SELECTION.md).
 #### `find`
 
 ```text
-usage: recap.py find [-h] [--source SOURCE] [--limit LIMIT] [--export-sha256 EXPORT_SHA256] [--include-title-history] [--canonical-unicode] [--text-role {user,assistant,system,tool}] [--cursor CURSOR] query
+usage: recap.py find [-h] [--source SOURCE] [--limit LIMIT] [--export-sha256 EXPORT_SHA256] [--include-title-history] [--canonical-unicode] [--text-role {user,assistant,system,tool}] [--from FROM_DATE] [--until UNTIL_DATE] [--cursor CURSOR] query
 ```
 
 Read-only search across current display titles and message text with bounded
@@ -393,7 +393,7 @@ Guide: [import conflicts](IMPORT_CONFLICTS.md).
 ### `conversation_search.py` (`find`)
 
 ```text
-usage: conversation_search.py [-h] --db DB [--source SOURCE] [--limit LIMIT] [--include-title-history] [--export-sha256 EXPORT_SHA256] [--text-role {user,assistant,system,tool}] [--cursor CURSOR] [--canonical-unicode] query
+usage: conversation_search.py [-h] --db DB [--source SOURCE] [--limit LIMIT] [--include-title-history] [--export-sha256 EXPORT_SHA256] [--text-role {user,assistant,system,tool}] [--cursor CURSOR] [--canonical-unicode] [--from FROM_DATE] [--until UNTIL_DATE] query
 ```
 
 Guides: [search excerpts](SEARCH_EXCERPTS.md), [search pagination](SEARCH_PAGINATION.md).
@@ -614,3 +614,7 @@ See [the executable walkthrough and rights boundary](ADAPTER_GUIDE.md).
 List's opt-in `--order recent|oldest` and strict whole-UTC-day `--from`/`--until`
 use a versioned query-time rule without changing stored timestamps or the default
 list output. See [time interpretation and pagination](BROWSE_BY_TIME.md).
+
+`find` and standalone `conversation_search.py` accept `--from YYYY-MM-DD` and
+`--until YYYY-MM-DD`: only bodies inside the inclusive UTC calendar-day window
+are searched. Titles remain conversation-wide. See [time browsing](BROWSE_BY_TIME.md).

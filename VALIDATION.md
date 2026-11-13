@@ -1,10 +1,20 @@
 # Validation record
 
-Current release: `0.95.0-time-listing`, dated 2026-11-13.
+Current release: `0.95.1-time-search`, dated 2026-11-14.
 This file is the current snapshot. Every dated entry since the first release is kept
 unchanged and in order in [docs/VALIDATION_HISTORY.md](docs/VALIDATION_HISTORY.md).
 
 ## Latest change
+
+2026-11-14 UTC search windows (0.95.1-time-search):
+adds opt-in find message-row UTC day filters and window-bound cursor scope.
+Default output/cursor scope, stored timestamps, schema and provenance are unchanged.
+Nine synthetic tests cover boundary/offset/epoch behavior, original-title refetch,
+role/export intersection, pre-open validation, legacy cursor compatibility,
+window continuation/rejection, read-only bytes and standalone/unified CLI parity.
+See [browse by time](docs/BROWSE_BY_TIME.md).
+
+Previous change:
 
 2026-11-13 Opt-in time listing (0.95.0-time-listing):
 adds a deterministic timestamp rule and list-only UTC windows/recent/oldest order.

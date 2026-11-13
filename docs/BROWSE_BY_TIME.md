@@ -4,12 +4,13 @@
 read-only view. It never changes supplied timestamps, message insertion order,
 normalized-file hashes/lines, export provenance, schema or title history.
 With none of these flags, list retains its exact binary-ID order and output shape.
-`find` and default `stats` are unchanged; this increment adds no time-aware search
-cursor, per-source statistics, derived index or ingestion ledger.
+`find --from/--until` also supports UTC day windows, with message-level semantics
+described below. Default `stats` remains unchanged; no per-source statistics,
+derived index or ingestion ledger is added.
 
 ## Declared rule: recap.timestamp.v1
 
-Every opted-in result reports `timestamp_interpretation.rule` and separate
+Every opted-in list result reports `timestamp_interpretation.rule` and separate
 `parsed_iso`, `parsed_epoch_seconds`, `unparsed` counts. These counts cover **all
 messages in the selected source scope before window filtering**, not just the page.
 The rule is deterministic and reads no clock or local time zone:
@@ -82,3 +83,24 @@ message; its last parsed time still shows February. `offset` starts at midnight
 with +09:00, which lies in the preceding UTC day. `digit-date` is interpreted as
 1970 under the rule, not as a 2026 calendar date. `unparsed` is last in ordered
 unfiltered results and absent from a time window. No stored value is rewritten.
+
+## Search inside a UTC window
+
+`find QUERY --from YYYY-MM-DD --until YYYY-MM-DD` uses the same rule and day
+bounds, but unlike list it filters **message rows** before matching/grouping.
+Only in-window bodies contribute terms, counts and samples. Source, role and
+export filters intersect with the window. Current and optionally historical
+titles remain conversation-wide metadata; at least one message must satisfy all
+selected filters before its conversation can match a title. Original titles
+still come from the first archived message, not the first surviving row.
+
+`timestamp_interpretation` reports the rule and separate ISO/epoch/unparsed counts
+for rows after source/role/export filters, **before** the window. `time_scope`
+discloses this read-only scan and exclusion of unparsed values; per-result
+`message_count_scope` describes the combined filters. Absence is not evidence of
+no activity. Stored timestamps are untouched and no clock/local zone is read.
+
+Search cursors bind both supplied bounds and the rule id only when a window is
+set. Continue with the exact same bounds and filters. Changing or removing a
+bound requires a fresh first page. Default output and pre-window cursor scope
+remain unchanged. Cursors are not content snapshots; see [pagination](SEARCH_PAGINATION.md).

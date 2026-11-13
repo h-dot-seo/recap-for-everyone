@@ -54,6 +54,11 @@ have `truncated: false` even though `total_matches` includes earlier pages.
 
 ## Freshness and scope
 
+When `--from` or `--until` is supplied, the cursor also binds both UTC date
+bounds and `recap.timestamp.v1`. Repeat the exact bounds on continuation. The
+window filters messages, not whole-conversation bodies; see [time browsing](BROWSE_BY_TIME.md).
+Without a window the previous cursor scope is unchanged.
+
 A token binds the case-folded, deduplicated query terms, source filter, history
 opt-in and original-export filter. Case changes, repeated spaces and duplicate
 terms do not change scope. Keep term order unchanged because term-coverage reporting

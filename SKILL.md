@@ -189,3 +189,6 @@ unparsed conversations follow. Read `docs/BROWSE_BY_TIME.md` before interpreting
 numeric strings: any 1..11 digits mean epoch seconds, even date-looking values.
 Stored timestamps, default list, find and stats stay unchanged. Never describe
 absence from a window as no activity. This is read-only query interpretation.
+
+For time-scoped body search, use `find --from YYYY-MM-DD --until YYYY-MM-DD`.
+Repeat both bounds with a search cursor; list windows instead qualify whole conversations.
