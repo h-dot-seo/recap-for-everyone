@@ -1,4 +1,5 @@
 """Read-only import conflict diagnostics; never repairs or imports evidence."""
+from recaplib.errors import add_json_errors_argument, exit_error
 from recaplib.cli_errors import safe_diagnostic
 import argparse
 import json
@@ -118,6 +119,7 @@ def check_import(db, source, path, kind, conversation=None, expected_export_sha2
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
+    add_json_errors_argument(parser)
     parser.add_argument('--db', required=True)
     parser.add_argument('input')
     parser.add_argument('--source', required=True)
@@ -131,7 +133,7 @@ def main():
         result = check_import(args.db, args.source, args.input, args.format, args.conversation,
                               args.expected_export_sha256, args.limit, args.delta_output)
     except (ValueError, OSError, KeyError, TypeError, sqlite3.Error) as error:
-        parser.exit(1, safe_diagnostic(error) + '\n')
+        exit_error(parser, args, error)
     print(json.dumps(result, ensure_ascii=True, indent=2))
     if result['conflicts_found']:
         raise SystemExit(1)

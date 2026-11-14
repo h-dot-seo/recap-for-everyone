@@ -1,4 +1,5 @@
 """Fail-closed text-only projection of a narrow, explicit local turn grammar."""
+from recaplib.errors import add_json_errors_argument
 import argparse
 import hashlib
 import json
@@ -245,7 +246,8 @@ def reconstruct_bytes(raw):
 
 
 def main():
-    parser = argparse.ArgumentParser(description=__doc__); parser.add_argument('input')
+    parser = argparse.ArgumentParser(description=__doc__)
+    add_json_errors_argument(parser); parser.add_argument('input')
     args = parser.parse_args(); result = reconstruct(args.input)
     print(json.dumps(result, ensure_ascii=True, indent=2))
     if not result['supported']:

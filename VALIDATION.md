@@ -1,10 +1,40 @@
 # Validation record
 
-Current release: `0.99.5-cli-version`, dated 2026-11-14.
+Current release: `0.99.6-standalone-json-errors`, dated 2026-11-14.
 This file is the current snapshot. Every dated entry since the first release is kept
 unchanged and in order in [docs/VALIDATION_HISTORY.md](docs/VALIDATION_HISTORY.md).
 
 ## Latest change
+
+2026-11-14 Standalone structured error parity (0.99.6-standalone-json-errors):
+adds the existing opt-in --json-errors contract to all sixteen standalone product
+parsers. Fourteen retain their original caught exception boundaries and reuse
+explicit typed error classification; title_adapter retains its closed symbolic
+codes and PROVIDER_FAILED fallback. Replay-local accepts the option but keeps its
+unsupported stdout document because it has no caught execution-error boundary.
+Nested parsers require the option before the subcommand. No catch set, default
+diagnostic, successful JSON, usage exit 2, negative stdout result or partial-output
+behavior is broadened. Envelopes remain single-line ASCII JSON with the same four
+fields as the unified CLI. They neither diagnose causes from text nor promise
+rollback, authorize retry, connect a provider or replace an approval boundary.
+The MCP and maintenance tools keep their separate interfaces.
+
+Validation: full synthetic suite 1,456 tests passed (one existing skip); focused
+35 tests and independent seven standalone contract tests passed. All sixteen
+standalone parsers were compared through real subprocesses against the previous
+release: default exit status, stdout and stderr remained byte-identical. Every
+existing catch type and non-main function/class AST was unchanged. All sixteen
+success/usage paths and fifteen caught failure paths were exercised with opt-in
+on/off; unsupported replay, import conflicts and failed recovery rehearsal keep
+their negative stdout documents. A failed rehearsal saves the same receipt bytes;
+a fault injected after declaration publication leaves the published file intact
+with no rollback claim. The new SQLite fixture connection is explicitly closed.
+Adapter fixed-code and unexpected-error fallback remain content-free. All 133
+prior sh blocks are unchanged. Manifest 314 files, limited audit 315 files,
+compile, Python 3.10 syntax and whitespace checks passed. No private inputs or
+actual provider connection were used.
+
+Previous change:
 
 2026-11-14 CLI version identity (0.99.5-cli-version):
 adds recap.py --version as the public interface for the declared numeric program

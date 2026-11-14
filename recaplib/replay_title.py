@@ -1,4 +1,5 @@
 """Bridge verified local source occurrences to a retained-turn title proposal."""
+from recaplib.errors import add_json_errors_argument, exit_error
 from recaplib.cli_errors import safe_diagnostic
 import argparse
 import json
@@ -94,6 +95,7 @@ def suggest_replay(db, source, conversation, path, message_id=None):
 def main():
     from recaplib.title_document_output import add_output_argument, save_if_requested
     parser = argparse.ArgumentParser(description=__doc__)
+    add_json_errors_argument(parser)
     parser.add_argument('--db', required=True); parser.add_argument('--source', required=True)
     parser.add_argument('--conversation', required=True); parser.add_argument('input')
     parser.add_argument('--message', help='use exactly this archived user message inside the verified retained turns, not a projection ID')
@@ -103,7 +105,7 @@ def main():
         result = suggest_replay(args.db, args.source, args.conversation, args.input, args.message)
         result = save_if_requested(result, args, 'proposal')
     except (ValueError, OSError, KeyError, TypeError, sqlite3.Error) as error:
-        parser.exit(1, safe_diagnostic(error) + '\n')
+        exit_error(parser, args, error)
     print(json.dumps(result, ensure_ascii=True, indent=2))
 
 

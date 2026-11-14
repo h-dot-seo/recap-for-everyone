@@ -1,4 +1,5 @@
 """Generate a reviewable local user-text excerpt, without models or network calls."""
+from recaplib.errors import add_json_errors_argument, exit_error
 from recaplib.cli_errors import safe_diagnostic
 import argparse
 import json
@@ -28,6 +29,7 @@ def suggest(db, source, conversation, message_id=None):
 def main():
     from recaplib.title_document_output import add_output_argument, save_if_requested
     parser = argparse.ArgumentParser(description=__doc__)
+    add_json_errors_argument(parser)
     parser.add_argument('--db', required=True)
     parser.add_argument('--source', required=True)
     parser.add_argument('--conversation', required=True)
@@ -38,7 +40,7 @@ def main():
         result = suggest(args.db, args.source, args.conversation, args.message)
         result = save_if_requested(result, args, 'proposal')
     except (ValueError, OSError, sqlite3.Error) as exc:
-        parser.exit(1, safe_diagnostic(exc) + '\n')
+        exit_error(parser, args, exc)
     print(json.dumps(result, ensure_ascii=True, indent=2))
 
 

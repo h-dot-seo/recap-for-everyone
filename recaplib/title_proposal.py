@@ -1,4 +1,5 @@
 """Validate externally supplied title proposals; this module calls no model."""
+from recaplib.errors import add_json_errors_argument, exit_error
 from recaplib.cli_errors import safe_diagnostic
 import argparse
 import hashlib
@@ -124,6 +125,7 @@ def apply_preview(db, reviewed):
 def main():
     from recaplib.title_document_output import add_output_argument, save_if_requested
     p = argparse.ArgumentParser(description=__doc__)
+    add_json_errors_argument(p)
     p.add_argument('--db', required=True)
     s = p.add_subparsers(dest='command', required=True)
     export = s.add_parser('snapshot'); export.add_argument('--source', required=True); export.add_argument('--conversation', required=True)
@@ -144,7 +146,7 @@ def main():
             result = preview(a.db, value, a.title, a.with_evidence) if a.command == 'preview' else apply_preview(a.db, value)
         result = save_if_requested(result, a, 'preview')
     except (ValueError, OSError, KeyError, TypeError, sqlite3.Error) as e:
-        p.exit(1, safe_diagnostic(e) + '\n')
+        exit_error(p, a, e)
     print(json.dumps(result, ensure_ascii=True, indent=2))
 
 

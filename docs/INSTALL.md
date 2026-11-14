@@ -140,7 +140,7 @@ or supply reviewed wording when the first excerpt is too generic.
 ## Report the CLI version
 
 Run `python recap.py --version` with your chosen launcher to print
-`recap-for-everyone 0.99.5`. This reads the bundled numeric identity, not an archive
+`recap-for-everyone 0.99.6`. This reads the bundled numeric identity, not an archive
 or the publication manifest; a missing manifest does not prevent this command.
 A version number is not proof of file integrity, authenticity or API stability.
 Keep using the manifest verification and validation record for their stated scope.
