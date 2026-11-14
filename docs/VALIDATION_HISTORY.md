@@ -2393,3 +2393,11 @@ private file; stdout becomes a body/ID-free byte/hash receipt. Default show stay
 Eight synthetic tests cover Unicode, selections, provenance, no-overwrite,
 invalid/oversized output, lone-surrogate escapes, CLI parity and executed guide.
 No database mutation, sidecar, vendor export, approval or memory-bound guarantee.
+
+2026-11-14 Fresh normalized-object rebuild rehearsal (0.96.5-rebuild-rehearsal):
+adds the roadmap #10 first-stage executable guide. Two independent ingests of
+retained synthetic JSONL create separate databases, then existing manifest checks
+verify logical rows and the newly built FTS index. Tests assert original DB
+immutability, real fresh destination, positive checks, changed-source failure and
+missing-object failure. No automatic rebuild command, replay plan, exclusive DB
+creation, local title/review recovery or remote backup guarantee is added.

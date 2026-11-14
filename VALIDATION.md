@@ -1,10 +1,20 @@
 # Validation record
 
-Current release: `0.96.4-saved-conversation`, dated 2026-11-14.
+Current release: `0.96.5-rebuild-rehearsal`, dated 2026-11-14.
 This file is the current snapshot. Every dated entry since the first release is kept
 unchanged and in order in [docs/VALIDATION_HISTORY.md](docs/VALIDATION_HISTORY.md).
 
 ## Latest change
+
+2026-11-14 Fresh normalized-object rebuild rehearsal (0.96.5-rebuild-rehearsal):
+adds the roadmap #10 first-stage executable guide. Two independent ingests of
+retained synthetic JSONL create separate databases, then existing manifest checks
+verify logical rows and the newly built FTS index. Tests assert original DB
+immutability, real fresh destination, positive checks, changed-source failure and
+missing-object failure. No automatic rebuild command, replay plan, exclusive DB
+creation, local title/review recovery or remote backup guarantee is added.
+
+Previous change:
 
 2026-11-14 Exact conversation JSON files (0.96.4-saved-conversation):
 adds show --output NEW_JSON to unified and standalone views. The unchanged view

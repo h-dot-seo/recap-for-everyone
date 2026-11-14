@@ -634,3 +634,8 @@ title collision checks remain. See [selected title review](SELECTED_TITLE_REVIEW
 `show` and standalone `conversation_view.py show` accept `--output NEW_JSON`.
 They save the unchanged selected view object as UTF-8 and print only a hash/byte
 receipt. See [saved conversation JSON](SAVED_CONVERSATION_JSON.md).
+
+For an actual fresh normalized-object replay rather than a live-DB self-check,
+follow the [rebuild rehearsal](REBUILD_REHEARSAL.md).
+Use separate absent DB paths; ingest is a write, and this guide does not make
+existing-path ingestion exclusive or recreate title/review history.

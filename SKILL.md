@@ -207,3 +207,8 @@ existing-title collisions still apply. See docs/SELECTED_TITLE_REVIEW.md.
 Use show --output NEW_JSON to save an exact private selected conversation view
 with provenance, not a vendor export or approval. Default stdout is unchanged;
 see docs/SAVED_CONVERSATION_JSON.md for the exclusive file and receipt boundary.
+
+For an actual fresh normalized-object replay rather than a live-DB self-check,
+follow the [rebuild rehearsal](docs/REBUILD_REHEARSAL.md).
+Use separate absent DB paths; ingest is a write, and this guide does not make
+existing-path ingestion exclusive or recreate title/review history.
