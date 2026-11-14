@@ -79,7 +79,13 @@ def _valid_receipt(receipt,modules,returncode):
     for row in [*receipt['modules'],total]:
         if any(type(row[key]) is not int or row[key]<0 for key in COUNTS):return False
         seconds=row['seconds']
-        if type(seconds) not in (int,float) or not math.isfinite(seconds) or seconds<0:return False
+        if type(seconds) not in (int,float) or seconds<0:return False
+        try:
+            if not math.isfinite(seconds):return False
+        except OverflowError:
+            # JSON integers can exceed float range; malformed observations must
+            # retain the fixed failure envelope instead of escaping validation.
+            return False
     if any(total[key]!=sum(row[key] for row in receipt['modules']) for key in COUNTS):return False
     success=not any(total[key] for key in ('failures','errors','unexpected_successes'))
     return receipt['success']==success and returncode==(0 if success else 1)
