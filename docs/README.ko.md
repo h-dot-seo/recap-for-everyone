@@ -289,3 +289,6 @@ do not establish authorship, consent, retrieval or publication evidence. See
 복원 사본의 제목·검토 이력 순서와 전체 출처·분기 원장을 비교하려면
 [명시적 복구 v2](RECOVERY_V2.md)를 사용합니다. 기본 v1 선언은 그대로이며
 백업 생성이나 v2 원본 재구축을 뜻하지 않습니다.
+
+별도의 [v2 재구축](REBUILD_V2.md)은 원본 객체로 재생 가능한 범위만 검사하며
+제목·검토 이력은 복원하지 않았다고 명시합니다. 전체 보관소 복원을 뜻하지 않습니다.

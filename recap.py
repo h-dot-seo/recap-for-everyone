@@ -128,7 +128,7 @@ def build_parser():
     changed.add_argument('--text', action='store_true')
     declare = sub.add_parser('declare-recovery', help='write a recovery manifest describing the live archive without changing it')
     declare.add_argument('--output', required=True, help='new manifest JSON path outside the archive; existing paths are refused')
-    declare.add_argument('--manifest-version',type=int,choices=(1,2),default=1,help='explicit manifest version; default 1, version 2 is restored-copy rehearsal only')
+    declare.add_argument('--manifest-version',type=int,choices=(1,2),default=1,help='explicit manifest version; default 1, version 2 also declares ordered history and auxiliary ledgers')
     declare.add_argument('--declared-at', help='YYYY-MM-DD recorded as supplied text; no clock is read')
     rehearse = sub.add_parser('rehearse-recovery', help='verify a restored archive copy against a declared manifest and write a receipt')
     rehearse.add_argument('input', help='recovery manifest JSON written by declare-recovery')

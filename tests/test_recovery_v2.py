@@ -138,10 +138,12 @@ class RecoveryV2Tests(unittest.TestCase):
             self.assertEqual(result.returncode,0,result.stderr);outputs.append(json.loads(result.stdout))
         self.assertEqual(outputs[0],outputs[1])
 
-    def test_v2_rebuild_rejected_before_plan_read_or_output_creation(self):
+    def test_unsupported_manifest_rebuild_rejected_before_plan_read_or_output_creation(self):
         from unittest.mock import patch
         from recaplib import rebuild
         path,_,_=self.declare();target=self.path('rebuilt.sqlite');output=self.path('rebuild.json')
+        malformed=json.loads(path.read_text());malformed['schema']='recap.recovery-manifest.v3'
+        path.write_text(json.dumps(malformed))
         before=self.db.read_bytes()
         with patch.object(rebuild,'_read_plan',side_effect=AssertionError('plan must not be read')):
             with self.assertRaises(ValueError):

@@ -2886,3 +2886,25 @@ and all 38 ledger-column mutation probes with independent duplicate/null digest
 calculations. V2 publication failure/retained staging, output collision and
 explicit connection-close tests passed. Compilation, Python 3.10 grammar and all
 134 existing shell examples were preserved; manifest 319 / audit 320 passed.
+
+## 2026-11-14 Explicit v2 replayable-content rebuild (0.100.1-v2-object-rebuild):
+accepts an explicit v2 recovery manifest for object replay and verifies the
+message/artifact/source/FTS and full provenance/topology subset. Title and review
+history are excluded from checks and expected tables, never marked PASS; the
+v2 receipt names exclusions, declared non-rebuildable histories, actual manifest
+schema and full_archive_restored:false. No decisions are invented. Existing
+object authorization and null/empty ledger distinctions remain; legacy-only or
+zero-message original hashes are not guessed from topology. V1 fields, order,
+outcomes and side effects remain unchanged, except actual implementation hashes
+and their derived receipt hashes necessarily reflect changed code. Default v1
+declaration/rehearsal bytes remain compatible. No full insertion-order restoration,
+archive migration, stamp, fingerprint, policy change or automatic resealing claim.
+
+Validation: all 1,509 tests passed (one environment-dependent skip), including
+10 v2 rebuild tests and the executed synthetic guide. Independent review passed
+65 targeted tests and exact previous/current v1 rebuild comparison apart from
+verified actual implementation hashes and their receipt hash. Default v1 declare
+and rehearse stdout/stderr and stored bytes matched the previous release exactly.
+Corrupt-DB checks exclude both histories without marking them passed. Compilation,
+Python 3.10 grammar and 135 existing shell examples were preserved; manifest
+321 / audit 322 passed.

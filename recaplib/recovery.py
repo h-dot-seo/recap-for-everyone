@@ -91,7 +91,8 @@ DIGEST_SEMANTICS_V2 = ('messages_sha256 and FTS counts retain v1 semantics. Each
     'physical duplicate rows are each included, without deduplication. Logical rows only: no physical page layout, indexes, sidecars or schema fingerprint.')
 MANIFEST_SCOPE_V2 = ('one read-only archive snapshot: v1 artifact, source, message and FTS observations plus '
     'ordered-id title/review history and exact legacy-provenance/topology ledger rows. This v2 manifest is '
-    'for restored-copy rehearsal only, not object rebuild. Original-object coverage retains v1 '
+    'for complete declared-ledger comparison on a restored copy. Object rebuild excludes title/review histories '
+    'and is not full restoration. Original-object coverage retains v1 '
     'export_occurrences-only semantics; declaring legacy provenance does not expand original_hashes or '
     'optional_artifacts. Sidecars are not observed or declared; read-only SQLite access can create WAL/SHM '
     'sidecars, without intentionally modifying the main archive bytes.')
@@ -667,7 +668,7 @@ def _objects_check(manifest, directory, supplied, paths_by_hash=None):
 def _archive_checks(manifest, restored_db, exclude_history=False):
     """Shared read-only checks; rebuild can explicitly exclude unreplayable history."""
     v2=manifest['schema']==MANIFEST_SCHEMA_V2
-    if v2 and exclude_history:raise ValueError('v2 recovery manifests support restored-copy rehearsal only')
+    excluded={'title_history','title_review_history'} if v2 and exclude_history else ({'title_history'} if exclude_history else set())
     checks = []
     connection = None
     sqlite_protections = dict(trusted_schema='NOT_CHECKED', cell_size_check='NOT_CHECKED', defensive='NOT_CHECKED')
@@ -692,8 +693,8 @@ def _archive_checks(manifest, restored_db, exclude_history=False):
             tables = _tables(connection)
             expected = list(EXPECTED_TABLES) + [name for name, declared in (
                 ('export_occurrences', manifest['export_occurrences']), ('title_history', manifest['title_history']))
-                if declared is not None and not (exclude_history and name == 'title_history')]
-            if v2:expected.extend(name for name in V2_LEDGER_FIELDS if manifest[name] is not None)
+                if declared is not None and name not in excluded]
+            if v2:expected.extend(name for name in V2_LEDGER_FIELDS if manifest[name] is not None and name not in excluded)
             missing = [name for name in expected if name not in tables]
             checks.append(dict(check='expected_tables', status='PASS' if not missing else 'FAIL',
                                expected=expected, missing=missing))
@@ -714,12 +715,13 @@ def _archive_checks(manifest, restored_db, exclude_history=False):
                 checks.append(_run_check('title_history', lambda: _v2_ledger_check(manifest,connection,tables,'title_history') if v2 else _history_check(manifest, connection, tables)))
             if v2:
                 for name in V2_LEDGER_FIELDS:
+                    if name in excluded:continue
                     checks.append(_run_check(name,lambda name=name:_v2_ledger_check(manifest,connection,tables,name)))
             checks.append(_run_check('fts_rows', lambda: _fts_count_check(manifest, connection, tables)))
             checks.append(_run_check('fts_match_sample', lambda: _fts_sample_check(connection)))
         else:
             checks.extend(dict(check=name, status='FAIL', detail=NOT_RUN) for name in (CHECKS_V2 if v2 else CHECKS)[1:]
-                          if not (exclude_history and name == 'title_history'))
+                          if name not in excluded)
     finally:
         if connection is not None:
             connection.close()
@@ -756,7 +758,7 @@ def rehearse_recovery(manifest_path, restored_db, output, objects=None):
 
 def render_text(result):
     header = ('Recovery manifest declaration' if result.get('schema') in (DECLARATION_SCHEMA,DECLARATION_SCHEMA_V2)
-              else 'Archive rebuild receipt' if result.get('schema') == 'recap.rebuild-receipt.v1'
+              else 'Archive rebuild receipt' if result.get('schema') in ('recap.rebuild-receipt.v1','recap.rebuild-receipt.v2')
               else 'Recovery rehearsal receipt')
     items = []
     for key, value in result.items():
@@ -776,7 +778,7 @@ def main():
     declare = commands.add_parser('declare', help='write a recovery manifest describing the live archive without changing it')
     declare.add_argument('--db', required=True)
     declare.add_argument('--output', required=True, help='new manifest JSON path outside the archive; existing paths are refused')
-    declare.add_argument('--manifest-version',type=int,choices=(1,2),default=1,help='explicit manifest version; default 1, version 2 is restored-copy rehearsal only')
+    declare.add_argument('--manifest-version',type=int,choices=(1,2),default=1,help='explicit manifest version; default 1, version 2 also declares ordered history and auxiliary ledgers')
     declare.add_argument('--declared-at', help='YYYY-MM-DD recorded as supplied text; no clock is read')
     rehearse = commands.add_parser('rehearse', help='verify a restored archive copy against a declared manifest and write a receipt')
     rehearse.add_argument('manifest', help='recovery manifest JSON written by declare')

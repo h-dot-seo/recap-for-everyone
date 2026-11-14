@@ -108,3 +108,10 @@ credited as recovered. A message rebuild is not a complete archive restoration.
 `clean_destination_verified: NOT_ESTABLISHED`. Remote backup, decryption-key and
 future-recovery verification remain NOT_ESTABLISHED. No network, model calls,
 real-corpus fixtures, automatic checkpoints or new provenance claims are added.
+
+## V2 replayable-content rebuild
+
+An explicit v2 manifest is also supported by `rebuild-archive`; see
+[v2 rebuild](REBUILD_V2.md). Title/review history checks are explicitly excluded,
+never counted as PASS. Other provenance/topology digests remain mandatory and
+`full_archive_restored` is false. V1 contracts remain unchanged.
