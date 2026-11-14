@@ -35,7 +35,10 @@ file set, not a permanently pinned release or an authenticity signature.
 Use a currently supported Python distribution from [Python.org](https://www.python.org/downloads/)
 or your trusted operating-system distributor. The code's compatibility minimum is
 Python **3.10**, not a recommendation to install an old, unsupported release.
-This repository currently runs CI on Python **3.10 and 3.12**, Ubuntu and Windows;
+The configured CI matrix is Python **3.10, 3.12 and 3.15** on Ubuntu and Windows
+(six jobs). Configuration alone does not establish a passing runtime result; see the
+[validation record](../VALIDATION.md) for observed runs. The compatibility floor remains
+3.10; changing it requires an explicit recorded decision. In particular,
 passing the small check below is not full testing of every newer version or OS.
 
 The command name depends on your installation. Try the version command for an

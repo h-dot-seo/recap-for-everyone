@@ -1,10 +1,41 @@
 # Validation record
 
-Current release: `0.99.2-mcp-supplied-proposals`, dated 2026-11-14.
+Current release: `0.99.3-current-python-ci`, dated 2026-11-14.
 This file is the current snapshot. Every dated entry since the first release is kept
 unchanged and in order in [docs/VALIDATION_HISTORY.md](docs/VALIDATION_HISTORY.md).
 
 ## Latest change
+
+2026-11-14 Current Python CI coverage (0.99.3-current-python-ci):
+adds Python 3.15 on Ubuntu and Windows to the existing Python 3.10/3.12
+matrix, making six jobs, and allows explicit manual workflow dispatch. Existing
+push branch filters, pull-request trigger, commit-pinned actions, read-only token
+permissions, disabled credential persistence, timeout and all three verification
+steps are preserved. The Python 3.10 compatibility floor is unchanged. No product
+code, schema, default output, private input, network client or approval boundary
+changes. Earlier deferred-lane records remain historical; a broader interpreter
+support or retirement policy is not introduced. New static workflow regression
+checks accompany the actual remote installation and full-suite CI gates.
+
+Validation: local Python 3.12 full synthetic suite 1,434 tests passed (one existing
+skip); focused nesting/import/title/workflow checks 69 passed (one existing skip).
+Independent review passed all five workflow contract tests and detected eight
+mutations of triggers, actions, permissions and verification gates. All 78 product
+modules and 132 existing sh blocks are byte-identical. Manifest 309 files, limited
+audit 310 files, compile, Python 3.10 syntax and whitespace checks passed. Remote
+Python 3.15 installation and six-job PR/main outcomes must be checked separately;
+no local result is claimed as new-interpreter or Windows evidence.
+
+Initial six-job CI (43605504317, head 91ad1a3) installed Python 3.15
+successfully and exposed a remaining fixed-depth adapter test: Ubuntu 3.15 accepted
+the depth-10,000 JSON, so three expected-error subtests failed. No product failure
+or new nesting restriction was inferred. That case now uses the existing bounded
+decoder-failure probe in a separate test, so an unavailable failing depth skips
+only nesting and cannot hide encoding/strict-JSON checks. The other invalid cases
+and all three adapter error-code expectations are preserved. Product code is
+unchanged; the corrected head requires all six CI jobs again.
+
+Previous change:
 
 2026-11-14 Opt-in MCP supplied-proposal review (0.99.2-mcp-supplied-proposals):
 adds proposal paths and supplied_only to review-titles only for servers launched
@@ -529,17 +560,20 @@ documented formats changed; 1012 tests before and after. Full entry:
 
 ## What CI runs
 
-`.github/workflows/tests.yml` runs on every push to `main` and on pull requests, on
-`ubuntu-latest` and `windows-latest` with Python 3.10 and 3.12 (four jobs, `fail-fast:
-false`, ten-minute timeout each), in this order: `python -m unittest discover -v`,
+`.github/workflows/tests.yml` runs on pushes to `main` and the preserved
+`codex/core-workflows-20261103` branch, on pull requests and manual dispatch, on
+`ubuntu-latest` and `windows-latest` with Python 3.10, 3.12 and 3.15 (six jobs,
+`fail-fast: false`, ten-minute timeout each), in this order: `python -m unittest discover -v`,
 `python audit_publication.py`, `python verify_manifest.py`. Actions are commit-pinned,
 token permissions are read-only, checkout does not persist credentials, and no secrets
 or deployment steps are used. Remote results are the public GitHub Actions history;
 this file does not restate or certify them.
 
-This bounded maintenance increment retains Python 3.10 compatibility and the
-existing CI matrix and triggers. A newest-interpreter lane and broader interpreter
-policy are deferred; no local run here establishes Python 3.15 compatibility.
+This increment preserves the Python 3.10 compatibility floor and existing CI
+triggers while adding the Python 3.15 lane and manual dispatch. A broader
+interpreter support or retirement policy remains a separate decision. Local checks
+do not establish Windows or Python 3.15 success; inspect the exact-commit remote
+six-job result before merging.
 
 ## How to verify locally
 

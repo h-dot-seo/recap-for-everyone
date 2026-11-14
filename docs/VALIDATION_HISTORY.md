@@ -2684,3 +2684,32 @@ tracking checked 41 SQLite connections, all explicitly closed; proposal loss aft
 preflight returns a fixed error before DB access. All 132 prior sh blocks remain
 unchanged. Manifest 308 files, limited audit 309 files, compile, Python 3.10 syntax
 and whitespace checks passed. No personal proposal or external connection used.
+
+## 2026-11-14 Current Python CI coverage (0.99.3-current-python-ci):
+adds Python 3.15 on Ubuntu and Windows to the existing Python 3.10/3.12
+matrix, making six jobs, and allows explicit manual workflow dispatch. Existing
+push branch filters, pull-request trigger, commit-pinned actions, read-only token
+permissions, disabled credential persistence, timeout and all three verification
+steps are preserved. The Python 3.10 compatibility floor is unchanged. No product
+code, schema, default output, private input, network client or approval boundary
+changes. Earlier deferred-lane records remain historical; a broader interpreter
+support or retirement policy is not introduced. New static workflow regression
+checks accompany the actual remote installation and full-suite CI gates.
+
+Validation: local Python 3.12 full synthetic suite 1,434 tests passed (one existing
+skip); focused nesting/import/title/workflow checks 69 passed (one existing skip).
+Independent review passed all five workflow contract tests and detected eight
+mutations of triggers, actions, permissions and verification gates. All 78 product
+modules and 132 existing sh blocks are byte-identical. Manifest 309 files, limited
+audit 310 files, compile, Python 3.10 syntax and whitespace checks passed. Remote
+Python 3.15 installation and six-job PR/main outcomes must be checked separately;
+no local result is claimed as new-interpreter or Windows evidence.
+
+Initial six-job CI (43605504317, head 91ad1a3) installed Python 3.15
+successfully and exposed a remaining fixed-depth adapter test: Ubuntu 3.15 accepted
+the depth-10,000 JSON, so three expected-error subtests failed. No product failure
+or new nesting restriction was inferred. That case now uses the existing bounded
+decoder-failure probe in a separate test, so an unavailable failing depth skips
+only nesting and cannot hide encoding/strict-JSON checks. The other invalid cases
+and all three adapter error-code expectations are preserved. Product code is
+unchanged; the corrected head requires all six CI jobs again.

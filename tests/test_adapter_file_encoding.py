@@ -13,6 +13,8 @@ import tempfile
 import unittest
 from unittest.mock import patch
 
+from tests._nesting import deep_json
+
 from recaplib import title_adapter as adapter
 from recaplib.conversation_search import find
 from recaplib.session_workflow import import_export, titles
@@ -174,8 +176,7 @@ class AdapterFileEncodingTests(unittest.TestCase):
                    b'\xff'+valid, valid.decode().encode('utf-16'), valid.decode().encode('utf-32'),
                    BOM_UTF8+b'{"x":"\xff"}', BOM_UTF8+b'{"a":1,"a":2}',
                    BOM_UTF8+b'{"x":"\\ud800"}', BOM_UTF8+b'{"x":NaN}',
-                   BOM_UTF8+b'{"x":1e999}', BOM_UTF8+b'[]',
-                   BOM_UTF8+b'{"x":'+b'['*10000+b'0'+b']'*10000+b'}']
+                   BOM_UTF8+b'{"x":1e999}', BOM_UTF8+b'[]']
         path = self.root/'invalid.json'
         for code in ('REQUEST_INVALID', 'INVALID_RESPONSE', 'CONSENT_REQUIRED'):
             for index, raw in enumerate(invalid):
@@ -183,6 +184,17 @@ class AdapterFileEncodingTests(unittest.TestCase):
                     path.write_bytes(raw)
                     self.assert_code(code, adapter._read_object, path, len(raw)+10, code)
                     self.assertEqual(path.read_bytes(), raw)
+
+    def test_decoder_rejected_nesting_remains_a_fixed_error(self):
+        # Probe only this case: a decoder with no bounded failure may skip it
+        # without hiding the independent encoding/strict-JSON assertions above.
+        raw = BOM_UTF8 + b'{"x":' + deep_json().encode('utf-8') + b'}'
+        path = self.root/'deep.json'
+        path.write_bytes(raw)
+        for code in ('REQUEST_INVALID', 'INVALID_RESPONSE', 'CONSENT_REQUIRED'):
+            with self.subTest(code=code):
+                self.assert_code(code, adapter._read_object, path, len(raw)+10, code)
+                self.assertEqual(path.read_bytes(), raw)
 
     def test_invalid_input_precedes_archive_access_and_output_creation(self):
         request, response = self.completion_files()
