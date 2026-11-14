@@ -1,4 +1,5 @@
 """Read-only conversation search across current display titles and message text."""
+from recaplib.cli_errors import safe_diagnostic
 import argparse
 import base64
 import binascii
@@ -356,7 +357,7 @@ def main():
     p.add_argument('--until', dest='until_date')
     a=p.parse_args()
     try: result=find(a.db,a.query,a.source,a.limit,a.include_title_history,a.export_sha256,a.cursor,a.canonical_unicode,a.text_role,a.from_date,a.until_date)
-    except (ValueError,OSError,sqlite3.Error) as e: p.exit(1,str(e)+'\n')
+    except (ValueError,OSError,sqlite3.Error) as e: p.exit(1,safe_diagnostic(e)+'\n')
     print(json.dumps(result,ensure_ascii=True,indent=2))
 
 

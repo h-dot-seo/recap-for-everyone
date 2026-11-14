@@ -682,3 +682,6 @@ usage: build_manifest.py [-h] [--root ROOT] [--release RELEASE] [--date DATE] [-
 
 Read-only plan by default; a reviewed plan hash permits only a new outside-tree
 manifest candidate. See [Build manifest](BUILD_MANIFEST.md).
+
+Handled low-level execution failures use [fixed stderr diagnostics](ERROR_DIAGNOSTICS.md).
+CLI usage and result-document failure statuses are unchanged.

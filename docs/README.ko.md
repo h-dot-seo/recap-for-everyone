@@ -253,3 +253,8 @@ For contributor byte inventories, `build_manifest.py` reports a read-only plan.
 After reviewing it, an exact plan hash can create a separate new candidate outside
 the checkout, never overwrite the manifest or approve publication. See
 [manifest generation](BUILD_MANIFEST.md).
+
+Handled CLI OS/SQLite/decoder failures use fixed, path-free stderr diagnostics.
+Existing validation messages and stdout result failures keep their contracts;
+exit 1 alone does not establish that no write occurred. See
+[failure diagnostics](ERROR_DIAGNOSTICS.md).

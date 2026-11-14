@@ -1,4 +1,5 @@
 """Propose a local title from explicitly source-labeled user text in a pinned export."""
+from recaplib.cli_errors import safe_diagnostic
 import argparse
 import json
 import re
@@ -200,7 +201,7 @@ def main():
         result = suggest_attributed(args.db, args.source, args.conversation, args.input, args.message, args.origin_locator)
         result = save_if_requested(result, args, 'proposal')
     except (ValueError, OSError, KeyError, TypeError, sqlite3.Error) as error:
-        parser.exit(1, str(error) + '\n')
+        parser.exit(1, safe_diagnostic(error) + '\n')
     print(json.dumps(result, ensure_ascii=True, indent=2))
 
 

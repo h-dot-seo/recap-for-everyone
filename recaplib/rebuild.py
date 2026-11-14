@@ -206,8 +206,8 @@ def rebuild_archive(manifest_path, plan_path, objects, new_db, output):
         publication = recovery._publish_new_file(output, encoded, '.recap-rebuild-receipt-')
     except (OSError, ValueError, TypeError, UnicodeError) as error:
         if receipt['new_database_created_exclusively']:
-            raise OSError('rebuilt database was published at ' + str(destination) +
-                          '; receipt publication failed; database was preserved') from error
+            raise OSError('rebuilt database was published; receipt publication failed; database was preserved; '
+                          'inspect the requested new database before retrying') from error
         raise
     return dict(receipt, receipt_bytes=len(encoded), receipt_sha256=hashlib.sha256(encoded).hexdigest(),
                 receipt_staging_cleanup_complete=publication['staging_cleanup_complete'],

@@ -1,10 +1,24 @@
 # Validation record
 
-Current release: `0.97.3-reviewed-manifest-builder`, dated 2026-11-14.
+Current release: `0.97.4-safe-cli-diagnostics`, dated 2026-11-14.
 This file is the current snapshot. Every dated entry since the first release is kept
 unchanged and in order in [docs/VALIDATION_HISTORY.md](docs/VALIDATION_HISTORY.md).
 
 ## Latest change
+
+2026-11-14 Safe low-level CLI diagnostics (0.97.4-safe-cli-diagnostics):
+shares fixed diagnostics for already-caught OS, SQLite, JSON-decoder and Unicode-
+decoder errors across unified and existing standalone entry points. Established
+validation messages, adapter codes, caught exception sets, exit statuses and
+stdout result-level failure documents remain unchanged. Exact code-authored safe
+publication/protection messages are retained; rebuild receipt failure after DB
+publication retains the published/preserved warning without the destination path.
+Synthetic actual and injected failures, output collisions, missing parents,
+private markers, fixed-message parity and the executed error guide are tested.
+No JSON envelope, new flag, global data-sanitization or no-mutation-on-error claim
+is introduced. Argparse and unexpected programming-error behavior are unchanged.
+
+Previous change:
 
 2026-11-14 Reviewed manifest candidate builder (0.97.3-reviewed-manifest-builder):
 adds public build_manifest.py with read-only added/removed/changed-path plans and

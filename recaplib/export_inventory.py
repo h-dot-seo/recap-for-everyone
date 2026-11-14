@@ -1,4 +1,5 @@
 """List explicit export identities and titles without importing message bodies."""
+from recaplib.cli_errors import safe_diagnostic
 import argparse
 import json
 import unicodedata
@@ -152,7 +153,7 @@ def main():
                              contains=args.contains, canonical_unicode=args.canonical_unicode,
                              text_contains=args.text_contains, text_role=args.text_role)
     except (ValueError, OSError, KeyError, TypeError) as error:
-        parser.exit(1, str(error) + '\n')
+        parser.exit(1, safe_diagnostic(error) + '\n')
     print(json.dumps(result, ensure_ascii=True, indent=2))
 
 

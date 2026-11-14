@@ -1,4 +1,5 @@
 """Generate a local excerpt from a verified archived web-export path, read-only."""
+from recaplib.cli_errors import safe_diagnostic
 import argparse
 import json
 import sqlite3
@@ -73,7 +74,7 @@ def main():
         result = suggest_branch(args.db, args.source, args.conversation, args.input, args.node, args.message)
         result = save_if_requested(result, args, 'proposal')
     except (ValueError, OSError, KeyError, TypeError, sqlite3.Error) as error:
-        parser.exit(1, str(error) + '\n')
+        parser.exit(1, safe_diagnostic(error) + '\n')
     print(json.dumps(result, ensure_ascii=True, indent=2))
 
 

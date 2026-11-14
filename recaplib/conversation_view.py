@@ -1,4 +1,5 @@
 """Read-only conversation inventory and structured evidence views; no network."""
+from recaplib.cli_errors import safe_diagnostic
 import argparse
 import json
 import sqlite3
@@ -223,7 +224,7 @@ def main():
             result = conversation(args.db, args.source, args.conversation, args.limit, args.offset,
                                   args.message, args.around_message, args.before, args.after)
     except (ValueError, OSError, sqlite3.Error) as exc:
-        parser.exit(1, str(exc) + '\n')
+        parser.exit(1, safe_diagnostic(exc) + '\n')
     print(json.dumps(result, ensure_ascii=True, indent=2))
 
 

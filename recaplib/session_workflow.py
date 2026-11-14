@@ -1,4 +1,5 @@
 """Explicit export adapters and reversible local title organization (no network)."""
+from recaplib.cli_errors import safe_diagnostic
 import argparse
 import hashlib
 import io
@@ -362,7 +363,7 @@ def main():
         else:
             result = titles(a.db, a.source, a.conversation, a.set, a.expected_revision)
     except (ValueError, OSError, KeyError, TypeError, sqlite3.Error) as e:
-        p.exit(1, str(e) + '\n')
+        p.exit(1, safe_diagnostic(e) + '\n')
     print(json.dumps(result, ensure_ascii=True, indent=2))
 
 
