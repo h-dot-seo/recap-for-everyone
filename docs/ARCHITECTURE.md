@@ -32,7 +32,10 @@ transaction. Schema initialization remains a separate earlier step: this is not 
 promise that every possible failure leaves no new database file or schema.
 
 Web/local export adapters hash the exact original source bytes, normalize their
-selected messages in memory and pass the generated JSONL bytes to that same writer.
+selected messages in memory. They serialize the same JSONL bytes for artifact
+identity but validate the existing rows without decoding that JSONL a second time,
+then pass the checked records to the same writer. Direct normalized ingestion
+still strict-parses its supplied bytes.
 They do not create temporary source or normalized JSONL files. The normalized
 artifact hash retains the prior platform-native text newline behavior; it is not
 the original export's hash or a cross-platform canonical identity. Original export

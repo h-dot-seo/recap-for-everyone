@@ -251,3 +251,7 @@ For a private pointer without message text or titles, use `export-provenance`
 for one explicit message and `check-provenance` to recheck it. Locator hashes
 do not establish authorship, consent, retrieval or publication evidence. See
 [message provenance cards](docs/MESSAGE_PROVENANCE.md).
+
+Adapter import and explicit byte replay reuse validated rows, but still retain the
+source, rows and derived JSONL bytes in memory. No new flag is needed. Do not infer
+bounded memory or a speed guarantee; see `docs/ADAPTER_IMPORT_COST.md`.

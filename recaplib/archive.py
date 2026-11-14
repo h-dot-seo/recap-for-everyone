@@ -1,5 +1,7 @@
 """Archive core shared by recap.py and the recaplib modules: schema, normalized JSONL ingest, read-only connections and FTS search."""
 import hashlib
+import io
+import json
 import sqlite3
 from collections import Counter
 from pathlib import Path
@@ -35,6 +37,19 @@ def _validate_source(source):
         raise ValueError('source must contain valid Unicode text')
 
 
+def _validate_record(row, line_no):
+    """Shared normalized row shape validation after Unicode-safe decoding/encoding."""
+    required = ('conversation_id', 'message_id', 'role', 'timestamp', 'text')
+    if not isinstance(row, dict) or any(not isinstance(row.get(k), str) or not row[k] for k in required):
+        raise ValueError(f'invalid record at line {line_no}')
+    if row['role'] not in ('user', 'assistant', 'system', 'tool'):
+        raise ValueError(f'unsupported role at line {line_no}')
+    title = row.get('title', '')
+    if not isinstance(title, str):
+        raise ValueError(f'invalid title at line {line_no}')
+    return row, title, line_no
+
+
 def _normalized_records(raw):
     """Yield structurally valid records in physical order, without admission checks."""
     if not isinstance(raw, bytes):
@@ -46,15 +61,7 @@ def _normalized_records(raw):
             row = loads(line)
         except ValueError as error:
             raise ValueError(f'invalid JSON record at line {line_no}') from error
-        required = ('conversation_id', 'message_id', 'role', 'timestamp', 'text')
-        if not isinstance(row, dict) or any(not isinstance(row.get(k), str) or not row[k] for k in required):
-            raise ValueError(f'invalid record at line {line_no}')
-        if row['role'] not in ('user', 'assistant', 'system', 'tool'):
-            raise ValueError(f'unsupported role at line {line_no}')
-        title = row.get('title', '')
-        if not isinstance(title, str):
-            raise ValueError(f'invalid title at line {line_no}')
-        yield row, title, line_no
+        yield _validate_record(row, line_no)
 
 
 def validate_normalized(raw):
@@ -128,11 +135,64 @@ def ingest_bytes(db, source, raw, provenance=None, *, expected_sha256=None):
     _validate_source(source)
     if not isinstance(raw, bytes):
         raise ValueError('normalized input must be immutable bytes')
-    digest = hashlib.sha256(raw).hexdigest()
     _check_expected_sha256(raw, expected_sha256)
+    records = _admit_incoming(_normalized_records(raw))
+    return _write_records(db, source, raw, records, provenance)
+
+
+def _normalized_bytes(rows, newline=None):
+    # Preserve the historical Path.write_text newline translation and exact JSON
+    # key ordering. Encoding also rejects non-Unicode strings anywhere in rows.
+    with io.BytesIO() as buffer:
+        with io.TextIOWrapper(buffer, encoding='utf-8', newline=newline) as text:
+            text.write(''.join(json.dumps(row, ensure_ascii=False) + '\n' for row in rows))
+            text.flush()
+            return buffer.getvalue()
+
+
+def _check_encoded_keys(row, line_no):
+    """Retain strict JSON duplicate-key rejection after encoder key coercion.
+
+    Real adapter rows use string keys. This also checks nested ignored members
+    so the private fast path cannot admit a dict that strict byte ingest rejects.
+    Serialization already checked cycles and unsupported key/value types.
+    """
+    pending = [row]
+    while pending:
+        item = pending.pop()
+        if isinstance(item, dict):
+            seen = set()
+            for key, value in item.items():
+                encoded_key = key if isinstance(key, str) else json.dumps(key)
+                if encoded_key in seen:
+                    raise ValueError(f'invalid JSON record at line {line_no}')
+                seen.add(encoded_key)
+                pending.append(value)
+        elif isinstance(item, (list, tuple)):
+            pending.extend(item)
+
+
+def _ingest_adapter_rows(db, source, rows, *, newline=None):
+    """Private validated adapter path: own serialization, never accept paired raw.
+
+    JSON encoding still validates serializability/Unicode of every value. Stored
+    fields retain the shared normalized row checks; conflicts are checked before
+    opening SQLite. One generated JSON record occupies one physical line, even
+    when string data contains newlines. The rows are not decoded a second time.
+    """
+    _validate_source(source)
+    rows = list(rows)
+    raw = _normalized_bytes(rows, newline)
+    for line_no, row in enumerate(rows, 1):
+        _check_encoded_keys(row, line_no)
+    records = _admit_incoming(_validate_record(row, line_no) for line_no, row in enumerate(rows, 1))
+    return _write_records(db, source, raw, records, rows)
+
+
+def _admit_incoming(candidates):
     records = []
     incoming = {}
-    for row, title, line_no in _normalized_records(raw):
+    for row, title, line_no in candidates:
         key = (row['conversation_id'], row['message_id'])
         values = (row['role'], row['timestamp'], title, row['text'])
         if key in incoming and incoming[key] != values:
@@ -141,6 +201,12 @@ def ingest_bytes(db, source, raw, provenance=None, *, expected_sha256=None):
             raise ValueError(f'conflicting message identity at line {line_no}')
         incoming[key] = values
         records.append((row, title, line_no))
+    return records
+
+
+def _write_records(db, source, raw, records, provenance):
+    """Shared transaction writer; callers finish validation before entering."""
+    digest = hashlib.sha256(raw).hexdigest()
     conn = sqlite3.connect(db)
     try:
         conn.execute('PRAGMA foreign_keys=ON')
