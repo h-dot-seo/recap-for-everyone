@@ -36,6 +36,13 @@ audit. It does not call recap version during warmup or allow archive/manifest I/
 Real missing-manifest and different-directory subprocess checks remain unchanged;
 no production code change was needed for this test portability correction.
 
+The corrected-head CI (43610451986) then exposed two Windows-only stdout
+assertions that expected LF bytes rather than the native CRLF console newline.
+Both real-process assertions now require the exact native newline via os.linesep;
+no stripping, arbitrary whitespace acceptance or product-output change was added.
+The in-process text-stream assertion still requires LF. All platforms must pass
+again on the corrected head.
+
 Previous change:
 
 2026-11-14 Synthetic suite timing observer (0.99.4-test-timing):

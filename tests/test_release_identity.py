@@ -1,6 +1,7 @@
 """CLI identity and declared release agreement, not authenticity or a tag policy."""
 import hashlib
 import json
+import os
 from pathlib import Path
 import re
 import shutil
@@ -64,7 +65,7 @@ recap.main()
 """
         result=subprocess.run([sys.executable,'-c',code],cwd=ROOT,capture_output=True,timeout=15)
         self.assertEqual(result.returncode,0,result.stderr)
-        self.assertEqual(result.stdout,('recap-for-everyone '+__version__+'\n').encode());self.assertEqual(result.stderr,b'')
+        self.assertEqual(result.stdout,('recap-for-everyone '+__version__+os.linesep).encode());self.assertEqual(result.stderr,b'')
 
     def test_real_process_other_cwd_missing_manifest_and_no_mutation(self):
         with tempfile.TemporaryDirectory() as directory:
@@ -75,7 +76,7 @@ recap.main()
             before={str(p.relative_to(root)):p.read_bytes() for p in root.rglob('*') if p.is_file()}
             result=subprocess.run([sys.executable,'-B',str(copy/'recap.py'),'--version'],cwd=cwd,capture_output=True,timeout=15)
             self.assertEqual(result.returncode,0,result.stderr)
-            self.assertEqual(result.stdout,('recap-for-everyone '+__version__+'\n').encode());self.assertEqual(result.stderr,b'')
+            self.assertEqual(result.stdout,('recap-for-everyone '+__version__+os.linesep).encode());self.assertEqual(result.stderr,b'')
             self.assertFalse((copy/'PUBLICATION_MANIFEST.json').exists())
             self.assertEqual(before,{str(p.relative_to(root)):p.read_bytes() for p in root.rglob('*') if p.is_file()})
 
