@@ -276,3 +276,7 @@ do not establish authorship, consent, retrieval or publication evidence. See
 --max-input-bytes를 지정합니다. 기본 인터페이스는 그대로이며, 선택한 경우에만
 내보내기/ZIP/분기/보존 턴 읽기 5종이 추가됩니다. 경로·크기 사전 검사는 보안
 격리나 파일 전송 동의가 아니며 실제 클라이언트 연결은 별도로 승인해야 합니다.
+
+같은 명시 입력 범위의 제안 파일은 review-titles의 proposal 배열과 supplied_only로
+검토할 수 있습니다. 기존 합산 1 MiB·파일 수·출처·중복·오래된 내용·충돌 검사를
+유지하며 READY는 사람의 승인이나 적용을 뜻하지 않습니다.

@@ -19,7 +19,7 @@ from recaplib.cli_errors import safe_diagnostic
 from recaplib.conversation_view import conversations, conversation
 from recaplib.conversation_search import find
 from recaplib.title_history import history
-from recaplib.title_batch import review_queue
+from recaplib.title_batch import review_queue, load_supplied_proposals, MAX_SUPPLIED_BYTES, MAX_SUPPLIED_PROPOSALS
 from recaplib.strict_json import loads
 
 PROTOCOL_VERSION = '2025-06-18'
@@ -119,8 +119,17 @@ def stats(db):
 TOOLS={'list':conversations,'find':find,'show':conversation,'title-history':history,'stats':stats,'review-titles':review_queue}
 
 
-def _arguments(name, arguments):
+def _contract(name,allow_proposals=False):
     contract=(SCHEMAS if name in SCHEMAS else FILE_SCHEMAS)[name]
+    if name=='review-titles' and allow_proposals:
+        return dict(contract,properties=dict(contract['properties'],
+            proposal=dict(type='array',items=dict(type='string',minLength=1),minItems=1,maxItems=MAX_SUPPLIED_PROPOSALS),
+            supplied_only=dict(type='boolean')))
+    return contract
+
+
+def _arguments(name, arguments,allow_proposals=False):
+    contract=_contract(name,allow_proposals)
     if not isinstance(arguments,dict) or set(arguments)-set(contract['properties']) or set(contract['required'])-set(arguments):
         return False
     for key,value in arguments.items():
@@ -128,7 +137,10 @@ def _arguments(name, arguments):
         if rule['type']=='string' and not isinstance(value,str):return False
         if rule['type']=='boolean' and type(value) is not bool:return False
         if rule['type']=='integer' and (type(value) is not int or not rule['minimum']<=value<=rule['maximum']):return False
+        if rule['type']=='array' and (not isinstance(value,list) or not rule['minItems']<=len(value)<=rule['maxItems'] or
+                any(not isinstance(item,str) or not item for item in value)):return False
         if 'enum' in rule and value not in rule['enum']:return False
+    if name=='review-titles' and arguments.get('supplied_only') and 'proposal' not in arguments:return False
     return True
 
 
@@ -193,11 +205,11 @@ class Server:
         if method=='tools/list':
             if params:return _error(identity,-32602,'Invalid params')
             return _result(identity,dict(tools=[dict(name=name,description='Read-only '+name+' from the operator-selected archive. '+BOUNDARY,
-                inputSchema=SCHEMAS[name],annotations=dict(readOnlyHint=True,destructiveHint=False,openWorldHint=False)) for name in TOOLS]+([dict(name=name,description='Explicitly allowed file read. '+FILE_BOUNDARY,
+                inputSchema=_contract(name,bool(self.roots)),annotations=dict(readOnlyHint=True,destructiveHint=False,openWorldHint=False)) for name in TOOLS]+([dict(name=name,description='Explicitly allowed file read. '+FILE_BOUNDARY,
                 inputSchema=FILE_SCHEMAS[name],annotations=dict(readOnlyHint=True,destructiveHint=False,openWorldHint=False))
                 for name in FILE_TOOLS] if self.roots else [])))
         name=params.get('name');arguments=params.get('arguments',{})
-        if set(params)-{'name','arguments'} or not isinstance(name,str) or name not in (set(TOOLS)|(set(FILE_TOOLS) if self.roots else set())) or not _arguments(name,arguments):
+        if set(params)-{'name','arguments'} or not isinstance(name,str) or name not in (set(TOOLS)|(set(FILE_TOOLS) if self.roots else set())) or not _arguments(name,arguments,bool(self.roots)):
             return _error(identity,-32602,'Invalid params or unknown tool')
         kwargs=dict(arguments)
         if name in FILE_TOOLS:
@@ -210,13 +222,27 @@ class Server:
                 result=dict(isError=True,content=[dict(type='text',text='Input file could not be read within configured limits'),
                     dict(type='text',text=FILE_BOUNDARY)])
             return _result(identity,result)
+        proposal_call=name=='review-titles' and 'proposal' in kwargs
+        if proposal_call:
+            try:
+                # Admit every path before opening any proposal. This sum is a
+                # preflight budget, not an immutable lease across reader opens.
+                paths=[_input_path(path,self.roots,self.max_input_bytes) for path in kwargs.pop('proposal')]
+                if sum(path.stat().st_size for path in paths)>min(self.max_input_bytes,MAX_SUPPLIED_BYTES):
+                    raise ValueError()
+                kwargs['supplied_proposals']=load_supplied_proposals(paths)
+            except (OSError,ValueError,KeyError,TypeError,RuntimeError):
+                return _result(identity,dict(isError=True,content=[
+                    dict(type='text',text='Supplied proposal files could not be read within configured limits'),
+                    dict(type='text',text=FILE_BOUNDARY)]))
         if name=='show':kwargs['conversation_id']=kwargs.pop('conversation')
         try:
             value=TOOLS[name](self.db,**kwargs)
             result=dict(content=[dict(type='text',text=json.dumps(value,ensure_ascii=True,indent=2,allow_nan=False)),
-                                 dict(type='text',text=BOUNDARY)],isError=False)
+                                 dict(type='text',text=FILE_BOUNDARY if proposal_call else BOUNDARY)],isError=False)
         except (OSError,ValueError,KeyError,TypeError,sqlite3.Error) as error:
             result=_tool_error(safe_diagnostic(error))
+            if proposal_call:result['content'][1]['text']=FILE_BOUNDARY
         return _result(identity,result)
 
 

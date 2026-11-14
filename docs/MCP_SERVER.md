@@ -32,7 +32,7 @@ model or retaining its text in a client log.
 | show | Selected archive message view | No saved output file |
 | title-history | Existing local title history | No title changes or restore |
 | stats | Stored message/artifact counts | No new schema or ingestion |
-| review-titles | Existing review queue and local excerpts | No proposal/checkpoint files, output save or review-state write |
+| review-titles | Existing review queue and local excerpts | No proposal/checkpoint files by default, output save or review-state write |
 
 Use tools/list for the exact input schemas, required identities and numeric
 bounds. The archive is fixed by the launch argument; calls cannot select another
@@ -151,5 +151,49 @@ existing lower-only member-size controls. It does not decompress candidate membe
 or bypass CRC/extraction validation for later operations. Other file tools do not
 auto-detect or decompress ZIPs. The existing 1 MiB response cap still applies to
 all tool results, including supported=false replay documents. Smaller selections
-can reduce output but do not guarantee bounded parsing time. No title proposal,
-checkpoint-file reader or write tool is added by directory authorization.
+can reduce output but do not guarantee bounded parsing time. No checkpoint-file reader or write tool is added by directory authorization.
+Explicit supplied proposals are a separate opt-in argument of review-titles as
+described below.
+
+## Review explicitly supplied proposal files
+
+When input directories have been explicitly allowed, review-titles additionally
+accepts a proposal array of 1..1000 exact file paths and optional supplied_only.
+Without allowed input directories these properties are absent and rejected; the
+default six-tool schemas and responses are unchanged. This reuses the existing
+[CLI supplied-proposal queue](SUPPLIED_TITLE_REVIEW.md), not a new approval or
+application path. A request has this generic shape after initialization:
+
+```json
+{"jsonrpc":"2.0","id":2,"method":"tools/call","params":{"name":"review-titles","arguments":{"source":"SOURCE","proposal":["PROPOSAL.json"],"supplied_only":true}}}
+```
+
+Replace SOURCE with the explicitly selected archive source and PROPOSAL.json with
+an authorized existing file under an allowed directory. The example is not an
+instruction to search folders or load personal proposals. Each file must contain
+one ordinary proposal, not a whole queue or reviewed preview. Provider labels and
+context are untrusted; they do not establish generation, consent or ownership.
+
+Every path must pass the same canonical containment, regular-file and configured
+byte preflight. Combined proposal bytes must pass a preflight budget equal to the
+smaller of --max-input-bytes and the existing combined 1 MiB loader limit. The
+existing loader additionally performs bounded reads and enforces its 1 MiB total
+after reading, including BOM bytes. As with other file access, path and reduced
+configuration-budget preflight are not atomic against concurrent replacement or
+growth. Keep inputs stable. No file is rewritten or staged by this workflow.
+
+Exact source, one candidate per conversation, valid finite JSON and the existing
+content/revision/evidence checks remain in force. Wrong-source or duplicate
+identities reject the queue. Stale or invalid selected candidates retain their
+existing unavailable status, never silently fall back to raw excerpts. Only the
+selected page receives full candidate-content validation; read unused counts and
+page coverage, and retain whole-source collision checks. supplied_only selects
+supplied identities before pagination and requires proposal inputs; it does not
+approve them. Without supplied inputs the normal raw-excerpt queue remains intact.
+
+The returned queue can expose private proposal wording, context and identifiers to
+the selected client. Fixed read errors do not echo paths, but successful content
+is not anonymized. A READY queue item is not human approval. Open and review the
+normal fresh preview through the existing separately authorized CLI workflow
+before application. MCP still exposes no preview-file write, apply, title write,
+review-state change or checkpoint-file read.

@@ -2662,3 +2662,25 @@ directories and node types; review caught a Windows separator assumption in the
 new inventory assertion, corrected to portable keys before publication. Existing
 132 sh blocks were preserved. Manifest 307 files, limited audit 308 files, compile,
 Python 3.10 syntax and whitespace checks passed. Only synthetic inputs were used.
+
+## 2026-11-14 Opt-in MCP supplied-proposal review (0.99.2-mcp-supplied-proposals):
+adds proposal paths and supplied_only to review-titles only for servers launched
+with allowed input directories. Default schemas, protocol bytes and raw review
+results remain unchanged. Every path is admitted before loading; file count and
+aggregate preflight use existing 1000-file and combined 1 MiB limits, additionally
+bounded by the lower configured byte budget. The existing loader retains its
+actual combined 1 MiB bounded-read check. Reduced preflight limits are not atomic
+against concurrent file growth or replacement. Existing exact-source, duplicate,
+stale-evidence, collision and partial-page checks are reused without new trust
+semantics. No checkpoint, output, application, title or review-state write is
+exposed; successful queues remain private and READY is not approval. Only invented
+proposals and local subprocess clients were used; no external client was connected.
+
+Validation: full synthetic suite 1,428 tests passed (one existing skip); focused
+and independent 76 tests passed. Default wire bytes and schemas remain unchanged
+across alternating opt-in/default sessions. Real subprocess supplied queues match
+existing CLI JSON and preserve the complete scratch tree. Independent connection
+tracking checked 41 SQLite connections, all explicitly closed; proposal loss after
+preflight returns a fixed error before DB access. All 132 prior sh blocks remain
+unchanged. Manifest 308 files, limited audit 309 files, compile, Python 3.10 syntax
+and whitespace checks passed. No personal proposal or external connection used.

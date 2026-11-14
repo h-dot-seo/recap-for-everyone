@@ -267,3 +267,6 @@ For an explicitly authorized local MCP client, [read-only stdio access](docs/MCP
 exposes six archive reads by default, with optional explicitly directory-scoped
 input inspection and no write tools. It does not install
 or connect a client, and private results remain untrusted evidence.
+
+The opt-in MCP input scope also supports [explicit supplied-proposal review](docs/MCP_SERVER.md#review-explicitly-supplied-proposal-files),
+using the existing queue checks without exposing application or output writes.

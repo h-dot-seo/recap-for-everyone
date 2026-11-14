@@ -415,6 +415,12 @@ normal source and disclosure permissions, and use client-owned timeouts.
 For explicitly authorized export inspection through that client, select narrow
 input directories at server launch with --allow-input-dir and an appropriate
 --max-input-bytes. Five additional file-read tools then become available; no
-write, title-proposal or checkpoint-file path is enabled. Resolve/stat admission
+write or checkpoint-file path is enabled. Resolve/stat admission
 is not a hostile-filesystem sandbox or permission to disclose every file. Keep
 source directories stable and private; see [the file-access limits](docs/MCP_SERVER.md#explicit-input-directory-access).
+
+For already supplied candidates in the same explicitly authorized input scope,
+review-titles may receive proposal file paths and supplied_only. Keep its combined
+1 MiB/file-count limits, exact-source and stale/duplicate/collision checks; inspect
+unused candidate counts and page coverage. Queue readiness is not approval or
+application. See [supplied MCP proposals](docs/MCP_SERVER.md#review-explicitly-supplied-proposal-files).

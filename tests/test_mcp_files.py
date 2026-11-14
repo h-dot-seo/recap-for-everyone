@@ -73,7 +73,7 @@ class McpFileTests(unittest.TestCase):
             self.assertNotIn(str(self.inputs),json.dumps(entries))
             for entry in entries:
                 self.assertFalse(entry['inputSchema']['additionalProperties'])
-                self.assertFalse(({'output','db','proposal','checkpoint','set'}|({'source'} if entry['name'] in mcp.FILE_TOOLS else set()))&set(entry['inputSchema']['properties']))
+                self.assertFalse(({'output','db','checkpoint','set'}|({'source','proposal'} if entry['name'] in mcp.FILE_TOOLS else set()))&set(entry['inputSchema']['properties']))
         catalog={entry['command']:entry for entry in describe(recap.build_parser())['commands']}
         self.assertTrue(set(mcp.FILE_TOOLS)<=set(catalog))
         for name in mcp.FILE_TOOLS:
