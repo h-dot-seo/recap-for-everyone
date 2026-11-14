@@ -1,4 +1,5 @@
 """Read-only conversation search across current display titles and message text."""
+from recaplib.errors import add_json_errors_argument, exit_error
 from recaplib.errors import Stale
 from recaplib.cli_errors import safe_diagnostic
 import argparse
@@ -348,6 +349,7 @@ def find(db, query, source=None, limit=20, include_title_history=False, export_s
 
 def main():
     p=argparse.ArgumentParser(description=__doc__)
+    add_json_errors_argument(p)
     p.add_argument('--db',required=True); p.add_argument('query'); p.add_argument('--source'); p.add_argument('--limit',type=int,default=20)
     p.add_argument('--include-title-history', action='store_true')
     p.add_argument('--export-sha256', help='restrict message bodies to one original export provenance hash')
@@ -358,7 +360,7 @@ def main():
     p.add_argument('--until', dest='until_date')
     a=p.parse_args()
     try: result=find(a.db,a.query,a.source,a.limit,a.include_title_history,a.export_sha256,a.cursor,a.canonical_unicode,a.text_role,a.from_date,a.until_date)
-    except (ValueError,OSError,sqlite3.Error) as e: p.exit(1,safe_diagnostic(e)+'\n')
+    except (ValueError,OSError,sqlite3.Error) as e: exit_error(p, a, e)
     print(json.dumps(result,ensure_ascii=True,indent=2))
 
 

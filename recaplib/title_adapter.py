@@ -1,4 +1,5 @@
 """Provider-neutral title generation contract. Only local/mock execution is shipped."""
+from recaplib.errors import add_json_errors_argument, exit_adapter_error
 from recaplib.input_files import require_regular_file
 import argparse
 import hashlib
@@ -507,6 +508,7 @@ def _read_object(path, limit, code):
 def main():
     from recaplib.title_document_output import add_output_argument, save_if_requested
     parser = argparse.ArgumentParser(description=__doc__)
+    add_json_errors_argument(parser)
     parser.add_argument('--db', required=True)
     parser.add_argument('--source', required=True); parser.add_argument('--conversation', required=True)
     parser.add_argument('--kind', choices=['local', 'mock', 'external'], default='local')
@@ -564,9 +566,9 @@ def main():
                 # Python 3.10-3.12 can report parent symlink loops as RuntimeError.
                 raise AdapterError('OUTPUT_FAILED') from None
     except AdapterError as error:
-        parser.exit(1, error.code + '\n')
+        exit_adapter_error(parser, args, error.code)
     except Exception:
-        parser.exit(1, 'PROVIDER_FAILED\n')
+        exit_adapter_error(parser, args, 'PROVIDER_FAILED')
     print(json.dumps(result, ensure_ascii=True, indent=2))
 
 

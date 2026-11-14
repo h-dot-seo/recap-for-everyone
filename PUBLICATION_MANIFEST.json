@@ -1,12 +1,12 @@
 {
   "project": "recap-for-everyone",
-  "release": "0.99.5-cli-version",
+  "release": "0.99.6-standalone-json-errors",
   "date": "2026-11-14",
   "private_history_imported": false,
   "actual_corpora_included": false,
   "synthetic_examples_only": true,
   "license_status": "NOT_SELECTED",
-  "file_count": 313,
+  "file_count": 314,
   "files": [
     {
       "path": ".gitattributes",
@@ -50,8 +50,8 @@
     },
     {
       "path": "VALIDATION.md",
-      "bytes": 44363,
-      "sha256": "07977d6aa75e771915130132e1a1f74f65df03fe0c04626476113d23afd04571"
+      "bytes": 46406,
+      "sha256": "ba8a007124dc097c758c9a4e842a608c2f00287a43009d77900854113279566a"
     },
     {
       "path": "attributed_title.py",
@@ -135,8 +135,8 @@
     },
     {
       "path": "docs/COMMANDS.md",
-      "bytes": 32930,
-      "sha256": "5927166cddf4f289fd190b2329afe17aaadfdd3cb552713c45ba0bc74775c9f2"
+      "bytes": 33545,
+      "sha256": "315d8203ac8426b421b664f509a6dfed875124a82108f83b51905b2005db78b5"
     },
     {
       "path": "docs/COMMAND_CATALOG.md",
@@ -186,12 +186,12 @@
     {
       "path": "docs/INSTALL.md",
       "bytes": 8440,
-      "sha256": "e24efad92e756e7c7e7feb61425bfd1b80464a7baf1e2e9b8306aac4f265f7fd"
+      "sha256": "9718e9ba4e39bc00ed2cf184b7dc3eeb0850974dc421f624bcc1432f80c3a22c"
     },
     {
       "path": "docs/JSON_ERRORS.md",
-      "bytes": 3776,
-      "sha256": "de84877cf9321f2f9f2c1539114c7e915ae1d6f662858bae53b55fb578294451"
+      "bytes": 5264,
+      "sha256": "d9703099bd0d1f7c1643029d717b28ba26101908d7c3c9c95769c5e604a637cc"
     },
     {
       "path": "docs/MCP_SERVER.md",
@@ -375,8 +375,8 @@
     },
     {
       "path": "docs/VALIDATION_HISTORY.md",
-      "bytes": 188211,
-      "sha256": "bd77e38c50a4a94ed132f8fbe8c72ac29103ef00cd4630951d9d76c73d9536a3"
+      "bytes": 190228,
+      "sha256": "7f9e722900937ea822e6e43bb6c5ee89fe336628edcdc310a81138565b5a77e9"
     },
     {
       "path": "docs/WEB_ZIP_INVENTORY.md",
@@ -521,7 +521,7 @@
     {
       "path": "recaplib/__init__.py",
       "bytes": 125,
-      "sha256": "fc6ee5024a59061ed2d379fc22e90feadf5cd44e771df09379d3e5e89a955610"
+      "sha256": "30042749f4b75a097fbcb3741483b091de0e76901735ba0a6fa920b217c6f46a"
     },
     {
       "path": "recaplib/archive.py",
@@ -535,8 +535,8 @@
     },
     {
       "path": "recaplib/attributed_title.py",
-      "bytes": 12197,
-      "sha256": "2e00d14f1f79316432ea61cec35712037a6d3b645a3ffd5220125dd06d1c6dbb"
+      "bytes": 12285,
+      "sha256": "e4c169ab5f2e4e38052fdea9e570676b5835ef749f59be8b8077469c47fddd9e"
     },
     {
       "path": "recaplib/benchmark.py",
@@ -545,8 +545,8 @@
     },
     {
       "path": "recaplib/branch_title.py",
-      "bytes": 4815,
-      "sha256": "89fda2b2df0e1fbcff19f4c980aeee50ad4118f72f42e013e3d487b79ff0be7c"
+      "bytes": 4903,
+      "sha256": "7ffb57cdd0ed7e5fbb7506268263f54e3a652ef1870e489156c55e489389839a"
     },
     {
       "path": "recaplib/cli_errors.py",
@@ -565,13 +565,13 @@
     },
     {
       "path": "recaplib/conversation_search.py",
-      "bytes": 23429,
-      "sha256": "581630d253d3f5db70c79ad68026e3a70b0b8eee5ee44250994a7264e842f1c7"
+      "bytes": 23512,
+      "sha256": "61247f2e87ac790ae382a3ab9b2cae72ca805ac446b9f2099e8a33239549be66"
     },
     {
       "path": "recaplib/conversation_view.py",
-      "bytes": 15202,
-      "sha256": "5ff0657f6a1c2bdfc26f44a8fb6a475eb509b63198b6e87235b8b7265804b2e8"
+      "bytes": 15290,
+      "sha256": "b248522143445e213f2ae5edba5a4ab10d5c69dd9ef567354148a07f3315a2dd"
     },
     {
       "path": "recaplib/document_output.py",
@@ -580,18 +580,18 @@
     },
     {
       "path": "recaplib/errors.py",
-      "bytes": 997,
-      "sha256": "59864c827ba073c9bac0bbb01e9e28c4ca40853c5f1c3e96f7995dab902b3706"
+      "bytes": 1898,
+      "sha256": "adc31ac83e263a6b1d8d315bef8f72f5652554f946a2ec1dc5015c5322636bdf"
     },
     {
       "path": "recaplib/export_inventory.py",
-      "bytes": 10563,
-      "sha256": "68bd899ef38c78c6660fd6756b1e388a6db2cbbb2330c46b7b49750bf98f9aff"
+      "bytes": 10651,
+      "sha256": "e2e1ad85bfd7264dd51949ce5a057c73750acdf51f721174920f11fa7736df11"
     },
     {
       "path": "recaplib/import_check.py",
-      "bytes": 8349,
-      "sha256": "3c651f18b5269265066f7b08e98b86196c4a31355681f8b993bda6057826f958"
+      "bytes": 8437,
+      "sha256": "94fd31f5e5bacf5ac07b163540045a3bb0b50588a272d7d95fd2dcdd0eea551f"
     },
     {
       "path": "recaplib/import_checkpoint.py",
@@ -640,8 +640,8 @@
     },
     {
       "path": "recaplib/recovery.py",
-      "bytes": 38748,
-      "sha256": "0241c19ce9727f81ad2f02dd05223180dcb679127837bc34fc97fe96b6ffd603"
+      "bytes": 38836,
+      "sha256": "caf70eac73b9879c4bd22e39410b03481ec0ac63f055afebe3108d2e25cb4c0c"
     },
     {
       "path": "recaplib/render_queue.py",
@@ -655,13 +655,13 @@
     },
     {
       "path": "recaplib/replay_local.py",
-      "bytes": 15703,
-      "sha256": "5b832abcdc38ab4642e77532e642019c65bf16847dad51feb8a21c454511ab43"
+      "bytes": 15793,
+      "sha256": "96bbeb35c77c67b98ffffb4fc46a099ef524ee8fa18270f78841431aad9bae62"
     },
     {
       "path": "recaplib/replay_title.py",
-      "bytes": 6709,
-      "sha256": "d4e707b35f91d848c85e30e91c69a295fb1223954a6e87f1b6811ede475902b3"
+      "bytes": 6797,
+      "sha256": "df42798d075b0615ea786ec11b488ea60dd5f93b59a3fe76d18c341c4b633153"
     },
     {
       "path": "recaplib/review_checkpoint.py",
@@ -670,8 +670,8 @@
     },
     {
       "path": "recaplib/session_workflow.py",
-      "bytes": 22174,
-      "sha256": "8285e640485e4aedab59daabacd60d0c20180df3ecc998cc97b5b671091cad1c"
+      "bytes": 22254,
+      "sha256": "d97472ba83235850307d4710f96118ee0c5f08c44d56a8d7d5648590e594baa9"
     },
     {
       "path": "recaplib/source_identity.py",
@@ -715,8 +715,8 @@
     },
     {
       "path": "recaplib/title_adapter.py",
-      "bytes": 28789,
-      "sha256": "86b05f51677504c331c5d5dbd4bac2cf824eb1500b3e994801b294753f46c932"
+      "bytes": 28926,
+      "sha256": "351f939a4b4834503145217cc80d330e56cb13a1715e2d6322e186dd782fd564"
     },
     {
       "path": "recaplib/title_batch.py",
@@ -740,18 +740,18 @@
     },
     {
       "path": "recaplib/title_history.py",
-      "bytes": 4768,
-      "sha256": "af5c5de9292002be3e7be1270f202a58a321eee69cc3d43aa47e3fbd0f524b1a"
+      "bytes": 4856,
+      "sha256": "74baf3b596bf061ec2eaa53fc3b0921256d15a22f903818ce178efbd296d8da0"
     },
     {
       "path": "recaplib/title_plan.py",
-      "bytes": 4629,
-      "sha256": "a39cb4008428e55f7d120fffe6002916db5668e06ffe989ecdebad125ea67c1d"
+      "bytes": 4717,
+      "sha256": "23b353b5ff8d161c866bb2201a683f48e8a61ae7fa4f2be14f21513060774995"
     },
     {
       "path": "recaplib/title_proposal.py",
-      "bytes": 7193,
-      "sha256": "ae00f23c7fe8a918710ee7c00595edef528467ed81ae38a3e43899f3f581140e"
+      "bytes": 7273,
+      "sha256": "80309fe059ab68e17abcb8c86373d941ec840119feeb1e3115595bb3fcb14d4c"
     },
     {
       "path": "recaplib/title_review.py",
@@ -770,8 +770,8 @@
     },
     {
       "path": "recaplib/title_suggestion.py",
-      "bytes": 2279,
-      "sha256": "e1c43ee3a7bef611028cfc889a18213a7c2cb2a6cc4a3fe9830a3f0015b0b571"
+      "bytes": 2367,
+      "sha256": "a004d1fce0aad2b0c7ac4373a01430b0455377844ae4711659b7af88d8185a51"
     },
     {
       "path": "recaplib/title_transfer.py",
@@ -785,8 +785,8 @@
     },
     {
       "path": "recaplib/web_branch.py",
-      "bytes": 3542,
-      "sha256": "81b52ad82fa3df4c64cb5228021471f96db2629c64fe1adffdc30ab254d60f3f"
+      "bytes": 3630,
+      "sha256": "a01c7a208b4d854887a4967694a64ef3e643bcd015410c7be4247d2feba716db"
     },
     {
       "path": "recaplib/zip_preflight.py",
@@ -1337,6 +1337,11 @@
       "path": "tests/test_sqlite_readonly_safety.py",
       "bytes": 5328,
       "sha256": "6f8ad2e763fc5231be87c8f3983aefbfc27a4316e4dd54084e4de24a7a9a2537"
+    },
+    {
+      "path": "tests/test_standalone_json_errors.py",
+      "bytes": 10041,
+      "sha256": "feb27ad8f3190b8ffe7050bb53550e139baf645b1b799bd1f0e51a1c10af1cb6"
     },
     {
       "path": "tests/test_start_here.py",

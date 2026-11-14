@@ -1,4 +1,5 @@
 """List explicit export identities and titles without importing message bodies."""
+from recaplib.errors import add_json_errors_argument, exit_error
 from recaplib.cli_errors import safe_diagnostic
 import argparse
 import json
@@ -136,6 +137,7 @@ def list_export(path, kind, limit=50, offset=0, expected_export_sha256=None, *,
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
+    add_json_errors_argument(parser)
     parser.add_argument('input')
     parser.add_argument('--format', choices=['web', 'local', 'local-codex'], required=True)
     parser.add_argument('--limit', type=int, default=50)
@@ -153,7 +155,7 @@ def main():
                              contains=args.contains, canonical_unicode=args.canonical_unicode,
                              text_contains=args.text_contains, text_role=args.text_role)
     except (ValueError, OSError, KeyError, TypeError) as error:
-        parser.exit(1, safe_diagnostic(error) + '\n')
+        exit_error(parser, args, error)
     print(json.dumps(result, ensure_ascii=True, indent=2))
 
 

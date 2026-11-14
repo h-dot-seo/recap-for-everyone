@@ -1,5 +1,6 @@
-"""Explicit domain errors and an opt-in unified CLI envelope, not diagnosis."""
+"""Explicit domain errors and opt-in CLI envelopes, not diagnosis."""
 import sqlite3
+import json
 from recaplib.cli_errors import safe_diagnostic
 
 
@@ -37,3 +38,22 @@ def error_document(error):
         code = 'UNCLASSIFIED'
     return dict(schema='recap.error.v1', code=code,
                 message=safe_diagnostic(error), exit_status=1)
+
+
+def add_json_errors_argument(parser):
+    """Opt in only at existing execution-error boundaries, never argparse usage."""
+    parser.add_argument('--json-errors', action='store_true',
+                        help='emit structured stderr for caught execution failures only; usage and result failures are unchanged')
+
+
+def exit_error(parser, args, error):
+    """Preserve legacy diagnostics unless explicitly requested otherwise."""
+    message=json.dumps(error_document(error),ensure_ascii=True) if args.json_errors else safe_diagnostic(error)
+    parser.exit(1,message+'\n')
+
+
+def exit_adapter_error(parser, args, code):
+    """Adapter's existing symbolic code is its whole diagnostic, not a cause."""
+    message=json.dumps(dict(schema='recap.error.v1',code=code,message=code,exit_status=1),
+                       ensure_ascii=True) if args.json_errors else code
+    parser.exit(1,message+'\n')

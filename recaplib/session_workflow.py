@@ -1,4 +1,5 @@
 """Explicit export adapters and reversible local title organization (no network)."""
+from recaplib.errors import add_json_errors_argument, exit_error
 from recaplib.errors import SourceChanged, Stale, UnknownIdentity
 from recaplib.cli_errors import safe_diagnostic
 import argparse
@@ -335,6 +336,7 @@ def titles(db, source, conversation, title=None, expected_revision=None, expecte
 
 def main():
     p = argparse.ArgumentParser(description=__doc__)
+    add_json_errors_argument(p)
     p.add_argument('--db')
     sub = p.add_subparsers(dest='command', required=True)
     imp = sub.add_parser('import'); imp.add_argument('path'); imp.add_argument('--format', choices=['web', 'local', 'local-codex'], required=True); imp.add_argument('--source', required=True)
@@ -358,7 +360,7 @@ def main():
         else:
             result = titles(a.db, a.source, a.conversation, a.set, a.expected_revision)
     except (ValueError, OSError, KeyError, TypeError, sqlite3.Error) as e:
-        p.exit(1, safe_diagnostic(e) + '\n')
+        exit_error(p, a, e)
     print(json.dumps(result, ensure_ascii=True, indent=2))
 
 

@@ -366,7 +366,7 @@ implementation is the module of the same name in `recaplib/`.
 ### `session_workflow.py` (`import`, `inspect`, `title`)
 
 ```text
-usage: session_workflow.py [-h] [--db DB] {import,inspect,title} ...
+usage: session_workflow.py [-h] [--json-errors] [--db DB] {import,inspect,title} ...
 usage: session_workflow.py import [-h] --format {web,local,local-codex} --source SOURCE [--conversation CONVERSATION] [--expected-export-sha256 EXPECTED_EXPORT_SHA256] path
 usage: session_workflow.py inspect [-h] --format {web,local,local-codex,normalized} [--conversation CONVERSATION] [--expected-export-sha256 EXPECTED_EXPORT_SHA256] path
 usage: session_workflow.py title [-h] --source SOURCE --conversation CONVERSATION [--set SET] [--expected-revision EXPECTED_REVISION]
@@ -378,7 +378,7 @@ Explicit export adapters and reversible local title organization. Guide:
 ### `export_inventory.py` (`list-export`)
 
 ```text
-usage: export_inventory.py [-h] --format {web,local,local-codex} [--limit LIMIT] [--offset OFFSET] [--expected-export-sha256 EXPECTED_EXPORT_SHA256] [--contains CONTAINS | --text-contains TEXT_CONTAINS] [--text-role {user,assistant,system,tool}] [--canonical-unicode] input
+usage: export_inventory.py [-h] [--json-errors] --format {web,local,local-codex} [--limit LIMIT] [--offset OFFSET] [--expected-export-sha256 EXPECTED_EXPORT_SHA256] [--contains CONTAINS | --text-contains TEXT_CONTAINS] [--text-role {user,assistant,system,tool}] [--canonical-unicode] input
 ```
 
 Guide: [export inventory](EXPORT_INVENTORY.md).
@@ -386,7 +386,7 @@ Guide: [export inventory](EXPORT_INVENTORY.md).
 ### `import_check.py` (`check-import`)
 
 ```text
-usage: import_check.py [-h] --db DB --source SOURCE --format {web,local,local-codex,normalized} [--conversation CONVERSATION] [--expected-export-sha256 EXPECTED_EXPORT_SHA256] [--limit LIMIT] input
+usage: import_check.py [-h] [--json-errors] --db DB --source SOURCE --format {web,local,local-codex,normalized} [--conversation CONVERSATION] [--expected-export-sha256 EXPECTED_EXPORT_SHA256] [--limit LIMIT] input
 ```
 
 Guide: [import conflicts](IMPORT_CONFLICTS.md).
@@ -394,7 +394,7 @@ Guide: [import conflicts](IMPORT_CONFLICTS.md).
 ### `conversation_search.py` (`find`)
 
 ```text
-usage: conversation_search.py [-h] --db DB [--source SOURCE] [--limit LIMIT] [--include-title-history] [--export-sha256 EXPORT_SHA256] [--text-role {user,assistant,system,tool}] [--cursor CURSOR] [--canonical-unicode] [--from FROM_DATE] [--until UNTIL_DATE] query
+usage: conversation_search.py [-h] [--json-errors] --db DB [--source SOURCE] [--limit LIMIT] [--include-title-history] [--export-sha256 EXPORT_SHA256] [--text-role {user,assistant,system,tool}] [--cursor CURSOR] [--canonical-unicode] [--from FROM_DATE] [--until UNTIL_DATE] query
 ```
 
 Guides: [search excerpts](SEARCH_EXCERPTS.md), [search pagination](SEARCH_PAGINATION.md).
@@ -402,7 +402,7 @@ Guides: [search excerpts](SEARCH_EXCERPTS.md), [search pagination](SEARCH_PAGINA
 ### `conversation_view.py` (`list`, `show`)
 
 ```text
-usage: conversation_view.py [-h] --db DB {list,show} ...
+usage: conversation_view.py [-h] [--json-errors] --db DB {list,show} ...
 usage: conversation_view.py list [-h] [--source SOURCE] [--limit LIMIT] [--offset OFFSET] [--order {recent,oldest}] [--from FROM_DATE] [--until UNTIL_DATE]
 usage: conversation_view.py --db DB show [-h] --source SOURCE --conversation CONVERSATION [--limit LIMIT] [--offset OFFSET] [--message MESSAGE] [--around-message AROUND_MESSAGE] [--before BEFORE] [--after AFTER]
 ```
@@ -412,7 +412,7 @@ Guide: [message selection](MESSAGE_SELECTION.md).
 ### `title_history.py` (`title-history`)
 
 ```text
-usage: title_history.py [-h] --db DB --source SOURCE --conversation CONVERSATION [--limit LIMIT] [--offset OFFSET] [--expected-revision EXPECTED_REVISION]
+usage: title_history.py [-h] [--json-errors] --db DB --source SOURCE --conversation CONVERSATION [--limit LIMIT] [--offset OFFSET] [--expected-revision EXPECTED_REVISION]
 ```
 
 Guide: [title history view](TITLE_HISTORY_VIEW.md).
@@ -420,7 +420,7 @@ Guide: [title history view](TITLE_HISTORY_VIEW.md).
 ### `title_suggestion.py` (`suggest-title`)
 
 ```text
-usage: title_suggestion.py [-h] --db DB --source SOURCE --conversation CONVERSATION [--message MESSAGE] [--output NEW_JSON]
+usage: title_suggestion.py [-h] [--json-errors] --db DB --source SOURCE --conversation CONVERSATION [--message MESSAGE] [--output NEW_JSON]
 ```
 
 Guide: [workflows](WORKFLOWS.md#generate-a-local-title-excerpt-for-review).
@@ -428,7 +428,7 @@ Guide: [workflows](WORKFLOWS.md#generate-a-local-title-excerpt-for-review).
 ### `title_proposal.py` (`preview-title`, `apply-title`)
 
 ```text
-usage: title_proposal.py [-h] --db DB {snapshot,preview,apply} ...
+usage: title_proposal.py [-h] [--json-errors] --db DB {snapshot,preview,apply} ...
 usage: title_proposal.py --db DB snapshot [-h] --source SOURCE --conversation CONVERSATION
 usage: title_proposal.py --db DB preview [-h] [--output NEW_JSON] [--title TITLE] [--with-evidence] input
 usage: title_proposal.py --db DB apply [-h] input
@@ -441,7 +441,7 @@ fingerprint a proposal must cite; no model is called. Guide:
 ### `web_branch.py` (`web-branch`)
 
 ```text
-usage: web_branch.py [-h] --conversation CONVERSATION [--node NODE] input
+usage: web_branch.py [-h] [--json-errors] --conversation CONVERSATION [--node NODE] input
 ```
 
 Guide: [workflows](WORKFLOWS.md#read-one-web-conversation-branch-without-importing-it).
@@ -449,7 +449,7 @@ Guide: [workflows](WORKFLOWS.md#read-one-web-conversation-branch-without-importi
 ### `branch_title.py` (`suggest-branch-title`)
 
 ```text
-usage: branch_title.py [-h] --db DB --source SOURCE --conversation CONVERSATION [--node NODE] [--message MESSAGE] [--output NEW_JSON] input
+usage: branch_title.py [-h] [--json-errors] --db DB --source SOURCE --conversation CONVERSATION [--node NODE] [--message MESSAGE] [--output NEW_JSON] input
 ```
 
 Guide: [workflows](WORKFLOWS.md#suggest-a-title-from-a-verified-archived-branch).
@@ -457,7 +457,7 @@ Guide: [workflows](WORKFLOWS.md#suggest-a-title-from-a-verified-archived-branch)
 ### `replay_local.py` (`replay-local`)
 
 ```text
-usage: replay_local.py [-h] input
+usage: replay_local.py [-h] [--json-errors] input
 ```
 
 Guide: [workflows](WORKFLOWS.md#opt-in-completed-turn-text-projection).
@@ -465,7 +465,7 @@ Guide: [workflows](WORKFLOWS.md#opt-in-completed-turn-text-projection).
 ### `replay_title.py` (`suggest-replay-title`)
 
 ```text
-usage: replay_title.py [-h] --db DB --source SOURCE --conversation CONVERSATION [--message MESSAGE] [--output NEW_JSON] input
+usage: replay_title.py [-h] [--json-errors] --db DB --source SOURCE --conversation CONVERSATION [--message MESSAGE] [--output NEW_JSON] input
 ```
 
 Guide: [workflows](WORKFLOWS.md#propose-a-title-from-verified-retained-local-turns).
@@ -473,7 +473,7 @@ Guide: [workflows](WORKFLOWS.md#propose-a-title-from-verified-retained-local-tur
 ### `attributed_title.py` (`suggest-attributed-title`)
 
 ```text
-usage: attributed_title.py [-h] --db DB --source SOURCE --conversation CONVERSATION [--message MESSAGE] [--origin-locator ORIGIN_LOCATOR] [--output NEW_JSON] input
+usage: attributed_title.py [-h] [--json-errors] --db DB --source SOURCE --conversation CONVERSATION [--message MESSAGE] [--origin-locator ORIGIN_LOCATOR] [--output NEW_JSON] input
 ```
 
 Guide: [source-attributed titles](SOURCE_ATTRIBUTED_TITLES.md).
@@ -481,7 +481,7 @@ Guide: [source-attributed titles](SOURCE_ATTRIBUTED_TITLES.md).
 ### `title_plan.py` (`export-title-plan`, `check-title-plan`)
 
 ```text
-usage: title_plan.py [-h] --db DB {export,check} ...
+usage: title_plan.py [-h] [--json-errors] --db DB {export,check} ...
 usage: title_plan.py --db DB export [-h] --format {web,local,local-codex} --source SOURCE --conversation CONVERSATION input
 usage: title_plan.py --db DB check [-h] input plan
 ```
@@ -491,7 +491,7 @@ Guide: [workflows](WORKFLOWS.md#export-a-manual-title-change-plan-for-web-or-loc
 ### `title_adapter.py` (no `recap.py` equivalent)
 
 ```text
-usage: title_adapter.py [-h] --db DB --source SOURCE --conversation CONVERSATION [--kind {local,mock,external}] [--provider-id PROVIDER_ID] [--model MODEL] [--endpoint ENDPOINT] [--allow-external] [--timeout TIMEOUT] [--evidence-scope {raw,web-branch,local-replay,local-attributed}] [--input INPUT] [--node NODE] [--message MESSAGE] [--origin-locator ORIGIN_LOCATOR] {prepare,generate,complete-response} ...
+usage: title_adapter.py [-h] [--json-errors] --db DB --source SOURCE --conversation CONVERSATION [--kind {local,mock,external}] [--provider-id PROVIDER_ID] [--model MODEL] [--endpoint ENDPOINT] [--allow-external] [--timeout TIMEOUT] [--evidence-scope {raw,web-branch,local-replay,local-attributed}] [--input INPUT] [--node NODE] [--message MESSAGE] [--origin-locator ORIGIN_LOCATOR] {prepare,generate,complete-response} ...
 usage: title_adapter.py --db DB --source SOURCE --conversation CONVERSATION prepare [-h] [--output NEW_JSON]
 usage: title_adapter.py --db DB --source SOURCE --conversation CONVERSATION generate [-h] [--response RESPONSE] [--consent CONSENT]
 usage: title_adapter.py --db DB --source SOURCE --conversation CONVERSATION complete-response [-h] [--output NEW_JSON] prepared response
@@ -507,7 +507,7 @@ preparation. Guides: [title adapter](TITLE_ADAPTER.md), [saved title response](S
 ### `recovery.py` (`declare-recovery`, `rehearse-recovery`)
 
 ```text
-usage: recovery.py [-h] {declare,rehearse} ...
+usage: recovery.py [-h] [--json-errors] {declare,rehearse} ...
 usage: recovery.py declare [-h] --db DB --output OUTPUT [--declared-at DECLARED_AT] [--text]
 usage: recovery.py rehearse [-h] --restored-db RESTORED_DB --output OUTPUT [--objects OBJECTS] [--text] manifest
 ```
@@ -754,9 +754,16 @@ example, output boundaries and failure behavior.
 
 ## CLI version identity
 
-`python recap.py --version` prints `recap-for-everyone 0.99.5` and exits without
+`python recap.py --version` prints `recap-for-everyone 0.99.6` and exits without
 opening an archive or reading the publication manifest. It works outside the
 repository working directory and without the manifest. This numeric identity is
 not byte verification, authenticity or a stability guarantee. Use the documented
 CLI rather than relying on private module layout. It does not create a tag or
 replace the validation history, decide licensing or set a release schedule.
+
+## Standalone structured errors
+
+The sixteen standalone product parsers accept `--json-errors` at the top level;
+place it before a subcommand where one exists. It only wraps already-caught
+execution failures. Default diagnostics, usage errors and negative result documents
+are unchanged. See [JSON_ERRORS.md](JSON_ERRORS.md#standalone-product-entry-points).

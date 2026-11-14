@@ -3,8 +3,9 @@
 The unified CLI accepts global `--json-errors` before the subcommand. It changes
 only caught execution errors that already exit 1: stderr becomes one ASCII JSON
 object with `schema: recap.error.v1`, `code`, `message` and `exit_status: 1`.
-Without the flag, existing stderr text is unchanged. Standalone entry points keep
-their current plain diagnostics even when they share the underlying library.
+Without the flag, existing stderr text is unchanged. The standalone product
+entry points listed below accept the same opt-in flag; their default diagnostics
+remain plain, including the adapter's existing bare error codes.
 
 ## Synthetic failure example
 
@@ -67,3 +68,26 @@ The envelope describes a failure, not source authenticity, completeness, authors
 consent, retention or recovery readiness. No model or network is called by error
 formatting. See [command discovery](COMMAND_CATALOG.md) for command effects and
 [diagnostic boundaries](ERROR_DIAGNOSTICS.md) for the existing privacy scope.
+
+## Standalone product entry points
+
+The same opt-in flag is available on `attributed_title.py`, `branch_title.py`,
+`conversation_search.py`, `conversation_view.py`, `export_inventory.py`,
+`import_check.py`, `recovery.py`, `replay_local.py`, `replay_title.py`,
+`session_workflow.py`, `title_adapter.py`, `title_history.py`, `title_plan.py`,
+`title_proposal.py`, `title_suggestion.py` and `web_branch.py`. Put it before the
+subcommand when that parser has subcommands. Runtime checks, publication tools,
+benchmarking and the MCP protocol are separate interfaces and are not changed.
+
+Fourteen parsers wrap only their existing caught exception boundary using the
+same typed classification as the unified CLI. The title adapter instead records
+its existing closed error code, with that same code as the message; its existing
+unexpected-error fallback remains PROVIDER_FAILED. No new exception diagnosis,
+provider call, consent or permission is introduced. Replay-local has no caught
+execution-error boundary: accepting the option does not transform unsupported
+replay documents or their exit status.
+
+Successful output, ordinary default stderr, usage exit 2, conflict/rehearsal/replay
+negative stdout results and already-published output on a later failure keep their
+existing contracts. An envelope does not prove that nothing was written, identify
+a safe retry, or authorize changing a source, revision or output destination.

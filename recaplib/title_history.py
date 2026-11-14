@@ -1,4 +1,5 @@
 """Explicit read-only local title history; never reads message-body columns."""
+from recaplib.errors import add_json_errors_argument, exit_error
 from recaplib.errors import Stale, UnknownIdentity
 from recaplib.cli_errors import safe_diagnostic
 import argparse
@@ -62,6 +63,7 @@ def history(db, source, conversation, limit=20, offset=0, expected_revision=None
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
+    add_json_errors_argument(parser)
     parser.add_argument('--db', required=True)
     parser.add_argument('--source', required=True)
     parser.add_argument('--conversation', required=True)
@@ -74,7 +76,7 @@ def main():
         result = history(args.db, args.source, args.conversation,
                          args.limit, args.offset, args.expected_revision)
     except (ValueError, OSError, sqlite3.Error) as error:
-        parser.exit(1, safe_diagnostic(error) + '\n')
+        exit_error(parser, args, error)
     print(json.dumps(result, ensure_ascii=True, indent=2))
 
 
