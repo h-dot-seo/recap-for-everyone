@@ -259,3 +259,5 @@ never counted as PASS. Other provenance/topology digests remain mandatory and
 Its recorded hashes do not expand declared original objects or rebuild permission.
 A retained zero-message hash in this ledger therefore does not by itself make a
 rebuild eligible. See [archive ledger](ARCHIVE_LEDGER.md).
+
+Optional [v3](RECOVERY_V3.md) adds original_exports preservation and separately declared original object hashes, including zero-message imports. Default v1 and stored v1/v2 checks remain unchanged. No missing metadata is inferred; the v3 object-rebuild path is explicitly unsupported.

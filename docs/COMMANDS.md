@@ -341,7 +341,7 @@ sent. Guide: [title transfer](TITLE_TRANSFER.md).
 #### `declare-recovery`
 
 ```text
-usage: recap.py declare-recovery [-h] --output OUTPUT [--manifest-version {1,2}] [--declared-at DECLARED_AT] [--text]
+usage: recap.py declare-recovery [-h] --output OUTPUT [--manifest-version {1,2,3}] [--declared-at DECLARED_AT] [--text]
 ```
 
 Write a `recap.recovery-manifest.v1` manifest describing the live archive
@@ -508,7 +508,7 @@ preparation. Guides: [title adapter](TITLE_ADAPTER.md), [saved title response](S
 
 ```text
 usage: recovery.py [-h] [--json-errors] {declare,rehearse} ...
-usage: recovery.py declare [-h] --db DB --output OUTPUT [--declared-at DECLARED_AT] [--manifest-version {1,2}] [--text]
+usage: recovery.py declare [-h] --db DB --output OUTPUT [--declared-at DECLARED_AT] [--manifest-version {1,2,3}] [--text]
 usage: recovery.py rehearse [-h] --restored-db RESTORED_DB --output OUTPUT [--objects OBJECTS] [--text] manifest
 ```
 
@@ -754,7 +754,7 @@ example, output boundaries and failure behavior.
 
 ## CLI version identity
 
-`python recap.py --version` prints `recap-for-everyone 0.100.2` and exits without
+`python recap.py --version` prints `recap-for-everyone 0.100.3` and exits without
 opening an archive or reading the publication manifest. It works outside the
 repository working directory and without the manifest. This numeric identity is
 not byte verification, authenticity or a stability guarantee. Use the documented
@@ -790,3 +790,5 @@ usage: recap.py ledger [-h] [--source SOURCE] [--limit LIMIT] [--offset OFFSET] 
 
 Read one private global page of recorded metadata, artifacts and unledgered
 original hashes. This is not recovery authorization. See [archive ledger](ARCHIVE_LEDGER.md).
+
+`declare-recovery --manifest-version 3` explicitly selects original-export metadata declaration and restored-copy checks. The default is still v1. `rebuild-archive` rejects v3 before plan input or output creation. See [RECOVERY_V3](RECOVERY_V3.md).
