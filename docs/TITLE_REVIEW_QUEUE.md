@@ -155,8 +155,8 @@ browsing a snapshot's unchanged order, not as a durable completion checkpoint.
 The filter does **not** mean “needs review” or “safe title.” Any title-history entry
 counts, including a no-op write, an old override or an override later reverted to
 the original title. A conversation with a good original title but no local history
-still appears. `UNAVAILABLE` and `no_change` items also remain eligible: there is no
-persistent skip/accept decision ledger. Do not apply artificial no-op changes merely
+still appears. `UNAVAILABLE` and `no_change` items also remain eligible: explicit per-conversation review-state decisions can record skip/defer, but do not
+establish source-wide completion. Do not apply artificial no-op changes merely
 to dismiss these items. Omit the filter to revisit previously renamed titles.
 
 Filtering changes only the read-only queue. It does not delete conversations,
@@ -171,3 +171,11 @@ skip/defer events return to open. It scans and hashes all conversations eligible
 after the optional unrenamed filter before paginating; this is an opt-in full
 content scan, not a metadata-only shortcut. See [state-view counts, concurrency
 and cost](TITLE_REVIEW_STATE.md#revisit-a-chosen-effective-state).
+
+## Source-wide review view cutoff
+
+Use `declare-review-checkpoint` and `review-titles --since-checkpoint` for an
+explicit unsigned source snapshot, not review completion or batch approval.
+Content/title comparisons and private-file limits are described in
+[the checkpoint guide](REVIEW_CHECKPOINT.md). Existing per-conversation review-state
+decisions remain independent; no checkpoint changes the archive.

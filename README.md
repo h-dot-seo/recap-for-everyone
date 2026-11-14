@@ -209,3 +209,11 @@ with `python recap.py rebuild-archive MANIFEST --plan PLAN --objects DIR
 --new-db NEW.sqlite --output NEW.json [--text]`. It never opens the original DB;
 it exclusively publishes a checked new DB from explicit replay steps. Declared
 title history is not rebuilt, and review state remains undeclared/unrestored.
+
+## Source-wide review view cutoff
+
+Use `declare-review-checkpoint` and `review-titles --since-checkpoint` for an
+explicit unsigned source snapshot, not review completion or batch approval.
+Content/title comparisons and private-file limits are described in
+[the checkpoint guide](docs/REVIEW_CHECKPOINT.md). Existing per-conversation review-state
+decisions remain independent; no checkpoint changes the archive.

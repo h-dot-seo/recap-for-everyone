@@ -45,7 +45,8 @@ def validate_queue(queue):
                     'review_state_filter filter next_offset items ready_count unavailable_count '
                     'execution_status remote_mutation semantic_validation scope warning').split(),
             ('proposal_mode', 'supplied_proposals', 'supplied_only', 'excluded_unsupplied_conversations',
-             'selected_conversation_count', 'excluded_unselected_conversations', 'selection_scope'))
+             'selected_conversation_count', 'excluded_unselected_conversations', 'selection_scope',
+             'checkpoint_comparison', 'excluded_checkpoint_conversations', 'checkpoint_scope'))
     _require(queue['schema'] == 'recap.title-review-queue.v1')
     for key in ('source', 'filter', 'scope', 'warning'):
         _require(isinstance(queue[key], str) and bool(queue[key]))
@@ -73,6 +74,26 @@ def validate_queue(queue):
     if 'supplied_only' in queue or 'excluded_unsupplied_conversations' in queue:
         _require(queue.get('supplied_only') is True and queue.get('proposal_mode') == 'supplied' and
                  _integer(queue.get('excluded_unsupplied_conversations')))
+    checkpoint_fields = ('checkpoint_comparison', 'excluded_checkpoint_conversations', 'checkpoint_scope')
+    if any(key in queue for key in checkpoint_fields):
+        _require(all(key in queue for key in checkpoint_fields))
+        _require(_integer(queue['excluded_checkpoint_conversations']))
+        _require(isinstance(queue['checkpoint_scope'], str) and bool(queue['checkpoint_scope']))
+        comparison = queue['checkpoint_comparison']
+        _fields(comparison, ('new', 'changed_content', 'changed_title', 'unchanged',
+                             'missing_from_archive', 'checkpoint_entries_sha256', 'scope'))
+        for key in ('new', 'changed_content', 'changed_title', 'unchanged', 'missing_from_archive'):
+            _require(_integer(comparison[key]))
+        _require(all(comparison[key] <= queue['source_total_conversations']
+                     for key in ('new', 'changed_content', 'changed_title', 'unchanged')))
+        _require(isinstance(comparison['checkpoint_entries_sha256'], str) and
+                 len(comparison['checkpoint_entries_sha256']) == 64 and
+                 all(c in '0123456789abcdef' for c in comparison['checkpoint_entries_sha256']))
+        _require(isinstance(comparison['scope'], str) and bool(comparison['scope']))
+        _require(queue['source_total_conversations'] == queue['excluded_renamed_conversations'] +
+                 queue['excluded_checkpoint_conversations'] + queue.get('excluded_unselected_conversations', 0) +
+                 queue.get('excluded_unsupplied_conversations', 0) +
+                 queue['excluded_review_state_conversations'] + queue['total_conversations'])
     selection_fields = ('selected_conversation_count', 'excluded_unselected_conversations', 'selection_scope')
     if any(key in queue for key in selection_fields):
         _require(all(key in queue for key in selection_fields))
@@ -80,7 +101,7 @@ def validate_queue(queue):
         _require(_integer(queue['excluded_unselected_conversations']))
         _require(isinstance(queue['selection_scope'], str) and bool(queue['selection_scope']))
         _require(queue['source_total_conversations'] == queue['excluded_renamed_conversations'] +
-                 queue['excluded_unselected_conversations'] + queue.get('excluded_unsupplied_conversations', 0) +
+                 queue['excluded_unselected_conversations'] + queue.get('excluded_checkpoint_conversations', 0) + queue.get('excluded_unsupplied_conversations', 0) +
                  queue['excluded_review_state_conversations'] + queue['total_conversations'])
     identities = set()
     ready = 0
