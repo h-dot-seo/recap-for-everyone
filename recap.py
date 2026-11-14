@@ -108,6 +108,12 @@ def main():
     normalized.add_argument('--source', required=True)
     normalized.add_argument('--conversation')
     normalized.add_argument('--output', required=True)
+    provenance = sub.add_parser('export-provenance', help='save one private text-free message locator card')
+    provenance.add_argument('--source', required=True); provenance.add_argument('--conversation', required=True)
+    provenance.add_argument('--message', required=True); provenance.add_argument('--output', required=True)
+    provenance.add_argument('--declared-at'); provenance.add_argument('--text', action='store_true')
+    provenance_check = sub.add_parser('check-provenance', help='compare a saved message locator card with one archive snapshot')
+    provenance_check.add_argument('input'); provenance_check.add_argument('--text', action='store_true')
     checkpoint = sub.add_parser('declare-review-checkpoint', help='save a private source-wide read snapshot; no review decision')
     checkpoint.add_argument('--source', required=True); checkpoint.add_argument('--output', required=True)
     checkpoint.add_argument('--declared-at'); checkpoint.add_argument('--text', action='store_true')
@@ -313,6 +319,12 @@ def main():
         elif args.command == 'export-normalized':
             from recaplib.normalized_export import export_normalized
             result = export_normalized(args.db, args.source, args.output, args.conversation)
+        elif args.command == 'export-provenance':
+            from recaplib.message_provenance import export_provenance
+            result = export_provenance(args.db, args.source, args.conversation, args.message, args.output, args.declared_at)
+        elif args.command == 'check-provenance':
+            from recaplib.message_provenance import check_provenance
+            result = check_provenance(args.db, args.input)
         elif args.command == 'declare-review-checkpoint':
             from recaplib.review_checkpoint import declare_review_checkpoint
             result = declare_review_checkpoint(args.db, args.source, args.output, args.declared_at)
@@ -339,7 +351,10 @@ def main():
         rendered = None
         if getattr(args, 'text', False):
             from recaplib.recovery import render_text
-            if args.command in ('declare-review-checkpoint', 'declare-checkpoint', 'changed-since'):
+            if args.command in ('export-provenance', 'check-provenance'):
+                from recaplib.text_summary import summary_text
+                rendered = summary_text('Private message provenance', list(result.items()))
+            elif args.command in ('declare-review-checkpoint', 'declare-checkpoint', 'changed-since'):
                 from recaplib.text_summary import summary_text
                 rendered = summary_text('Review view checkpoint declaration' if args.command == 'declare-review-checkpoint' else 'Accepted-artifact cutoff', list(result.items()))
             else:
@@ -353,6 +368,8 @@ def main():
         print(rendered, end='')
     else:
         print(json.dumps(result, ensure_ascii=True, indent=2))
+    if args.command == 'check-provenance' and result['status'] != 'PASS':
+        raise SystemExit(1)
     if args.command == 'check-import' and result['conflicts_found']:
         raise SystemExit(1)
     if args.command == 'changed-since' and result['status'] != 'CUTOFF_VERIFIED':

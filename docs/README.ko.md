@@ -258,3 +258,8 @@ Handled CLI OS/SQLite/decoder failures use fixed, path-free stderr diagnostics.
 Existing validation messages and stdout result failures keep their contracts;
 exit 1 alone does not establish that no write occurred. See
 [failure diagnostics](ERROR_DIAGNOSTICS.md).
+
+For a private pointer without message text or titles, use `export-provenance`
+for one explicit message and `check-provenance` to recheck it. Locator hashes
+do not establish authorship, consent, retrieval or publication evidence. See
+[message provenance cards](MESSAGE_PROVENANCE.md).

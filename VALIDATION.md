@@ -1,10 +1,24 @@
 # Validation record
 
-Current release: `0.97.4-safe-cli-diagnostics`, dated 2026-11-14.
+Current release: `0.97.5-message-provenance-cards`, dated 2026-11-14.
 This file is the current snapshot. Every dated entry since the first release is kept
 unchanged and in order in [docs/VALIDATION_HISTORY.md](docs/VALIDATION_HISTORY.md).
 
 ## Latest change
+
+2026-11-14 Private message provenance cards (0.97.5-message-provenance-cards):
+adds export-provenance and check-provenance for one exact source/conversation/
+message tuple. A private unsigned bounded card contains text hashes and byte
+counts, normalized locators and the same legacy/complete occurrence UNION as
+show, without message bodies, titles or title revisions. A shared caller-snapshot
+helper preserves show pagination and context selection. Rechecks compare exact
+current metadata, reporting PASS or STALE without private values and without
+changing the archive or card. Exclusive creation, schema/size gates, deterministic
+bytes, legacy/plain ingest, changed occurrences, Unicode, exact identities and
+executed guide are tested. A locator is not evidence of validity, authorship,
+consent, retrieval or publication status; no cross-repository mapping is added.
+
+Previous change:
 
 2026-11-14 Safe low-level CLI diagnostics (0.97.4-safe-cli-diagnostics):
 shares fixed diagnostics for already-caught OS, SQLite, JSON-decoder and Unicode-
@@ -374,3 +388,5 @@ Contributor inventory entry point: `build_manifest.py` plans by default and only
 creates new outside-tree candidates with an exact reviewed plan hash.
 
 Prepublication independent review caught a candidate-metadata audit gap: supplied release/date text had not been checked against publication patterns. Candidate encoded bytes now receive the same pattern checks, with value-free errors and plan/write regression coverage. Nothing was published before this correction.
+
+Prepublication independent review found a SQLite BLOB locator escaping the intended stale-check boundary as a serialization TypeError. The bounded card projection now converts only serialization/type failures to a fixed ValueError so a valid saved card recheck reports STALE; genuine SQLite/query errors still propagate and unbounded show behavior is unchanged. A BLOB-anchor regression verifies no output or database mutation.
