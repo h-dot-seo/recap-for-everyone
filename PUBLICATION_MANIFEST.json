@@ -1,12 +1,12 @@
 {
   "project": "recap-for-everyone",
-  "release": "0.98.1-cli-test-harness",
+  "release": "0.98.2-agent-task-routing",
   "date": "2026-11-14",
   "private_history_imported": false,
   "actual_corpora_included": false,
   "synthetic_examples_only": true,
   "license_status": "NOT_SELECTED",
-  "file_count": 301,
+  "file_count": 302,
   "files": [
     {
       "path": ".gitattributes",
@@ -30,8 +30,8 @@
     },
     {
       "path": "README.md",
-      "bytes": 18810,
-      "sha256": "c53e768a16c7a507d428fdb093fb4c4b87d6fc11b4bce531246c3f250684b0f8"
+      "bytes": 19046,
+      "sha256": "b7c038e2051192fb75911ee4c25a3f4248cbc603dd824c4edb9fea0bb02dc820"
     },
     {
       "path": "RIGHTS.md",
@@ -45,13 +45,13 @@
     },
     {
       "path": "SKILL.md",
-      "bytes": 18883,
-      "sha256": "95eb71206d504f4542422060f8e4e7976f8d2da5fdec96cf8ffcf292bed1aca7"
+      "bytes": 29197,
+      "sha256": "4882947fd571a3ac822ffa48a2b6344c61925ecdf1a27884a00a7375e5efdfa9"
     },
     {
       "path": "VALIDATION.md",
-      "bytes": 30645,
-      "sha256": "9a585a8c441662f0aa97e3bb5f8a4af7d917f862cfc28030d08ba799bf63d04b"
+      "bytes": 32032,
+      "sha256": "4c5ed8f5dbb8396151e195b65fab549e5192507be7469dc169bfdb85d64977f2"
     },
     {
       "path": "attributed_title.py",
@@ -105,8 +105,8 @@
     },
     {
       "path": "docs/ARCHITECTURE.md",
-      "bytes": 17924,
-      "sha256": "37cf6ab644075173cf1392a49117a045385c2f6c2c93664bda1a50547ea473bc"
+      "bytes": 18598,
+      "sha256": "3ded9f7945c142009da31e5c1d53bc6dc2baa17c419815890b2f39c6475eb091"
     },
     {
       "path": "docs/ATTRIBUTED_MESSAGE_SELECTION.md",
@@ -365,8 +365,8 @@
     },
     {
       "path": "docs/VALIDATION_HISTORY.md",
-      "bytes": 174776,
-      "sha256": "583729fc9a10cbe34307c5136829e12079d2351064ed7846127907bc09642f9f"
+      "bytes": 176146,
+      "sha256": "5dd536069ac2dd963724fbb58eb89fc6ffdafe0fd4e345d857513feff545dddd"
     },
     {
       "path": "docs/WEB_ZIP_INVENTORY.md",
@@ -1272,6 +1272,11 @@
       "path": "tests/test_session_workflow.py",
       "bytes": 3021,
       "sha256": "0a12489fe054f58a3e4dac592ce0fe2d080e8488dd1398b9a7414e4598a3c128"
+    },
+    {
+      "path": "tests/test_skill_document.py",
+      "bytes": 31195,
+      "sha256": "2b6c52e517f18a76dd2a530264b9d6d047e0be400dab2a97f4d6775a781370b9"
     },
     {
       "path": "tests/test_source_identity.py",

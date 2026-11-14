@@ -286,3 +286,14 @@ checks also remain real processes. Root CLI help and ASCII-failure smoke checks
 exercise the shims that in-process calls bypass. Manifest verification and
 publication audit retain their real-process checks. Production CLI output, archive
 transactions, provenance and partial-publication behavior are unchanged.
+
+## Agent routing and write stop points
+
+SKILL.md uses the README task categories for navigation and the command catalogue
+for current DB requirements and write resources. Archive writes and new-file
+publication are listed separately, including conditional output flags. Source
+import, title wording and review-state decisions remain operator-controlled; a
+saved file or catalogue entry is not approval. Existing detailed boundary prose
+is retained with its guides, not replaced by links. Regression checks bind the
+routing and write tables to parser/catalogue facts and preserve the prior skill
+text. They do not validate an operator's review or grant execution authority.

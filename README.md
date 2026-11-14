@@ -186,6 +186,10 @@ re-ingestible JSONL. This derived copy does not replace original exports or back
 
 ## Design
 
+For agent-assisted use, the [agent workflow](SKILL.md) routes the current task
+to a command, fields to inspect and a guide. Its write tables identify approval
+stop points; command metadata is never permission or proof of human review.
+
 See [architecture](docs/ARCHITECTURE.md), [agent workflow](SKILL.md),
 [publication boundary](PUBLICATION.md), [security](SECURITY.md), [rights](RIGHTS.md)
 and the [validation record](VALIDATION.md).

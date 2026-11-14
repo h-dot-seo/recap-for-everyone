@@ -1,10 +1,31 @@
 # Validation record
 
-Current release: `0.98.1-cli-test-harness`, dated 2026-11-14.
+Current release: `0.98.2-agent-task-routing`, dated 2026-11-14.
 This file is the current snapshot. Every dated entry since the first release is kept
 unchanged and in order in [docs/VALIDATION_HISTORY.md](docs/VALIDATION_HISTORY.md).
 
 ## Latest change
+
+2026-11-14 Agent task routing and write stop points (0.98.2-agent-task-routing):
+reorganizes SKILL.md around the README's 17 task categories, documented result
+fields, DB policies and guide links. Separate archive and new-file write tables
+cover current default/conditional resources and the adapter's two native saves.
+Source import, wording, review decisions and output destinations remain explicit
+operator choices. Error/partial-publication stop points do not authorize retry.
+All prior 43 prose paragraphs, the frontmatter and eight principles are preserved;
+regressions bind navigation and write declarations to actual parser/catalogue
+metadata and verify guide links/anchors. No production code, output format,
+archive write, source/provenance semantics or common instruction template changes.
+
+Validation: full synthetic suite 1,396 tests passed (one existing skip); eight
+focused document tests passed, with independent boundary extraction and deliberate
+command/write/link/boundary fault checks. Recognizable command/option fragments
+are checked against parsers; arbitrary prose or unknown bare fragments are not
+a complete command grammar. All 132 existing sh blocks remain unchanged. Manifest
+302 files and limited audit 303 files passed, as did compile, Python 3.10 syntax
+and whitespace checks. This documentation is not permission or proof of review.
+
+Previous change:
 
 2026-11-14 Selected in-process CLI regression checks (0.98.1-cli-test-harness):
 adds a test-only direct-call harness with write-time ASCII stdout, escaped stderr,

@@ -2590,3 +2590,22 @@ resolved-path equality, with an alias-path regression and a different-directory
 negative check. Original cwd-string restoration checks remain. Failures now expose
 the captured diagnostic to the test runner. This changes no product code; the
 Windows result must be established by the corrected-head CI, not inferred locally.
+
+## 2026-11-14 Agent task routing and write stop points (0.98.2-agent-task-routing):
+reorganizes SKILL.md around the README's 17 task categories, documented result
+fields, DB policies and guide links. Separate archive and new-file write tables
+cover current default/conditional resources and the adapter's two native saves.
+Source import, wording, review decisions and output destinations remain explicit
+operator choices. Error/partial-publication stop points do not authorize retry.
+All prior 43 prose paragraphs, the frontmatter and eight principles are preserved;
+regressions bind navigation and write declarations to actual parser/catalogue
+metadata and verify guide links/anchors. No production code, output format,
+archive write, source/provenance semantics or common instruction template changes.
+
+Validation: full synthetic suite 1,396 tests passed (one existing skip); eight
+focused document tests passed, with independent boundary extraction and deliberate
+command/write/link/boundary fault checks. Recognizable command/option fragments
+are checked against parsers; arbitrary prose or unknown bare fragments are not
+a complete command grammar. All 132 existing sh blocks remain unchanged. Manifest
+302 files and limited audit 303 files passed, as did compile, Python 3.10 syntax
+and whitespace checks. This documentation is not permission or proof of review.
