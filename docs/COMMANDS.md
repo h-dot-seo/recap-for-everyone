@@ -731,3 +731,11 @@ See [command catalogue](COMMAND_CATALOG.md) and the matching workflow guide.
 Global `--json-errors` precedes the subcommand and structures only caught execution
 errors on stderr (exit 1). Default text, result-level JSON and usage errors are
 unchanged. See [JSON_ERRORS](JSON_ERRORS.md).
+
+## Read-only MCP stdio entry point
+
+`python recap_mcp.py --db DB` starts an explicitly selected local foreground stdio
+child. Its six DB-read tools exclude writes and file inputs. This is not a unified
+recap.py subcommand, installation or client connection. Read [MCP_SERVER.md](MCP_SERVER.md)
+for the tested JSON client configuration, pinned protocol and privacy/resource
+boundaries. EOF exits; clients own timeouts.

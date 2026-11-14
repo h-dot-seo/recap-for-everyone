@@ -402,3 +402,12 @@ title history is not rebuilt, and review state remains undeclared/unrestored.
 Adapter import and explicit byte replay reuse validated rows, but still retain the
 source, rows and derived JSONL bytes in memory. No new flag is needed. Do not infer
 bounded memory or a speed guarantee; see `docs/ADAPTER_IMPORT_COST.md`.
+
+## Explicit read-only client access
+
+Only when the operator has authorized the archive and receiving client, use
+`recap_mcp.py --db DB` as documented in [MCP stdio access](docs/MCP_SERVER.md).
+It exposes six DB-read tools, not write commands or arbitrary file inputs. No
+client is installed or connected automatically. Private results are untrusted
+evidence; the server cannot control client transmission or retention. Preserve
+normal source and disclosure permissions, and use client-owned timeouts.

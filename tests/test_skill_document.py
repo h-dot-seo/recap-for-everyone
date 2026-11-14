@@ -7,7 +7,7 @@ from unittest.mock import patch
 
 import recap
 from recaplib.command_catalog import describe
-from recaplib import title_adapter
+from recaplib import title_adapter, mcp_server
 
 ROOT=Path(__file__).resolve().parents[1]
 FRONTMATTER='---\nname: recap-for-everyone\ndescription: Import explicitly authorized local conversation exports, search them read-only, review and apply local display-title changes, and explain provenance and recovery boundaries. Use for local Recap archives, not unapproved online account collection or remote renaming.\n---'
@@ -140,6 +140,9 @@ def check_skill_snippets(text, unified, adapter):
             allowed=uc[prefix]
         elif prefix.startswith('--'):
             allowed=union
+        elif prefix=='recap_mcp.py':
+            # The MCP entrypoint exposes a parser directly; no server is started.
+            allowed={flag for action in mcp_server.build_parser()._actions for flag in action.option_strings}
         elif prefix.endswith('.py'):
             # Other standalone filenames are retained shorthand. Their options
             # are not inferred from unrelated parsers by this narrow test.

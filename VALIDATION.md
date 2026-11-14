@@ -1,10 +1,42 @@
 # Validation record
 
-Current release: `0.98.2-agent-task-routing`, dated 2026-11-14.
+Current release: `0.99.0-readonly-mcp`, dated 2026-11-14.
 This file is the current snapshot. Every dated entry since the first release is kept
 unchanged and in order in [docs/VALIDATION_HISTORY.md](docs/VALIDATION_HISTORY.md).
 
 ## Latest change
+
+2026-11-14 Explicit read-only MCP stdio access (0.99.0-readonly-mcp):
+adds an operator-launched foreground stdio entry point with six fixed archive-read
+tools and protocolVersion 2025-06-18. It directly invokes existing read functions,
+not a generic CLI, SQL or shell dispatcher. Calls cannot select a DB, supply files,
+write outputs or change titles/review state. Private result text is not sanitized
+or approved for disclosure; the client controls subsequent transmission/retention.
+Strict framing, parameter/type checks, finite JSON, request/response bounds and
+an explicit request-ID admission limit are tested. No installed/connected client,
+network service, private archive or external model is involved in validation.
+Existing CLI outputs, archive writes, source bytes and provenance remain unchanged.
+
+Pre-publication independent review found three protocol defects in the first
+implementation: notification-named requests with IDs were silently dropped;
+a large Unicode request ID could be replaced by null after response expansion;
+and standard object-valued params._meta was rejected. These were corrected before
+publishing. Notifications now depend only on absent ID; accepted IDs are preserved,
+over-limit IDs are refused before execution and close the session; _meta is
+validated and ignored without enabling progress notifications. Regression checks
+cover these cases. The server does not promise query time/memory bounds, absence
+of SQLite sidecars, client data protection or full protocol extension support.
+
+Validation: full synthetic suite 1,407 tests passed (one existing skip); focused
+22 tests passed. Independent checks reproduced and then verified fixes for the
+three pre-publication protocol issues, including a large Unicode ID and accepted
+ID boundary values. All six tool results match existing CLI JSON on the synthetic
+archive; the DELETE-mode scratch tree is unchanged. The documented configuration
+was parsed and launched with fictional data. Existing 132 sh blocks were preserved.
+Manifest 306 files, limited audit 307 files, compile, Python 3.10 syntax and
+whitespace checks passed. No real client connection or private DB was used.
+
+Previous change:
 
 2026-11-14 Agent task routing and write stop points (0.98.2-agent-task-routing):
 reorganizes SKILL.md around the README's 17 task categories, documented result

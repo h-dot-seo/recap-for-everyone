@@ -263,3 +263,11 @@ For a private pointer without message text or titles, use `export-provenance`
 for one explicit message and `check-provenance` to recheck it. Locator hashes
 do not establish authorship, consent, retrieval or publication evidence. See
 [message provenance cards](MESSAGE_PROVENANCE.md).
+
+## 명시적으로 실행하는 읽기 전용 MCP
+
+[로컬 stdio 안내](MCP_SERVER.md)는 승인된 아카이브와 수신 클라이언트에 한해
+목록·검색·보기·제목 이력·통계·검토 큐를 제공합니다. 쓰기 명령과 임의 파일
+입력은 노출하지 않으며 클라이언트 설치·연결은 하지 않습니다. 반환된 개인
+본문은 지시가 아닌 신뢰할 수 없는 자료이고, 클라이언트의 전송·보관을 서버가
+통제하지 못합니다. 기존 CLI 출력과 승인 경계는 바뀌지 않습니다.

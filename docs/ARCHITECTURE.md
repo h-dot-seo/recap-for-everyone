@@ -297,3 +297,13 @@ saved file or catalogue entry is not approval. Existing detailed boundary prose
 is retained with its guides, not replaced by links. Regression checks bind the
 routing and write tables to parser/catalogue facts and preserve the prior skill
 text. They do not validate an operator's review or grant execution authority.
+
+## Explicit MCP read surface
+
+The optional recap_mcp.py shim enters a standard-library stdio dispatcher with a
+fixed six-tool allowlist. It calls read functions directly, never the unified CLI
+or a generic shell. Launch-time DB selection is not a tool argument; write flags
+and file-input fields are absent and rejected. Each call owns a read connection,
+not a session-long snapshot. Request/response bounds do not bound query memory or
+wall time. Logical read-only access can still have SQLite sidecar effects and can
+disclose private content to the selected client. See [MCP_SERVER](MCP_SERVER.md).
