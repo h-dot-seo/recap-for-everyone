@@ -108,7 +108,7 @@ Every script and subcommand with its exact usage line is in the
 `conversation_search.py`, `title_proposal.py` and the others listed there) remain
 supported with equivalent behavior. Layout: the repository root holds the entry points
 only (`recap.py`, the standalone scripts, `runtime_check.py`, `verify_manifest.py`,
-`audit_publication.py`); the implementation modules live in the `recaplib/` package and
+`audit_publication.py`, `build_manifest.py`); the implementation modules live in the `recaplib/` package and
 the test suite in the `tests/` package, both reached from the root, where
 `python -m unittest discover -v` still runs the whole suite.
 
@@ -223,3 +223,8 @@ decisions remain independent; no checkpoint changes the archive.
 `declare-checkpoint` and `changed-since` verify a declared source artifact subset
 before returning ID-free import-delta counts. They do not approve imports, record
 review completion or mutate the archive. See [the cutoff guide](docs/IMPORT_CHECKPOINT.md).
+
+For contributor byte inventories, `build_manifest.py` reports a read-only plan.
+After reviewing it, an exact plan hash can create a separate new candidate outside
+the checkout, never overwrite the manifest or approve publication. See
+[manifest generation](docs/BUILD_MANIFEST.md).

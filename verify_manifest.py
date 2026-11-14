@@ -14,14 +14,15 @@ def _portable_component(part):
             stem not in reserved and not re.fullmatch(r'(COM|LPT)[1-9¹²³]', stem))
 
 
-def verify(root):
+def verify(root, manifest=None):
     root = Path(root)
-    if (root/'PUBLICATION_MANIFEST.json').is_symlink():
-        return ['manifest symlink not allowed']
-    try:
-        manifest=loads((root/'PUBLICATION_MANIFEST.json').read_text(encoding='utf-8'))
-    except (OSError, ValueError) as error:
-        return ['manifest is missing, unreadable or invalid JSON']
+    if manifest is None:
+        if (root/'PUBLICATION_MANIFEST.json').is_symlink():
+            return ['manifest symlink not allowed']
+        try:
+            manifest=loads((root/'PUBLICATION_MANIFEST.json').read_text(encoding='utf-8'))
+        except (OSError, ValueError) as error:
+            return ['manifest is missing, unreadable or invalid JSON']
     if (not isinstance(manifest, dict) or not isinstance(manifest.get('files'), list) or
             type(manifest.get('file_count')) is not int):
         return ['invalid manifest structure']

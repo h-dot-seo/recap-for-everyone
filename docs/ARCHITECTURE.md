@@ -122,7 +122,7 @@ repaired or removed by this change.
 
 The repository root holds the entry points: `recap.py` (the unified CLI), the
 standalone scripts (thin compatibility entry points that import `main` from the module
-of the same name in `recaplib/`), `runtime_check.py`, `verify_manifest.py` and
+of the same name in `recaplib/`), `runtime_check.py`, `verify_manifest.py`, `build_manifest.py` and
 `audit_publication.py`. The implementation is the `recaplib/` package;
 `recaplib/archive.py` holds the schema, the import transaction, the read-only
 connection and the FTS search described above and is re-exported by `recap.py`. The
@@ -219,3 +219,8 @@ with the same explicit source. Continue only on `CUTOFF_VERIFIED`; an unverified
 subset reports no delta. This is distinct from the title/content review view cutoff,
 not review completion or import permission. Never advance automatically. See
 [accepted-artifact cutoff](IMPORT_CHECKPOINT.md).
+
+For contributor byte inventories, `build_manifest.py` reports a read-only plan.
+After reviewing it, an exact plan hash can create a separate new candidate outside
+the checkout, never overwrite the manifest or approve publication. See
+[manifest generation](BUILD_MANIFEST.md).

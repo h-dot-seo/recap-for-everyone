@@ -2450,3 +2450,17 @@ No source/conversation IDs or excerpts enter stdout, no DB mutation, approval,
 completeness, review completion, archive identity or automatic advancement is
 claimed. Exact bounded schemas, exclusive output, tamper refusal, CLI parity,
 executed guide and explicit SQLite connection closure are checked.
+
+## 2026-11-14 Reviewed manifest candidate builder (0.97.3-reviewed-manifest-builder):
+adds public build_manifest.py with read-only added/removed/changed-path plans and
+exact plan-hash leases for exclusively new outside-tree candidates. Base bytes
+and complete candidate bytes bind each plan; existing metadata is retained except
+explicit release/date text. The existing verifier accepts a candidate object for
+shared validation without changing its default CLI. Limited audit, portable paths,
+CR/symlink/special-file refusals and repeat scans guard publication. A fictional
+contributor guide exercises plan review and candidate creation. No manifest is
+overwritten, no privacy/rights approval or license/tag policy is inferred, and
+no Git, deployment or CI permission change is performed. This is not an atomic
+filesystem snapshot or a hostile concurrent-namespace sandbox.
+
+Prepublication independent review caught a candidate-metadata audit gap: supplied release/date text had not been checked against publication patterns. Candidate encoded bytes now receive the same pattern checks, with value-free errors and plan/write regression coverage. Nothing was published before this correction.
