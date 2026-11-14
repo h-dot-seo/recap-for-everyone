@@ -1,10 +1,20 @@
 # Validation record
 
-Current release: `0.96.5-rebuild-rehearsal`, dated 2026-11-14.
+Current release: `0.96.6-export-byte-replay`, dated 2026-11-14.
 This file is the current snapshot. Every dated entry since the first release is kept
 unchanged and in order in [docs/VALIDATION_HISTORY.md](docs/VALIDATION_HISTORY.md).
 
 ## Latest change
+
+2026-11-14 Explicit export byte replay (0.96.6-export-byte-replay):
+adds import_export_bytes with explicit original parsing label and LF/CRLF output,
+sharing exact conversation selection and provenance logic with path imports.
+Eight synthetic tests cover all adapters, file/API parity, label identity,
+newline-sensitive digest failure, selection refusal, transactions and executed
+guide. Existing CLI serialization and output stay unchanged. No replay-plan
+validation, exclusive DB creation or automatic recovery claim is introduced.
+
+Previous change:
 
 2026-11-14 Fresh normalized-object rebuild rehearsal (0.96.5-rebuild-rehearsal):
 adds the roadmap #10 first-stage executable guide. Two independent ingests of
