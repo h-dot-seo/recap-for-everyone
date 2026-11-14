@@ -199,3 +199,7 @@ not source activity, completeness or ingestion-attempt totals.
 Before re-import, use check-import conversation_delta to distinguish new identities
 from conflicts, not infer activity. Optional --delta-output writes private bounded
 ID samples; see docs/REIMPORT_DELTA.md. No checkpoint is advanced.
+
+For an operator-selected subset after a delta/search, review-titles --conversation ID
+may repeat. Selection never approves a title or writes review state; full-source
+existing-title collisions still apply. See docs/SELECTED_TITLE_REVIEW.md.

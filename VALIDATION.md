@@ -1,10 +1,21 @@
 # Validation record
 
-Current release: `0.96.2-input-admission`, dated 2026-11-14.
+Current release: `0.96.3-selected-review`, dated 2026-11-14.
 This file is the current snapshot. Every dated entry since the first release is kept
 unchanged and in order in [docs/VALIDATION_HISTORY.md](docs/VALIDATION_HISTORY.md).
 
 ## Latest change
+
+2026-11-14 Explicit title-review identity selection (0.96.3-selected-review):
+adds repeated review-titles --conversation ID and a validated API selection list.
+Unrenamed/selected/supplied/state filters intersect before pagination, with binary
+order and explicit exclusion accounting. Source-wide existing-title collisions
+remain visible; default output, title/state writes and approval boundaries stay.
+Nine synthetic tests cover scope, counts, unknown/invalid IDs, page order,
+excluded-body reads, collisions, saved-queue rendering/preview, CLI/read-only behavior and an executable guide.
+No automatic delta ingestion, checkpoint, completion claim or title application.
+
+Previous change:
 
 2026-11-14 Bounded-reader regular-file admission (0.96.2-input-admission):
 adds pre-open regular-file/type and existing-size-budget checks to ZIP archives,

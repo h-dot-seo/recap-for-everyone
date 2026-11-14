@@ -53,3 +53,7 @@ python recap.py --db "OUTPUT/archive.sqlite" check-import examples/delta-after.j
 The result has one conversation in each category. `archive-only` is not counted.
 The archive remains unchanged by the check; inspect the private file before taking
 any separately authorized import or review action.
+
+To review operator-chosen IDs from this private delta, use repeated
+`review-titles --conversation ID`; see [selected title review](SELECTED_TITLE_REVIEW.md).
+Nothing selects, approves or applies them automatically.
