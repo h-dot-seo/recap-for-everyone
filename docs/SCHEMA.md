@@ -255,3 +255,47 @@ read-stable columns, require additive-change announcements in validation history
 and choose a migration/layout mechanism such as `PRAGMA user_version`. Those
 choices, versioning rules and compatibility guarantees remain open. This guide's
 drift tests document current code; they do not turn it into a permanent contract.
+
+## Optional web topology ledgers
+
+Explicit web import retains `export_nodes` (source, conversation, original hash,
+node ID, parent ID and deterministic mapping ordinal) and `export_conversations`
+(source, conversation, original hash, supplied current-node ID/state and node
+count). These additive rows share the existing import transaction, not a new
+schema epoch or automatic migration. They contain no title or message text, but
+IDs are private metadata. A selected import stores only its selected conversation.
+See [archive branches](ARCHIVE_BRANCH.md) for path selection and recovery limits.
+
+### export_conversations
+
+Created only by explicit web import, in its data transaction.
+
+- `source`: supplied source label.
+- `conversation`: supplied conversation identifier.
+- `original_hash`: exact original web-export SHA-256.
+- `current_node`: valid supplied mapping-node ID, otherwise NULL.
+- `current_node_state`: valid, absent, invalid or ambiguous; never an inferred leaf.
+- `mapping_nodes`: recorded mapping-node count, zero for ambiguous duplicate records.
+
+Primary key: `(source, conversation, original_hash)`. Duplicate conversation
+records in the same export remain importable but cannot supply an unambiguous
+branch. This preserves import admission rather than choosing the first record.
+
+### export_nodes
+
+Created only by explicit web import, in its data transaction.
+
+- `source`: supplied source label.
+- `conversation`: supplied conversation identifier.
+- `original_hash`: exact original web-export SHA-256.
+- `node`: mapping-node identifier, including nodes without extracted text.
+- `parent`: supplied parent identifier or NULL for a root.
+- `ordinal`: zero-based original mapping order, not SQLite rowid or chronology.
+- `has_text`: 0 or 1, whether normalization extracted supported nonblank text for this node.
+
+Primary key: `(source, conversation, original_hash, node)`. Ordinal and text
+membership are deterministic parsing metadata, not new message content. Readers
+validate graph structure, counts and selected-export occurrence agreement rather
+than inferring a missing path. These tables have no NOT NULL constraints; malformed
+or incomplete values are not accepted as branch evidence. Recovery v1 does not
+compare either table. There is no automatic repair, DROP or migration.

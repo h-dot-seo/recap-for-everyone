@@ -160,13 +160,16 @@ def build_parser():
         command = sub.add_parser(name)
         command.add_argument('--source', required=True); command.add_argument('--conversation', required=True)
         if name == 'show':
+            command.add_argument('--branch',action='store_true',help='read one recorded web export path')
+            command.add_argument('--node',help='explicit recorded node; requires --branch')
+            command.add_argument('--export-sha256',help='recorded original export SHA-256; requires --branch')
             command.add_argument('--output', help='save exact show JSON to a new private UTF-8 file; print receipt only')
         if name == 'suggest-title':
             add_output_argument(command)
             command.add_argument('--message', help='use exactly this archived user message for the excerpt; no alternate-message fallback')
         if name in ('show', 'render'):
             command.add_argument('--limit', type=int, help='read at most this many messages (1..1000)')
-            command.add_argument('--offset', type=int, default=0, help='message offset; requires --limit')
+            command.add_argument('--offset', type=int, default=None if name=='show' else 0, help='message offset; requires --limit')
             command.add_argument('--message', help='read exactly this message ID; excludes --limit/--offset')
             command.add_argument('--around-message', help='read bounded raw archive neighbors around this exact message ID')
             command.add_argument('--before', type=int, help='earlier archive neighbors, 0..50; default 2 with --around-message')
@@ -320,14 +323,15 @@ def main():
                                          args.limit, args.offset, args.message,
                                          args.around_message, args.before, args.after, args.format)
         elif args.command == 'show':
-            from recaplib.conversation_view import conversation
+            from recaplib.conversation_view import conversation, _UNSET_OFFSET
+            if args.offset is None:args.offset=_UNSET_OFFSET
             if args.output is not None:
                 from recaplib.conversation_document import save_conversation
                 result = save_conversation(args.db, args.source, args.conversation, args.limit, args.offset, args.message,
-                                           args.around_message, args.before, args.after, output=args.output)
+                                           args.around_message, args.before, args.after, output=args.output, branch=args.branch, node=args.node, export_sha256=args.export_sha256)
             else:
                 result = conversation(args.db, args.source, args.conversation, args.limit, args.offset, args.message,
-                                      args.around_message, args.before, args.after)
+                                      args.around_message, args.before, args.after, branch=args.branch, node=args.node, export_sha256=args.export_sha256)
         elif args.command == 'find':
             from recaplib.conversation_search import find
             result = find(args.db, args.query, args.source, args.limit, args.include_title_history, args.export_sha256, args.cursor, args.canonical_unicode, args.text_role, args.from_date, args.until_date)

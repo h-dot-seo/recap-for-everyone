@@ -263,7 +263,8 @@ unsupported text fields and forked conversations, without exposing message text 
 IDs. Normalization and first import retain all mapping branches in original mapping order.
 `current_node` does not select a path. Fork warnings make clear that title proposals
 can mix alternate conversation paths; review the evidence before applying a title.
-Archive branch filtering, binary attachments and remote title changes are not implemented.
+Archive branch reading is available after an explicit web import records topology; see
+[archive branches](ARCHIVE_BRANCH.md). Binary attachments and remote title changes are not implemented.
 The separate read-only export branch viewer below supports branch selection.
 
 Reimporting an original export can add code/output messages skipped by older
@@ -760,8 +761,10 @@ loaded in memory and parsed twice, so this is not a bounded-memory large-file vi
 
 The all-branch archive import and title-generation behavior are unchanged. Branch
 output is a review view, not a title proposal or replacement export, and cannot be
-applied as one. Branch-specific archive indexing remains future work; the verified branch title
-proposal command below connects this view to the existing archive. Original exports are needed because the archive does not retain `current_node`.
+applied as one. The archive can now retain an ID-only topology and supplied `current_node` on an
+explicit web import; see [archive branches](ARCHIVE_BRANCH.md). Older archives do
+not gain that information without the original export bytes. The verified branch
+title proposal below remains a separate source-file-based workflow.
 
 The structural contract is informed by the public converter's
 [data models](https://difegam.github.io/chatgpt-to-markdown/reference/data-models/),

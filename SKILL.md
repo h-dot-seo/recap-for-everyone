@@ -424,3 +424,10 @@ review-titles may receive proposal file paths and supplied_only. Keep its combin
 1 MiB/file-count limits, exact-source and stale/duplicate/collision checks; inspect
 unused candidate counts and page coverage. Queue readiness is not approval or
 application. See [supplied MCP proposals](docs/MCP_SERVER.md#review-explicitly-supplied-proposal-files).
+
+For a recorded web-export path already retained by explicit import, use
+`show --branch` with an optional explicit `--node` and, when ambiguous, the exact
+`--export-sha256`. Read its PRIVATE CONTENT and selected-export boundaries. Do not
+guess a pointer, missing topology or newest export. Default show, render, MCP and
+title workflows retain their existing scopes; recovery v1 does not declare these
+new ledgers. See `docs/ARCHIVE_BRANCH.md`.

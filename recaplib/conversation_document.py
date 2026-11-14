@@ -1,18 +1,18 @@
 """Save the exact read-only conversation view as a new private UTF-8 JSON file."""
 import hashlib
 import json
-from recaplib.conversation_view import conversation
+from recaplib.conversation_view import conversation, _UNSET_OFFSET
 from recaplib.document_output import write_bytes
 from recaplib.recovery import _reject_existing
 
 MAX_OUTPUT_BYTES = 16 * 1024 * 1024
 
 
-def save_conversation(db, source, conversation_id, limit=None, offset=0, message_id=None,
-                      around_message_id=None, before=None, after=None, *, output):
+def save_conversation(db, source, conversation_id, limit=None, offset=_UNSET_OFFSET, message_id=None,
+                      around_message_id=None, before=None, after=None, *, output, branch=False, node=None, export_sha256=None):
     _reject_existing(output)
     value = conversation(db, source, conversation_id, limit, offset, message_id,
-                         around_message_id, before, after)
+                         around_message_id, before, after, branch=branch, node=node, export_sha256=export_sha256)
     raw = bytearray()
     encoder = json.JSONEncoder(ensure_ascii=False, allow_nan=False, indent=2)
     for chunk in encoder.iterencode(value):

@@ -1,12 +1,12 @@
 {
   "project": "recap-for-everyone",
-  "release": "0.99.7-title-history-index",
+  "release": "0.99.8-archive-web-branches",
   "date": "2026-11-14",
   "private_history_imported": false,
   "actual_corpora_included": false,
   "synthetic_examples_only": true,
   "license_status": "NOT_SELECTED",
-  "file_count": 315,
+  "file_count": 317,
   "files": [
     {
       "path": ".gitattributes",
@@ -30,8 +30,8 @@
     },
     {
       "path": "README.md",
-      "bytes": 19564,
-      "sha256": "ccb4aafcc61f67b07abbc918b2df9614e44a48b85deaee7e3651b8f033f54c0f"
+      "bytes": 19781,
+      "sha256": "7df541ca28cdff7e870c7eec7af72b9878cf1c057c4320e19282c6842ba0b466"
     },
     {
       "path": "RIGHTS.md",
@@ -45,13 +45,13 @@
     },
     {
       "path": "SKILL.md",
-      "bytes": 30639,
-      "sha256": "e241a34bc165d238ed66fb0a3058f24d9ba25ecb01f345bf5fc4daee8a41cbe7"
+      "bytes": 31083,
+      "sha256": "faab62d67c2ccc21bebf0f74e27688bfe5f3213690e2721454c9964fb31b6320"
     },
     {
       "path": "VALIDATION.md",
-      "bytes": 47831,
-      "sha256": "5b8daabc3625e75c486c8c28dcbdfe59c3089fd144b3823eab6e31dfa1d0fa30"
+      "bytes": 49535,
+      "sha256": "7a995ec316b8394bb31a7eb354d2d4df0c62c9489408e526066e59aaba4d3c46"
     },
     {
       "path": "attributed_title.py",
@@ -105,8 +105,13 @@
     },
     {
       "path": "docs/ARCHITECTURE.md",
-      "bytes": 20208,
-      "sha256": "83b5c282c9849d7e8aef88aaae58002682b89e3df2145a3d0cdde2e9e6cd8927"
+      "bytes": 20707,
+      "sha256": "1db5b0e00c6b9a63c3a6500eeac13735e42eac299bd569ab07632c82816aeee9"
+    },
+    {
+      "path": "docs/ARCHIVE_BRANCH.md",
+      "bytes": 4539,
+      "sha256": "4c9170178580d62e2801a0cee71fa979627791a3e7582f9cf97eb383a4522735"
     },
     {
       "path": "docs/ATTRIBUTED_MESSAGE_SELECTION.md",
@@ -135,8 +140,8 @@
     },
     {
       "path": "docs/COMMANDS.md",
-      "bytes": 33545,
-      "sha256": "171ccdd1244271105c9fdcd819c2940721693c9b0df2e9367f51ebcb7701fdda"
+      "bytes": 34021,
+      "sha256": "3d96a80a18d822336cde19c0c83128da35efad30dbf132a0706ce515caa9acf0"
     },
     {
       "path": "docs/COMMAND_CATALOG.md",
@@ -186,12 +191,12 @@
     {
       "path": "docs/INSTALL.md",
       "bytes": 8440,
-      "sha256": "0e0a7793e33fc66b2f23ea652b287725e9c18d1b2d739af1877364ed3828e25f"
+      "sha256": "9e924c65641b983a3ad26a79efa6347ce31bda6c841e3960cfc3642cf8d801fd"
     },
     {
       "path": "docs/JSON_ERRORS.md",
-      "bytes": 5264,
-      "sha256": "d9703099bd0d1f7c1643029d717b28ba26101908d7c3c9c95769c5e604a637cc"
+      "bytes": 5515,
+      "sha256": "297baa679ae5f76380ee18847a4763a2eacd8bd27deb41f8ea2877178bdb026c"
     },
     {
       "path": "docs/MCP_SERVER.md",
@@ -205,8 +210,8 @@
     },
     {
       "path": "docs/MESSAGE_SELECTION.md",
-      "bytes": 7561,
-      "sha256": "c82137448baad2dd7628054d98497e6ac025af4adde66368ba687aefb7a68a31"
+      "bytes": 7903,
+      "sha256": "be71c18f75662f2a74aea30e31a114cfb6d8b5345cf9928d85d9f25e044802f6"
     },
     {
       "path": "docs/NORMALIZED_JSONL.md",
@@ -225,8 +230,8 @@
     },
     {
       "path": "docs/README.ko.md",
-      "bytes": 22992,
-      "sha256": "276332f260736d2167639edc8f8cb8ce7c373ae80c419fbecce1cdf1cf0eb30f"
+      "bytes": 23289,
+      "sha256": "a0fa7ec9fd658bd25f725b2ca6c87629521d7e33b7ae9e442802acb831d8c979"
     },
     {
       "path": "docs/REBUILD_REHEARSAL.md",
@@ -235,8 +240,8 @@
     },
     {
       "path": "docs/RECOVERY_REHEARSAL.md",
-      "bytes": 16051,
-      "sha256": "cc86ff7b465b91a5ab15294bd4c0cdeb6d7964be1b2db4e14e9dbe85f3f53e89"
+      "bytes": 16617,
+      "sha256": "d3042758655b78be8eee2853556f83a1c92701ade3db1fbd08cedfaabae22da8"
     },
     {
       "path": "docs/REIMPORT_DELTA.md",
@@ -280,8 +285,8 @@
     },
     {
       "path": "docs/SCHEMA.md",
-      "bytes": 12628,
-      "sha256": "fe521ac69fa9688e7d5d034f487eefccbad3967f6cec1a51e01e0af9476c9b9a"
+      "bytes": 14931,
+      "sha256": "8e5a3dbc119e043a573d862406f0e9d20f61831c1b63ac2a178f157aa9e0fc42"
     },
     {
       "path": "docs/SEARCH_EXCERPTS.md",
@@ -375,8 +380,8 @@
     },
     {
       "path": "docs/VALIDATION_HISTORY.md",
-      "bytes": 191641,
-      "sha256": "6c598bd8bd66bd4716f08155b73ba0f25faa51efc5deeb74df97928c9b6a5990"
+      "bytes": 193329,
+      "sha256": "ef87634519f22310b89f563afd78adfb0c7f9222b491e1ec9d9337ca36751160"
     },
     {
       "path": "docs/WEB_ZIP_INVENTORY.md",
@@ -385,8 +390,8 @@
     },
     {
       "path": "docs/WORKFLOWS.md",
-      "bytes": 77634,
-      "sha256": "0b0be09b76837f09bb071cd3edb75384ec098bee13111060cae8798284af231f"
+      "bytes": 77819,
+      "sha256": "d5f1ce3dba950599ef4543116ad8133eb11e4e8db681b8ccb121681d28591641"
     },
     {
       "path": "examples/adapter-message-focus.jsonl",
@@ -510,8 +515,8 @@
     },
     {
       "path": "recap.py",
-      "bytes": 32353,
-      "sha256": "29ab06ed9fe5f79b6acd112db67ecc22b8509c6e23d66f29e6e160996320893f"
+      "bytes": 32904,
+      "sha256": "f0f07736d15481b0e3b3c187fefc3237c0165a8164251b1eeaa338d13e440051"
     },
     {
       "path": "recap_mcp.py",
@@ -521,17 +526,17 @@
     {
       "path": "recaplib/__init__.py",
       "bytes": 125,
-      "sha256": "e0b37c03e894dcf3ca1dcc51d3e355a0ec6fb7cbeac42eef06aed392e3359a33"
+      "sha256": "f5c560eae1a5cf1a6581055ab02ceedf4c1148949291fb5fccef64890b213e71"
     },
     {
       "path": "recaplib/archive.py",
-      "bytes": 13753,
-      "sha256": "dc806089d481d64d4e647e68483b97877ec559d988207eaf882cf28ebde2d288"
+      "bytes": 15271,
+      "sha256": "a39fb21bb6f2e7e79ba4247a34160e89dab1147721578e9f594fb7b3bfe8f0ca"
     },
     {
       "path": "recaplib/archive_schema.py",
-      "bytes": 4951,
-      "sha256": "77b8823c8b31f5775c813e5fdaac3dbe92a2c8d9e1b0364b3fb9e7f843d11d69"
+      "bytes": 4991,
+      "sha256": "c9c97a8ee4197ddcb39c5b2b04ac35909e31947aa7f223ff99e6e53ddd6fdb1d"
     },
     {
       "path": "recaplib/attributed_title.py",
@@ -560,8 +565,8 @@
     },
     {
       "path": "recaplib/conversation_document.py",
-      "bytes": 2016,
-      "sha256": "776ff1e74e39256eb6b044a499fcaa1864e1fe9e92c41edba133ac69345f6ac8"
+      "bytes": 2143,
+      "sha256": "3427f2f418284d250a8cdb327b7c0c719e38b92410b8a250b06e1765ba887c1b"
     },
     {
       "path": "recaplib/conversation_search.py",
@@ -570,8 +575,8 @@
     },
     {
       "path": "recaplib/conversation_view.py",
-      "bytes": 15290,
-      "sha256": "b248522143445e213f2ae5edba5a4ab10d5c69dd9ef567354148a07f3315a2dd"
+      "bytes": 22933,
+      "sha256": "ab74a87d6d4f0d0656c9575ecde56797cec5710c2a9005f0559b17743508b198"
     },
     {
       "path": "recaplib/document_output.py",
@@ -580,8 +585,8 @@
     },
     {
       "path": "recaplib/errors.py",
-      "bytes": 1898,
-      "sha256": "adc31ac83e263a6b1d8d315bef8f72f5652554f946a2ec1dc5015c5322636bdf"
+      "bytes": 2047,
+      "sha256": "f89513b0aa28ece166f8d57113918e3ca7d24d4a3920ff45907177200cd4ac2d"
     },
     {
       "path": "recaplib/export_inventory.py",
@@ -670,8 +675,8 @@
     },
     {
       "path": "recaplib/session_workflow.py",
-      "bytes": 22374,
-      "sha256": "68b960a0d66700013065dacea80509a8eaffccfb40d2f8c0da7bf139576c94ac"
+      "bytes": 23786,
+      "sha256": "a5a86e97c260a998f9ff0b84866c0956c389e2388b6fb165e9bc36d047d491f7"
     },
     {
       "path": "recaplib/source_identity.py",
@@ -855,8 +860,13 @@
     },
     {
       "path": "tests/test_adapter_single_pass.py",
-      "bytes": 7219,
-      "sha256": "2db576dd65dccb3998deb1ef9f6ad11bfc7fa74d1b219f45587908bf5bf89f61"
+      "bytes": 7617,
+      "sha256": "60490d8c6e1a640de3d08cd4588752ebab4146716707af2a272945b3482a95e8"
+    },
+    {
+      "path": "tests/test_archive_branch.py",
+      "bytes": 15668,
+      "sha256": "3ed886633178f0663d5a80db4567afa756542f640d08a13acfac59582be4c86c"
     },
     {
       "path": "tests/test_archive_scaling.py",
@@ -1135,8 +1145,8 @@
     },
     {
       "path": "tests/test_normalized_byte_ingest.py",
-      "bytes": 13557,
-      "sha256": "aa6f61cb4b6ac503a6ccb240e71142a30ee6f7bbcdee71b929e40e816c9fdc33"
+      "bytes": 14111,
+      "sha256": "b8d4c7741ad82a67ae4ed51e7f1146044a0a9d98e65bd8613aece24ec78d56ec"
     },
     {
       "path": "tests/test_normalized_contract.py",

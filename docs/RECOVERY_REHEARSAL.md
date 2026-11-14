@@ -226,3 +226,13 @@ row digest; this auxiliary lookup index changes neither recovery rows nor their
 meaning. It does not restore missing title or review history. An existing index
 of the same name is retained even if defined differently; no automatic repair or
 performance guarantee is implied.
+
+## Optional archived web topology is not declared by v1
+
+`export_nodes` and `export_conversations`, written by explicit web import, are
+not declared or compared by recovery manifest v1. Missing or changed topology
+therefore does not by itself fail a v1 rehearsal. The original web export bytes
+can reproduce these ID-only ledgers through explicit import; without those bytes,
+text-only occurrence rows cannot reconstruct missing roots, tips or pointers.
+This does not change any existing v1 digest, check or result field. See
+[archive branches](ARCHIVE_BRANCH.md).

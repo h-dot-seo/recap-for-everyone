@@ -146,7 +146,15 @@ class ExportByteIngestWorkflowTests(unittest.TestCase):
                     self.assertEqual(actual['coverage'], coverage)
                     self.assertEqual({k:v for k,v in actual.items() if k!='coverage'}, expected)
                     self.assertEqual(actual['source_sha256'], hashlib.sha256(old_raw).hexdigest())
-                    self.assertEqual(tables(new_db), tables(old_db))
+                    actual_tables = tables(new_db)
+                    if kind == 'web':
+                        # Explicit web import now retains ID-only source topology;
+                        # legacy normalized staging cannot reconstruct textless nodes.
+                        topology = {name: actual_tables.pop(name) for name in
+                                    ('export_nodes', 'export_conversations')}
+                        self.assertTrue(topology['export_nodes'])
+                        self.assertTrue(topology['export_conversations'])
+                    self.assertEqual(actual_tables, tables(old_db))
                     self.assertEqual(search(new_db, 'synthetic'), search(old_db, 'synthetic'))
 
     def test_normalized_memory_writer_preserves_text_bytes_and_never_adds_a_bom(self):

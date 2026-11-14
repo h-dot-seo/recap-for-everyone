@@ -322,3 +322,12 @@ size are admitted before loading; the original combined 1 MiB bounded-read check
 remains. Raw default queues and CLI contracts are unchanged. Reduced preflight
 budgets do not create an atomic filesystem lease, and queue readiness never
 authenticates operator approval or enables application.
+
+## Recorded web-export topology
+
+An explicit web import also writes deterministic ID-only nodes, parent links,
+mapping ordinals and the supplied pointer state inside its existing transaction.
+`show --branch` reads a selected recorded export, not a live website selection.
+It neither changes default show ordering nor imports only the active branch.
+These additive ledgers do not imply a schema epoch, automatic migration or
+manifest-v1 recovery coverage. See [archive branches](ARCHIVE_BRANCH.md).

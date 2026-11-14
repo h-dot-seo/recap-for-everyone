@@ -131,3 +131,10 @@ selection/context warnings and provenance; stdout is only a private saved-view
 receipt. The 16 MiB output cap does not turn a message-count bound into an input
 memory limit. See [Markdown views](RENDER_MARKDOWN.md) and
 [HTML views](RENDER_VIEWS.md).
+
+## A recorded web-export branch
+
+Use `show --branch [--node NODE] [--export-sha256 HASH]` to select one retained
+web-export path, not insertion-order neighbors. See the executed synthetic
+[archive branch walkthrough](ARCHIVE_BRANCH.md). Older archives require an
+explicit reimport of the original web bytes; the view never invents topology.

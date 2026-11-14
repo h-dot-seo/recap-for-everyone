@@ -30,6 +30,8 @@ problem; never create or overwrite a database just because a code was returned.
 | SOURCE_CHANGED | Explicit checked source hash mismatch at supported normalized/export/ZIP paths |
 | STALE | Explicit supported revision/content, plan/request or cursor-state mismatch |
 | UNKNOWN_IDENTITY | Explicit supported conversation/message lookup failure |
+| PATH_UNAVAILABLE | Recorded web topology is missing, ambiguous, inconsistent or excludes the selected node/hash |
+| CURRENT_NODE_UNAVAILABLE | The chosen recorded export supplies no usable current-node pointer; explicit node selection is required |
 | CONFLICTING_IDENTITY | Incoming or stored normalized message identity conflict |
 | OUTPUT_EXISTS | FileExistsError |
 | FILE_ERROR | Other caught OSError |

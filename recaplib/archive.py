@@ -173,7 +173,7 @@ def _check_encoded_keys(row, line_no):
             pending.extend(item)
 
 
-def _ingest_adapter_rows(db, source, rows, *, newline=None):
+def _ingest_adapter_rows(db, source, rows, *, newline=None, topology=None):
     """Private validated adapter path: own serialization, never accept paired raw.
 
     JSON encoding still validates serializability/Unicode of every value. Stored
@@ -187,7 +187,7 @@ def _ingest_adapter_rows(db, source, rows, *, newline=None):
     for line_no, row in enumerate(rows, 1):
         _check_encoded_keys(row, line_no)
     records = _admit_incoming(_validate_record(row, line_no) for line_no, row in enumerate(rows, 1))
-    return _write_records(db, source, raw, records, rows)
+    return _write_records(db, source, raw, records, rows, topology)
 
 
 def _admit_incoming(candidates):
@@ -205,7 +205,7 @@ def _admit_incoming(candidates):
     return records
 
 
-def _write_records(db, source, raw, records, provenance):
+def _write_records(db, source, raw, records, provenance, topology=None):
     """Shared transaction writer; callers finish validation before entering."""
     digest = hashlib.sha256(raw).hexdigest()
     conn = sqlite3.connect(db)
@@ -222,6 +222,22 @@ def _write_records(db, source, raw, records, provenance):
                 if occurrence_table is None:
                     # Additive upgrade: preserve the legacy table and its schema.
                     conn.execute('INSERT OR IGNORE INTO export_occurrences SELECT source,conversation,message,original_hash,locator,parent FROM export_provenance')
+            if topology is not None:
+                conn.execute('CREATE TABLE IF NOT EXISTS export_nodes (source TEXT, conversation TEXT, original_hash TEXT, node TEXT, parent TEXT, ordinal INTEGER, has_text INTEGER, PRIMARY KEY(source,conversation,original_hash,node))')
+                conn.execute('CREATE TABLE IF NOT EXISTS export_conversations (source TEXT, conversation TEXT, original_hash TEXT, current_node TEXT, current_node_state TEXT, mapping_nodes INTEGER, PRIMARY KEY(source,conversation,original_hash))')
+                counts={}
+                for graph in topology:
+                    key=(graph['conversation'],graph['original_hash'])
+                    counts[key]=counts.get(key,0)+1
+                for graph in topology:
+                    cid,digest_key=graph['conversation'],graph['original_hash']
+                    ambiguous=counts[(cid,digest_key)]!=1
+                    conn.execute('INSERT OR IGNORE INTO export_conversations VALUES(?,?,?,?,?,?)',
+                        (source,cid,digest_key,None if ambiguous else graph['current_node'],
+                         'ambiguous' if ambiguous else graph['current_node_state'],0 if ambiguous else len(graph['nodes'])))
+                    if not ambiguous:
+                        conn.executemany('INSERT OR IGNORE INTO export_nodes VALUES(?,?,?,?,?,?,?)',
+                            [(source,cid,digest_key,node,parent,ordinal,has_text) for node,parent,ordinal,has_text in graph['nodes']])
             conn.execute('INSERT OR IGNORE INTO artifacts VALUES(?,?,?,?)',
                          (source, digest, len(raw), len(records)))
             for row, title, line_no in records:
