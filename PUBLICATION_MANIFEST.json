@@ -1,12 +1,12 @@
 {
   "project": "recap-for-everyone",
-  "release": "0.99.2-mcp-supplied-proposals",
+  "release": "0.99.3-current-python-ci",
   "date": "2026-11-14",
   "private_history_imported": false,
   "actual_corpora_included": false,
   "synthetic_examples_only": true,
   "license_status": "NOT_SELECTED",
-  "file_count": 308,
+  "file_count": 309,
   "files": [
     {
       "path": ".gitattributes",
@@ -15,8 +15,8 @@
     },
     {
       "path": ".github/workflows/tests.yml",
-      "bytes": 727,
-      "sha256": "5c005874d212d26d7259fd9c52a13aa13e4c75ad668396f8f1c34908896f5bfd"
+      "bytes": 756,
+      "sha256": "2ba15bcc02cb1ddcb177aba5d1a46d6fbddcaded26a45b77ad45e83f798fd79a"
     },
     {
       "path": ".gitignore",
@@ -50,8 +50,8 @@
     },
     {
       "path": "VALIDATION.md",
-      "bytes": 37559,
-      "sha256": "c16845d79d1cf9d0e768240030f625e3809f5634150292335cdc56d5039009cd"
+      "bytes": 39175,
+      "sha256": "043ed4bb7786ede7fc915a3b95943af3fced5034aee1cec77cc29b27a965f9c0"
     },
     {
       "path": "attributed_title.py",
@@ -185,8 +185,8 @@
     },
     {
       "path": "docs/INSTALL.md",
-      "bytes": 7773,
-      "sha256": "9f2ecd477edaaf9ce5d95556a3a33bd536eac3724757a609160804b7952498e9"
+      "bytes": 8018,
+      "sha256": "04185a55809d516467f0cc1fc8338374a47934dc813ff8f728e7124707151e32"
     },
     {
       "path": "docs/JSON_ERRORS.md",
@@ -225,8 +225,8 @@
     },
     {
       "path": "docs/README.ko.md",
-      "bytes": 22769,
-      "sha256": "ee2b6482953d15f4729b08a70812272bf970c1bc26d91aca129e733b9d865195"
+      "bytes": 22992,
+      "sha256": "276332f260736d2167639edc8f8cb8ce7c373ae80c419fbecce1cdf1cf0eb30f"
     },
     {
       "path": "docs/REBUILD_REHEARSAL.md",
@@ -370,8 +370,8 @@
     },
     {
       "path": "docs/VALIDATION_HISTORY.md",
-      "bytes": 181624,
-      "sha256": "31e8a7754b7e7cd9563c499494ab16d2edfab76ece04f475429456a04aa89b87"
+      "bytes": 183047,
+      "sha256": "6b7d30bc03cfc9408b241fe922b47a53e10ea19e2d703d5bfba908832d477c43"
     },
     {
       "path": "docs/WEB_ZIP_INVENTORY.md",
@@ -380,8 +380,8 @@
     },
     {
       "path": "docs/WORKFLOWS.md",
-      "bytes": 77389,
-      "sha256": "07cfac8454b9116ad55a195527977779083e5ba82f15275e769036fb71d08730"
+      "bytes": 77634,
+      "sha256": "0b0be09b76837f09bb071cd3edb75384ec098bee13111060cae8798284af231f"
     },
     {
       "path": "examples/adapter-message-focus.jsonl",
@@ -897,6 +897,11 @@
       "path": "tests/test_canonical_search.py",
       "bytes": 13891,
       "sha256": "99dafdb926a3fb9b19387630057f621f1d93d567b8062df9ffc26ebb4b1076ce"
+    },
+    {
+      "path": "tests/test_ci_contract.py",
+      "bytes": 4699,
+      "sha256": "08ad08009b9a2ef9df5e4182644cde312448a5964ca8ec1e8c3c8e0b00dc66ef"
     },
     {
       "path": "tests/test_cli_diagnostics.py",

@@ -31,8 +31,9 @@ recap-for-everyone은 ChatGPT 웹 내보내기와 Codex 같은 로컬 에이전�
 ## 설치와 빠른 시작
 
 `pip install`, 모델, 계정, API 키가 필요하지 않습니다. 표준 라이브러리만 사용하며
-Python 3.10 이상과 SQLite FTS5가 필요합니다. CI는 Ubuntu와 Windows에서 Python 3.10과
-3.12로 실행됩니다. 자세한 절차는 [설치와 런타임 점검](INSTALL.md)에 있습니다.
+Python 3.10 이상과 SQLite FTS5가 필요합니다. CI는 Ubuntu와 Windows에서 Python 3.10, 3.12, 3.15의 총 6개 조합으로
+설정되어 있습니다. 설정 자체가 성공을 뜻하지 않으며 실제 결과는
+[검증 기록](../VALIDATION.md)을 확인하세요. 호환성 하한 3.10은 명시적 결정 전까지 유지합니다. 자세한 절차는 [설치와 런타임 점검](INSTALL.md)에 있습니다.
 
 1. 기본 브랜치 `main`을 받습니다. 여기서 설명하는 작업 흐름은 2026-11-08부터 `main`에
    있습니다. 그 이전에 받은 사본에는 일부 명령이 없습니다.
