@@ -152,6 +152,7 @@ class AdapterFileEncodingTests(unittest.TestCase):
             def __init__(self, data): super().__init__(data); self.sizes = []
             def read(self, size=-1): self.sizes.append(size); return super().read(size)
         stream = Stream(raw)
+        (self.root/'never-opened.json').write_bytes(raw)
         with patch.object(Path, 'open', return_value=stream) as opened:
             self.assertEqual(adapter._read_object(self.root/'never-opened.json', len(raw), 'REQUEST_INVALID'),
                              {'title':'Synthetic'})

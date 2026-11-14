@@ -1,4 +1,5 @@
 """Provider-neutral title generation contract. Only local/mock execution is shipped."""
+from recaplib.input_files import require_regular_file
 import argparse
 import hashlib
 import json
@@ -481,6 +482,8 @@ def generate(prepared, config=AdapterConfig(), *, consent=None, mock_response=No
 
 def _read_bounded(path, limit, error_code):
     try:
+        require_regular_file(path, max_bytes=limit, label='adapter document',
+                             too_large='adapter document exceeds its byte limit')
         with path.open('rb') as stream:
             raw = stream.read(limit + 1)
         if len(raw) > limit:

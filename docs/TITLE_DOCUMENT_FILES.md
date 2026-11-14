@@ -131,3 +131,8 @@ Saved queues and previews can contain private titles, identifiers and message te
 especially with `--with-evidence`. Keep all generated files outside public repositories
 and shared directories. No account collection, model transmission or remote rename
 is performed.
+
+Relevant existing bounded readers now preflight regular-file type and their existing
+byte budget before open, while retaining one bounded read and post-read checks.
+Symlinks to regular files retain their prior behavior; this does not change the
+separate recovery restored/object symlink policy. See [security](../SECURITY.md).

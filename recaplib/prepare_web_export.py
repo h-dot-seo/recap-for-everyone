@@ -9,6 +9,7 @@ import zipfile
 import zlib
 from recaplib.session_workflow import _normalize_bytes
 from recaplib.zip_preflight import check_directory
+from recaplib.input_files import require_regular_file
 
 MAX_ARCHIVE_BYTES = 64 * 1024 * 1024
 MAX_MEMBER_BYTES = 16 * 1024 * 1024
@@ -49,6 +50,8 @@ def _safe_member(name):
 
 
 def archive_bytes(path):
+    require_regular_file(path, max_bytes=MAX_ARCHIVE_BYTES, label='ZIP archive',
+                         too_large='ZIP archive exceeds the 64 MiB preparation limit')
     with Path(path).open('rb') as stream:
         raw = stream.read(MAX_ARCHIVE_BYTES + 1)
     if len(raw) > MAX_ARCHIVE_BYTES:

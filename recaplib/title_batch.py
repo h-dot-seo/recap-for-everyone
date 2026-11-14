@@ -4,6 +4,7 @@ import json
 import unicodedata
 from pathlib import Path
 from recaplib.archive import readonly
+from recaplib.input_files import require_regular_file
 from recaplib.conversation_view import _inventory
 from recaplib.title_proposal import content_fingerprint, validate_against_snapshot
 from recaplib.title_suggestion import excerpt
@@ -24,6 +25,8 @@ def load_supplied_proposals(paths):
         raise ValueError('supply at most 1000 explicit proposal files')
     proposals, used = [], 0
     for path in paths:
+        require_regular_file(path, max_bytes=MAX_SUPPLIED_BYTES-used, label='supplied proposal file',
+                             too_large='supplied proposal files exceed the combined 1 MiB limit')
         with Path(path).open('rb') as stream:
             raw = stream.read(MAX_SUPPLIED_BYTES - used + 1)
         used += len(raw)

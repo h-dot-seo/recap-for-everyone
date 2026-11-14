@@ -210,3 +210,8 @@ no SQL CPU/memory budget or protection against hostile concurrent directory
 changes. Write connections for ingest, title history and review state are unchanged
 and assume an operator-created archive. These protections do not authenticate
 content, validate all semantics or prove recovery completeness.
+
+Relevant existing bounded readers now preflight regular-file type and their existing
+byte budget before open, while retaining one bounded read and post-read checks.
+Symlinks to regular files retain their prior behavior; this does not change the
+separate recovery restored/object symlink policy. See [security](../SECURITY.md).

@@ -40,3 +40,24 @@ no SQL CPU/memory budget or protection against hostile concurrent directory
 changes. Write connections for ingest, title history and review state are unchanged
 and assume an operator-created archive. These protections do not authenticate
 content, validate all semantics or prove recovery completeness.
+
+## Regular-file admission for existing bounded readers
+
+ZIP archive input, recovery manifest input, supplied proposal files and adapter
+request/response documents now check file type and the existing byte budget before
+opening. Directories, FIFOs, sockets and device paths are rejected; this avoids
+blocking on an ordinary FIFO path. Symlinks to regular files retain the existing
+follow behavior. Recovery's separate restored-archive/object symlink refusal is
+unchanged. Missing files retain their existing errors; adapter readers still map
+failures to their existing AdapterError code. New type errors omit the input path.
+
+No budget is enlarged or newly imposed: ZIP/manifests retain 64 MiB, supplied
+proposals retain their combined 1 MiB, and adapter documents retain their existing
+per-kind limits. Each reader still performs one bounded read and checks actual
+length afterward, so growth after stat cannot silently exceed that read budget.
+The stat/open pair is not an atomic lease. Hostile concurrent namespace changes,
+symlink swaps, special-file replacement between stat/open and total process memory
+are not defended or bounded by this preflight. File contents are never changed.
+
+This change does not cover all export/title/plan readers and does not establish
+universal input admission or a sandbox. It preserves their current behavior.
