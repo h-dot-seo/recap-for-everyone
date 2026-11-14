@@ -24,7 +24,7 @@ through the repository root, which is why the commands run from there.
 ## recap.py
 
 ```text
-usage: recap.py [-h] [--version] [--db DB] [--json-errors] {ingest,search,stats,describe-schema,inspect,list-export,inspect-web-zip,prepare-web-export,replay-local,web-branch,suggest-branch-title,suggest-replay-title,suggest-attributed-title,preview-title,apply-title,review-state,render-queue,review-titles,title-adapter-dry-run,title-adapter-simulate,export-title-plan,check-title-plan,import,check-import,export-normalized,export-provenance,check-provenance,declare-review-checkpoint,declare-checkpoint,changed-since,declare-recovery,rehearse-recovery,rebuild-archive,list,find,show,render,suggest-title,title,title-history,describe} ...
+usage: recap.py [-h] [--version] [--db DB] [--json-errors] {ingest,search,stats,ledger,describe-schema,inspect,list-export,inspect-web-zip,prepare-web-export,replay-local,web-branch,suggest-branch-title,suggest-replay-title,suggest-attributed-title,preview-title,apply-title,review-state,render-queue,review-titles,title-adapter-dry-run,title-adapter-simulate,export-title-plan,check-title-plan,import,check-import,export-normalized,export-provenance,check-provenance,declare-review-checkpoint,declare-checkpoint,changed-since,declare-recovery,rehearse-recovery,rebuild-archive,list,find,show,render,suggest-title,title,title-history,describe} ...
 ```
 
 The global `--db DB` precedes the subcommand. `describe` lists the current required,
@@ -714,7 +714,7 @@ saves a private measurement receipt. See [SCALING](SCALING.md).
 ## Command catalogue
 
 ```text
-usage: recap.py describe [-h] [{apply-title,changed-since,check-import,check-provenance,check-title-plan,declare-checkpoint,declare-recovery,declare-review-checkpoint,describe,describe-schema,export-normalized,export-provenance,export-title-plan,find,import,ingest,inspect,inspect-web-zip,list,list-export,prepare-web-export,preview-title,rebuild-archive,rehearse-recovery,render,render-queue,replay-local,review-state,review-titles,search,show,stats,suggest-attributed-title,suggest-branch-title,suggest-replay-title,suggest-title,title,title-adapter-dry-run,title-adapter-simulate,title-history,web-branch}]
+usage: recap.py describe [-h] [{apply-title,changed-since,check-import,check-provenance,check-title-plan,declare-checkpoint,declare-recovery,declare-review-checkpoint,describe,describe-schema,export-normalized,export-provenance,export-title-plan,find,import,ingest,inspect,inspect-web-zip,ledger,list,list-export,prepare-web-export,preview-title,rebuild-archive,rehearse-recovery,render,render-queue,replay-local,review-state,review-titles,search,show,stats,suggest-attributed-title,suggest-branch-title,suggest-replay-title,suggest-title,title,title-adapter-dry-run,title-adapter-simulate,title-history,web-branch}]
 ```
 
 No archive/input access; optional release metadata is not verification. See
@@ -754,7 +754,7 @@ example, output boundaries and failure behavior.
 
 ## CLI version identity
 
-`python recap.py --version` prints `recap-for-everyone 0.100.1` and exits without
+`python recap.py --version` prints `recap-for-everyone 0.100.2` and exits without
 opening an archive or reading the publication manifest. It works outside the
 repository working directory and without the manifest. This numeric identity is
 not byte verification, authenticity or a stability guarantee. Use the documented
@@ -781,3 +781,12 @@ recovery-v1 limits. This does not extend render, title generation or MCP schemas
 provenance/topology digests. Default v1 is unchanged. Rehearsal reads the selected
 manifest version; rebuild v2 checks only the replayable subset with histories explicitly excluded. See
 [explicit v2 recovery](RECOVERY_V2.md).
+
+## Stored original-export metadata
+
+```text
+usage: recap.py ledger [-h] [--source SOURCE] [--limit LIMIT] [--offset OFFSET] [--text]
+```
+
+Read one private global page of recorded metadata, artifacts and unledgered
+original hashes. This is not recovery authorization. See [archive ledger](ARCHIVE_LEDGER.md).

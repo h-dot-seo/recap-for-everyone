@@ -305,3 +305,24 @@ compare either table. There is no automatic repair, DROP or migration.
 [Recovery v2](RECOVERY_V2.md) optionally binds history revision IDs and all
 provenance/topology row columns. This adds no SQLite tables, migration, index,
 archive stamp or schema-stability promise. Default recovery v1 stays unchanged.
+
+### original_exports
+
+Created only by explicit web/local/local-codex import, in its existing transaction.
+
+- `source`: supplied source label (NOT NULL).
+- `original_sha256`: exact original input byte hash (NOT NULL).
+- `original_bytes`: original byte count, not original content (NOT NULL).
+- `format`: explicit web, local or local-codex format (NOT NULL).
+- `selected_conversation`: exact selected ID, or empty string for whole input (NOT NULL).
+- `normalized_sha256`: actual serialized normalized artifact hash (NOT NULL).
+- `extracted_messages`: actual normalized input row count, including repeated extracted rows (NOT NULL).
+
+Primary key: `(source, original_sha256, format, selected_conversation, normalized_sha256)`.
+No clock, path or original message body is stored. Read-only access never creates
+or backfills it; same-key metadata conflicts fail without overwrite. Recovery v1
+and v2 do not declare or compare it. See [archive ledger](ARCHIVE_LEDGER.md).
+
+`original_exports` is recognized in the present-table listing only; existing
+`ledgers_present` flags remain unchanged. Presence does not imply recovery v1/v2
+coverage.

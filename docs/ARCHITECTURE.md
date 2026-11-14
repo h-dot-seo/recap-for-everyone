@@ -343,3 +343,11 @@ Default declarations and saved v1 checks remain unchanged. See
 V2 object rebuild is a separate, limited path: it validates the replayable
 provenance/topology subset, explicitly excludes both decision histories and
 reports `full_archive_restored: false`. See [v2 rebuild](REBUILD_V2.md).
+
+## Explicit import-origin bookkeeping
+
+Export imports now retain deterministic original hash, byte count, format and
+selection beside the normalized artifact hash/count, including zero-message
+imports. This is an additive, clock-free subset of the collection ledger, not a
+collection-run record or full provenance guarantee. `ledger` reads that metadata
+without changing recovery v1/v2 object authorization. See [archive ledger](ARCHIVE_LEDGER.md).

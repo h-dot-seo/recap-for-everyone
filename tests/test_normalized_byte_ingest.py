@@ -147,6 +147,10 @@ class ExportByteIngestWorkflowTests(unittest.TestCase):
                     self.assertEqual({k:v for k,v in actual.items() if k!='coverage'}, expected)
                     self.assertEqual(actual['source_sha256'], hashlib.sha256(old_raw).hexdigest())
                     actual_tables = tables(new_db)
+                    origins=actual_tables.pop('original_exports')
+                    self.assertEqual(len(origins),1)
+                    self.assertEqual(origins[0][3],kind)
+                    self.assertEqual(origins[0][5],actual['source_sha256'])
                     if kind == 'web':
                         # Explicit web import now retains ID-only source topology;
                         # legacy normalized staging cannot reconstruct textless nodes.

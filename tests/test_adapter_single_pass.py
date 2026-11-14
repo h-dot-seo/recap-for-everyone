@@ -56,6 +56,10 @@ class AdapterSinglePassTests(unittest.TestCase):
                         self.assertEqual({k:v for k,v in actual.items() if k not in ('coverage','replay')},expected)
                         self.assertEqual(actual['coverage'],coverage)
                         actual_tables=tables(new)
+                        origins=actual_tables.pop('original_exports')
+                        self.assertEqual(len(origins),1)
+                        self.assertEqual(origins[0][3],kind)
+                        self.assertEqual(origins[0][5],actual['source_sha256'])
                         if kind == 'web':
                             for name in ('export_nodes','export_conversations'):
                                 self.assertTrue(actual_tables.pop(name))
@@ -76,6 +80,10 @@ class AdapterSinglePassTests(unittest.TestCase):
         expected=archive.ingest_bytes(self.root/'old.sqlite','demo',workflow._normalized_bytes(rows),rows)
         self.assertEqual(actual,dict(expected,coverage=report))
         actual_tables=tables(self.root/'new.sqlite')
+        origins=actual_tables.pop('original_exports')
+        self.assertEqual(len(origins),1)
+        self.assertEqual(origins[0][3],'web')
+        self.assertEqual(origins[0][5],actual['source_sha256'])
         for name in ('export_nodes','export_conversations'):
             self.assertTrue(actual_tables.pop(name))
         self.assertEqual(tables(self.root/'old.sqlite'),actual_tables)
