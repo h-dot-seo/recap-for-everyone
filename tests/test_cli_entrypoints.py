@@ -9,7 +9,7 @@ import unittest
 ROOT=Path(__file__).resolve().parents[1]
 ENTRYPOINTS=('attributed_title.py','benchmark.py','branch_title.py','build_manifest.py',
              'conversation_search.py','conversation_view.py','export_inventory.py','import_check.py',
-             'recap.py','recovery.py','replay_local.py','replay_title.py','runtime_check.py',
+             'recap.py','recap_mcp.py','recovery.py','replay_local.py','replay_title.py','runtime_check.py',
              'session_workflow.py','title_adapter.py','title_history.py','title_plan.py',
              'title_proposal.py','title_suggestion.py','web_branch.py')
 
@@ -24,7 +24,7 @@ class CliEntrypointTests(unittest.TestCase):
                    for node in tree.body):
                 found.add(path.name)
         self.assertEqual(found,set(ENTRYPOINTS))
-        self.assertEqual(len(found),20)
+        self.assertEqual(len(found),21)
 
     def run_process(self,name,*arguments):
         return subprocess.run([sys.executable,str(ROOT/name),*arguments],cwd=ROOT,
