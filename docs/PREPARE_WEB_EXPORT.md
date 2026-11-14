@@ -107,8 +107,8 @@ no remote state is changed, and nothing is transmitted.
 
 Successful v1 receipts now include `limits`: `member_bytes` (16777216),
 `ratio` (200), `entries` (1000), `archive_ceiling` (67108864), and
-`operator_supplied` (false). These disclose existing fixed safety bounds; there
-is no override flag and no limit increase. Invalid or over-budget archives still
+`operator_supplied` (false). These disclose existing fixed safety bounds; the default ceiling is unchanged. An operator may lower the member bound as
+described below; no limit increase is permitted. Invalid or over-budget archives still
 fail without a successful receipt. Archive bytes are still read once into the
 same bounded immutable in-memory snapshot. This is not streaming support.
 
@@ -124,4 +124,21 @@ No candidate is decompressed to produce these diagnostics.
 The central-directory signature pre-count is unchanged and remains conservative:
 signatures inside stored attachments can count toward the entry bound. This
 increment neither fixes that false rejection nor introduces EOCD/ZIP64 parsing,
-new compression formats, chunked archive handling or operator-controlled bounds.
+new compression formats or chunked archive handling.
+
+## Lowering the member budget
+
+Both `inspect-web-zip` and `prepare-web-export` accept `--max-member-bytes N`.
+N must be an integer from 1 through 16777216 (the existing 16 MiB hard maximum).
+Omitting the option retains the previous default. The value is validated before
+archive access. It can reduce the decompressed-member byte budget on a constrained
+computer; it cannot raise any safety bound or make a rejected large member eligible.
+It does not cap total process memory: the ZIP snapshot and decoded JSON also use
+memory. Archive-size, entry-count and 200:1 ratio bounds stay unchanged.
+
+Repeat the selected value in both commands when carrying a metadata selection to
+preparation. `--expected-archive-sha256` binds archive bytes, not this option.
+Preparation independently rechecks its effective member bound and reads at most
+N+1 bytes before size/CRC/JSON checks and before staging. No streaming or partial
+output is introduced. Successful `limits.member_bytes` echoes N and
+`operator_supplied` is true even when N equals the default.

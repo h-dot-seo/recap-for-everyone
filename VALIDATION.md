@@ -1,10 +1,20 @@
 # Validation record
 
-Current release: `0.95.3-zip-limit-disclosure`, dated 2026-11-14.
+Current release: `0.95.4-zip-member-budget`, dated 2026-11-14.
 This file is the current snapshot. Every dated entry since the first release is kept
 unchanged and in order in [docs/VALIDATION_HISTORY.md](docs/VALIDATION_HISTORY.md).
 
 ## Latest change
+
+2026-11-14 Lower-only ZIP member budget (0.95.4-zip-member-budget):
+adds --max-member-bytes to inspection/preparation, restricted to 1..the existing
+16 MiB hard ceiling and validated before archive access. Metadata diagnostics,
+actual limit+1 member read and receipts share the effective value. No archive,
+ratio or entry bound is raised; byte snapshot and CRC/JSON-before-staging remain.
+Eight synthetic regressions cover validation, no-read rejection, exact bound/read
+budget, runtime constants, ratio protection, defaults, hash/CRC and both CLIs.
+
+Previous change:
 
 2026-11-14 ZIP fixed-limit disclosure (0.95.3-zip-limit-disclosure):
 adds effective fixed limits to both existing v1 ZIP receipts and metadata-only
