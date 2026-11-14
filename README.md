@@ -249,3 +249,7 @@ bounded-memory or speed guarantee.
 Use the optional [synthetic scaling observations](docs/SCALING.md) to measure
 import, query, review and recovery operations on generated fictional input in new
 scratch archives. Measurements stay in a private receipt, not a speed guarantee.
+
+Automation may opt into [structured execution errors](docs/JSON_ERRORS.md) with
+global `--json-errors`. Default text, successful results and negative-result JSON
+are unchanged; codes do not authorize automatic retries or repairs.

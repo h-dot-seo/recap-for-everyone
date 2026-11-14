@@ -13,6 +13,7 @@ def build_parser():
     from recaplib.title_document_output import add_output_argument
     p = argparse.ArgumentParser(description=__doc__)
     p.add_argument('--db')
+    p.add_argument('--json-errors', action='store_true', help='emit structured stderr for caught execution failures only; usage and result failures are unchanged')
     sub = p.add_subparsers(dest='command', required=True)
     imp = sub.add_parser('ingest'); imp.add_argument('input'); imp.add_argument('--source', required=True)
     imp.add_argument('--expected-sha256', help='require the normalized whole-file hash from inspection before writing')
@@ -372,6 +373,9 @@ def main():
             else:
                 rendered = render_text(result)
     except (OSError, ValueError, KeyError, TypeError, sqlite3.Error) as exc:
+        if args.json_errors:
+            from recaplib.errors import error_document
+            p.exit(1, json.dumps(error_document(exc), ensure_ascii=True) + '\n')
         p.exit(1, safe_diagnostic(exc) + '\n')
     # JSON escapes preserve Unicode data even when the terminal is ASCII-only.
     # In particular, a committed title change must not look failed at print time.

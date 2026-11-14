@@ -1,4 +1,5 @@
 """Export and recheck a manual title-change plan, without remote execution."""
+from recaplib.errors import Stale
 from recaplib.cli_errors import safe_diagnostic
 import argparse
 import json
@@ -55,7 +56,7 @@ def check_plan(db, path, plan):
             raise ValueError('title plan requires source, conversation and format')
     current = make_plan(db, plan['source'], plan['conversation'], path, plan['format'])
     if json.dumps(plan, sort_keys=True, ensure_ascii=True) != json.dumps(current, sort_keys=True, ensure_ascii=True):
-        raise ValueError('title plan is stale or altered; export and review a new plan')
+        raise Stale('title plan is stale or altered; export and review a new plan')
     return dict(valid=True, schema=SCHEMA, execution_status='NOT_EXECUTED', remote_mutation=False,
                 warning='Local consistency check only; remote identity and remote title are not verified.')
 

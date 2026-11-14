@@ -75,3 +75,8 @@ archive. It is not exhaustive option-combination testing, arbitrary schema
 validation, an OS access monitor, a hostile namespace sandbox, or a claim that WAL
 and journal sidecars can never be created. It grants no permission to run commands
 against a person's data. Static declarations still need review when code changes.
+
+The unified global `--json-errors` option structures only caught execution-error
+stderr. It does not change the output_schema of successful or negative result
+documents. See [structured execution errors](JSON_ERRORS.md); usage exit 2 and
+standalone diagnostics remain plain, and codes are not retry authorization.

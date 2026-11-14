@@ -2554,3 +2554,14 @@ this is not an arbitrary-archive, hostile-filesystem or WAL-sidecar guarantee.
 Negative-result paths and oracle fault injections prevent failure-only or vacuous
 read-only assertions. Existing command outputs, write authorization, provenance,
 recovery and partial-publication boundaries remain unchanged.
+
+## 2026-11-14 Opt-in structured execution errors (0.98.0-json-execution-errors):
+adds unified global --json-errors for the existing caught-error exit-1 stderr
+path only. Explicit ValueError subclasses mark selected source, stale-state,
+identity-lookup and identity-conflict checks without changing messages or order.
+Standard exception families map to coarse filesystem/SQLite codes; the remainder
+is UNCLASSIFIED without message matching. Default and standalone text, successful
+stdout, negative result documents and argparse exit 2 remain unchanged. Synthetic
+actual failures, private diagnostic markers, partial rebuild publication and the
+executed guide are tested. No catch-set expansion, automatic retry, rollback,
+privacy-sanitization or recovery-readiness guarantee is added.

@@ -33,8 +33,9 @@ partial-publication warning below. Arbitrary exception text is not whitelisted.
 An error does not establish that no write occurred. Ingest/schema initialization,
 explicit title writes and output receipt failures have their existing documented
 transaction/publication boundaries. Check the resulting artifact or archive when
-an outcome is uncertain; do not blindly retry a mutation. This change adds no JSON
-error envelope, error-format flag, new permission or automatic recovery action.
+an outcome is uncertain; do not blindly retry a mutation. The default formatter remains plain text. The unified CLI can now opt into
+[structured execution errors](JSON_ERRORS.md) with global `--json-errors`; it uses
+the same diagnostic message and grants no permission or automatic recovery action.
 
 ## Executable synthetic failure example
 

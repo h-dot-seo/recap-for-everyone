@@ -1,4 +1,5 @@
 """Explicit export adapters and reversible local title organization (no network)."""
+from recaplib.errors import SourceChanged, Stale, UnknownIdentity
 from recaplib.cli_errors import safe_diagnostic
 import argparse
 import hashlib
@@ -69,7 +70,7 @@ def _read_export_bytes(path, expected_export_sha256=None):
         raise ValueError('expected export hash must be a lowercase SHA-256 hex digest')
     raw = Path(path).read_bytes()
     if expected_export_sha256 is not None and hashlib.sha256(raw).hexdigest() != expected_export_sha256:
-        raise ValueError('export changed after inspection; inspect and select again')
+        raise SourceChanged('export changed after inspection; inspect and select again')
     return raw
 
 
@@ -306,10 +307,10 @@ def titles(db, source, conversation, title=None, expected_revision=None, expecte
                 'SELECT message_id,role,text FROM messages WHERE source_id=? AND conversation_id=? ORDER BY message_pk', (source, conversation))]
             digest = hashlib.sha256(json.dumps(content, sort_keys=True, ensure_ascii=False).encode()).hexdigest()
             if digest != expected_content_sha256:
-                raise ValueError('conversation changed after proposal generation')
+                raise Stale('conversation changed after proposal generation')
         messages = c.execute('SELECT role,text,title,message_id FROM messages WHERE source_id=? AND conversation_id=? ORDER BY message_pk', (source, conversation)).fetchall()
         if not messages:
-            raise ValueError('unknown conversation')
+            raise UnknownIdentity('unknown conversation')
         try:
             suggestion = excerpt([dict(role=m[0], text=m[1], message_id=m[3]) for m in messages])['title']
         except ValueError:
@@ -322,7 +323,7 @@ def titles(db, source, conversation, title=None, expected_revision=None, expecte
         current = history[-1][0] if history else messages[0][2]
         if title is not None:
             if expected_revision is not None and expected_revision != revision:
-                raise ValueError('stale title preview; preview again before applying')
+                raise Stale('stale title preview; preview again before applying')
             with c:
                 c.execute('CREATE TABLE IF NOT EXISTS title_history (id INTEGER PRIMARY KEY, source TEXT, conversation TEXT, previous TEXT, title TEXT, changed_at TEXT DEFAULT CURRENT_TIMESTAMP)')
                 revision = c.execute('INSERT INTO title_history(source,conversation,previous,title) VALUES(?,?,?,?)', (source, conversation, current, title)).lastrowid

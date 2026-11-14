@@ -1,4 +1,5 @@
 """Read-only conversation inventory and structured evidence views; no network."""
+from recaplib.errors import UnknownIdentity
 from recaplib.cli_errors import safe_diagnostic
 import argparse
 import json
@@ -74,7 +75,7 @@ def _context_window(connection, source, conversation_id, anchor, before, after):
     row = connection.execute('SELECT message_pk FROM messages WHERE source_id=? '
                              'AND conversation_id=? AND message_id=?', (*identity, anchor)).fetchone()
     if row is None:
-        raise ValueError('unknown message in conversation')
+        raise UnknownIdentity('unknown message in conversation')
     pk = row['message_pk']
     earlier = connection.execute('SELECT message_pk FROM messages WHERE source_id=? '
         'AND conversation_id=? AND message_pk<? ORDER BY message_pk DESC LIMIT ?',
@@ -163,7 +164,7 @@ def conversation(db, source, conversation_id, limit=None, offset=0, message_id=N
         rows = _inventory(connection, source, conversation_id, limit=1)
         summary = rows[0] if rows else None
         if summary is None:
-            raise ValueError('unknown conversation')
+            raise UnknownIdentity('unknown conversation')
         selection_sql = ' WHERE source_id=? AND conversation_id=?'
         selection_params = (source, conversation_id)
         context = None
@@ -183,7 +184,7 @@ def conversation(db, source, conversation_id, limit=None, offset=0, message_id=N
             'SELECT message_id,role,timestamp,text,title AS original_title,'
             'source_sha256,source_line FROM messages' + selection_sql, selection_params)]
         if message_id is not None and not messages:
-            raise ValueError('unknown message in conversation')
+            raise UnknownIdentity('unknown message in conversation')
         provenance = message_provenance_rows(
             connection, source, conversation_id,
             selection_sql if limit is not None or message_id is not None or context is not None else None,

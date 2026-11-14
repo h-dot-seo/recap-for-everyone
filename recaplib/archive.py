@@ -1,4 +1,5 @@
 """Archive core shared by recap.py and the recaplib modules: schema, normalized JSONL ingest, read-only connections and FTS search."""
+from recaplib.errors import ConflictingIdentity, SourceChanged
 import hashlib
 import io
 import json
@@ -118,7 +119,7 @@ def _check_expected_sha256(raw, expected_sha256):
                 any(ch not in '0123456789abcdef' for ch in expected_sha256)):
             raise ValueError('expected hash must be a lowercase SHA-256 hex digest')
         if hashlib.sha256(raw).hexdigest() != expected_sha256:
-            raise ValueError('normalized input changed after inspection; inspect again')
+            raise SourceChanged('normalized input changed after inspection; inspect again')
 
 
 def ingest(db, source, path, provenance=None, *, expected_sha256=None):
@@ -198,7 +199,7 @@ def _admit_incoming(candidates):
         if key in incoming and incoming[key] != values:
             # Input-only contradictions must not create an empty archive/schema.
             # Archive comparisons still run under the write lock below.
-            raise ValueError(f'conflicting message identity at line {line_no}')
+            raise ConflictingIdentity(f'conflicting message identity at line {line_no}')
         incoming[key] = values
         records.append((row, title, line_no))
     return records
@@ -230,7 +231,7 @@ def _write_records(db, source, raw, records, provenance):
                                         'WHERE source_id=? AND conversation_id=? AND message_id=?', key).fetchone()
                 if existing is not None:
                     if existing != values:
-                        raise ValueError(f'conflicting message identity at line {line_no}')
+                        raise ConflictingIdentity(f'conflicting message identity at line {line_no}')
                     continue
                 conn.execute('INSERT INTO messages(source_id,conversation_id,message_id,role,timestamp,title,text,source_sha256,source_line) '
                              'VALUES(?,?,?,?,?,?,?,?,?)', (*key, *values, digest, line_no))

@@ -1,10 +1,23 @@
 # Validation record
 
-Current release: `0.97.9-command-effect-matrix`, dated 2026-11-14.
+Current release: `0.98.0-json-execution-errors`, dated 2026-11-14.
 This file is the current snapshot. Every dated entry since the first release is kept
 unchanged and in order in [docs/VALIDATION_HISTORY.md](docs/VALIDATION_HISTORY.md).
 
 ## Latest change
+
+2026-11-14 Opt-in structured execution errors (0.98.0-json-execution-errors):
+adds unified global --json-errors for the existing caught-error exit-1 stderr
+path only. Explicit ValueError subclasses mark selected source, stale-state,
+identity-lookup and identity-conflict checks without changing messages or order.
+Standard exception families map to coarse filesystem/SQLite codes; the remainder
+is UNCLASSIFIED without message matching. Default and standalone text, successful
+stdout, negative result documents and argparse exit 2 remain unchanged. Synthetic
+actual failures, private diagnostic markers, partial rebuild publication and the
+executed guide are tested. No catch-set expansion, automatic retry, rollback,
+privacy-sanitization or recovery-readiness guarantee is added.
+
+Previous change:
 
 2026-11-14 Synthetic command effect matrix (0.97.9-command-effect-matrix):
 checks every unified command declared to have no default write through an actual

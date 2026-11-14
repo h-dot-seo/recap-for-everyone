@@ -1,4 +1,5 @@
 """Explicit local skip/defer/open decisions, separate from title changes."""
+from recaplib.errors import Stale, UnknownIdentity
 import sqlite3
 from pathlib import Path
 from recaplib.archive import readonly
@@ -24,7 +25,7 @@ def _snapshot(connection, source, conversation):
         'SELECT message_id,role,text FROM messages WHERE source_id=? AND conversation_id=? ORDER BY message_pk',
         (source, conversation))]
     if not rows:
-        raise ValueError('unknown conversation')
+        raise UnknownIdentity('unknown conversation')
     digest = content_fingerprint(rows)
     exists = connection.execute("SELECT 1 FROM sqlite_master WHERE type='table' AND name='title_history'").fetchone()
     row = connection.execute('SELECT id FROM title_history WHERE source=? AND conversation=? ORDER BY id DESC LIMIT 1',
@@ -54,7 +55,7 @@ def review_state(db, source, conversation, state=None, expected_state_revision=N
         current = state_snapshot(connection, source, conversation, digest, title_revision)
         if state is not None:
             if expected_content_sha256 != digest or expected_title_revision != title_revision or expected_state_revision != current['state_revision']:
-                raise ValueError('stale review-state snapshot; read and review current state before changing it')
+                raise Stale('stale review-state snapshot; read and review current state before changing it')
             # DDL and event append stay in the same explicit transaction. All
             # stale checks precede schema changes; no scripts/implicit commits.
             connection.execute('CREATE TABLE IF NOT EXISTS title_review_history ('

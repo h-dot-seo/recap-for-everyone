@@ -1,4 +1,5 @@
 """Read-only conversation search across current display titles and message text."""
+from recaplib.errors import Stale
 from recaplib.cli_errors import safe_diagnostic
 import argparse
 import base64
@@ -307,7 +308,7 @@ def find(db, query, source=None, limit=20, include_title_history=False, export_s
         finish()
         order = order_digest.hexdigest()
         if after is not None and (after['order_sha256'] != order or not position_seen):
-            raise ValueError('search result order changed or cursor position is unavailable; restart without a cursor')
+            raise Stale('search result order changed or cursor position is unavailable; restart without a cursor')
         page = (title_hits + historical_hits + text_hits)[:limit]
         remaining = available - len(page)
         next_cursor = _encode_cursor(page[-1], scope, order) if page and remaining else None
