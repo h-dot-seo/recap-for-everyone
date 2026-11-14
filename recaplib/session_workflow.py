@@ -327,6 +327,7 @@ def titles(db, source, conversation, title=None, expected_revision=None, expecte
                 raise Stale('stale title preview; preview again before applying')
             with c:
                 c.execute('CREATE TABLE IF NOT EXISTS title_history (id INTEGER PRIMARY KEY, source TEXT, conversation TEXT, previous TEXT, title TEXT, changed_at TEXT DEFAULT CURRENT_TIMESTAMP)')
+                c.execute('CREATE INDEX IF NOT EXISTS title_history_identity ON title_history(source,conversation,id)')
                 revision = c.execute('INSERT INTO title_history(source,conversation,previous,title) VALUES(?,?,?,?)', (source, conversation, current, title)).lastrowid
             current = title
         return dict(display_title=current, suggested_title=suggestion, revision=revision, original_title=messages[0][2], prior_titles=[m[0] for m in history], scope='local display only')

@@ -1,10 +1,32 @@
 # Validation record
 
-Current release: `0.99.6-standalone-json-errors`, dated 2026-11-14.
+Current release: `0.99.7-title-history-index`, dated 2026-11-14.
 This file is the current snapshot. Every dated entry since the first release is kept
 unchanged and in order in [docs/VALIDATION_HISTORY.md](docs/VALIDATION_HISTORY.md).
 
 ## Latest change
+
+2026-11-14 Lazy title-history lookup index (0.99.7-title-history-index):
+adds the roadmap #24 identity index on title_history(source,conversation,id) inside
+the existing explicit title-write transaction, after table creation and before
+the new history row. Read-only commands never create it; an older archive keeps
+its previous layout and cost until its next explicit title write. No new table,
+row format, archive version, migration, automatic repair or data rewrite is added.
+An existing same-name index is preserved even if its definition differs; the
+optimization is not guaranteed in that case. Query results, logical recovery
+digests, validation order and rollback behavior remain unchanged. Index storage
+and write maintenance are a tradeoff, not a speed guarantee. Absolute timing and
+runtime details stay only in private synthetic measurement receipts.
+
+Validation: all 1,464 tests passed (one environment-dependent skip), including
+eight index-contract tests. Independent review passed 46 targeted tests; reader
+query plans, legacy read-only compatibility, conflicting-index preservation,
+logical recovery digests and atomic rollback were checked. Compilation, Python
+3.10 grammar parsing and all 133 existing shell examples were preserved. The
+315-file manifest and 316-file publication audit passed. Synthetic before/after
+observations are documented in SCALING; absolute timings remain private.
+
+Previous change:
 
 2026-11-14 Standalone structured error parity (0.99.6-standalone-json-errors):
 adds the existing opt-in --json-errors contract to all sixteen standalone product

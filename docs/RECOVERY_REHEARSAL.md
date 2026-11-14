@@ -215,3 +215,14 @@ Relevant existing bounded readers now preflight regular-file type and their exis
 byte budget before open, while retaining one bounded read and post-read checks.
 Symlinks to regular files retain their prior behavior; this does not change the
 separate recovery restored/object symlink policy. See [security](../SECURITY.md).
+
+### Optional title-history lookup index
+
+Successful explicit title writes request `title_history_identity` on
+`title_history(source, conversation, id)` within the write transaction. Older
+archives remain readable without it, and reads or recovery inspection do not add
+it. Index presence or physical layout is not part of the logical title-history
+row digest; this auxiliary lookup index changes neither recovery rows nor their
+meaning. It does not restore missing title or review history. An existing index
+of the same name is retained even if defined differently; no automatic repair or
+performance guarantee is implied.
