@@ -228,3 +228,9 @@ python recap.py --db ../demo.sqlite title --source demo --conversation synthetic
 
 Read-only SQLite connections now apply and read back defense-in-depth settings;
 see [security](../SECURITY.md). Write connections are unchanged.
+
+Use [automated declared-object rebuild](AUTOMATED_REBUILD.md)
+with `python recap.py rebuild-archive MANIFEST --plan PLAN --objects DIR
+--new-db NEW.sqlite --output NEW.json [--text]`. It never opens the original DB;
+it exclusively publishes a checked new DB from explicit replay steps. Declared
+title history is not rebuilt, and review state remains undeclared/unrestored.

@@ -2409,3 +2409,14 @@ Eight synthetic tests cover all adapters, file/API parity, label identity,
 newline-sensitive digest failure, selection refusal, transactions and executed
 guide. Existing CLI serialization and output stay unchanged. No replay-plan
 validation, exclusive DB creation or automatic recovery claim is introduced.
+
+2026-11-14 Declared-object archive rebuild (0.97.0-declared-object-rebuild):
+adds rebuild-archive with an exact strict-JSON ordered replay plan, source-bound
+declared object hashes, explicit adapter labels/newlines and exclusive verified
+new-DB publication. Existing recovery checks are shared without changing existing
+receipt shape. Declared title history is explicitly not rebuildable; review state
+is undeclared/unrestored. Twenty-three synthetic tests cover all formats, digest
+mismatches, ordering, source authorization, limits, collisions, staging cleanup,
+partial publication, private errors and an executed guide. No live DB access,
+full archive restoration, two-file atomicity, hostile namespace defense or remote
+backup guarantee is claimed.

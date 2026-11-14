@@ -1,7 +1,7 @@
 # Replay export bytes with explicit parsing parameters
 
 `recaplib.session_workflow.import_export_bytes` is a Python API for replaying one
-immutable export snapshot. It is a prerequisite for a future rebuild orchestrator,
+immutable export snapshot. It is used by the [rebuild orchestrator](AUTOMATED_REBUILD.md),
 not an automatic recovery command or an exclusive new-database wrapper.
 
 The existing path-based `import` CLI is unchanged: it uses the input basename and
@@ -65,7 +65,8 @@ explicit selected conversation ID; keep receipts and labels private.
 - This API does not authorize an object against a recovery manifest, validate a
   replay plan, create DB paths exclusively, clean a multi-step partial rebuild,
   restore title/review history, authenticate content or verify a backup. The
-  caller owns those orchestration responsibilities. No new resource limit or
+  caller owns those orchestration responsibilities; `rebuild-archive` implements
+  them for an explicit declared-object replay plan. No new resource limit or
   bounded-memory guarantee is introduced.
 
 See [the normalized-object rehearsal](REBUILD_REHEARSAL.md) for the existing

@@ -114,7 +114,13 @@ def main():
     rehearse.add_argument('--restored-db', required=True, help='restored SQLite copy; opened read-only and never written')
     rehearse.add_argument('--output', required=True, help='new receipt JSON path; existing paths are refused')
     rehearse.add_argument('--objects', help='directory of fetched backup objects to hash for every declared artifact and original export hash')
-    for command in (declare, rehearse):
+    rebuild = sub.add_parser('rebuild-archive', help='replay declared objects into an exclusively new verified database')
+    rebuild.add_argument('input', help='recovery manifest JSON')
+    rebuild.add_argument('--plan', required=True)
+    rebuild.add_argument('--objects', required=True)
+    rebuild.add_argument('--new-db', required=True)
+    rebuild.add_argument('--output', required=True)
+    for command in (declare, rehearse, rebuild):
         command.add_argument('--text', action='store_true', help='print an ASCII text summary instead of JSON')
     listing = sub.add_parser('list', help='list conversations and current display titles')
     listing.add_argument('--source'); listing.add_argument('--limit', type=int, default=50); listing.add_argument('--offset', type=int, default=0)
@@ -156,10 +162,12 @@ def main():
             command.add_argument('--expected-revision', type=int,
                                  help='reject title history changed since an earlier page')
     args = p.parse_args()
-    if args.command not in ('inspect', 'list-export', 'web-branch', 'replay-local', 'prepare-web-export', 'inspect-web-zip', 'rehearse-recovery', 'render-queue') and not args.db:
-        p.error('--db is required except for inspect, list-export, web-branch, replay-local, prepare-web-export, inspect-web-zip, rehearse-recovery and render-queue')
+    if args.command not in ('inspect', 'list-export', 'web-branch', 'replay-local', 'prepare-web-export', 'inspect-web-zip', 'rehearse-recovery', 'rebuild-archive', 'render-queue') and not args.db:
+        p.error('--db is required except for inspect, list-export, web-branch, replay-local, prepare-web-export, inspect-web-zip, rehearse-recovery, rebuild-archive and render-queue')
     if args.command == 'render-queue' and args.db:
         p.error('render-queue reads a saved JSON file only; do not pass --db')
+    if args.command == 'rebuild-archive' and args.db:
+        p.error('rebuild-archive creates --new-db only; do not pass --db')
     if args.command == 'rehearse-recovery' and args.db:
         p.error('rehearse-recovery opens --restored-db only; do not pass --db')
     try:
@@ -297,6 +305,9 @@ def main():
         elif args.command == 'declare-recovery':
             from recaplib.recovery import declare_recovery
             result = declare_recovery(args.db, args.output, args.declared_at)
+        elif args.command == 'rebuild-archive':
+            from recaplib.rebuild import rebuild_archive
+            result = rebuild_archive(args.input, args.plan, args.objects, args.new_db, args.output)
         elif args.command == 'rehearse-recovery':
             from recaplib.recovery import rehearse_recovery
             result = rehearse_recovery(args.input, args.restored_db, args.output, args.objects)
@@ -319,6 +330,8 @@ def main():
     else:
         print(json.dumps(result, ensure_ascii=True, indent=2))
     if args.command == 'check-import' and result['conflicts_found']:
+        raise SystemExit(1)
+    if args.command == 'rebuild-archive' and result['status'] != 'REBUILD_REHEARSAL_PASSED':
         raise SystemExit(1)
     if args.command == 'rehearse-recovery' and result['status'] != 'RECOVERY_REHEARSAL_PASSED':
         raise SystemExit(1)

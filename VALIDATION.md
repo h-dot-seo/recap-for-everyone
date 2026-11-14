@@ -1,10 +1,23 @@
 # Validation record
 
-Current release: `0.96.6-export-byte-replay`, dated 2026-11-14.
+Current release: `0.97.0-declared-object-rebuild`, dated 2026-11-14.
 This file is the current snapshot. Every dated entry since the first release is kept
 unchanged and in order in [docs/VALIDATION_HISTORY.md](docs/VALIDATION_HISTORY.md).
 
 ## Latest change
+
+2026-11-14 Declared-object archive rebuild (0.97.0-declared-object-rebuild):
+adds rebuild-archive with an exact strict-JSON ordered replay plan, source-bound
+declared object hashes, explicit adapter labels/newlines and exclusive verified
+new-DB publication. Existing recovery checks are shared without changing existing
+receipt shape. Declared title history is explicitly not rebuildable; review state
+is undeclared/unrestored. Twenty-three synthetic tests cover all formats, digest
+mismatches, ordering, source authorization, limits, collisions, staging cleanup,
+partial publication, private errors and an executed guide. No live DB access,
+full archive restoration, two-file atomicity, hostile namespace defense or remote
+backup guarantee is claimed.
+
+Previous change:
 
 2026-11-14 Explicit export byte replay (0.96.6-export-byte-replay):
 adds import_export_bytes with explicit original parsing label and LF/CRLF output,
