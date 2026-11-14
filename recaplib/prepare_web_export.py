@@ -15,16 +15,24 @@ MAX_ENTRIES = 1000
 MAX_RATIO = 200
 
 
-def resource_limits():
-    """Declare the fixed effective bounds; no operator override is accepted."""
-    return dict(member_bytes=MAX_MEMBER_BYTES, ratio=MAX_RATIO, entries=MAX_ENTRIES,
-                archive_ceiling=MAX_ARCHIVE_BYTES, operator_supplied=False)
+def validate_member_limit(value):
+    if value is None:
+        return MAX_MEMBER_BYTES
+    if type(value) is not int or not 1 <= value <= MAX_MEMBER_BYTES:
+        raise ValueError('max_member_bytes must be an integer in 1..' + str(MAX_MEMBER_BYTES))
+    return value
 
 
-def exceeded_member_limits(info):
+def resource_limits(max_member_bytes=None):
+    """Declare effective bounds; an operator may only lower the member bound."""
+    return dict(member_bytes=validate_member_limit(max_member_bytes), ratio=MAX_RATIO, entries=MAX_ENTRIES,
+                archive_ceiling=MAX_ARCHIVE_BYTES, operator_supplied=max_member_bytes is not None)
+
+
+def exceeded_member_limits(info, max_member_bytes=None):
     """Metadata-only diagnostics, independent of higher-priority safety reasons."""
     exceeded = []
-    if info.file_size > MAX_MEMBER_BYTES:
+    if info.file_size > validate_member_limit(max_member_bytes):
         exceeded.append('member_bytes')
     if info.file_size > max(info.compress_size, 1) * MAX_RATIO:
         exceeded.append('ratio')
@@ -63,7 +71,7 @@ def _checked_archive_sha256(raw, expected):
     return digest
 
 
-def member_problem(info):
+def member_problem(info, max_member_bytes=None):
     """Metadata-only eligibility shared with read-only candidate inspection."""
     try:
         _safe_member(info.orig_filename)
@@ -78,12 +86,13 @@ def member_problem(info):
         return 'ENCRYPTED_MEMBER', 'encrypted ZIP members are not supported'
     if info.compress_type not in (zipfile.ZIP_STORED, zipfile.ZIP_DEFLATED):
         return 'UNSUPPORTED_COMPRESSION', 'only stored or deflated ZIP members are supported'
-    if exceeded_member_limits(info):
+    if exceeded_member_limits(info, max_member_bytes):
         return 'MEMBER_EXPANSION_LIMIT', 'selected member exceeds the 16 MiB or 200:1 expansion limit'
     return None
 
 
-def prepare_web_export(path, member, output, expected_archive_sha256=None):
+def prepare_web_export(path, member, output, expected_archive_sha256=None, max_member_bytes=None):
+    member_limit = validate_member_limit(max_member_bytes)
     _validate_expected_archive_sha256(expected_archive_sha256)
     member = _safe_member(member)
     if not member.lower().endswith('.json'):
@@ -99,12 +108,14 @@ def prepare_web_export(path, member, output, expected_archive_sha256=None):
             if len(selected) != 1:
                 raise ValueError('member must identify exactly one ZIP entry; no member is selected automatically')
             info = selected[0]
-            problem = member_problem(info)
+            problem = member_problem(info, max_member_bytes)
             if problem is not None:
+                if max_member_bytes is not None and problem[0] == 'MEMBER_EXPANSION_LIMIT':
+                    raise ValueError('selected member exceeds effective limits: ' + ', '.join(exceeded_member_limits(info, max_member_bytes)) + '; member_bytes=' + str(member_limit) + '; ratio=' + str(MAX_RATIO))
                 raise ValueError(problem[1])
             with archive.open(info) as stream:
-                content = stream.read(MAX_MEMBER_BYTES + 1)
-            if len(content) > MAX_MEMBER_BYTES or len(content) != info.file_size:
+                content = stream.read(member_limit + 1)
+            if len(content) > member_limit or len(content) != info.file_size:
                 raise ValueError('selected member size is inconsistent or exceeds the limit')
             # read() reaches EOF for accepted members and validates the CRC.
     except (zipfile.BadZipFile, zipfile.LargeZipFile, RuntimeError, NotImplementedError, zlib.error) as error:
@@ -136,7 +147,7 @@ def prepare_web_export(path, member, output, expected_archive_sha256=None):
                     raise
                 cleanup_complete = False
     return dict(schema='recap.prepared-web-export.v1', archive_sha256=archive_digest,
-                limits=resource_limits(),
+                limits=resource_limits(max_member_bytes),
                 archive_bytes=len(raw), selected_member=member, prepared_sha256=hashlib.sha256(content).hexdigest(),
                 prepared_bytes=len(content), coverage=coverage, database_access=False, remote_mutation=False,
                 staging_cleanup_complete=cleanup_complete,

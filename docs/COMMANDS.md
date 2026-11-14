@@ -92,7 +92,7 @@ Read-only counts for the selected archive.
 #### `inspect-web-zip`
 
 ```text
-usage: recap.py inspect-web-zip [-h] [--limit LIMIT] [--offset OFFSET] [--expected-archive-sha256 EXPECTED_ARCHIVE_SHA256] input
+usage: recap.py inspect-web-zip [-h] [--limit LIMIT] [--offset OFFSET] [--expected-archive-sha256 EXPECTED_ARCHIVE_SHA256] [--max-member-bytes MAX_MEMBER_BYTES] input
 ```
 
 List conventionally named conversation JSON members of a downloaded ZIP with
@@ -101,7 +101,7 @@ metadata-only eligibility, without decompression. Guide: [ZIP inventory](WEB_ZIP
 #### `prepare-web-export`
 
 ```text
-usage: recap.py prepare-web-export [-h] --member MEMBER --output OUTPUT [--expected-archive-sha256 EXPECTED_ARCHIVE_SHA256] input
+usage: recap.py prepare-web-export [-h] --member MEMBER --output OUTPUT [--expected-archive-sha256 EXPECTED_ARCHIVE_SHA256] [--max-member-bytes MAX_MEMBER_BYTES] input
 ```
 
 Validate one explicitly selected ZIP JSON member and copy its bytes to a new local

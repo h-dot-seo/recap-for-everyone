@@ -2332,3 +2332,11 @@ byte snapshots, CRC/JSON-before-staging, hard bounds and error behavior remain.
 Six synthetic regressions cover default/call-time constants, size-only/ratio/both,
 exact boundaries, unsafe/duplicate priority and pre-construction budget rejection.
 This is diagnostics only, not streaming, adjustable bounds or an EOCD rewrite.
+
+2026-11-14 Lower-only ZIP member budget (0.95.4-zip-member-budget):
+adds --max-member-bytes to inspection/preparation, restricted to 1..the existing
+16 MiB hard ceiling and validated before archive access. Metadata diagnostics,
+actual limit+1 member read and receipts share the effective value. No archive,
+ratio or entry bound is raised; byte snapshot and CRC/JSON-before-staging remain.
+Eight synthetic regressions cover validation, no-read rejection, exact bound/read
+budget, runtime constants, ratio protection, defaults, hash/CRC and both CLIs.
