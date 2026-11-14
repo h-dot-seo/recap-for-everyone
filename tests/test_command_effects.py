@@ -171,6 +171,12 @@ class CommandEffectsTests(unittest.TestCase):
                 if command.startswith('suggest-'):self.assertTrue(result['evidence_message_ids'])
                 if command=='title-adapter-simulate':self.assertEqual(result['execution_status'],'SIMULATED_ONLY')
 
+    def test_optin_storage_observation_delete_mode_is_readonly(self):
+        result=self.assert_readonly('describe-schema',['--observe-storage'])
+        self.assertEqual(result['schema'],'recap.archive-storage-observation.v1')
+        self.assertEqual(result['status'],'OBSERVED')
+        self.assertEqual(result['copy_safety'],'NOT_ESTABLISHED')
+
     def test_explicit_negative_results_exit_one_are_readonly(self):
         cases=[('check-import',[self.conflict,'--source','web','--format','web'],'conflicts_found',True),
                ('check-provenance',[self.stale_card],'status','STALE'),

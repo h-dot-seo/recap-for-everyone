@@ -355,3 +355,5 @@ without changing recovery v1/v2 object authorization. See [archive ledger](ARCHI
 The optional recovery v3 contract declares the seven-column original_exports ledger with exact rows, count and logical digest. Its separate explicit original_export_hashes set covers zero-message imports without reinterpreting legacy source hash fields. It compares restored copies, not replayed or inferred import metadata. See [v3](RECOVERY_V3.md).
 
 V3 replay validates source/hash/format/selection against explicit origin rows and checks all seven fields in the rebuilt ledger. Label, newline and import order remain supplied plan parameters, not inferred metadata. Title/review histories remain excluded; see [v3 replay](REBUILD_V3.md).
+
+Optional storage observation precedes SQLite access: a bounded 100-byte main header and lstat-only fixed sidecar metadata are captured separately from the later read-only inventory. Nonregular main/sidecars are refused before SQLite reads. This is not an atomic snapshot or safe-copy verdict; read-only SQLite may change WAL/SHM files. See [storage observations](STORAGE_OBSERVATION.md).

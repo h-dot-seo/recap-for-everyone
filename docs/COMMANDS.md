@@ -40,7 +40,7 @@ JSONL, not a title document, and stdout carries a text-free receipt.
 #### `describe-schema`
 
 ```text
-usage: recap.py describe-schema [-h]
+usage: recap.py describe-schema [-h] [--observe-storage]
 ```
 
 Read-only, single-snapshot table/column inventory, counts, lazy-ledger presence,
@@ -754,7 +754,7 @@ example, output boundaries and failure behavior.
 
 ## CLI version identity
 
-`python recap.py --version` prints `recap-for-everyone 0.100.4` and exits without
+`python recap.py --version` prints `recap-for-everyone 0.100.5` and exits without
 opening an archive or reading the publication manifest. It works outside the
 repository working directory and without the manifest. This numeric identity is
 not byte verification, authenticity or a stability guarantee. Use the documented
@@ -793,3 +793,8 @@ original hashes. This is not recovery authorization. See [archive ledger](ARCHIV
 
 `declare-recovery --manifest-version 3` explicitly selects original-export metadata declaration and restored-copy checks. The default is still v1. `rebuild-archive` accepts v3 with an explicit plan and checks the original-export
 ledger while excluding title/review histories; see [REBUILD_V3](REBUILD_V3.md). See [RECOVERY_V3](RECOVERY_V3.md).
+
+`describe-schema --observe-storage` returns opt-in pre-open storage observations
+and a later metadata inventory, or a sanitized failure with exit 1. Ordinary
+`describe-schema` and the command-only `describe` retain their default contracts.
+See [STORAGE_OBSERVATION](STORAGE_OBSERVATION.md).

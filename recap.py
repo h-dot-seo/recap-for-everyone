@@ -25,7 +25,8 @@ def build_parser():
     ledger_parser=sub.add_parser('ledger',help='read explicit import metadata and unledgered identities')
     ledger_parser.add_argument('--source'); ledger_parser.add_argument('--limit',type=int,default=50)
     ledger_parser.add_argument('--offset',type=int,default=0); ledger_parser.add_argument('--text',action='store_true')
-    sub.add_parser('describe-schema', help='inspect a read-only archive metadata snapshot, not validate it')
+    describe_schema_parser = sub.add_parser('describe-schema', help='inspect a read-only archive metadata snapshot, not validate it')
+    describe_schema_parser.add_argument('--observe-storage', action='store_true', help='observe the main header and sidecar kinds/sizes before SQLite opening; not a copy-safety check')
     check = sub.add_parser('inspect', help='inspect export coverage without a database')
     check.add_argument('input'); check.add_argument('--format', choices=['web', 'local', 'local-codex', 'normalized'], required=True)
     check.add_argument('--conversation', help='inspect an explicit conversation selection without writing')
@@ -291,7 +292,7 @@ def main():
             result = search(args.db, args.query, args.limit)
         elif args.command == 'describe-schema':
             from recaplib.archive_schema import describe_schema
-            result = describe_schema(args.db)
+            result = describe_schema(args.db, observe_storage=args.observe_storage)
         elif args.command == 'stats' and args.by_source:
             from recaplib.time_stats import stats_by_source
             result = stats_by_source(args.db)
@@ -400,6 +401,8 @@ def main():
         print(rendered, end='')
     else:
         print(json.dumps(result, ensure_ascii=True, indent=2))
+    if args.command == 'describe-schema' and args.observe_storage and result['status'] != 'OBSERVED':
+        raise SystemExit(1)
     if args.command == 'check-provenance' and result['status'] != 'PASS':
         raise SystemExit(1)
     if args.command == 'check-import' and result['conflicts_found']:

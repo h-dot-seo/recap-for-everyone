@@ -38,7 +38,7 @@ SCHEMAS = {
     'check-provenance':'recap.message-provenance-check.v1','declare-review-checkpoint':'recap.review-checkpoint-declaration.v1',
     'declare-checkpoint':'recap.import-checkpoint-declaration.v1','changed-since':'recap.import-changes.v1',
     'ledger':'recap.archive-ledger.v1','declare-recovery':'recap.recovery-declaration.v1','rehearse-recovery':'recap.recovery-receipt.v1','rebuild-archive':'recap.rebuild-receipt.v1'}
-RESULT_FAILURES = {'replay-local':'supported is false','check-import':'conflicts_found is true',
+RESULT_FAILURES = {'describe-schema':'with --observe-storage, status is not OBSERVED','replay-local':'supported is false','check-import':'conflicts_found is true',
                   'check-provenance':'status is not PASS','changed-since':'status is not CUTOFF_VERIFIED',
                   'rebuild-archive':'status is not REBUILD_REHEARSAL_PASSED',
                   'rehearse-recovery':'status is not RECOVERY_REHEARSAL_PASSED'}
@@ -66,6 +66,10 @@ def _effects(name):
             conditional.append(dict(flag='--set',writes=['--db']))
         else:
             opens.append(_open('--db'))
+    if name=='describe-schema':
+        schemas.append(dict(when='with --observe-storage',schema='recap.archive-storage-observation.v1'))
+        opens.append(_open('--db header and fixed -wal/-shm/-journal metadata','read','with --observe-storage'))
+        notes.append('Pre-open header/sidecar observations precede the inventory; SQLite read-only opening may create or change sidecars. No consistency or safe-copy verdict.')
     if name in INPUT_COMMANDS:
         opens.append(_open('input'))
     if name in DEFAULT_FILES:
