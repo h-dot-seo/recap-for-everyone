@@ -1,6 +1,7 @@
 """Independent synthetic checks for offline adapter native JSON saving."""
 import hashlib
 import io
+from tests._cli import run_cli
 import json
 import os
 import sqlite3
@@ -62,9 +63,7 @@ class AdapterNativeOutputTests(unittest.TestCase):
         return flags
 
     def call(self, *arguments, code=None):
-        result = subprocess.run([sys.executable, str(ROOT / 'title_adapter.py'), *map(str, arguments)],
-            cwd=ROOT, capture_output=True, text=True, encoding='ascii', timeout=30,
-            env=dict(os.environ, PYTHONIOENCODING='ascii'))
+        result = run_cli(adapter.main, list(map(str, arguments)))
         self.assertNotIn('Traceback', result.stderr)
         if code is not None:
             self.assertEqual(result.returncode, 1, result.stderr)
@@ -76,21 +75,15 @@ class AdapterNativeOutputTests(unittest.TestCase):
         return json.loads(result.stdout)
 
     def in_process(self, arguments, code=None):
-        stdout, stderr = io.StringIO(), io.StringIO()
-        with patch.object(sys, 'argv', ['title_adapter.py', *map(str, arguments)]), redirect_stdout(stdout), redirect_stderr(stderr):
-            if code is None:
-                adapter.main()
-            else:
-                with self.assertRaises(SystemExit) as caught:
-                    adapter.main()
-                self.assertEqual(caught.exception.code, 1)
+        result = run_cli(adapter.main, list(map(str, arguments)))
+        self.assertEqual(result.returncode, 0 if code is None else 1, result.stderr)
         if code is not None:
-            self.assertEqual(stdout.getvalue(), '')
-            self.assertEqual(stderr.getvalue(), code + '\n')
+            self.assertEqual(result.stdout, '')
+            self.assertEqual(result.stderr, code + '\n')
             return
-        self.assertEqual(stderr.getvalue(), '')
-        stdout.getvalue().encode('ascii')
-        return json.loads(stdout.getvalue())
+        self.assertEqual(result.stderr, '')
+        result.stdout.encode('ascii')
+        return json.loads(result.stdout)
 
     def save(self, name, value):
         path = self.root / name

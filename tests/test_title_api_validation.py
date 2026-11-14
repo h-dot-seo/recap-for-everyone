@@ -5,6 +5,9 @@ network calls, models, or remote title changes are used by these tests.
 """
 from contextlib import closing
 from enum import IntEnum
+from tests._cli import run_cli
+import recap
+from recaplib import session_workflow
 import json
 import os
 from pathlib import Path
@@ -136,19 +139,9 @@ class TitleApiValidationTests(unittest.TestCase):
         self.assertEqual(self.export.read_bytes(), export)
 
     def cli(self, script, *args, db=None, synthetic_argv=False):
-        argv = [script, '--db', str(self.db if db is None else db), 'title', *args]
-        if synthetic_argv:
-            # Code-point arrays preserve even adjacent surrogate pairs on Windows
-            # without asking the OS or a JSON string decoder to rewrite them.
-            code = ('import json,runpy,sys; '
-                    'sys.argv=["".join(map(chr,value)) for value in json.loads(sys.argv[1])]; '
-                    'runpy.run_path(sys.argv[0],run_name="__main__")')
-            command = [sys.executable, '-c', code, json.dumps([[ord(char) for char in value] for value in argv])]
-        else:
-            command = [sys.executable, *argv]
-        return subprocess.run(command, cwd=ROOT, capture_output=True, text=True,
-                              encoding='ascii', timeout=20,
-                              env=dict(os.environ, PYTHONIOENCODING='ascii'))
+        # Direct argv preserves synthetic surrogate code points without an OS codec.
+        entry = {'recap.py': recap.main, 'session_workflow.py': session_workflow.main}[script]
+        return run_cli(entry, ['--db', str(self.db if db is None else db), 'title', *args])
 
     def assert_clean_failure(self, result, message=None):
         self.assertNotEqual(result.returncode, 0)

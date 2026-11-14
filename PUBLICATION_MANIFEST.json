@@ -1,12 +1,12 @@
 {
   "project": "recap-for-everyone",
-  "release": "0.98.0-json-execution-errors",
+  "release": "0.98.1-cli-test-harness",
   "date": "2026-11-14",
   "private_history_imported": false,
   "actual_corpora_included": false,
   "synthetic_examples_only": true,
   "license_status": "NOT_SELECTED",
-  "file_count": 298,
+  "file_count": 301,
   "files": [
     {
       "path": ".gitattributes",
@@ -30,8 +30,8 @@
     },
     {
       "path": "README.md",
-      "bytes": 18464,
-      "sha256": "5ad5ea0043ade19cb024a9e09dc99609cc4881379488d5cf9927b98a87d98167"
+      "bytes": 18810,
+      "sha256": "c53e768a16c7a507d428fdb093fb4c4b87d6fc11b4bce531246c3f250684b0f8"
     },
     {
       "path": "RIGHTS.md",
@@ -50,8 +50,8 @@
     },
     {
       "path": "VALIDATION.md",
-      "bytes": 28855,
-      "sha256": "4c4eb835efaeb74a06157972f28d36f8d3f72b8cd40ec1992514f4fe83d9ddc6"
+      "bytes": 30083,
+      "sha256": "0eadedd655bb5602de436380db98fb737a376957fded9726b62c0637dcf1cbf6"
     },
     {
       "path": "attributed_title.py",
@@ -105,8 +105,8 @@
     },
     {
       "path": "docs/ARCHITECTURE.md",
-      "bytes": 16852,
-      "sha256": "e8e71e5d11029b8fe4fd075fa859fb0df8ced184edf15c50c3f0b9ad7d58239b"
+      "bytes": 17924,
+      "sha256": "37cf6ab644075173cf1392a49117a045385c2f6c2c93664bda1a50547ea473bc"
     },
     {
       "path": "docs/ATTRIBUTED_MESSAGE_SELECTION.md",
@@ -365,8 +365,8 @@
     },
     {
       "path": "docs/VALIDATION_HISTORY.md",
-      "bytes": 172996,
-      "sha256": "07aa506d4db488843db6e99be516dec2849df7a509a111c346c886b11d2b8d66"
+      "bytes": 174214,
+      "sha256": "d14c61d0fe1690cf21c0c96efe715dcbcc28bf0c373cdd0979f69e7a02e5a209"
     },
     {
       "path": "docs/WEB_ZIP_INVENTORY.md",
@@ -804,6 +804,11 @@
       "sha256": "114347f7f8536c1051bba7da18db7dda41fb9e77b8ad2008575e5f0d4ff6de16"
     },
     {
+      "path": "tests/_cli.py",
+      "bytes": 1925,
+      "sha256": "b9c86ca09d59477f6f9353395cbe50ec072eb5089fbcd1b5b8bb9ee8fda1a7af"
+    },
+    {
       "path": "tests/_nesting.py",
       "bytes": 939,
       "sha256": "2d34080364b88c7792e6aec6bb6fa27dfb8af7668099ce36f930a364d8228888"
@@ -825,8 +830,8 @@
     },
     {
       "path": "tests/test_adapter_native_output.py",
-      "bytes": 24324,
-      "sha256": "9d911b8b6434c1acfbda936c1656d56dff51c3d98ac0a2485a991d7ba569542c"
+      "bytes": 23882,
+      "sha256": "c03c473ed3a6770582836f7cbcb661a8dffd8b622d2e9f81a5da0a568022c331"
     },
     {
       "path": "tests/test_adapter_single_pass.py",
@@ -887,6 +892,16 @@
       "path": "tests/test_cli_e2e.py",
       "bytes": 2532,
       "sha256": "eff1c4da5b9df771723537714dbdfb747ca717226e3d4a9864556854401c670b"
+    },
+    {
+      "path": "tests/test_cli_entrypoints.py",
+      "bytes": 2524,
+      "sha256": "caf7dab60fae1a23bb29f05c620ac6747fab502dc59b794d1af39f2f44299355"
+    },
+    {
+      "path": "tests/test_cli_harness.py",
+      "bytes": 3647,
+      "sha256": "5ae948afaded160a8e6740f9ada6445e4f47067c9392bf5369b59ebbb393aedd"
     },
     {
       "path": "tests/test_command_catalog.py",
@@ -1215,8 +1230,8 @@
     },
     {
       "path": "tests/test_saved_title_response.py",
-      "bytes": 28750,
-      "sha256": "c894b1be310615dd622eb2398eb895dede8d05998b68125a317f5cead36f97fe"
+      "bytes": 28947,
+      "sha256": "efcf905e47e2a96f7fa5dadc38aa79e0d398c5d918425d06013377a8ca79730b"
     },
     {
       "path": "tests/test_scoped_message_selection.py",
@@ -1315,8 +1330,8 @@
     },
     {
       "path": "tests/test_title_api_validation.py",
-      "bytes": 25226,
-      "sha256": "95c0db847c985961f4a2e9eda83811b39991b65b79234e73368a6ced41e3619c"
+      "bytes": 24703,
+      "sha256": "b54f7e9ef3701af2916c0e16fd41276d678962ed7f573f407116d16d78d1fea0"
     },
     {
       "path": "tests/test_title_batch.py",
@@ -1325,13 +1340,13 @@
     },
     {
       "path": "tests/test_title_document_output.py",
-      "bytes": 22929,
-      "sha256": "c6fda69c7b8724abe17b266f933b8b3116bd9611e6a230eaff73494ce6b61f40"
+      "bytes": 23425,
+      "sha256": "b2b3a617eea3afff01c1739ba6ac628dbd2085ff1cf4ccfd2dcf2013b7362eae"
     },
     {
       "path": "tests/test_title_file_encoding.py",
-      "bytes": 15711,
-      "sha256": "18f653fee40d9bc02cd593740f28ee923f63f4260b9274e813a8329eb93a322c"
+      "bytes": 15866,
+      "sha256": "beaccb5babca2d0aa6e0c5326eeafd0d5e24f1a647b942df79062904abfda9c1"
     },
     {
       "path": "tests/test_title_history_view.py",

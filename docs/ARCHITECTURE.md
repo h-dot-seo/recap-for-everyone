@@ -269,3 +269,20 @@ unified CLI. Explicit ValueError subclasses retain authored messages and check
 order; standard exception families supply coarse codes. No substring classifier,
 new catch boundary or transaction behavior is added. Default/standalone diagnostics
 and result-level negative JSON remain unchanged. See [JSON_ERRORS](JSON_ERRORS.md).
+
+## Synthetic CLI test boundaries
+
+The test-only `tests/_cli.py` harness invokes explicitly imported entry points
+with temporary argv, cwd and captured ASCII streams. It preserves integer return
+codes, SystemExit semantics and unexpected-exception traceback visibility, then
+restores the caller state. It is serial test infrastructure, not process isolation
+or a replacement for interpreter startup, fd-level behavior or subprocess deadlines.
+
+The first migrated family is adapter native output, title API validation, title
+document output, title file encoding and saved title responses. Commands parsed
+from guides remain real subprocesses, including the saved-response walkthrough.
+Interpreter-mode, temporary-directory environment, audit-hook and fd-leakage
+checks also remain real processes. Root CLI help and ASCII-failure smoke checks
+exercise the shims that in-process calls bypass. Manifest verification and
+publication audit retain their real-process checks. Production CLI output, archive
+transactions, provenance and partial-publication behavior are unchanged.

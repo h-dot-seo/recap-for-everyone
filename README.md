@@ -253,3 +253,8 @@ scratch archives. Measurements stay in a private receipt, not a speed guarantee.
 Automation may opt into [structured execution errors](docs/JSON_ERRORS.md) with
 global `--json-errors`. Default text, successful results and negative-result JSON
 are unchanged; codes do not authorize automatic retries or repairs.
+
+Synthetic test coverage uses a shared in-process CLI harness for selected repeated
+argument/output checks. Documented guide commands and root-entrypoint smoke checks
+still run as real processes; this is a test-maintenance change, not a runtime or
+performance guarantee. See [test boundaries](docs/ARCHITECTURE.md#synthetic-cli-test-boundaries).

@@ -1,10 +1,29 @@
 # Validation record
 
-Current release: `0.98.0-json-execution-errors`, dated 2026-11-14.
+Current release: `0.98.1-cli-test-harness`, dated 2026-11-14.
 This file is the current snapshot. Every dated entry since the first release is kept
 unchanged and in order in [docs/VALIDATION_HISTORY.md](docs/VALIDATION_HISTORY.md).
 
 ## Latest change
+
+2026-11-14 Selected in-process CLI regression checks (0.98.1-cli-test-harness):
+adds a test-only direct-call harness with write-time ASCII stdout, escaped stderr,
+SystemExit/integer-return handling, unexpected-exception tracebacks and restored
+argv/cwd/streams. The first five repeated title/adapter modules retain their 101
+tests; eight new tests check the harness and all 20 root CLI entry points through
+real processes. Saved-response guide commands and all other guide/interpreter/
+fd/audit-hook checks remain actual subprocesses. No production module, output,
+archive, provenance, consent or partial-publication behavior changes. A bounded
+local comparison observed less repeated interpreter startup, not a portable speed
+claim or complete test-process isolation. Remaining test families are not migrated.
+
+Validation: full synthetic suite 1,387 tests passed (one existing skip); focused
+109 tests passed. Independent review retained all 101 migrated test-method ASTs
+and tracked 679 SQLite connections, all explicitly closed. All 132 existing sh
+blocks were preserved. Manifest: 301 files; limited publication audit: 302 files;
+compile and Python 3.10 syntax checks passed. No portable timing claim is made.
+
+Previous change:
 
 2026-11-14 Opt-in structured execution errors (0.98.0-json-execution-errors):
 adds unified global --json-errors for the existing caught-error exit-1 stderr

@@ -1,6 +1,9 @@
 """Synthetic editor-saved UTF-8 title files; no model, network or real sessions."""
 from codecs import BOM_UTF8
 import hashlib
+from tests._cli import run_cli
+import recap
+from recaplib import title_proposal
 import json
 import os
 from pathlib import Path
@@ -118,8 +121,9 @@ class TitleFileEncodingWorkflowTests(unittest.TestCase):
         import_export(self.db, 'mixed', self.sources[1], 'local-codex')
 
     def call(self, *args, script='recap.py', success=True):
-        result = subprocess.run([sys.executable, script, '--db', str(self.db), *map(str, args)],
-            capture_output=True, env=dict(os.environ, PYTHONIOENCODING='ascii'), timeout=30)
+        entry = {'recap.py': recap.main, 'title_proposal.py': title_proposal.main}[script]
+        result = run_cli(entry, ['--db', str(self.db), *map(str, args)])
+        result.stdout = result.stdout.encode('ascii'); result.stderr = result.stderr.encode('ascii')
         self.assertEqual(result.returncode, 0 if success else 1, result.stderr.decode('ascii', errors='replace'))
         self.assertNotIn(b'Traceback', result.stderr); result.stdout.decode('ascii')
         if not success:

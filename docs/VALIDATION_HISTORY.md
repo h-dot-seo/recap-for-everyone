@@ -2565,3 +2565,20 @@ stdout, negative result documents and argparse exit 2 remain unchanged. Syntheti
 actual failures, private diagnostic markers, partial rebuild publication and the
 executed guide are tested. No catch-set expansion, automatic retry, rollback,
 privacy-sanitization or recovery-readiness guarantee is added.
+
+## 2026-11-14 Selected in-process CLI regression checks (0.98.1-cli-test-harness):
+adds a test-only direct-call harness with write-time ASCII stdout, escaped stderr,
+SystemExit/integer-return handling, unexpected-exception tracebacks and restored
+argv/cwd/streams. The first five repeated title/adapter modules retain their 101
+tests; eight new tests check the harness and all 20 root CLI entry points through
+real processes. Saved-response guide commands and all other guide/interpreter/
+fd/audit-hook checks remain actual subprocesses. No production module, output,
+archive, provenance, consent or partial-publication behavior changes. A bounded
+local comparison observed less repeated interpreter startup, not a portable speed
+claim or complete test-process isolation. Remaining test families are not migrated.
+
+Validation: full synthetic suite 1,387 tests passed (one existing skip); focused
+109 tests passed. Independent review retained all 101 migrated test-method ASTs
+and tracked 679 SQLite connections, all explicitly closed. All 132 existing sh
+blocks were preserved. Manifest: 301 files; limited publication audit: 302 files;
+compile and Python 3.10 syntax checks passed. No portable timing claim is made.

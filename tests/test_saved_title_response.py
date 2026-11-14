@@ -1,6 +1,9 @@
 """Offline saved-request completion: synthetic files only, no provider execution."""
 import copy
 import hashlib
+from tests._cli import run_cli
+import recap
+from recaplib import title_proposal
 import json
 import os
 import re
@@ -93,8 +96,10 @@ class SavedTitleResponseTests(unittest.TestCase):
         return flags
 
     def cli(self, *args, script='title_adapter.py', code=None):
-        result = subprocess.run([sys.executable, str(ROOT / script), *map(str, args)],
-            capture_output=True, timeout=30, env=dict(os.environ, PYTHONIOENCODING='ascii'))
+        entry = {'title_adapter.py': adapter.main, 'title_proposal.py': title_proposal.main,
+                 'recap.py': recap.main}[script]
+        result = run_cli(entry, list(map(str, args)))
+        result.stdout = result.stdout.encode('ascii'); result.stderr = result.stderr.encode('ascii')
         self.assertNotIn(b'Traceback', result.stderr)
         if code:
             self.assertNotEqual(result.returncode, 0)
