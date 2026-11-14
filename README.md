@@ -238,3 +238,8 @@ For a private pointer without message text or titles, use `export-provenance`
 for one explicit message and `check-provenance` to recheck it. Locator hashes
 do not establish authorship, consent, retrieval or publication evidence. See
 [message provenance cards](docs/MESSAGE_PROVENANCE.md).
+
+Adapter imports avoid decoding their generated JSONL a second time while preserving
+artifact hashes, source lines and admission checks. See
+[adapter import cost and boundaries](docs/ADAPTER_IMPORT_COST.md); this is not a
+bounded-memory or speed guarantee.

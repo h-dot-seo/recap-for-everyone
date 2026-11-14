@@ -1,10 +1,25 @@
 # Validation record
 
-Current release: `0.97.5-message-provenance-cards`, dated 2026-11-14.
+Current release: `0.97.6-single-pass-adapter-import`, dated 2026-11-14.
 This file is the current snapshot. Every dated entry since the first release is kept
 unchanged and in order in [docs/VALIDATION_HISTORY.md](docs/VALIDATION_HISTORY.md).
 
 ## Latest change
+
+2026-11-14 Single-pass adapter admission (0.97.6-single-pass-adapter-import):
+removes the repeated normalized JSON decode after web/local/local-codex adapters
+have produced rows. Shared row validation and input-conflict preflight precede
+SQLite; direct normalized ingest still strict-parses its byte snapshot. The same
+writer retains artifact bytes/hashes, native or explicit replay newline behavior,
+physical source lines, original occurrences, receipts, rollback and FTS semantics.
+Synthetic differential tests compare serialized-byte ingestion with adapter rows,
+including Unicode, duplicate identities, conflicts, empty input and both newline
+forms; a work-count oracle and executed guide cover the removed decode pass.
+No new CLI flag, schema, provenance meaning, authorization, streaming, timing or
+bounded-memory guarantee is introduced. Source, rows and derived bytes still
+remain in memory. Newly owned SQLite test connections close explicitly.
+
+Previous change:
 
 2026-11-14 Private message provenance cards (0.97.5-message-provenance-cards):
 adds export-provenance and check-provenance for one exact source/conversation/

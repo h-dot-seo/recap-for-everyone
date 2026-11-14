@@ -163,6 +163,11 @@ receipt's `source_sha256` identifies those derived normalized bytes. Use
 chosen export bytes. Existing archived message provenance is never rewritten just
 because a later export is imported.
 
+Adapter imports reuse their parsed rows instead of decoding the derived JSONL
+again. The derived bytes are still constructed for the same artifact hash and byte
+count. This removes one repeated parsing pass, not the whole-file memory cost or
+a promised runtime fraction. See [adapter import cost](ADAPTER_IMPORT_COST.md).
+
 All record and incoming-identity checks still run before opening SQLite. Existing
 archive conflicts and provenance failures still roll back the data transaction;
 schema setup and all possible filesystem failures are not newly made atomic. Full

@@ -2,7 +2,6 @@
 from recaplib.cli_errors import safe_diagnostic
 import argparse
 import hashlib
-import io
 import json
 import math
 import sqlite3
@@ -10,7 +9,8 @@ from contextlib import closing
 from collections import Counter
 from pathlib import Path
 from recaplib.local_parser import parse_jsonl_bytes
-from recaplib.archive import _validate_source, ingest_bytes, readonly
+from recaplib.archive import _validate_source, ingest_bytes, readonly, _ingest_adapter_rows
+from recaplib.archive import _normalized_bytes as _serialize_normalized_rows
 from recaplib.strict_json import loads
 from recaplib.title_rules import validate_title
 from recaplib.title_excerpt import excerpt
@@ -230,13 +230,8 @@ def inspect_export(path, kind, conversation=None, expected_export_sha256=None):
 
 
 def _normalized_bytes(rows, newline=None):
-    # Match the previous UTF-8 Path.write_text default newline translation,
-    # including Windows CRLF artifact hashes, but keep the derived bytes in memory.
-    with io.BytesIO() as buffer:
-        with io.TextIOWrapper(buffer, encoding='utf-8', newline=newline) as text:
-            text.write(''.join(json.dumps(row, ensure_ascii=False) + '\n' for row in rows))
-            text.flush()
-            return buffer.getvalue()
+    # Compatibility helper retains exact historical serialization for callers.
+    return _serialize_normalized_rows(rows, newline)
 
 
 def import_export(db, source, path, kind, conversation=None, expected_export_sha256=None):
@@ -244,7 +239,7 @@ def import_export(db, source, path, kind, conversation=None, expected_export_sha
     rows, report = normalize(path, kind, include_report=True, conversation=conversation,
                              expected_export_sha256=expected_export_sha256)
     # Keep original hash/locator/branch metadata in companion provenance tables.
-    result = ingest_bytes(db, source, _normalized_bytes(rows), provenance=rows)
+    result = _ingest_adapter_rows(db, source, rows)
     result['coverage'] = report
     return result
 
@@ -274,8 +269,7 @@ def import_export_bytes(db, source, raw, label, kind, conversation=None, *, newl
             raise ValueError('replay label must contain valid Unicode text') from None
         parser_label = label
     rows, report = _normalize_selected_bytes(raw, parser_label, kind, conversation)
-    result = ingest_bytes(db, source, _normalized_bytes(rows, '\n' if newline == 'lf' else '\r\n'),
-                          provenance=rows)
+    result = _ingest_adapter_rows(db, source, rows, newline='\n' if newline == 'lf' else '\r\n')
     result['coverage'] = report
     # Do not echo the potentially private label or selection in this new block.
     # Existing coverage selection fields retain the import API's prior contract.

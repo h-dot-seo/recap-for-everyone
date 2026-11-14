@@ -2490,3 +2490,16 @@ executed guide are tested. A locator is not evidence of validity, authorship,
 consent, retrieval or publication status; no cross-repository mapping is added.
 
 Prepublication independent review found a SQLite BLOB locator escaping the intended stale-check boundary as a serialization TypeError. The bounded card projection now converts only serialization/type failures to a fixed ValueError so a valid saved card recheck reports STALE; genuine SQLite/query errors still propagate and unbounded show behavior is unchanged. A BLOB-anchor regression verifies no output or database mutation.
+
+## 2026-11-14 Single-pass adapter admission (0.97.6-single-pass-adapter-import):
+removes the repeated normalized JSON decode after web/local/local-codex adapters
+have produced rows. Shared row validation and input-conflict preflight precede
+SQLite; direct normalized ingest still strict-parses its byte snapshot. The same
+writer retains artifact bytes/hashes, native or explicit replay newline behavior,
+physical source lines, original occurrences, receipts, rollback and FTS semantics.
+Synthetic differential tests compare serialized-byte ingestion with adapter rows,
+including Unicode, duplicate identities, conflicts, empty input and both newline
+forms; a work-count oracle and executed guide cover the removed decode pass.
+No new CLI flag, schema, provenance meaning, authorization, streaming, timing or
+bounded-memory guarantee is introduced. Source, rows and derived bytes still
+remain in memory. Newly owned SQLite test connections close explicitly.
