@@ -1,4 +1,5 @@
 """Explicit read-only local title history; never reads message-body columns."""
+from recaplib.errors import Stale, UnknownIdentity
 from recaplib.cli_errors import safe_diagnostic
 import argparse
 import json
@@ -23,7 +24,7 @@ def history(db, source, conversation, limit=20, offset=0, expected_revision=None
         original = connection.execute('SELECT title FROM messages WHERE source_id=? '
             'AND conversation_id=? ORDER BY message_pk LIMIT 1', identity).fetchone()
         if original is None:
-            raise ValueError('unknown conversation')
+            raise UnknownIdentity('unknown conversation')
         original = original[0]
         exists = connection.execute(
             "SELECT 1 FROM sqlite_master WHERE type='table' AND name='title_history'").fetchone()
@@ -31,7 +32,7 @@ def history(db, source, conversation, limit=20, offset=0, expected_revision=None
             'AND conversation=? ORDER BY id DESC LIMIT 1', identity).fetchone() if exists else None
         display_title, revision = current if current is not None else (original, 0)
         if expected_revision is not None and expected_revision != revision:
-            raise ValueError('stale title history; restart at offset 0 and review the current revision')
+            raise Stale('stale title history; restart at offset 0 and review the current revision')
         changes = []
         total = 0
         if exists:

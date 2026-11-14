@@ -1,4 +1,5 @@
 """Mock-only title transfer contract. No network transport or credential support."""
+from recaplib.errors import Stale
 import copy
 import hashlib
 import json
@@ -60,7 +61,7 @@ class MockTitleAdapter:
         validate_title(title)
         with self._lock:
             if _canonical(self._target) != _canonical(expected):
-                raise ValueError('MOCK_TARGET_STALE: target identity, title or revision changed')
+                raise Stale('MOCK_TARGET_STALE: target identity, title or revision changed')
             changed = title != self._target['title']
             if changed:
                 # An opaque synthetic revision, not a real platform version/ETag.
@@ -83,7 +84,7 @@ def simulate(db, path, request, approval, adapter):
     # plan state all fail before touching mock state. No live service is contacted.
     current = dry_run(db, path, request.get('plan'), request.get('target'))
     if _canonical(current) != _canonical(request):
-        raise ValueError('transfer request is stale or altered; create and review a new dry run')
+        raise Stale('transfer request is stale or altered; create and review a new dry run')
     if approval['request_sha256'] != current['request_sha256']:
         raise ValueError('approval does not match this exact transfer request')
     after, changed = adapter.compare_and_set(current['target'], current['proposed_title'])

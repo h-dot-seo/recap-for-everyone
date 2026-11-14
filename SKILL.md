@@ -268,3 +268,9 @@ metadata is not permission or proof of operator review. Preserve existing stop
 points and inspect result JSON even on documented exit 1. See
 `docs/COMMAND_CATALOG.md`; do not infer an error envelope or schema for unlabelled
 legacy outputs.
+
+For machine-readable caught execution failures, use global `--json-errors` on
+`recap.py` only. Follow `docs/JSON_ERRORS.md`: result-level exit 1 remains stdout
+JSON, usage exit 2 stays plain, and UNCLASSIFIED does not imply safety. Preserve
+the original source/hash/revision and inspect partial publication warnings; never
+retry or repair solely from the code.

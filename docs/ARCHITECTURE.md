@@ -261,3 +261,11 @@ synthetic fixtures before checking full scratch-tree byte/path invariance. Expli
 conditional writes are tested separately. The archive fixture uses DELETE journal
 mode and is closed between operations; this evidence is not a universal no-sidecar
 or hostile-filesystem guarantee. See [command catalogue](COMMAND_CATALOG.md).
+
+## Execution error representation
+
+Global `--json-errors` changes only the existing caught-error stderr path in the
+unified CLI. Explicit ValueError subclasses retain authored messages and check
+order; standard exception families supply coarse codes. No substring classifier,
+new catch boundary or transaction behavior is added. Default/standalone diagnostics
+and result-level negative JSON remain unchanged. See [JSON_ERRORS](JSON_ERRORS.md).

@@ -24,7 +24,7 @@ through the repository root, which is why the commands run from there.
 ## recap.py
 
 ```text
-usage: recap.py [-h] [--db DB] {ingest,search,stats,describe-schema,inspect,list-export,inspect-web-zip,prepare-web-export,replay-local,web-branch,suggest-branch-title,suggest-replay-title,suggest-attributed-title,preview-title,apply-title,review-state,render-queue,review-titles,title-adapter-dry-run,title-adapter-simulate,export-title-plan,check-title-plan,import,check-import,export-normalized,export-provenance,check-provenance,declare-review-checkpoint,declare-checkpoint,changed-since,declare-recovery,rehearse-recovery,rebuild-archive,list,find,show,render,suggest-title,title,title-history,describe} ...
+usage: recap.py [-h] [--db DB] [--json-errors] {ingest,search,stats,describe-schema,inspect,list-export,inspect-web-zip,prepare-web-export,replay-local,web-branch,suggest-branch-title,suggest-replay-title,suggest-attributed-title,preview-title,apply-title,review-state,render-queue,review-titles,title-adapter-dry-run,title-adapter-simulate,export-title-plan,check-title-plan,import,check-import,export-normalized,export-provenance,check-provenance,declare-review-checkpoint,declare-checkpoint,changed-since,declare-recovery,rehearse-recovery,rebuild-archive,list,find,show,render,suggest-title,title,title-history,describe} ...
 ```
 
 The global `--db DB` precedes the subcommand. `describe` lists the current required,
@@ -727,3 +727,7 @@ usage: recap.py rebuild-archive [-h] --plan PLAN --objects OBJECTS --new-db NEW_
 ```
 
 See [command catalogue](COMMAND_CATALOG.md) and the matching workflow guide.
+
+Global `--json-errors` precedes the subcommand and structures only caught execution
+errors on stderr (exit 1). Default text, result-level JSON and usage errors are
+unchanged. See [JSON_ERRORS](JSON_ERRORS.md).

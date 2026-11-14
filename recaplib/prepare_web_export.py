@@ -1,4 +1,5 @@
 """Prepare one explicitly chosen ZIP member as a new local web-export file."""
+from recaplib.errors import SourceChanged
 import hashlib
 import io
 import os
@@ -67,7 +68,7 @@ def _validate_expected_archive_sha256(expected):
 def _checked_archive_sha256(raw, expected):
     digest = hashlib.sha256(raw).hexdigest()
     if expected is not None and digest != expected:
-        raise ValueError('ZIP archive changed after inspection; inspect and select again')
+        raise SourceChanged('ZIP archive changed after inspection; inspect and select again')
     return digest
 
 
