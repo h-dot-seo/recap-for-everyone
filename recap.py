@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Local-only archive import, inspection, search and checked title workflows."""
 from recaplib.cli_errors import safe_diagnostic
+from recaplib import __version__
 import argparse
 import json
 import sqlite3
@@ -12,6 +13,7 @@ from recaplib.archive import SCHEMA, _validate_source, ingest, ingest_bytes, rea
 def build_parser():
     from recaplib.title_document_output import add_output_argument
     p = argparse.ArgumentParser(description=__doc__)
+    p.add_argument('--version', action='version', version='recap-for-everyone '+__version__)
     p.add_argument('--db')
     p.add_argument('--json-errors', action='store_true', help='emit structured stderr for caught execution failures only; usage and result failures are unchanged')
     sub = p.add_subparsers(dest='command', required=True)
