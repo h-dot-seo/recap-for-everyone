@@ -307,3 +307,10 @@ and file-input fields are absent and rejected. Each call owns a read connection,
 not a session-long snapshot. Request/response bounds do not bound query memory or
 wall time. Logical read-only access can still have SQLite sidecar effects and can
 disclose private content to the selected client. See [MCP_SERVER](MCP_SERVER.md).
+
+Optional MCP file reads are gated by explicit launch-time input directories and a
+lowerable byte admission limit. Canonical-path containment, regular-file status
+and size are checked before existing readers. This deliberately preserves those
+readers and their source semantics rather than claiming an atomic namespace lease
+or hostile-writer protection. Default archive tools are unchanged; no additional
+DB access, output writer or automatic directory enumeration is exposed.

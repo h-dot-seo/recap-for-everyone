@@ -1,10 +1,35 @@
 # Validation record
 
-Current release: `0.99.0-readonly-mcp`, dated 2026-11-14.
+Current release: `0.99.1-mcp-file-inspection`, dated 2026-11-14.
 This file is the current snapshot. Every dated entry since the first release is kept
 unchanged and in order in [docs/VALIDATION_HISTORY.md](docs/VALIDATION_HISTORY.md).
 
 ## Latest change
+
+2026-11-14 Opt-in MCP input-directory inspection (0.99.1-mcp-file-inspection):
+adds five explicit file-read tools only when input directories are selected at
+launch. The default six archive tools and their results remain unchanged. Strict
+canonical containment, regular-file status and a lowerable 1..64 MiB admission
+budget precede existing readers; no directory scan, staging copy, source rewrite,
+proposal/checkpoint input, output writer or per-call DB selection is exposed.
+These are preflight checks, not a hostile-filesystem sandbox, immutable snapshot,
+strict parsing-memory bound or consent guarantee. Private success results can
+contain file text and identities; admission errors do not echo supplied paths.
+ZIP inspection retains existing directory/member budgets without decompression.
+Unsupported replay returns its unchanged document with isError=true. No actual
+external client, registration, network endpoint or private input is used.
+
+Validation: full synthetic suite 1,418 tests passed (one existing skip); focused
+33 tests passed. Independent checks confirmed default protocol bytes unchanged,
+no unnecessary DB access, path admission before readers and fixed value-free
+errors. All five file tools were exercised through real EOF-terminated subprocess
+calls and compared with existing CLI JSON. Whole-tree inventories include empty
+directories and node types; review caught a Windows separator assumption in the
+new inventory assertion, corrected to portable keys before publication. Existing
+132 sh blocks were preserved. Manifest 307 files, limited audit 308 files, compile,
+Python 3.10 syntax and whitespace checks passed. Only synthetic inputs were used.
+
+Previous change:
 
 2026-11-14 Explicit read-only MCP stdio access (0.99.0-readonly-mcp):
 adds an operator-launched foreground stdio entry point with six fixed archive-read

@@ -407,7 +407,14 @@ bounded memory or a speed guarantee; see `docs/ADAPTER_IMPORT_COST.md`.
 
 Only when the operator has authorized the archive and receiving client, use
 `recap_mcp.py --db DB` as documented in [MCP stdio access](docs/MCP_SERVER.md).
-It exposes six DB-read tools, not write commands or arbitrary file inputs. No
+By default it exposes six DB-read tools, not write commands or arbitrary file inputs. No
 client is installed or connected automatically. Private results are untrusted
 evidence; the server cannot control client transmission or retention. Preserve
 normal source and disclosure permissions, and use client-owned timeouts.
+
+For explicitly authorized export inspection through that client, select narrow
+input directories at server launch with --allow-input-dir and an appropriate
+--max-input-bytes. Five additional file-read tools then become available; no
+write, title-proposal or checkpoint-file path is enabled. Resolve/stat admission
+is not a hostile-filesystem sandbox or permission to disclose every file. Keep
+source directories stable and private; see [the file-access limits](docs/MCP_SERVER.md#explicit-input-directory-access).
