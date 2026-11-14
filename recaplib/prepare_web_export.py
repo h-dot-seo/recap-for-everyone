@@ -15,6 +15,22 @@ MAX_ENTRIES = 1000
 MAX_RATIO = 200
 
 
+def resource_limits():
+    """Declare the fixed effective bounds; no operator override is accepted."""
+    return dict(member_bytes=MAX_MEMBER_BYTES, ratio=MAX_RATIO, entries=MAX_ENTRIES,
+                archive_ceiling=MAX_ARCHIVE_BYTES, operator_supplied=False)
+
+
+def exceeded_member_limits(info):
+    """Metadata-only diagnostics, independent of higher-priority safety reasons."""
+    exceeded = []
+    if info.file_size > MAX_MEMBER_BYTES:
+        exceeded.append('member_bytes')
+    if info.file_size > max(info.compress_size, 1) * MAX_RATIO:
+        exceeded.append('ratio')
+    return exceeded
+
+
 def _safe_member(name):
     if (not isinstance(name, str) or not name or '\\' in name or ':' in name or '\x00' in name
             or name.startswith('/') or any(part in ('', '.', '..') for part in name.split('/'))
@@ -62,7 +78,7 @@ def member_problem(info):
         return 'ENCRYPTED_MEMBER', 'encrypted ZIP members are not supported'
     if info.compress_type not in (zipfile.ZIP_STORED, zipfile.ZIP_DEFLATED):
         return 'UNSUPPORTED_COMPRESSION', 'only stored or deflated ZIP members are supported'
-    if info.file_size > MAX_MEMBER_BYTES or info.file_size > max(info.compress_size, 1) * MAX_RATIO:
+    if exceeded_member_limits(info):
         return 'MEMBER_EXPANSION_LIMIT', 'selected member exceeds the 16 MiB or 200:1 expansion limit'
     return None
 
@@ -120,6 +136,7 @@ def prepare_web_export(path, member, output, expected_archive_sha256=None):
                     raise
                 cleanup_complete = False
     return dict(schema='recap.prepared-web-export.v1', archive_sha256=archive_digest,
+                limits=resource_limits(),
                 archive_bytes=len(raw), selected_member=member, prepared_sha256=hashlib.sha256(content).hexdigest(),
                 prepared_bytes=len(content), coverage=coverage, database_access=False, remote_mutation=False,
                 staging_cleanup_complete=cleanup_complete,

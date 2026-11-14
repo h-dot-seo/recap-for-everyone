@@ -34,11 +34,13 @@ def inspect_web_zip(path, limit=50, offset=0, expected_archive_sha256=None):
                                        compressed_bytes=entry.compress_size, declared_bytes=entry.file_size,
                                        metadata_eligible=problem is None, reason_code=problem[0] if problem else None,
                                        duplicate_name_count=names[entry.filename],
-                                       content_validation='NOT_PERFORMED'))
+                                       content_validation='NOT_PERFORMED',
+                                       exceeded_limits=preparation.exceeded_member_limits(entry)))
     except (zipfile.BadZipFile, zipfile.LargeZipFile, RuntimeError, NotImplementedError) as error:
         raise ValueError('invalid or unsupported ZIP archive metadata') from error
     page = candidates[offset:offset+limit]
     return dict(schema='recap.web-zip-candidates.v1', archive_sha256=archive_digest,
+                limits=preparation.resource_limits(),
                 archive_bytes=len(raw), total_entries=len(entries), total_candidates=len(candidates),
                 other_entries_not_listed=len(entries)-len(candidates), limit=limit, offset=offset,
                 next_offset=offset+len(page) if offset+len(page)<len(candidates) else None,

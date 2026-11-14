@@ -2324,3 +2324,11 @@ Eight synthetic tests cover empty/artifact-only archives, binary identities,
 repeated imports, numeric policy and extremes, missing artifact records,
 CLI/default/read-only behavior, missing DB and interleaved snapshot consistency.
 No schema, ingestion ledger or source activity claim is added.
+
+2026-11-14 ZIP fixed-limit disclosure (0.95.3-zip-limit-disclosure):
+adds effective fixed limits to both existing v1 ZIP receipts and metadata-only
+exceeded_limits to inventory candidates. Existing reason codes/precedence,
+byte snapshots, CRC/JSON-before-staging, hard bounds and error behavior remain.
+Six synthetic regressions cover default/call-time constants, size-only/ratio/both,
+exact boundaries, unsafe/duplicate priority and pre-construction budget rejection.
+This is diagnostics only, not streaming, adjustable bounds or an EOCD rewrite.

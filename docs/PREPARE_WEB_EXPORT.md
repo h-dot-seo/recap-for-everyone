@@ -102,3 +102,26 @@ conversations/messages were included by the service. The prepared file and recei
 can contain sensitive data/identifiers, so keep them private. CRC and hashes check
 consistency, not sender authenticity or privacy. No title is generated/applied,
 no remote state is changed, and nothing is transmitted.
+
+## Declared fixed resource limits
+
+Successful v1 receipts now include `limits`: `member_bytes` (16777216),
+`ratio` (200), `entries` (1000), `archive_ceiling` (67108864), and
+`operator_supplied` (false). These disclose existing fixed safety bounds; there
+is no override flag and no limit increase. Invalid or over-budget archives still
+fail without a successful receipt. Archive bytes are still read once into the
+same bounded immutable in-memory snapshot. This is not streaming support.
+
+Inventory candidates additionally carry `exceeded_limits`, an ordered list of
+`member_bytes` and/or `ratio` derived only from declared metadata. The ratio test
+is `declared_bytes > max(compressed_bytes, 1) * ratio`; equality passes either
+limit. `MEMBER_EXPANSION_LIMIT` remains unchanged. Higher-priority reasons such
+as unsafe paths or duplicate names remain primary even when this independent
+list is nonempty. An empty list is not eligibility or content validation: CRC,
+JSON shape and all other safety checks still apply during explicit preparation.
+No candidate is decompressed to produce these diagnostics.
+
+The central-directory signature pre-count is unchanged and remains conservative:
+signatures inside stored attachments can count toward the entry bound. This
+increment neither fixes that false rejection nor introduces EOCD/ZIP64 parsing,
+new compression formats, chunked archive handling or operator-controlled bounds.
