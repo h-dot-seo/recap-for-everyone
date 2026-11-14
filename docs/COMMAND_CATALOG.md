@@ -55,3 +55,23 @@ Follow [SKILL.md](../SKILL.md) for authorization and human-review boundaries.
 Import needs approved sources, local title changes need approved wording, and
 review-state writes record an operator decision. Discovery itself approves none
 of these. Existing protected example commands and default outputs are unchanged.
+
+## Executed effect regressions
+
+The test suite binds its read-case names to all unified commands whose declared
+**default** write list is empty. Each case must actually complete with its expected
+exit status and valid result before the test compares every file byte and path in
+the synthetic scratch tree. Source exports, prepared documents and the archive are
+part of that comparison, not just the database's main file.
+
+Conditional saved outputs are exercised separately: a requested new document must
+appear and existing inputs/archive bytes must remain unchanged. Explicit approved
+synthetic title and review-state changes are checked as writes, not relabelled as
+read-only. Documented negative result statuses have separate cases. Fault-injected
+mutations and failed invocations must be caught by the assertion helper.
+
+Coverage is for those synthetic invocations on an explicitly closed DELETE-mode
+archive. It is not exhaustive option-combination testing, arbitrary schema
+validation, an OS access monitor, a hostile namespace sandbox, or a claim that WAL
+and journal sidecars can never be created. It grants no permission to run commands
+against a person's data. Static declarations still need review when code changes.

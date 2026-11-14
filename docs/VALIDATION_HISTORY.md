@@ -2542,3 +2542,15 @@ Command/option coverage, no archive opening, release fallbacks, write conditions
 usage-document drift and the executed guide are checked with synthetic fixtures.
 No JSON error envelope, document relabelling, schema migration, permission grant,
 review authentication or provenance/rights expansion is introduced.
+
+## 2026-11-14 Synthetic command effect matrix (0.97.9-command-effect-matrix):
+checks every unified command declared to have no default write through an actual
+successful CLI invocation before comparing the complete synthetic scratch tree
+and file bytes. Conditional document outputs and explicit local title/review
+writes are checked separately for their declared effects. The matrix case set is
+bound to the command catalogue, so new or reclassified commands require a case.
+Synthetic inputs and an explicitly closed DELETE-mode archive bound the claim;
+this is not an arbitrary-archive, hostile-filesystem or WAL-sidecar guarantee.
+Negative-result paths and oracle fault injections prevent failure-only or vacuous
+read-only assertions. Existing command outputs, write authorization, provenance,
+recovery and partial-publication boundaries remain unchanged.
