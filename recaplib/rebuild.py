@@ -17,6 +17,7 @@ from recaplib.strict_json import loads
 PLAN_SCHEMA = 'recap.rebuild-plan.v1'
 RECEIPT_SCHEMA = 'recap.rebuild-receipt.v1'
 RECEIPT_SCHEMA_V2 = 'recap.rebuild-receipt.v2'
+RECEIPT_SCHEMA_V3 = 'recap.rebuild-receipt.v3'
 PASSED = 'REBUILD_REHEARSAL_PASSED'
 FAILED = 'REBUILD_REHEARSAL_FAILED'
 MAX_PLAN_BYTES = 64 * 1024 * 1024
@@ -43,6 +44,18 @@ BOUNDARY_V2 = ('Rebuilt declared replayable message objects and checked declared
     'operator-supplied, not authenticated. New database and receipt publication are not a '
     'two-file atomic transaction. No defense against a hostile concurrent path namespace or '
     'whole-process memory limit is established.')
+
+
+BOUNDARY_V3 = ('Rebuilt explicitly planned declared objects and checked declared replayable rows, including '
+    'original-export metadata, not a full archive restoration. Title history and review decisions are '
+    'not restored or compared; use rehearse-recovery on a retained database copy to check them. PASSED '
+    'applies only to the checks actually listed, not the excluded history checks. Original-export '
+    'metadata does not supply parsing labels, newline choices or original archive insertion order; '
+    'these are taken only from the explicit replay plan, never inferred. Unreplayable declared ledger '
+    'states fail comparison and are not repaired or dropped. No remote backup, decryption-key, '
+    'clean-directory or future-recovery verification. Plans and manifests are operator-supplied, not '
+    'authenticated. New database and receipt publication are not a two-file atomic transaction. '
+    'No defense against a hostile concurrent path namespace or whole-process memory limit is established.')
 
 
 def _read_plan(path):
@@ -99,7 +112,15 @@ def _declared_steps(plan, manifest):
     artifacts = {(row['source_id'], row['sha256']) for row in manifest['artifacts']}
     originals = {(source['source_id'], digest) for source in manifest['sources']
                  for digest in source['original_hashes'] or ()}
+    v3 = manifest['schema'] == recovery.MANIFEST_SCHEMA_V3
+    declared_exports = {(row['source'], row['original_sha256'], row['format'], row['selected_conversation'])
+                        for row in (manifest['original_exports']['rows'] if manifest['original_exports'] is not None else ())} if v3 else set()
     for step in plan['steps']:
+        if v3 and step['kind'] != 'normalized':
+            identity = (step['source'], step['object_sha256'], step['kind'], step['conversation'] or '')
+            if identity not in declared_exports:
+                raise ValueError('plan object is not declared for this source, format and selection')
+            continue
         allowed = artifacts if step['kind'] == 'normalized' else originals
         if (step['source'], step['object_sha256']) not in allowed:
             raise ValueError('plan object is not declared for this source and input kind')
@@ -130,14 +151,13 @@ def rebuild_archive(manifest_path, plan_path, objects, new_db, output):
     """Create only a verified new DB; never open or mutate the original archive."""
     destination, output = _destinations(new_db, output)
     raw_manifest, manifest = recovery._read_manifest(manifest_path)
-    if manifest['schema']==recovery.MANIFEST_SCHEMA_V3:
-        raise ValueError('v3 recovery manifests support restored-copy rehearsal only; object rebuild requires v1 or v2')
-    v2=manifest['schema']==recovery.MANIFEST_SCHEMA_V2
+    v3=manifest['schema']==recovery.MANIFEST_SCHEMA_V3
+    v2=manifest['schema'] in (recovery.MANIFEST_SCHEMA_V2,recovery.MANIFEST_SCHEMA_V3)
     raw_plan, plan = _read_plan(plan_path)
     store = Path(objects)
     if store.is_symlink() or not store.is_dir():
         raise ValueError('objects path must be an existing directory, not a symlink')
-    receipt = dict(schema=RECEIPT_SCHEMA_V2 if v2 else RECEIPT_SCHEMA, status=FAILED, checks=[], steps=[], objects_used=[],
+    receipt = dict(schema=RECEIPT_SCHEMA_V3 if v3 else RECEIPT_SCHEMA_V2 if v2 else RECEIPT_SCHEMA, status=FAILED, checks=[], steps=[], objects_used=[],
                    manifest=dict(sha256=hashlib.sha256(raw_manifest).hexdigest(), bytes=len(raw_manifest)),
                    plan=dict(sha256=hashlib.sha256(raw_plan).hexdigest(), bytes=len(raw_plan), steps=len(plan['steps'])),
                    new_database=str(destination), new_database_created_exclusively=False,
@@ -151,7 +171,7 @@ def rebuild_archive(manifest_path, plan_path, objects, new_db, output):
                    implementation_sha256={name: hashlib.sha256((Path(__file__).parent / name).read_bytes()).hexdigest()
                                           for name in IMPLEMENTATIONS},
                    scope='replay plan order, retained object hashes, declared logical rows and sampled FTS checks',
-                   boundary=BOUNDARY_V2 if v2 else BOUNDARY)
+                   boundary=BOUNDARY_V3 if v3 else BOUNDARY_V2 if v2 else BOUNDARY)
     if v2:
         receipt['manifest']['schema']=manifest['schema']
         receipt['excluded_checks']=['title_history','title_review_history']

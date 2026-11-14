@@ -260,4 +260,6 @@ Its recorded hashes do not expand declared original objects or rebuild permissio
 A retained zero-message hash in this ledger therefore does not by itself make a
 rebuild eligible. See [archive ledger](ARCHIVE_LEDGER.md).
 
-Optional [v3](RECOVERY_V3.md) adds original_exports preservation and separately declared original object hashes, including zero-message imports. Default v1 and stored v1/v2 checks remain unchanged. No missing metadata is inferred; the v3 object-rebuild path is explicitly unsupported.
+Optional [v3](RECOVERY_V3.md) adds original_exports preservation and separately declared original object hashes, including zero-message imports. Default v1 and stored v1/v2 checks remain unchanged. No missing metadata is inferred; the v3 object-rebuild path requires an explicit plan.
+
+V3 object replay is now supported through the explicit plan path described in [REBUILD_V3](REBUILD_V3.md). It checks replayable metadata but excludes title/review histories. A full restored-copy rehearsal remains a separate operation.

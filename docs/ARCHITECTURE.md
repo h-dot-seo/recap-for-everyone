@@ -353,3 +353,5 @@ collection-run record or full provenance guarantee. `ledger` reads that metadata
 without changing recovery v1/v2 object authorization. See [archive ledger](ARCHIVE_LEDGER.md).
 
 The optional recovery v3 contract declares the seven-column original_exports ledger with exact rows, count and logical digest. Its separate explicit original_export_hashes set covers zero-message imports without reinterpreting legacy source hash fields. It compares restored copies, not replayed or inferred import metadata. See [v3](RECOVERY_V3.md).
+
+V3 replay validates source/hash/format/selection against explicit origin rows and checks all seven fields in the rebuilt ledger. Label, newline and import order remain supplied plan parameters, not inferred metadata. Title/review histories remain excluded; see [v3 replay](REBUILD_V3.md).

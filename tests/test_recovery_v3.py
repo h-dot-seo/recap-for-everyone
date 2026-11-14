@@ -135,10 +135,10 @@ class RecoveryV3Tests(unittest.TestCase):
             before=self.db.read_bytes();out=self.path('invalid.json')
             with self.assertRaises(ValueError):recovery.declare_recovery(self.db,out,manifest_version=3)
             self.assertFalse(out.exists());self.assertEqual(self.db.read_bytes(),before)
-    def test_v3_rebuild_rejected_before_plan_or_output(self):
+    def test_v3_rebuild_malformed_plan_rejected_before_output(self):
         path,_,_=self.declare();out=self.path('receipt.json');db=self.path('new.sqlite')
-        with patch.object(rebuild,'_read_plan',side_effect=AssertionError('must not read')):
-            with self.assertRaises(ValueError):rebuild.rebuild_archive(path,self.root/'missing-plan',self.root,db,out)
+        bad=self.path('bad-plan.json');bad.write_text('{}')
+        with self.assertRaises(ValueError):rebuild.rebuild_archive(path,bad,self.root,db,out)
         self.assertFalse(out.exists());self.assertFalse(db.exists())
     def test_cli_parity_and_executed_guide(self):
         result=[]

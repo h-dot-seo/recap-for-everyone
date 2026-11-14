@@ -80,3 +80,5 @@ re-seal existing manifests. No source authenticity, rights or complete recovery
 is established by the new rows.
 
 Optional [recovery v3](RECOVERY_V3.md) now declares this table and its explicit hash set. This does not alter the v1/v2 limitations above or retroactively protect an existing older manifest.
+
+[V3 explicit replay](REBUILD_V3.md) can reproduce this ledger, including zero-message origins, when the supplied objects and plan match it. It never fabricates legacy rows or assumes parsing labels, newline or order.

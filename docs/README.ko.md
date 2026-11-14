@@ -296,4 +296,6 @@ do not establish authorship, consent, retrieval or publication evidence. See
 `ledger`는 원본 내보내기의 기록된 형식·바이트 수·명시 선택을 읽습니다.
 [원본 메타데이터 원장](ARCHIVE_LEDGER.md)의 미기록·복구 미선언 한계를 확인하세요.
 
-명시적 `--manifest-version 3`는 원본 내보내기 메타데이터 원장을 선언하고 복원 사본에서 비교합니다. 기본 v1 및 저장된 v1/v2는 그대로이며 v3 객체 재생은 지원하지 않습니다. [범위와 예제](RECOVERY_V3.md)를 참고하세요.
+명시적 `--manifest-version 3`는 원본 내보내기 메타데이터 원장을 선언하고 복원 사본에서 비교합니다. 기본 v1 및 저장된 v1/v2는 그대로이며 v3 객체 재생에는 명시 계획이 필요합니다. [범위와 예제](RECOVERY_V3.md)를 참고하세요.
+
+v3 선언의 원본 메타데이터와 0건 내보내기도 명시 계획으로 새 DB에 재생·비교합니다. 제목·검토 이력은 복원하지 않으며 전체 복원 완료를 뜻하지 않습니다. [v3 재생](REBUILD_V3.md).
