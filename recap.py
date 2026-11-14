@@ -77,6 +77,7 @@ def main():
     queue_view.add_argument('--output', required=True, metavar='NEW_FILE')
     batch = sub.add_parser('review-titles', help='build a read-only page of local title proposals and collision warnings')
     batch.add_argument('--source', required=True); batch.add_argument('--limit', type=int, default=20); batch.add_argument('--offset', type=int, default=0)
+    batch.add_argument('--conversation', action='append', help='review only these explicit IDs; repeat, then intersect other filters')
     batch.add_argument('--state', choices=['open', 'skipped', 'deferred'], help='filter by current snapshot-bound review state; scans eligible source content')
     batch.add_argument('--unrenamed-only', action='store_true', help='exclude conversations with any existing local title history')
     batch.add_argument('--proposal', action='append', help='explicit proposal JSON object file; repeat to review supplied candidates instead of generating raw excerpts')
@@ -198,7 +199,7 @@ def main():
         elif args.command == 'review-titles':
             from recaplib.title_batch import review_queue, load_supplied_proposals
             supplied = load_supplied_proposals(args.proposal) if args.proposal is not None else None
-            result = review_queue(args.db, args.source, args.limit, args.offset, args.unrenamed_only, args.state, supplied, args.supplied_only)
+            result = review_queue(args.db, args.source, args.limit, args.offset, args.unrenamed_only, args.state, supplied, args.supplied_only, args.conversation)
         elif args.command in ('title-adapter-dry-run', 'title-adapter-simulate'):
             from recaplib.title_transfer import dry_run, simulate, MockTitleAdapter
             from recaplib.strict_json import loads

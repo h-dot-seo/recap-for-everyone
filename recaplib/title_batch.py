@@ -71,20 +71,22 @@ def _key(title):
     return ' '.join(unicodedata.normalize('NFKC', title).casefold().split())
 
 
-def _state_filtered_inventory(connection, source, unrenamed_only, state, limit, offset, supplied_ids=None):
+def _state_filtered_inventory(connection, source, unrenamed_only, state, limit, offset, supplied_ids=None, selected_ids=None):
     # Effective state cannot safely be filtered by stored label alone: content
     # may have changed. Scan one conversation at a time in the same read snapshot,
     # retaining only this page's metadata, never all source message bodies.
     page = []
     matched = 0
     before_state = 0
+    before_supplied = 0
     after_conversation = None
-    if supplied_ids is not None and not supplied_ids:
-        return [], 0, 0
     while True:
         chunk = _inventory(connection, source, limit=100, unrenamed_only=unrenamed_only,
                            after_conversation=after_conversation)
         for record in chunk:
+            if selected_ids is not None and record['conversation'] not in selected_ids:
+                continue
+            before_supplied += 1
             if supplied_ids is not None and record['conversation'] not in supplied_ids:
                 continue
             before_state += 1
@@ -99,13 +101,13 @@ def _state_filtered_inventory(connection, source, unrenamed_only, state, limit, 
                     page.append(record)
                 matched += 1
         if len(chunk) < 100:
-            return page, matched, before_state
+            return page, matched, before_state, before_supplied
         # Continue strictly after the last identity in this read snapshot rather
         # than repeatedly walking earlier groups through an increasing OFFSET.
         after_conversation = chunk[-1]['conversation']
 
 
-def review_queue(db, source, limit=20, offset=0, unrenamed_only=False, review_state_filter=None, supplied_proposals=None, supplied_only=False):
+def review_queue(db, source, limit=20, offset=0, unrenamed_only=False, review_state_filter=None, supplied_proposals=None, supplied_only=False, conversations=None):
     if not isinstance(source, str) or not source.strip():
         raise ValueError('explicit nonempty source required')
     if type(limit) is not int or not 1 <= limit <= 100 or type(offset) is not int or not 0 <= offset <= 2**63-1:
@@ -116,6 +118,18 @@ def review_queue(db, source, limit=20, offset=0, unrenamed_only=False, review_st
         raise ValueError('state filter must be open, skipped or deferred')
     if type(supplied_only) is not bool or supplied_only and supplied_proposals is None:
         raise ValueError('supplied_only must be boolean and requires supplied proposals when enabled')
+    selected_ids = None
+    if conversations is not None:
+        if not isinstance(conversations, (list, tuple)) or not 1 <= len(conversations) <= 1000 or any(not isinstance(cid, str) or not cid.strip() for cid in conversations):
+            raise ValueError('conversations must be 1..1000 explicit nonempty IDs')
+        selected_ids = set(conversations)
+        if len(selected_ids) != len(conversations):
+            raise ValueError('conversation IDs must not repeat')
+        try:
+            if sum(len(cid.encode('utf-8')) for cid in conversations) > 1024 * 1024:
+                raise ValueError('selected conversation IDs exceed 1 MiB')
+        except UnicodeError:
+            raise ValueError('conversation IDs must be valid UTF-8 text') from None
     supplied = _supplied_by_id(supplied_proposals, source) if supplied_proposals is not None else None
     connection = readonly(db)
     try:
@@ -129,12 +143,13 @@ def review_queue(db, source, limit=20, offset=0, unrenamed_only=False, review_st
             total = source_total
         before_state_filter = total
         before_supplied_filter = total
-        if review_state_filter is None and not supplied_only:
+        before_identity_filter = total
+        if review_state_filter is None and not supplied_only and selected_ids is None:
             inventory = _inventory(connection, source, limit=limit, offset=offset, unrenamed_only=unrenamed_only)
         else:
-            inventory, total, before_state_filter = _state_filtered_inventory(
+            inventory, total, before_state_filter, before_supplied_filter = _state_filtered_inventory(
                 connection, source, unrenamed_only, review_state_filter, limit, offset,
-                set(supplied) if supplied_only else None)
+                set(supplied) if supplied_only else None, selected_ids)
         items = []
         for record in inventory:
             identity = record['conversation']
@@ -205,7 +220,7 @@ def review_queue(db, source, limit=20, offset=0, unrenamed_only=False, review_st
                                       existing_title_count=count, existing_title_conversations=current,
                                       samples_limited_to=10, normalization='NFKC + casefold + whitespace collapse')
         result = dict(schema=SCHEMA, source=source, limit=limit, offset=offset, total_conversations=total,
-                    source_total_conversations=source_total, excluded_renamed_conversations=source_total-before_supplied_filter,
+                    source_total_conversations=source_total, excluded_renamed_conversations=source_total-before_identity_filter,
                     excluded_review_state_conversations=before_state_filter-total,
                     review_state_filter=review_state_filter,
                     filter='no local title history' if unrenamed_only else 'all conversations',
@@ -216,6 +231,10 @@ def review_queue(db, source, limit=20, offset=0, unrenamed_only=False, review_st
                     semantic_validation='NOT_PERFORMED',
                     scope='Raw archive excerpts; all imported web branches/local records, not selected branch or retained replay history.',
                     warning='PRIVATE TITLES AND IDS. Read-only single database snapshot. Collisions are advisory, page proposal comparisons are not global, and this queue is unsigned. Review one proposal before applying.')
+        if selected_ids is not None:
+            result.update(selected_conversation_count=len(selected_ids),
+                excluded_unselected_conversations=before_identity_filter-before_supplied_filter,
+                selection_scope='explicit IDs intersect this source; absent IDs yield no items; binary archive order, not argument order; filter order: unrenamed, explicit IDs, supplied-only, state, pagination; source-wide existing-title collisions remain checked; selection is not review or approval')
         if supplied is not None:
             on_page = sum(item['conversation'] in supplied for item in items)
             result.update(proposal_mode='supplied', supplied_proposals=dict(total=len(supplied), on_page=on_page,

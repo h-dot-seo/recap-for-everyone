@@ -44,7 +44,8 @@ def validate_queue(queue):
                     'excluded_renamed_conversations excluded_review_state_conversations '
                     'review_state_filter filter next_offset items ready_count unavailable_count '
                     'execution_status remote_mutation semantic_validation scope warning').split(),
-            ('proposal_mode', 'supplied_proposals', 'supplied_only', 'excluded_unsupplied_conversations'))
+            ('proposal_mode', 'supplied_proposals', 'supplied_only', 'excluded_unsupplied_conversations',
+             'selected_conversation_count', 'excluded_unselected_conversations', 'selection_scope'))
     _require(queue['schema'] == 'recap.title-review-queue.v1')
     for key in ('source', 'filter', 'scope', 'warning'):
         _require(isinstance(queue[key], str) and bool(queue[key]))
@@ -72,6 +73,15 @@ def validate_queue(queue):
     if 'supplied_only' in queue or 'excluded_unsupplied_conversations' in queue:
         _require(queue.get('supplied_only') is True and queue.get('proposal_mode') == 'supplied' and
                  _integer(queue.get('excluded_unsupplied_conversations')))
+    selection_fields = ('selected_conversation_count', 'excluded_unselected_conversations', 'selection_scope')
+    if any(key in queue for key in selection_fields):
+        _require(all(key in queue for key in selection_fields))
+        _require(_integer(queue['selected_conversation_count'], 1000) and queue['selected_conversation_count'] > 0)
+        _require(_integer(queue['excluded_unselected_conversations']))
+        _require(isinstance(queue['selection_scope'], str) and bool(queue['selection_scope']))
+        _require(queue['source_total_conversations'] == queue['excluded_renamed_conversations'] +
+                 queue['excluded_unselected_conversations'] + queue.get('excluded_unsupplied_conversations', 0) +
+                 queue['excluded_review_state_conversations'] + queue['total_conversations'])
     identities = set()
     ready = 0
     for item in items:

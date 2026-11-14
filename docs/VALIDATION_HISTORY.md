@@ -2376,3 +2376,12 @@ Eight synthetic tests cover directory/device/FIFO refusal, size and cumulative
 budgets, growth after stat, regular symlinks and missing-file/error behavior.
 A read-once adapter test now supplies a real file for stat before mocking open.
 Not universal admission, an atomic filesystem lease or a process-memory guarantee.
+
+2026-11-14 Explicit title-review identity selection (0.96.3-selected-review):
+adds repeated review-titles --conversation ID and a validated API selection list.
+Unrenamed/selected/supplied/state filters intersect before pagination, with binary
+order and explicit exclusion accounting. Source-wide existing-title collisions
+remain visible; default output, title/state writes and approval boundaries stay.
+Nine synthetic tests cover scope, counts, unknown/invalid IDs, page order,
+excluded-body reads, collisions, saved-queue rendering/preview, CLI/read-only behavior and an executable guide.
+No automatic delta ingestion, checkpoint, completion claim or title application.

@@ -626,3 +626,7 @@ See [time browsing](BROWSE_BY_TIME.md).
 `check-import` and `import_check.py` accept `--delta-output NEW_JSON` for an
 exclusive private conversation delta sample file. Counts are always included.
 See [re-import delta](REIMPORT_DELTA.md).
+
+`review-titles --conversation ID` may repeat to explicitly select a bounded
+identity subset before pagination. Other filters intersect; source-wide existing
+title collision checks remain. See [selected title review](SELECTED_TITLE_REVIEW.md).
