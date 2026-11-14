@@ -10,15 +10,15 @@ unchanged and in order in [docs/VALIDATION_HISTORY.md](docs/VALIDATION_HISTORY.m
 adds a test-only direct-call harness with write-time ASCII stdout, escaped stderr,
 SystemExit/integer-return handling, unexpected-exception tracebacks and restored
 argv/cwd/streams. The first five repeated title/adapter modules retain their 101
-tests; eight new tests check the harness and all 20 root CLI entry points through
+tests; nine new tests check the harness and all 20 root CLI entry points through
 real processes. Saved-response guide commands and all other guide/interpreter/
 fd/audit-hook checks remain actual subprocesses. No production module, output,
 archive, provenance, consent or partial-publication behavior changes. A bounded
 local comparison observed less repeated interpreter startup, not a portable speed
 claim or complete test-process isolation. Remaining test families are not migrated.
 
-Validation: full synthetic suite 1,387 tests passed (one existing skip); focused
-109 tests passed. Independent review retained all 101 migrated test-method ASTs
+Validation: full synthetic suite 1,388 tests passed (one existing skip); focused
+110 tests passed. Independent review retained all 101 migrated test-method ASTs
 and tracked 679 SQLite connections, all explicitly closed. All 132 existing sh
 blocks were preserved. Manifest: 301 files; limited publication audit: 302 files;
 compile and Python 3.10 syntax checks passed. No portable timing claim is made.
@@ -481,3 +481,11 @@ creates new outside-tree candidates with an exact reviewed plan hash.
 Prepublication independent review caught a candidate-metadata audit gap: supplied release/date text had not been checked against publication patterns. Candidate encoded bytes now receive the same pattern checks, with value-free errors and plan/write regression coverage. Nothing was published before this correction.
 
 Prepublication independent review found a SQLite BLOB locator escaping the intended stale-check boundary as a serialization TypeError. The bounded card projection now converts only serialization/type failures to a fixed ValueError so a valid saved card recheck reports STALE; genuine SQLite/query errors still propagate and unbounded show behavior is unchanged. A BLOB-anchor regression verifies no output or database mutation.
+
+Round-34 CI correction: the first PR head passed both Ubuntu jobs but a new
+Windows cwd assertion failed; its captured traceback was hidden by the assertion
+diff. Directory equality now uses actual filesystem identity rather than lexical
+resolved-path equality, with an alias-path regression and a different-directory
+negative check. Original cwd-string restoration checks remain. Failures now expose
+the captured diagnostic to the test runner. This changes no product code; the
+Windows result must be established by the corrected-head CI, not inferred locally.

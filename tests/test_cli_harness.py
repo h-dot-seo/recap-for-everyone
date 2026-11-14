@@ -15,12 +15,38 @@ class CliHarnessTests(unittest.TestCase):
             for value in ('first','second','\ud800'):
                 def main():
                     self.assertEqual(sys.argv[1:],[value])
-                    self.assertEqual(Path.cwd(),Path(temporary).resolve())
+                    # Windows TEMP may use an 8.3 spelling while resolve() uses
+                    # its long name/junction target. Check directory identity.
+                    self.assertTrue(os.path.samefile(Path.cwd(),temporary))
                     print('result');print('warning',file=sys.stderr)
                 result=run_cli(main,[value],cwd=temporary)
-                self.assertEqual((result.returncode,result.stdout,result.stderr),(0,'result\n','warning\n'))
+                self.assertEqual(result.returncode,0,result.stderr)
+                self.assertEqual((result.stdout,result.stderr),('result\n','warning\n'))
                 self.assertIs(sys.argv,saved[0]);self.assertEqual(os.getcwd(),saved[1])
                 self.assertIs(sys.stdout,saved[2]);self.assertIs(sys.stderr,saved[3])
+
+    def test_cwd_alias_is_same_directory_not_merely_any_existing_path(self):
+        saved=os.getcwd()
+        with tempfile.TemporaryDirectory() as temporary:
+            target=Path(temporary)/'long synthetic directory name'
+            target.mkdir()
+            child=target/'child'
+            child.mkdir()
+            # A real, privilege-free alias on both Windows and POSIX. The raw
+            # pathname differs, but its referent is precisely the target.
+            alias=child/'..'
+            self.assertNotEqual(str(alias),str(target))
+            self.assertTrue(os.path.samefile(alias,target))
+            self.assertFalse(os.path.samefile(alias,child))
+            def main():
+                self.assertTrue(os.path.samefile(Path.cwd(),target))
+                self.assertFalse(os.path.samefile(Path.cwd(),child))
+                print('identity verified')
+            result=run_cli(main,[],cwd=alias)
+            self.assertEqual(result.returncode,0,result.stderr)
+            self.assertEqual(result.stdout,'identity verified\n')
+            self.assertEqual(result.stderr,'')
+        self.assertEqual(os.getcwd(),saved)
 
     def test_system_exit_variants_and_integer_return(self):
         for code,expected,stderr in ((None,0,''),(0,0,''),(7,7,''),('problem',1,'problem\n'),('한글',1,'\\ud55c\\uae00\n')):
