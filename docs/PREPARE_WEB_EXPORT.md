@@ -159,3 +159,8 @@ CRC or JSON validation. Selected-member validation still occurs before staging.
 This removes false entry-limit rejection caused by signatures inside stored
 attachments without changing the accepted member formats or raising budgets.
 The snapshot is not re-read or streamed, and no partial output is published.
+
+Relevant existing bounded readers now preflight regular-file type and their existing
+byte budget before open, while retaining one bounded read and post-read checks.
+Symlinks to regular files retain their prior behavior; this does not change the
+separate recovery restored/object symlink policy. See [security](../SECURITY.md).

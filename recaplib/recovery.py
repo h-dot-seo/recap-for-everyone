@@ -11,6 +11,7 @@ import unicodedata
 from pathlib import Path
 
 from recaplib.archive import readonly
+from recaplib.input_files import require_regular_file
 from recaplib.source_text import decode_source
 from recaplib.strict_json import loads
 from recaplib.text_summary import summary_text
@@ -315,6 +316,8 @@ def declare_recovery(db, output, declared_at=None):
 
 
 def _read_manifest(path):
+    require_regular_file(path, max_bytes=MAX_MANIFEST_BYTES, label='recovery manifest',
+                         too_large='recovery manifest exceeds the 64 MiB limit')
     with Path(path).open('rb') as stream:
         raw = stream.read(MAX_MANIFEST_BYTES + 1)
     if len(raw) > MAX_MANIFEST_BYTES:

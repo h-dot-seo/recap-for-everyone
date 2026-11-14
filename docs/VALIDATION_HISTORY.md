@@ -2367,3 +2367,12 @@ features are not claimed active. Existing top-level output, schema and writes st
 Eight synthetic regressions cover settings, non-innocuous hostile views, FTS and
 continued ingest, local parser, receipt detail, unavailable APIs and setup cleanup.
 These controls are defense in depth, not a hostile-DB sandbox or resource budget.
+
+2026-11-14 Bounded-reader regular-file admission (0.96.2-input-admission):
+adds pre-open regular-file/type and existing-size-budget checks to ZIP archives,
+recovery manifests, supplied proposals and adapter document readers. Existing
+symlink-follow behavior, byte budgets, read-once/post-read checks and errors stay.
+Eight synthetic tests cover directory/device/FIFO refusal, size and cumulative
+budgets, growth after stat, regular symlinks and missing-file/error behavior.
+A read-once adapter test now supplies a real file for stat before mocking open.
+Not universal admission, an atomic filesystem lease or a process-memory guarantee.

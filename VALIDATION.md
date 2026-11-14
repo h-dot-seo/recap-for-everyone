@@ -1,10 +1,21 @@
 # Validation record
 
-Current release: `0.96.1-sqlite-read-safety`, dated 2026-11-14.
+Current release: `0.96.2-input-admission`, dated 2026-11-14.
 This file is the current snapshot. Every dated entry since the first release is kept
 unchanged and in order in [docs/VALIDATION_HISTORY.md](docs/VALIDATION_HISTORY.md).
 
 ## Latest change
+
+2026-11-14 Bounded-reader regular-file admission (0.96.2-input-admission):
+adds pre-open regular-file/type and existing-size-budget checks to ZIP archives,
+recovery manifests, supplied proposals and adapter document readers. Existing
+symlink-follow behavior, byte budgets, read-once/post-read checks and errors stay.
+Eight synthetic tests cover directory/device/FIFO refusal, size and cumulative
+budgets, growth after stat, regular symlinks and missing-file/error behavior.
+A read-once adapter test now supplies a real file for stat before mocking open.
+Not universal admission, an atomic filesystem lease or a process-memory guarantee.
+
+Previous change:
 
 2026-11-14 Read-only SQLite protections (0.96.1-sqlite-read-safety):
 adds connection-local trusted_schema OFF, cell_size_check ON and available
