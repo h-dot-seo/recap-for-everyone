@@ -2349,3 +2349,12 @@ the same immutable bytes, archive/member ceilings and CRC/JSON staging order rem
 Seven synthetic tests cover nested signatures, empty/prefix/comment/ZIP64 archives,
 declared/actual count budgets, malformed lengths/offsets and hash-before-parse.
 No streaming, bound increase, schema or provenance changes are introduced.
+
+2026-11-14 Re-import conversation delta (0.96.0-import-delta):
+adds mutually exclusive conflicting/new/has_new_identities/no_new_identities
+conversation counts to check-import in its existing read snapshot, plus optional
+exclusive --delta-output private bounded ID samples. Existing message comparisons,
+source/selection boundaries and conflict exit1 remain; ingest/provenance unchanged.
+Eight synthetic tests and a two-file walkthrough cover priority, duplicates,
+scope, snapshot consistency, byte bounds, no-overwrite, privacy and CLI parity.
+No activity inference, automatic import, checkpoint or archive-only category.

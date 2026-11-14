@@ -100,6 +100,7 @@ def main():
     admission.add_argument('input'); admission.add_argument('--format', choices=['web', 'local', 'local-codex', 'normalized'], required=True)
     admission.add_argument('--source', required=True); admission.add_argument('--conversation')
     admission.add_argument('--expected-export-sha256'); admission.add_argument('--limit', type=int, default=20)
+    admission.add_argument('--delta-output', help='exclusive new private file for bounded conversation delta ID samples')
     normalized = sub.add_parser('export-normalized', help='export private message text as derived normalized JSONL')
     normalized.add_argument('--source', required=True)
     normalized.add_argument('--conversation')
@@ -173,7 +174,7 @@ def main():
         elif args.command == 'check-import':
             from recaplib.import_check import check_import
             result = check_import(args.db, args.source, args.input, args.format, args.conversation,
-                                  args.expected_export_sha256, args.limit)
+                                  args.expected_export_sha256, args.limit, args.delta_output)
         elif args.command == 'prepare-web-export':
             from recaplib.prepare_web_export import prepare_web_export
             result = prepare_web_export(args.input, args.member, args.output, args.expected_archive_sha256, args.max_member_bytes)

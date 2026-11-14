@@ -1,12 +1,12 @@
 {
   "project": "recap-for-everyone",
-  "release": "0.95.5-zip-directory-budget",
+  "release": "0.96.0-import-delta",
   "date": "2026-11-08",
   "private_history_imported": false,
   "actual_corpora_included": false,
   "synthetic_examples_only": true,
   "license_status": "NOT_SELECTED",
-  "file_count": 241,
+  "file_count": 245,
   "files": [
     {
       "path": ".gitattributes",
@@ -45,13 +45,13 @@
     },
     {
       "path": "SKILL.md",
-      "bytes": 14071,
-      "sha256": "884475c502eeffa39ef58b18462fe5d39d56bc069b787362c27aa1ed866be3ca"
+      "bytes": 14306,
+      "sha256": "f632b541016adf74761e2bfd980efea9a59b932817e30c61d7fd5fec479ad288"
     },
     {
       "path": "VALIDATION.md",
-      "bytes": 12381,
-      "sha256": "341b47991445662f2c94dd2ebc09cbda3755865a7053c653b5424aefbf717c6d"
+      "bytes": 13015,
+      "sha256": "8542f816a2455292c3192a04bcaece574de9366c133a823988b7515c69aa0a7b"
     },
     {
       "path": "attributed_title.py",
@@ -110,8 +110,8 @@
     },
     {
       "path": "docs/COMMANDS.md",
-      "bytes": 25963,
-      "sha256": "531edd45dea81506964c88bf9eae7f919cc6fa92ef8f8abe0289f49a83c83e64"
+      "bytes": 26161,
+      "sha256": "a1d79053f472841801237eb893582acf367b3d476a4752e4b2f361458606cf08"
     },
     {
       "path": "docs/EXPORT_INVENTORY.md",
@@ -172,6 +172,11 @@
       "path": "docs/RECOVERY_REHEARSAL.md",
       "bytes": 13690,
       "sha256": "0af9b00aab3324f16d8faa39f0922a9b02998bcc1bf56a2afd84721298449fec"
+    },
+    {
+      "path": "docs/REIMPORT_DELTA.md",
+      "bytes": 3155,
+      "sha256": "1ae7c989c1d432b431bf130e5cbef592f0a76ed9883ecee49529b8ef9e2e60b2"
     },
     {
       "path": "docs/RENDER_MARKDOWN.md",
@@ -280,8 +285,8 @@
     },
     {
       "path": "docs/VALIDATION_HISTORY.md",
-      "bytes": 156088,
-      "sha256": "9b00d8086899e4f002886eb4dcd346c2143583fd5940f75ba3ea320c9fb80914"
+      "bytes": 156712,
+      "sha256": "d2c324fc14bd64fd1d57b0e419bcf668979cf13b217d4ef07ff1541b4593c377"
     },
     {
       "path": "docs/WEB_ZIP_INVENTORY.md",
@@ -312,6 +317,16 @@
       "path": "examples/conversations.jsonl",
       "bytes": 443,
       "sha256": "7b3ad06b959ecea9d39ed485ecd571838e8a1217e8cbf51dc89e3d6de9121dc9"
+    },
+    {
+      "path": "examples/delta-after.jsonl",
+      "bytes": 704,
+      "sha256": "87c2e16033580a49fcd842659b6f9f90baddbb9ab96124251163a6b99aa2f1f9"
+    },
+    {
+      "path": "examples/delta-before.jsonl",
+      "bytes": 563,
+      "sha256": "e3e7d8aa8a1ec455e019c766eefc669b6dc67458406b96086b41c3a42ca09ef7"
     },
     {
       "path": "examples/foreign-sample.json",
@@ -390,8 +405,8 @@
     },
     {
       "path": "recap.py",
-      "bytes": 26129,
-      "sha256": "925977b8273c6ba9d56ae82e40694d299f7220fb9dd923f964414c2ef7bc8ce8"
+      "bytes": 26270,
+      "sha256": "996be059a6446870b42fc164ff504ced8c2c54badf370a8ea7366cdd3daf15ab"
     },
     {
       "path": "recaplib/__init__.py",
@@ -440,8 +455,8 @@
     },
     {
       "path": "recaplib/import_check.py",
-      "bytes": 5025,
-      "sha256": "b7d602891a2a77104b7954525df55f48e2ed2dacbe62bf2824bac913a6b244ae"
+      "bytes": 8289,
+      "sha256": "ebbf8b0fc90abe9c171f4b06c4a7f457689855c49a39c7ef05559a2e62cd9b4b"
     },
     {
       "path": "recaplib/inspect_web_zip.py",
@@ -772,6 +787,11 @@
       "path": "tests/test_import_check.py",
       "bytes": 14481,
       "sha256": "72fc011c0e6b918e1cf90a210be59629848af937645a0ae05a5a1127fdf76c4a"
+    },
+    {
+      "path": "tests/test_import_conversation_delta.py",
+      "bytes": 6962,
+      "sha256": "2a98606a9a40f1fa52b90f62be0a59af0914a1ba01e6d9aaad048646e83c3b8e"
     },
     {
       "path": "tests/test_import_failure_boundaries.py",

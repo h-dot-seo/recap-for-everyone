@@ -195,3 +195,7 @@ Repeat both bounds with a search cursor; list windows instead qualify whole conv
 
 Use `stats --by-source` for per-source stored counts and explicit timestamp-rule coverage,
 not source activity, completeness or ingestion-attempt totals.
+
+Before re-import, use check-import conversation_delta to distinguish new identities
+from conflicts, not infer activity. Optional --delta-output writes private bounded
+ID samples; see docs/REIMPORT_DELTA.md. No checkpoint is advanced.

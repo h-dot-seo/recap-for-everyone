@@ -1,0 +1,4 @@
+{"conversation_id": "changed", "message_id": "m", "role": "user", "text": "invented example", "timestamp": "unknown", "title": "synthetic"}
+{"conversation_id": "same", "message_id": "m", "role": "user", "text": "invented example", "timestamp": "unknown", "title": "synthetic"}
+{"conversation_id": "conflict", "message_id": "m", "role": "user", "text": "invented example", "timestamp": "unknown", "title": "synthetic"}
+{"conversation_id": "archive-only", "message_id": "m", "role": "user", "text": "invented example", "timestamp": "unknown", "title": "synthetic"}
