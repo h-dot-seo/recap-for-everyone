@@ -1,0 +1,13 @@
+{
+  "schema": "recap.rebuild-plan.v1",
+  "steps": [
+    {
+      "source": "demo",
+      "kind": "normalized",
+      "object_sha256": "7b3ad06b959ecea9d39ed485ecd571838e8a1217e8cbf51dc89e3d6de9121dc9",
+      "label": null,
+      "conversation": null,
+      "newline": "lf"
+    }
+  ]
+}

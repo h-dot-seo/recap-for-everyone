@@ -3,7 +3,8 @@
 This rehearsal creates a second database from the retained JSONL, rather than
 copying SQLite pages or checking the live archive against itself. It exercises
 `ingest` creating new message rows and a new FTS index, followed by the existing
-read-only manifest checks. There is no `rebuild-archive` command yet.
+read-only manifest checks. The [automated rebuild command](AUTOMATED_REBUILD.md) now adds explicit replay
+plans and exclusive verified-DB publication; this manual walkthrough remains useful.
 
 ## Run the normalized-object rehearsal
 
@@ -61,8 +62,8 @@ are the comparison contract.
   operator used a fresh directory or DB. This guide's fresh-path requirement is
   an operator step, not a new receipt claim.
 - FTS checks count indexed rows and sample one token, not every possible query.
-  No live DB repair, remote backup, transport, decryption, authentication,
-  automatic checkpoint, replay plan or new provenance is created.
+  This manual walkthrough creates no live DB repair, remote backup, transport,
+  decryption, authentication, automatic checkpoint, replay plan or new provenance.
 - Rehearsal receipts/manifests use exclusive output files. Repeating these exact
   commands in the same directory is not a fresh rehearsal; choose another empty
   directory rather than overwriting evidence or an existing database.

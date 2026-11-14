@@ -216,3 +216,9 @@ existing-path ingestion exclusive or recreate title/review history.
 For Python callers replaying retained export bytes, see [explicit byte replay](docs/EXPORT_BYTE_REPLAY.md). This API supplies original parsing labels and
 LF/CRLF serialization explicitly; the existing path-based CLI remains unchanged.
 It is an import write API, not an exclusive new-DB or verified recovery command.
+
+Use [automated declared-object rebuild](docs/AUTOMATED_REBUILD.md)
+with `python recap.py rebuild-archive MANIFEST --plan PLAN --objects DIR
+--new-db NEW.sqlite --output NEW.json [--text]`. It never opens the original DB;
+it exclusively publishes a checked new DB from explicit replay steps. Declared
+title history is not rebuilt, and review state remains undeclared/unrestored.

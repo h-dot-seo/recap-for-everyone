@@ -515,7 +515,7 @@ def _relative(path, directory):
         return Path(path).name
 
 
-def _objects_check(manifest, directory, supplied):
+def _objects_check(manifest, directory, supplied, paths_by_hash=None):
     kinds, required = {}, set()
     optional = {(row['source_id'], row['sha256']) for row in manifest['optional_artifacts']}
     for row in manifest['artifacts']:
@@ -565,12 +565,15 @@ def _objects_check(manifest, directory, supplied):
     if checked:
         # A file that cannot be read, or vanished since the walk, is recorded and skipped like an
         # oversized one; the remaining files are still hashed so the receipt stays informative.
-        for path in files:
+        for path in sorted(files, key=lambda item: _relative(item, directory)):
             try:
                 if path.lstat().st_size > MAX_OBJECT_BYTES:
                     refusals.add('OVERSIZED_FILE')
                     continue
-                present.add(_hash_file(path))
+                digest = _hash_file(path)
+                present.add(digest)
+                if paths_by_hash is not None:
+                    paths_by_hash.setdefault(digest, path)
             except OSError as error:
                 refuse('UNREADABLE_FILE', path, error)
                 continue
@@ -589,15 +592,8 @@ def _objects_check(manifest, directory, supplied):
         limits=dict(max_files=MAX_OBJECT_FILES, max_bytes_per_file=MAX_OBJECT_BYTES), objects=objects)
 
 
-def rehearse_recovery(manifest_path, restored_db, output, objects=None):
-    """Verify a restored copy against a declared manifest; the copy is only read."""
-    raw, manifest = _read_manifest(manifest_path)
-    _reject_existing(output)
-    if objects is not None:
-        store = Path(objects)
-        if store.is_symlink() or not store.is_dir():
-            raise ValueError('objects path must be an existing directory, not a symlink')
-    restored = _regular_file(restored_db, 'restored archive')
+def _archive_checks(manifest, restored_db, exclude_history=False):
+    """Shared read-only checks; rebuild can explicitly exclude unreplayable history."""
     checks = []
     connection = None
     sqlite_protections = dict(trusted_schema='NOT_CHECKED', cell_size_check='NOT_CHECKED', defensive='NOT_CHECKED')
@@ -622,7 +618,7 @@ def rehearse_recovery(manifest_path, restored_db, output, objects=None):
             tables = _tables(connection)
             expected = list(EXPECTED_TABLES) + [name for name, declared in (
                 ('export_occurrences', manifest['export_occurrences']), ('title_history', manifest['title_history']))
-                if declared is not None]
+                if declared is not None and not (exclude_history and name == 'title_history')]
             missing = [name for name in expected if name not in tables]
             checks.append(dict(check='expected_tables', status='PASS' if not missing else 'FAIL',
                                expected=expected, missing=missing))
@@ -639,14 +635,29 @@ def rehearse_recovery(manifest_path, restored_db, output, objects=None):
                 checks.append(_run_check('messages_digest', lambda: _digest_check(manifest, connection)))
                 checks.append(_run_check('export_occurrences',
                                          lambda: _occurrence_check(manifest, entries, total, tables)))
-            checks.append(_run_check('title_history', lambda: _history_check(manifest, connection, tables)))
+            if not exclude_history:
+                checks.append(_run_check('title_history', lambda: _history_check(manifest, connection, tables)))
             checks.append(_run_check('fts_rows', lambda: _fts_count_check(manifest, connection, tables)))
             checks.append(_run_check('fts_match_sample', lambda: _fts_sample_check(connection)))
         else:
-            checks.extend(dict(check=name, status='FAIL', detail=NOT_RUN) for name in CHECKS[1:])
+            checks.extend(dict(check=name, status='FAIL', detail=NOT_RUN) for name in CHECKS[1:]
+                          if not (exclude_history and name == 'title_history'))
     finally:
         if connection is not None:
             connection.close()
+    return checks
+
+
+def rehearse_recovery(manifest_path, restored_db, output, objects=None):
+    """Verify a restored copy against a declared manifest; the copy is only read."""
+    raw, manifest = _read_manifest(manifest_path)
+    _reject_existing(output)
+    if objects is not None:
+        store = Path(objects)
+        if store.is_symlink() or not store.is_dir():
+            raise ValueError('objects path must be an existing directory, not a symlink')
+    restored = _regular_file(restored_db, 'restored archive')
+    checks = _archive_checks(manifest, restored_db)
     if objects is not None:
         checks.append(_run_check(OBJECTS_CHECK, lambda: _objects_check(manifest, Path(objects), str(objects))))
     failed = [check['check'] for check in checks if check['status'] != 'PASS']
@@ -667,6 +678,7 @@ def rehearse_recovery(manifest_path, restored_db, output, objects=None):
 
 def render_text(result):
     header = ('Recovery manifest declaration' if result.get('schema') == DECLARATION_SCHEMA
+              else 'Archive rebuild receipt' if result.get('schema') == 'recap.rebuild-receipt.v1'
               else 'Recovery rehearsal receipt')
     items = []
     for key, value in result.items():

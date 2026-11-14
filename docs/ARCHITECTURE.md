@@ -87,7 +87,8 @@ established; this command verifies the index in place. The separate
 [normalized-object rebuild rehearsal](REBUILD_REHEARSAL.md) exercises a new database
 and index via retained JSONL on supported platforms. Adapter replay additionally
 requires matching format, selection, label, order and platform newline behavior;
-no automatic rebuild command or complete replay plan is supplied. Remote fetch, decryption, key custody
+the automated rebuild command requires an operator-supplied replay plan;
+the manifest still does not contain a complete plan. Remote fetch, decryption, key custody
 and backup scheduling stay outside the repository. See
 [the recovery rehearsal guide](RECOVERY_REHEARSAL.md).
 
@@ -198,3 +199,9 @@ content, validate all semantics or prove recovery completeness.
 For Python callers replaying retained export bytes, see [explicit byte replay](EXPORT_BYTE_REPLAY.md). This API supplies original parsing labels and
 LF/CRLF serialization explicitly; the existing path-based CLI remains unchanged.
 It is an import write API, not an exclusive new-DB or verified recovery command.
+
+Use [automated declared-object rebuild](AUTOMATED_REBUILD.md)
+with `python recap.py rebuild-archive MANIFEST --plan PLAN --objects DIR
+--new-db NEW.sqlite --output NEW.json [--text]`. It never opens the original DB;
+it exclusively publishes a checked new DB from explicit replay steps. Declared
+title history is not rebuilt, and review state remains undeclared/unrestored.

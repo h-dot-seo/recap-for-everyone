@@ -2409,3 +2409,18 @@ Eight synthetic tests cover all adapters, file/API parity, label identity,
 newline-sensitive digest failure, selection refusal, transactions and executed
 guide. Existing CLI serialization and output stay unchanged. No replay-plan
 validation, exclusive DB creation or automatic recovery claim is introduced.
+
+2026-11-14 Declared-object archive rebuild (0.97.0-declared-object-rebuild):
+adds rebuild-archive with an exact strict-JSON ordered replay plan, source-bound
+declared object hashes, explicit adapter labels/newlines and exclusive verified
+new-DB publication. Existing recovery checks are shared without changing existing
+receipt shape. Declared title history is explicitly not rebuildable; review state
+is undeclared/unrestored. Twenty-four synthetic tests cover all formats, digest
+mismatches, ordering, source authorization, limits, collisions, staging cleanup,
+partial publication, private errors and an executed guide. No live DB access,
+full archive restoration, two-file atomicity, hostile namespace defense or remote
+backup guarantee is claimed. Windows prepublication fsync uses a writable
+non-truncating staging descriptor; a zero-byte-write regression verifies that
+requirement on POSIX as well as Windows. The initial PR CI passed both Ubuntu lanes but failed both Windows lanes before DB publication (seven failures and one error in Python 3.12); that failed run is retained as validation history. The repair does not skip fsync or publish an unverified DB.
+
+Windows repair validation follow-up: the first repair passed rebuild success paths but exposed one remaining link-failure injection error on Windows. The test compared an unresolved TEMP alias with the resolved publication path. Its matcher now resolves both paths and asserts exactly one injected failure; production publication code is unchanged.
