@@ -1,12 +1,12 @@
 {
   "project": "recap-for-everyone",
-  "release": "0.97.7-synthetic-scaling-observations",
+  "release": "0.97.8-command-catalog",
   "date": "2026-11-14",
   "private_history_imported": false,
   "actual_corpora_included": false,
   "synthetic_examples_only": true,
   "license_status": "NOT_SELECTED",
-  "file_count": 290,
+  "file_count": 294,
   "files": [
     {
       "path": ".gitattributes",
@@ -30,8 +30,8 @@
     },
     {
       "path": "README.md",
-      "bytes": 18017,
-      "sha256": "6955da0b49857c6e5eff2d0a28c962b966601540f1fc8778bff7d2c05b6c241e"
+      "bytes": 18233,
+      "sha256": "6e43b0215b29bff75ecc25c6b0403e39ad4f8e8eaf45503c0f93e836c4cf37d5"
     },
     {
       "path": "RIGHTS.md",
@@ -45,13 +45,13 @@
     },
     {
       "path": "SKILL.md",
-      "bytes": 18123,
-      "sha256": "a31f3d884a7481fe3efa1f74a25907dd65abd0a62ccdce574e7b0c4faf19322f"
+      "bytes": 18521,
+      "sha256": "9400f6eaf24e98a9ad6517122b1c66a4eded6f7e0ffdf68eed633b530563fa76"
     },
     {
       "path": "VALIDATION.md",
-      "bytes": 26236,
-      "sha256": "95d1e800df3e0c46970461e60f3ae95795cc0a311a605f254f095100a572fb3c"
+      "bytes": 27174,
+      "sha256": "12a444c2e1f8088d630c0df4a9a2e305604b5e0abc3acc7aab6ef990e9d246d7"
     },
     {
       "path": "attributed_title.py",
@@ -105,8 +105,8 @@
     },
     {
       "path": "docs/ARCHITECTURE.md",
-      "bytes": 15544,
-      "sha256": "47b8bb60fa4de6303127ec3cf184a0d5b48424c0b1abf8c744ecd3c08fe3742f"
+      "bytes": 15998,
+      "sha256": "0541dbb1fcc2286d71b770052fcfa1542cd7c36edcdb5c60bad42610ff327ed2"
     },
     {
       "path": "docs/ATTRIBUTED_MESSAGE_SELECTION.md",
@@ -135,8 +135,13 @@
     },
     {
       "path": "docs/COMMANDS.md",
-      "bytes": 29968,
-      "sha256": "0ff579a977ff974c4d2ac1d3d6c2915e70ee25ab637a3fd9122e83e5e3a44864"
+      "bytes": 31065,
+      "sha256": "f1e31f97940d85d4f46074118e3cc3271815d39b4018323da7f4fcf6d554eb1a"
+    },
+    {
+      "path": "docs/COMMAND_CATALOG.md",
+      "bytes": 3187,
+      "sha256": "15cb703a1b64d849a9210c38375afaf57b2f5a0897c6b996933cb1fbcf21fe34"
     },
     {
       "path": "docs/ERROR_DIAGNOSTICS.md",
@@ -210,8 +215,8 @@
     },
     {
       "path": "docs/README.ko.md",
-      "bytes": 21462,
-      "sha256": "1b352c2cfa5002af7d9dee1dd62bde5ad14a9ffcf5fa1131a1ba0839f5bdf1ee"
+      "bytes": 21489,
+      "sha256": "8635c10dd1317dad44c27881b103da8b23d393d1646117107d3192db63d1acbf"
     },
     {
       "path": "docs/REBUILD_REHEARSAL.md",
@@ -355,8 +360,8 @@
     },
     {
       "path": "docs/VALIDATION_HISTORY.md",
-      "bytes": 170413,
-      "sha256": "b4c6ce2256b5ffe0789ee6c096c54d00fb00ddd3a458207bf3ce79e7f6c0e1e1"
+      "bytes": 171351,
+      "sha256": "b4e947ee7e2b23d308bd300056236b45d8f69f4c3a20fe06fcdeca486a5b57d1"
     },
     {
       "path": "docs/WEB_ZIP_INVENTORY.md",
@@ -490,8 +495,8 @@
     },
     {
       "path": "recap.py",
-      "bytes": 31521,
-      "sha256": "3ec76a5a199d6015707c690e3a0fd7bd13e40986a0c1d4792640f707257c54ec"
+      "bytes": 31898,
+      "sha256": "82d6e59cc3f91ab2554d5e010871b775a636272d5a14d0fd49a5340e6fd9c9e7"
     },
     {
       "path": "recaplib/__init__.py",
@@ -527,6 +532,11 @@
       "path": "recaplib/cli_errors.py",
       "bytes": 1641,
       "sha256": "85fe4c95ad32f263f3f7b3ad5b9827d73460babf66d0e8a4352f1827f671520c"
+    },
+    {
+      "path": "recaplib/command_catalog.py",
+      "bytes": 12995,
+      "sha256": "bcff27de3b19fcb1a8f4d17f84c344c58652c599e4d21900fb1831fd810dfb09"
     },
     {
       "path": "recaplib/conversation_document.py",
@@ -867,6 +877,16 @@
       "path": "tests/test_cli_e2e.py",
       "bytes": 2532,
       "sha256": "eff1c4da5b9df771723537714dbdfb747ca717226e3d4a9864556854401c670b"
+    },
+    {
+      "path": "tests/test_command_catalog.py",
+      "bytes": 8708,
+      "sha256": "9fe074c947a532f5c9213fd09109623b8a4cccdfb539b1dffe33b0efdb0ea3eb"
+    },
+    {
+      "path": "tests/test_command_usage.py",
+      "bytes": 1489,
+      "sha256": "e8dd24149ec34f98b25f0cdae3ed9a1b8d215cc01ce39944eebc98c0c212af1d"
     },
     {
       "path": "tests/test_concurrent_titles.py",

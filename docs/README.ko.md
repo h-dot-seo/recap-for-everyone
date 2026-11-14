@@ -79,10 +79,10 @@ python recap.py --db ../demo.sqlite title --source demo --conversation synthetic
 
 ## 주요 명령
 
-`--db DB`는 하위 명령 앞에 씁니다. `inspect`, `list-export`, `inspect-web-zip`,
-`prepare-web-export`, `replay-local`, `web-branch`, `rehearse-recovery`는 데이터베이스
-없이 실행됩니다. 모든 명령의 정확한 usage 줄은 [명령 참조](COMMANDS.md)에, 기능별
-설명은 [작업 흐름](WORKFLOWS.md)에 있습니다.
+`--db DB`는 하위 명령 앞에 씁니다. `python recap.py describe`는 각 명령의
+DB 필요·무시·거부 여부와 조건부 쓰기를 보여 줍니다. 별도의 복원 DB·새 DB를
+여는 명령도 구분합니다. [명령 카탈로그](COMMAND_CATALOG.md)를 참고하세요.
+이 조회는 출처 수집·제목 변경·검토 결정의 승인이 아닙니다.
 
 | 할 일 | 명령 | 안내서 |
 |---|---|---|

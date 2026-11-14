@@ -57,7 +57,7 @@ Search and statistics open SQLite using `mode=ro` and `PRAGMA query_only=ON`.
 FTS queries use bound SQL parameters and quoted terms. A local database is still
 private user material: read-only access does not anonymize results.
 
-Local display-title changes are the one deliberate write path. `title --set`,
+Local display-title changes are one deliberate write path. `title --set`,
 reviewed proposal application and explicit restores append to the title history
 under revision checks. They never rewrite archived message bytes, source hashes or
 the original export title, and they never rename a conversation online.
@@ -246,3 +246,12 @@ scratch archives, not an existing user archive. Local receipts bind fixture and
 implementation bytes and state uncontrolled-cache and native-memory limits. They
 do not change archive contracts or establish speed, correctness or recovery
 guarantees. See [SCALING](SCALING.md).
+
+## Command discovery
+
+`describe` combines the unified argparse tree with explicit current DB/effect
+declarations. It reads no archive and grants no authorization. Import/ingest,
+title changes and review decisions remain separate authorized write paths;
+new-file publication and rebuild retain their existing partial-failure boundaries.
+The optional release label is declared metadata, not manifest verification.
+See [command catalogue](COMMAND_CATALOG.md).
