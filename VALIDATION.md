@@ -1,10 +1,20 @@
 # Validation record
 
-Current release: `0.95.2-time-stats`, dated 2026-11-14.
+Current release: `0.95.3-zip-limit-disclosure`, dated 2026-11-14.
 This file is the current snapshot. Every dated entry since the first release is kept
 unchanged and in order in [docs/VALIDATION_HISTORY.md](docs/VALIDATION_HISTORY.md).
 
 ## Latest change
+
+2026-11-14 ZIP fixed-limit disclosure (0.95.3-zip-limit-disclosure):
+adds effective fixed limits to both existing v1 ZIP receipts and metadata-only
+exceeded_limits to inventory candidates. Existing reason codes/precedence,
+byte snapshots, CRC/JSON-before-staging, hard bounds and error behavior remain.
+Six synthetic regressions cover default/call-time constants, size-only/ratio/both,
+exact boundaries, unsafe/duplicate priority and pre-construction budget rejection.
+This is diagnostics only, not streaming, adjustable bounds or an EOCD rewrite.
+
+Previous change:
 
 2026-11-14 Per-source time coverage (0.95.2-time-stats):
 adds stats --by-source while preserving the default two-key stats output.
