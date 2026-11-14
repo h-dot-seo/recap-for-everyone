@@ -53,7 +53,7 @@ class RebuildTests(unittest.TestCase):
         self.declare([self.step()])
         before = self.live.read_bytes()
         result = self.run_rebuild()
-        self.assertEqual(result['status'], rebuild.PASSED)
+        self.assertEqual(result['status'], rebuild.PASSED, result)
         self.assertEqual(before, self.live.read_bytes())
         self.assertFalse(os.path.samefile(self.live, self.db))
         self.assertTrue(result['new_database_created_exclusively'])
@@ -72,7 +72,7 @@ class RebuildTests(unittest.TestCase):
                  self.step('local-codex', 'rollback-session.jsonl', 'original-label.jsonl', 'crlf', 'codex')]
         self.declare(steps)
         result = self.run_rebuild()
-        self.assertEqual(result['status'], rebuild.PASSED)
+        self.assertEqual(result['status'], rebuild.PASSED, result)
         self.assertEqual(len(result['steps']), 3)
         self.assertNotIn('coverage', result['steps'][0])
 
@@ -100,7 +100,7 @@ class RebuildTests(unittest.TestCase):
         self.declare([dict(source='demo', kind='web', object_sha256=hashlib.sha256(raw).hexdigest(),
                            label=None, conversation=None, newline='lf')])
         result = self.run_rebuild()
-        self.assertEqual(result['status'], rebuild.PASSED)
+        self.assertEqual(result['status'], rebuild.PASSED, result)
         self.assertEqual(result['not_rebuildable_from_objects'], ['title_history'])
         self.assertEqual(result['title_history'], 'NOT_REBUILDABLE_FROM_OBJECTS')
         self.assertNotIn('title_history', [c['check'] for c in result['checks']])
@@ -304,7 +304,7 @@ class RebuildTests(unittest.TestCase):
             return unlink(path, *args, **kwargs)
         with patch.object(Path, 'unlink', fail_staging):
             result = self.run_rebuild()
-        self.assertEqual(result['status'], rebuild.PASSED)
+        self.assertEqual(result['status'], rebuild.PASSED, result)
         self.assertFalse(result['staging_cleanup_complete'])
         self.assertEqual(len(result['remaining_staging_files']), 1)
         leftover = self.root / result['remaining_staging_files'][0]
@@ -334,7 +334,7 @@ class RebuildTests(unittest.TestCase):
         self.declare([self.step()])
         self.db = self.root / 'rebuilt-\udcff.sqlite'
         result = self.run_rebuild()
-        self.assertEqual(result['status'], rebuild.PASSED)
+        self.assertEqual(result['status'], rebuild.PASSED, result)
         self.assertTrue(self.db.is_file())
         saved = self.output.read_bytes()
         self.assertTrue(saved.isascii())
@@ -348,3 +348,19 @@ class RebuildTests(unittest.TestCase):
         self.assertTrue(self.db.is_file())
         self.assertFalse(self.output.exists())
         self.assertFalse(list(self.root.glob('.recap-*')))
+
+    def test_publication_fsync_uses_writable_descriptor(self):
+        self.declare([self.step()])
+        fsync = os.fsync
+        synced = []
+        def require_writable(fd):
+            # Windows _commit rejects a read-only descriptor. A zero-byte
+            # write also detects that mistake on POSIX without changing bytes.
+            os.write(fd, b'')
+            synced.append(fd)
+            return fsync(fd)
+        with patch.object(os, 'fsync', side_effect=require_writable):
+            result = self.run_rebuild()
+        self.assertEqual(result['status'], rebuild.PASSED, result)
+        self.assertGreaterEqual(len(synced), 2)  # Verified DB and receipt staging.
+        self.assertTrue(self.db.is_file())

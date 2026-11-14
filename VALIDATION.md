@@ -11,11 +11,13 @@ adds rebuild-archive with an exact strict-JSON ordered replay plan, source-bound
 declared object hashes, explicit adapter labels/newlines and exclusive verified
 new-DB publication. Existing recovery checks are shared without changing existing
 receipt shape. Declared title history is explicitly not rebuildable; review state
-is undeclared/unrestored. Twenty-three synthetic tests cover all formats, digest
+is undeclared/unrestored. Twenty-four synthetic tests cover all formats, digest
 mismatches, ordering, source authorization, limits, collisions, staging cleanup,
 partial publication, private errors and an executed guide. No live DB access,
 full archive restoration, two-file atomicity, hostile namespace defense or remote
-backup guarantee is claimed.
+backup guarantee is claimed. Windows prepublication fsync uses a writable
+non-truncating staging descriptor; a zero-byte-write regression verifies that
+requirement on POSIX as well as Windows. The initial PR CI passed both Ubuntu lanes but failed both Windows lanes before DB publication (seven failures and one error in Python 3.12); that failed run is retained as validation history. The repair does not skip fsync or publish an unverified DB.
 
 Previous change:
 

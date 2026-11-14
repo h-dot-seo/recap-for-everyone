@@ -178,7 +178,9 @@ def rebuild_archive(manifest_path, plan_path, objects, new_db, output):
         # never publish a DB that depends on a journal or WAL being copied too.
         for path in _database_paths(staging)[1:]:
             recovery._reject_existing(path)
-        with staging.open('rb') as stream:
+        # Windows _commit requires a writable descriptor. This is our own
+        # closed, verified staging DB; opening r+b does not truncate or alter it.
+        with staging.open('r+b') as stream:
             os.fsync(stream.fileno())
         os.link(staging, destination)
         receipt['new_database_created_exclusively'] = True
