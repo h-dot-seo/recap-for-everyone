@@ -1,10 +1,20 @@
 # Validation record
 
-Current release: `0.96.3-selected-review`, dated 2026-11-14.
+Current release: `0.96.4-saved-conversation`, dated 2026-11-14.
 This file is the current snapshot. Every dated entry since the first release is kept
 unchanged and in order in [docs/VALIDATION_HISTORY.md](docs/VALIDATION_HISTORY.md).
 
 ## Latest change
+
+2026-11-14 Exact conversation JSON files (0.96.4-saved-conversation):
+adds show --output NEW_JSON to unified and standalone views. The unchanged view
+object, selection and provenance are serialized as readable UTF-8 to one exclusive
+private file; stdout becomes a body/ID-free byte/hash receipt. Default show stays.
+Eight synthetic tests cover Unicode, selections, provenance, no-overwrite,
+invalid/oversized output, lone-surrogate escapes, CLI parity and executed guide.
+No database mutation, sidecar, vendor export, approval or memory-bound guarantee.
+
+Previous change:
 
 2026-11-14 Explicit title-review identity selection (0.96.3-selected-review):
 adds repeated review-titles --conversation ID and a validated API selection list.

@@ -201,6 +201,7 @@ def main():
     listing.add_argument('--from', dest='from_date')
     listing.add_argument('--until', dest='until_date')
     show = sub.add_parser('show')
+    show.add_argument('--output', help='save exact show JSON to a new private UTF-8 file; print receipt only')
     show.add_argument('--source', required=True)
     show.add_argument('--conversation', required=True)
     show.add_argument('--limit', type=int, help='read at most this many messages (1..1000)')
@@ -211,11 +212,16 @@ def main():
     show.add_argument('--after', type=int, help='later archive neighbors, 0..50; default 2 with --around-message')
     args = parser.parse_args()
     try:
-        result = (conversations(args.db, args.source, args.limit, args.offset,
-                                order=args.order, from_date=args.from_date, until_date=args.until_date)
-                  if args.command == 'list' else conversation(args.db, args.source, args.conversation,
-                                                             args.limit, args.offset, args.message,
-                                                             args.around_message, args.before, args.after))
+        if args.command == 'list':
+            result = conversations(args.db, args.source, args.limit, args.offset,
+                                   order=args.order, from_date=args.from_date, until_date=args.until_date)
+        elif args.output is not None:
+            from recaplib.conversation_document import save_conversation
+            result = save_conversation(args.db, args.source, args.conversation, args.limit, args.offset,
+                                       args.message, args.around_message, args.before, args.after, output=args.output)
+        else:
+            result = conversation(args.db, args.source, args.conversation, args.limit, args.offset,
+                                  args.message, args.around_message, args.before, args.after)
     except (ValueError, OSError, sqlite3.Error) as exc:
         parser.exit(1, str(exc) + '\n')
     print(json.dumps(result, ensure_ascii=True, indent=2))
