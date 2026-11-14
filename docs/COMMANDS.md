@@ -24,7 +24,7 @@ through the repository root, which is why the commands run from there.
 ## recap.py
 
 ```text
-usage: recap.py [-h] [--db DB] [--json-errors] {ingest,search,stats,describe-schema,inspect,list-export,inspect-web-zip,prepare-web-export,replay-local,web-branch,suggest-branch-title,suggest-replay-title,suggest-attributed-title,preview-title,apply-title,review-state,render-queue,review-titles,title-adapter-dry-run,title-adapter-simulate,export-title-plan,check-title-plan,import,check-import,export-normalized,export-provenance,check-provenance,declare-review-checkpoint,declare-checkpoint,changed-since,declare-recovery,rehearse-recovery,rebuild-archive,list,find,show,render,suggest-title,title,title-history,describe} ...
+usage: recap.py [-h] [--version] [--db DB] [--json-errors] {ingest,search,stats,describe-schema,inspect,list-export,inspect-web-zip,prepare-web-export,replay-local,web-branch,suggest-branch-title,suggest-replay-title,suggest-attributed-title,preview-title,apply-title,review-state,render-queue,review-titles,title-adapter-dry-run,title-adapter-simulate,export-title-plan,check-title-plan,import,check-import,export-normalized,export-provenance,check-provenance,declare-review-checkpoint,declare-checkpoint,changed-since,declare-recovery,rehearse-recovery,rebuild-archive,list,find,show,render,suggest-title,title,title-history,describe} ...
 ```
 
 The global `--db DB` precedes the subcommand. `describe` lists the current required,
@@ -751,3 +751,12 @@ or a filesystem sandbox. See [input-directory access](MCP_SERVER.md#explicit-inp
 all unittest outcome counts as stdout JSON only. It is not a product command or
 replacement for the CI gate. See [TESTING.md](TESTING.md) for the small runnable
 example, output boundaries and failure behavior.
+
+## CLI version identity
+
+`python recap.py --version` prints `recap-for-everyone 0.99.5` and exits without
+opening an archive or reading the publication manifest. It works outside the
+repository working directory and without the manifest. This numeric identity is
+not byte verification, authenticity or a stability guarantee. Use the documented
+CLI rather than relying on private module layout. It does not create a tag or
+replace the validation history, decide licensing or set a release schedule.

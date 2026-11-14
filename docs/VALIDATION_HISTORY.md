@@ -2741,3 +2741,25 @@ selection refusal and hidden fd output; the small documented command runs as a
 real process. All existing product and test files and 132 sh blocks are unchanged.
 Manifest 312 files, limited audit 313 files, compile, Python 3.10 syntax and
 whitespace checks passed. No private input or published timing receipt was used.
+
+## 2026-11-14 CLI version identity (0.99.5-cli-version):
+adds recap.py --version as the public interface for the declared numeric program
+version. The value is a code constant: version dispatch does not open the local
+publication manifest, an archive or a network connection. It works from a different
+working directory and without a manifest file. Release-identity tests bind the
+numeric value to the manifest release, current validation label and final labeled
+history entry using an exact value or value-plus-hyphen boundary, not a loose
+prefix. The live command catalog includes the new global option. Existing command
+JSON and archive behavior are unchanged. A version label is not proof of exact
+file bytes, authenticity, compatibility or a stability promise. No tag, license,
+branch deletion, release-frequency or changelog replacement decision is made.
+
+Validation: full synthetic suite 1,449 tests passed (one existing skip); focused
+17 and independent 21 checks passed. Representative existing successful JSON and
+plain/structured execution errors remain byte-identical to the previous release.
+Real subprocess checks cover other working directories, a manifest-free copy,
+invalid version options and no archive access. A post-import/warmup audit forbids
+file, SQLite and socket I/O during version dispatch; normal Python import reads
+are not claimed to disappear. All 133 existing sh blocks remain unchanged.
+Manifest 313 files, limited audit 314 files, compile, Python 3.10 syntax and
+whitespace checks passed. Version information is not an integrity attestation.

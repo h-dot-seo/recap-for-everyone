@@ -1,12 +1,12 @@
 {
   "project": "recap-for-everyone",
-  "release": "0.99.4-test-timing",
+  "release": "0.99.5-cli-version",
   "date": "2026-11-14",
   "private_history_imported": false,
   "actual_corpora_included": false,
   "synthetic_examples_only": true,
   "license_status": "NOT_SELECTED",
-  "file_count": 312,
+  "file_count": 313,
   "files": [
     {
       "path": ".gitattributes",
@@ -50,8 +50,8 @@
     },
     {
       "path": "VALIDATION.md",
-      "bytes": 41788,
-      "sha256": "d98f2428a97c57834aafda87b91d47eb4720d9e79550708266b45f52198a7b58"
+      "bytes": 43380,
+      "sha256": "134a71124096601573593fa06afa6fb3f239a46321702fd17935f72f8dae1ac6"
     },
     {
       "path": "attributed_title.py",
@@ -135,8 +135,8 @@
     },
     {
       "path": "docs/COMMANDS.md",
-      "bytes": 32419,
-      "sha256": "128396e9d9a435f6d9b7585cca3d924e5746ebb9b304eefb61827bd62490a6f3"
+      "bytes": 32930,
+      "sha256": "5927166cddf4f289fd190b2329afe17aaadfdd3cb552713c45ba0bc74775c9f2"
     },
     {
       "path": "docs/COMMAND_CATALOG.md",
@@ -185,8 +185,8 @@
     },
     {
       "path": "docs/INSTALL.md",
-      "bytes": 8018,
-      "sha256": "04185a55809d516467f0cc1fc8338374a47934dc813ff8f728e7124707151e32"
+      "bytes": 8440,
+      "sha256": "e24efad92e756e7c7e7feb61425bfd1b80464a7baf1e2e9b8306aac4f265f7fd"
     },
     {
       "path": "docs/JSON_ERRORS.md",
@@ -375,8 +375,8 @@
     },
     {
       "path": "docs/VALIDATION_HISTORY.md",
-      "bytes": 185651,
-      "sha256": "ca0cfb74cd6408748d4e364e8cfefc432c681c46276ec7715c49da5be06b27f7"
+      "bytes": 187228,
+      "sha256": "f5dabd4825697221edf7389693149f03e869ae51eb4a41defbc228e9e64a694c"
     },
     {
       "path": "docs/WEB_ZIP_INVENTORY.md",
@@ -510,8 +510,8 @@
     },
     {
       "path": "recap.py",
-      "bytes": 32227,
-      "sha256": "952ca5494e58e3a51327f90af5d4d1cf71d86f5e36688065ad15318b99b1000f"
+      "bytes": 32353,
+      "sha256": "29ab06ed9fe5f79b6acd112db67ecc22b8509c6e23d66f29e6e160996320893f"
     },
     {
       "path": "recap_mcp.py",
@@ -520,8 +520,8 @@
     },
     {
       "path": "recaplib/__init__.py",
-      "bytes": 101,
-      "sha256": "b0e31981d132eae4ff05dc302440a7d02ae1918e5c813f6cf8078fcf87db5189"
+      "bytes": 125,
+      "sha256": "fc6ee5024a59061ed2d379fc22e90feadf5cd44e771df09379d3e5e89a955610"
     },
     {
       "path": "recaplib/archive.py",
@@ -1187,6 +1187,11 @@
       "path": "tests/test_recovery_rehearsal.py",
       "bytes": 41365,
       "sha256": "b5fd2749daf974616b3ee7e0515d1ab8ba98bf9ef78348eff31f0df424c6d01d"
+    },
+    {
+      "path": "tests/test_release_identity.py",
+      "bytes": 4579,
+      "sha256": "b04633df19f14aaa7981afe02fe83c51a20e7a8de5f4ef611b0e271df5a3e4b8"
     },
     {
       "path": "tests/test_render_markdown.py",
