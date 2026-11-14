@@ -75,3 +75,7 @@ proposal needed for exact ordering and detectable occurrence-loss boundaries.
 Existing readers ignore these tables. This release does not rewrite any same-name
 table with an incompatible layout: a conflicting shape makes the explicit import
 fail, preserving its previous data. There is no automatic compatibility repair.
+
+For an explicitly chosen declaration that does compare these ledgers, see
+[recovery v2](RECOVERY_V2.md). Default v1 continues to omit topology; v2 does not
+make object-based rebuild restore title/review decisions.

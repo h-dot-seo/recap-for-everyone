@@ -341,7 +341,7 @@ sent. Guide: [title transfer](TITLE_TRANSFER.md).
 #### `declare-recovery`
 
 ```text
-usage: recap.py declare-recovery [-h] --output OUTPUT [--declared-at DECLARED_AT] [--text]
+usage: recap.py declare-recovery [-h] --output OUTPUT [--manifest-version {1,2}] [--declared-at DECLARED_AT] [--text]
 ```
 
 Write a `recap.recovery-manifest.v1` manifest describing the live archive
@@ -508,7 +508,7 @@ preparation. Guides: [title adapter](TITLE_ADAPTER.md), [saved title response](S
 
 ```text
 usage: recovery.py [-h] [--json-errors] {declare,rehearse} ...
-usage: recovery.py declare [-h] --db DB --output OUTPUT [--declared-at DECLARED_AT] [--text]
+usage: recovery.py declare [-h] --db DB --output OUTPUT [--declared-at DECLARED_AT] [--manifest-version {1,2}] [--text]
 usage: recovery.py rehearse [-h] --restored-db RESTORED_DB --output OUTPUT [--objects OBJECTS] [--text] manifest
 ```
 
@@ -754,7 +754,7 @@ example, output boundaries and failure behavior.
 
 ## CLI version identity
 
-`python recap.py --version` prints `recap-for-everyone 0.99.9` and exits without
+`python recap.py --version` prints `recap-for-everyone 0.100.0` and exits without
 opening an archive or reading the publication manifest. It works outside the
 repository working directory and without the manifest. This numeric identity is
 not byte verification, authenticity or a stability guarantee. Use the documented
@@ -774,3 +774,10 @@ are unchanged. See [JSON_ERRORS.md](JSON_ERRORS.md#standalone-product-entry-poin
 path. It is mutually exclusive with message/page/context selectors; default show
 is unchanged. See [archive branches](ARCHIVE_BRANCH.md), including legacy and
 recovery-v1 limits. This does not extend render, title generation or MCP schemas.
+
+## Optional v2 recovery ledger declaration
+
+`declare-recovery --manifest-version 2` opts into ordered history and complete
+provenance/topology digests. Default v1 is unchanged. Rehearsal reads the selected
+manifest version; rebuild currently rejects v2 before creating outputs. See
+[explicit v2 recovery](RECOVERY_V2.md).

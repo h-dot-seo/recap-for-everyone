@@ -118,6 +118,8 @@ def rebuild_archive(manifest_path, plan_path, objects, new_db, output):
     """Create only a verified new DB; never open or mutate the original archive."""
     destination, output = _destinations(new_db, output)
     raw_manifest, manifest = recovery._read_manifest(manifest_path)
+    if manifest['schema'] != recovery.MANIFEST_SCHEMA:
+        raise ValueError('v2 recovery manifests support restored-copy rehearsal only; object rebuild requires v1')
     raw_plan, plan = _read_plan(plan_path)
     store = Path(objects)
     if store.is_symlink() or not store.is_dir():

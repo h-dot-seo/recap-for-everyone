@@ -2865,3 +2865,24 @@ huge-integer parent injection now returns exact fixed failure JSON with exit 1;
 normal finite integers/floats and outcome/return-code checks remain unchanged.
 Compilation, Python 3.10 grammar and 134 existing shell examples passed. Manifest
 317 / audit 318 passed. No product behavior or private data was exercised.
+
+## 2026-11-14 Explicit ledger-preserving recovery v2 (0.100.0-ledger-recovery-v2):
+adds opt-in --manifest-version 2 for restored-copy rehearsal while preserving
+all default and saved-v1 contracts. V2 binds semantic revision IDs in title/review
+history, every legacy provenance/topology column and a full occurrence digest
+alongside its unchanged count field. The latter closes count-preserving locator
+or parent changes rather than claiming counts prove row preservation. Null absent
+ledgers differ from present empty tables; canonical full-column BINARY ordering
+includes duplicate rows and excludes physical layout/indexes. Receipts identify
+the actual input schema. Rebuild explicitly rejects v2 before creating outputs;
+it cannot infer title/review recovery from original objects. No archive migration,
+stamp, fingerprint, automatic re-sealing, private-data use or authority-policy
+wording change is introduced.
+
+Validation: all 1,499 tests passed (one environment-dependent skip), including
+15 v2 contract tests and the executed self-check guide. Independent review passed
+54 targeted tests, previous-release v1 CLI and saved-document byte comparisons,
+and all 38 ledger-column mutation probes with independent duplicate/null digest
+calculations. V2 publication failure/retained staging, output collision and
+explicit connection-close tests passed. Compilation, Python 3.10 grammar and all
+134 existing shell examples were preserved; manifest 319 / audit 320 passed.

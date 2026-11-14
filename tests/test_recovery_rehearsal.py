@@ -520,7 +520,7 @@ class RecoveryRehearsalTests(unittest.TestCase):
                 self.rehearse(restored, manifest=path)
             self.assertFalse((self.root / f'receipt-{self.counter}.json').exists())
 
-        rejected(lambda v: v.update(schema='recap.recovery-manifest.v2'), 'unsupported recovery manifest schema')
+        rejected(lambda v: v.update(schema='recap.recovery-manifest.v3'), 'unsupported recovery manifest schema')
         rejected(lambda v: v.pop('fts_rows'), 'exactly the declared fields')
         rejected(lambda v: v.update(unexpected=1), 'exactly the declared fields')
         rejected(lambda v: v.update(messages_sha256='XYZ'), 'malformed')

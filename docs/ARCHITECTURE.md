@@ -331,3 +331,11 @@ mapping ordinals and the supplied pointer state inside its existing transaction.
 It neither changes default show ordering nor imports only the active branch.
 These additive ledgers do not imply a schema epoch, automatic migration or
 manifest-v1 recovery coverage. See [archive branches](ARCHIVE_BRANCH.md).
+
+## Explicit versioned ledger rehearsal
+
+A new, explicitly selected recovery manifest v2 can bind ordered title/review
+history and full legacy/occurrence/topology rows. It compares a supplied restored
+copy, not a source-object rebuild, and does not create a backup or remote receipt.
+Default declarations and saved v1 checks remain unchanged. See
+[recovery v2](RECOVERY_V2.md).
