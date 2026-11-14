@@ -17,14 +17,23 @@ changes. Earlier deferred-lane records remain historical; a broader interpreter
 support or retirement policy is not introduced. New static workflow regression
 checks accompany the actual remote installation and full-suite CI gates.
 
-Validation: local Python 3.12 full synthetic suite 1,433 tests passed (one existing
-skip); focused nesting/import/title/workflow checks 54 passed (one existing skip).
+Validation: local Python 3.12 full synthetic suite 1,434 tests passed (one existing
+skip); focused nesting/import/title/workflow checks 69 passed (one existing skip).
 Independent review passed all five workflow contract tests and detected eight
 mutations of triggers, actions, permissions and verification gates. All 78 product
 modules and 132 existing sh blocks are byte-identical. Manifest 309 files, limited
 audit 310 files, compile, Python 3.10 syntax and whitespace checks passed. Remote
 Python 3.15 installation and six-job PR/main outcomes must be checked separately;
 no local result is claimed as new-interpreter or Windows evidence.
+
+Initial six-job CI (43605504317, head 91ad1a3) installed Python 3.15
+successfully and exposed a remaining fixed-depth adapter test: Ubuntu 3.15 accepted
+the depth-10,000 JSON, so three expected-error subtests failed. No product failure
+or new nesting restriction was inferred. That case now uses the existing bounded
+decoder-failure probe in a separate test, so an unavailable failing depth skips
+only nesting and cannot hide encoding/strict-JSON checks. The other invalid cases
+and all three adapter error-code expectations are preserved. Product code is
+unchanged; the corrected head requires all six CI jobs again.
 
 Previous change:
 
