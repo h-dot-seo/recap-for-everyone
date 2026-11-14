@@ -1,10 +1,21 @@
 # Validation record
 
-Current release: `0.95.5-zip-directory-budget`, dated 2026-11-14.
+Current release: `0.96.0-import-delta`, dated 2026-11-14.
 This file is the current snapshot. Every dated entry since the first release is kept
 unchanged and in order in [docs/VALIDATION_HISTORY.md](docs/VALIDATION_HISTORY.md).
 
 ## Latest change
+
+2026-11-14 Re-import conversation delta (0.96.0-import-delta):
+adds mutually exclusive conflicting/new/has_new_identities/no_new_identities
+conversation counts to check-import in its existing read snapshot, plus optional
+exclusive --delta-output private bounded ID samples. Existing message comparisons,
+source/selection boundaries and conflict exit1 remain; ingest/provenance unchanged.
+Eight synthetic tests and a two-file walkthrough cover priority, duplicates,
+scope, snapshot consistency, byte bounds, no-overwrite, privacy and CLI parity.
+No activity inference, automatic import, checkpoint or archive-only category.
+
+Previous change:
 
 2026-11-14 ZIP directory-budget admission (0.95.5-zip-directory-budget):
 replaces whole-archive signature counting with bounded EOCD/ZIP64 and actual
