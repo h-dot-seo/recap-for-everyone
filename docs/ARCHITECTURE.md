@@ -314,3 +314,11 @@ and size are checked before existing readers. This deliberately preserves those
 readers and their source semantics rather than claiming an atomic namespace lease
 or hostile-writer protection. Default archive tools are unchanged; no additional
 DB access, output writer or automatic directory enumeration is exposed.
+
+The opt-in MCP supplied-proposal queue preserves the existing bounded proposal
+loader and read-only review_queue logic. Its extra arguments exist only for
+servers launched with allowed input directories. All paths and aggregate declared
+size are admitted before loading; the original combined 1 MiB bounded-read check
+remains. Raw default queues and CLI contracts are unchanged. Reduced preflight
+budgets do not create an atomic filesystem lease, and queue readiness never
+authenticates operator approval or enables application.
