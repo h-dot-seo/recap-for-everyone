@@ -78,6 +78,7 @@ def main():
     batch = sub.add_parser('review-titles', help='build a read-only page of local title proposals and collision warnings')
     batch.add_argument('--source', required=True); batch.add_argument('--limit', type=int, default=20); batch.add_argument('--offset', type=int, default=0)
     batch.add_argument('--conversation', action='append', help='review only these explicit IDs; repeat, then intersect other filters')
+    batch.add_argument('--since-checkpoint', help='filter changes from an explicit unsigned source checkpoint; not review completion')
     batch.add_argument('--state', choices=['open', 'skipped', 'deferred'], help='filter by current snapshot-bound review state; scans eligible source content')
     batch.add_argument('--unrenamed-only', action='store_true', help='exclude conversations with any existing local title history')
     batch.add_argument('--proposal', action='append', help='explicit proposal JSON object file; repeat to review supplied candidates instead of generating raw excerpts')
@@ -106,6 +107,9 @@ def main():
     normalized.add_argument('--source', required=True)
     normalized.add_argument('--conversation')
     normalized.add_argument('--output', required=True)
+    checkpoint = sub.add_parser('declare-review-checkpoint', help='save a private source-wide read snapshot; no review decision')
+    checkpoint.add_argument('--source', required=True); checkpoint.add_argument('--output', required=True)
+    checkpoint.add_argument('--declared-at'); checkpoint.add_argument('--text', action='store_true')
     declare = sub.add_parser('declare-recovery', help='write a recovery manifest describing the live archive without changing it')
     declare.add_argument('--output', required=True, help='new manifest JSON path outside the archive; existing paths are refused')
     declare.add_argument('--declared-at', help='YYYY-MM-DD recorded as supplied text; no clock is read')
@@ -209,7 +213,7 @@ def main():
         elif args.command == 'review-titles':
             from recaplib.title_batch import review_queue, load_supplied_proposals
             supplied = load_supplied_proposals(args.proposal) if args.proposal is not None else None
-            result = review_queue(args.db, args.source, args.limit, args.offset, args.unrenamed_only, args.state, supplied, args.supplied_only, args.conversation)
+            result = review_queue(args.db, args.source, args.limit, args.offset, args.unrenamed_only, args.state, supplied, args.supplied_only, args.conversation, checkpoint=args.since_checkpoint)
         elif args.command in ('title-adapter-dry-run', 'title-adapter-simulate'):
             from recaplib.title_transfer import dry_run, simulate, MockTitleAdapter
             from recaplib.strict_json import loads
@@ -302,6 +306,9 @@ def main():
         elif args.command == 'export-normalized':
             from recaplib.normalized_export import export_normalized
             result = export_normalized(args.db, args.source, args.output, args.conversation)
+        elif args.command == 'declare-review-checkpoint':
+            from recaplib.review_checkpoint import declare_review_checkpoint
+            result = declare_review_checkpoint(args.db, args.source, args.output, args.declared_at)
         elif args.command == 'declare-recovery':
             from recaplib.recovery import declare_recovery
             result = declare_recovery(args.db, args.output, args.declared_at)
@@ -319,7 +326,11 @@ def main():
         rendered = None
         if getattr(args, 'text', False):
             from recaplib.recovery import render_text
-            rendered = render_text(result)
+            if args.command == 'declare-review-checkpoint':
+                from recaplib.text_summary import summary_text
+                rendered = summary_text('Review view checkpoint declaration', list(result.items()))
+            else:
+                rendered = render_text(result)
     except (OSError, ValueError, KeyError, TypeError, sqlite3.Error) as exc:
         p.exit(1, str(exc) + '\n')
     # JSON escapes preserve Unicode data even when the terminal is ASCII-only.

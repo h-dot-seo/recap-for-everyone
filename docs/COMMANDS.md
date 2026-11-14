@@ -23,7 +23,7 @@ through the repository root, which is why the commands run from there.
 ## recap.py
 
 ```text
-usage: recap.py [-h] [--db DB] {ingest,search,stats,describe-schema,inspect,list-export,inspect-web-zip,prepare-web-export,replay-local,web-branch,suggest-branch-title,suggest-replay-title,suggest-attributed-title,preview-title,apply-title,review-state,render-queue,review-titles,title-adapter-dry-run,title-adapter-simulate,export-title-plan,check-title-plan,import,check-import,export-normalized,declare-recovery,rehearse-recovery,list,find,show,render,suggest-title,title,title-history} ...
+usage: recap.py [-h] [--db DB] {ingest,search,stats,describe-schema,inspect,list-export,inspect-web-zip,prepare-web-export,replay-local,web-branch,suggest-branch-title,suggest-replay-title,suggest-attributed-title,preview-title,apply-title,review-state,render-queue,review-titles,title-adapter-dry-run,title-adapter-simulate,export-title-plan,check-title-plan,import,check-import,export-normalized,declare-review-checkpoint,declare-recovery,rehearse-recovery,rebuild-archive,list,find,show,render,suggest-title,title,title-history} ...
 ```
 
 The global `--db DB` precedes the subcommand and is required except for `inspect`,
@@ -232,7 +232,7 @@ Guides: [source-attributed titles](SOURCE_ATTRIBUTED_TITLES.md),
 #### `review-titles`
 
 ```text
-usage: recap.py review-titles [-h] --source SOURCE [--limit LIMIT] [--offset OFFSET] [--state {open,skipped,deferred}] [--unrenamed-only] [--proposal PROPOSAL] [--supplied-only] [--output NEW_JSON]
+usage: recap.py review-titles [-h] --source SOURCE [--limit LIMIT] [--offset OFFSET] [--conversation CONVERSATION] [--since-checkpoint SINCE_CHECKPOINT] [--state {open,skipped,deferred}] [--unrenamed-only] [--proposal PROPOSAL] [--supplied-only] [--output NEW_JSON]
 ```
 
 Read-only page of proposals with current titles, advisory hints and collision
@@ -649,3 +649,14 @@ with `python recap.py rebuild-archive MANIFEST --plan PLAN --objects DIR
 --new-db NEW.sqlite --output NEW.json [--text]`. It never opens the original DB;
 it exclusively publishes a checked new DB from explicit replay steps. Declared
 title history is not rebuilt, and review state remains undeclared/unrestored.
+
+### Private review view checkpoint
+
+```text
+usage: recap.py declare-review-checkpoint [-h] --source SOURCE --output OUTPUT [--declared-at DECLARED_AT] [--text]
+```
+
+Read one source snapshot and write a new private unsigned view cutoff, not a
+review decision. `review-titles --since-checkpoint FILE` compares the entire
+source before intersecting other filters; no archive mutation or automatic
+advancement. See [checkpoint semantics and workflow](REVIEW_CHECKPOINT.md).

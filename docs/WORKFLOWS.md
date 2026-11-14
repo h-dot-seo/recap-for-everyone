@@ -1182,3 +1182,11 @@ not rewritten timestamps or a new ingestion order. See [browse by time](BROWSE_B
 
 Read-only SQLite connections now apply and read back defense-in-depth settings;
 see [security](../SECURITY.md). Write connections are unchanged.
+
+## Source-wide review view cutoff
+
+Use `declare-review-checkpoint` and `review-titles --since-checkpoint` for an
+explicit unsigned source snapshot, not review completion or batch approval.
+Content/title comparisons and private-file limits are described in
+[the checkpoint guide](REVIEW_CHECKPOINT.md). Existing per-conversation review-state
+decisions remain independent; no checkpoint changes the archive.

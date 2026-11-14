@@ -1,10 +1,22 @@
 # Validation record
 
-Current release: `0.97.0-declared-object-rebuild`, dated 2026-11-14.
+Current release: `0.97.1-review-view-checkpoint`, dated 2026-11-14.
 This file is the current snapshot. Every dated entry since the first release is kept
 unchanged and in order in [docs/VALIDATION_HISTORY.md](docs/VALIDATION_HISTORY.md).
 
 ## Latest change
+
+2026-11-14 Source-wide review view cutoff (0.97.1-review-view-checkpoint):
+adds declare-review-checkpoint and opt-in review-titles --since-checkpoint.
+One read snapshot binds sorted source identities, existing content fingerprints
+and local title revisions in a private unsigned file. Exact bounded validation,
+deterministic bytes, source-wide comparison counts, filter intersections and
+full-source existing-title collisions are tested. Saved queues remain usable for
+HTML and fresh previews. No archive mutation, approval, completion, batch skip,
+authentication, provenance comparison or automatic checkpoint advancement is
+claimed. Existing no-checkpoint outputs and tested guide commands are preserved.
+
+Previous change:
 
 2026-11-14 Declared-object archive rebuild (0.97.0-declared-object-rebuild):
 adds rebuild-archive with an exact strict-JSON ordered replay plan, source-bound

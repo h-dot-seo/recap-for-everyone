@@ -222,3 +222,11 @@ with `python recap.py rebuild-archive MANIFEST --plan PLAN --objects DIR
 --new-db NEW.sqlite --output NEW.json [--text]`. It never opens the original DB;
 it exclusively publishes a checked new DB from explicit replay steps. Declared
 title history is not rebuilt, and review state remains undeclared/unrestored.
+
+For a source-wide incremental view cutoff, use `declare-review-checkpoint` with
+an explicitly new private output, then `review-titles --since-checkpoint` to
+review changed identities. This is not completion, permission or a bulk skip.
+The operator advances it by creating a new file after scoped work. Preserve
+normal preview/apply and whole-source collision checks; omit --unrenamed-only
+when renamed conversations with new messages must remain visible. See
+[the checkpoint guide](docs/REVIEW_CHECKPOINT.md).
