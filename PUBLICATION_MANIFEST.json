@@ -1,12 +1,12 @@
 {
   "project": "recap-for-everyone",
-  "release": "0.96.3-selected-review",
+  "release": "0.96.4-saved-conversation",
   "date": "2026-11-08",
   "private_history_imported": false,
   "actual_corpora_included": false,
   "synthetic_examples_only": true,
   "license_status": "NOT_SELECTED",
-  "file_count": 251,
+  "file_count": 254,
   "files": [
     {
       "path": ".gitattributes",
@@ -45,13 +45,13 @@
     },
     {
       "path": "SKILL.md",
-      "bytes": 14548,
-      "sha256": "f92ec99436c1e93cf013062b4319709cc8609da6eb6373ac760a2bd723cab5a1"
+      "bytes": 14788,
+      "sha256": "10cb1f7c03d5c7bd9a9e81d1b1db1a3dae18242ebe0d6b9fbbee2aeb67447eb2"
     },
     {
       "path": "VALIDATION.md",
-      "bytes": 15014,
-      "sha256": "e79b12d02a58cbea5f9831430f48edca84f7f6dd9de60d738540c4d1a286a753"
+      "bytes": 15590,
+      "sha256": "159733560ae454e344940587ff78be8d2d577b64ff94607613d8e968408ec89a"
     },
     {
       "path": "attributed_title.py",
@@ -110,8 +110,8 @@
     },
     {
       "path": "docs/COMMANDS.md",
-      "bytes": 26405,
-      "sha256": "d11e977e202968c1d0bab69a70874391e05f9e3e7fe70f7cfbb371e2895f5ce3"
+      "bytes": 26633,
+      "sha256": "b79249266deb3ade09b954e62ad605b70588fceffc27422c7d971cc633f51803"
     },
     {
       "path": "docs/EXPORT_INVENTORY.md",
@@ -194,6 +194,11 @@
       "sha256": "10c5f29e1b45df0f84bc8f4a5515ac6479799d5f0b050701db3857e8dbad067a"
     },
     {
+      "path": "docs/SAVED_CONVERSATION_JSON.md",
+      "bytes": 2628,
+      "sha256": "5a0d056944aead9da1d2036e3ea48a2ff3f4f07ecd1fe8ffea986b07da7eb219"
+    },
+    {
       "path": "docs/SAVED_TITLE_RESPONSE.md",
       "bytes": 10041,
       "sha256": "a4276d396436b07836748cf797615b4b73e6d01d61a33e517e9b09e870d6656d"
@@ -245,8 +250,8 @@
     },
     {
       "path": "docs/TITLE_DOCUMENT_FILES.md",
-      "bytes": 8775,
-      "sha256": "f7cd820fd43f05c7bc468fc89eb7f284d3fc36b0e02171263d87befc9c610960"
+      "bytes": 9005,
+      "sha256": "5c607a170253fe1a7c7515721120b31af99b825afd2409a93bb2411a2af23a13"
     },
     {
       "path": "docs/TITLE_HISTORY_SEARCH.md",
@@ -290,8 +295,8 @@
     },
     {
       "path": "docs/VALIDATION_HISTORY.md",
-      "bytes": 158654,
-      "sha256": "73da4980bb95a9053ea871355ae9551ebd7083f401c44ca9cb40211c11353d07"
+      "bytes": 159209,
+      "sha256": "b819295088b4df20de02acacc39b082500c1ef96813e817af9d00bd569275d39"
     },
     {
       "path": "docs/WEB_ZIP_INVENTORY.md",
@@ -410,8 +415,8 @@
     },
     {
       "path": "recap.py",
-      "bytes": 26424,
-      "sha256": "2496592a5c16580e5b55c4028f6338660c2afb12946c2e7f4da61e390d076244"
+      "bytes": 26948,
+      "sha256": "e0ccee16c917708d89ba8e5e725550cdb835e42aa0da3ad6bee97de305358c25"
     },
     {
       "path": "recaplib/__init__.py",
@@ -439,14 +444,19 @@
       "sha256": "f59b3f7913b9f357b48faecc3ad4d2106dfca310bc6533a7699735e8e271e778"
     },
     {
+      "path": "recaplib/conversation_document.py",
+      "bytes": 2016,
+      "sha256": "776ff1e74e39256eb6b044a499fcaa1864e1fe9e92c41edba133ac69345f6ac8"
+    },
+    {
       "path": "recaplib/conversation_search.py",
       "bytes": 23340,
       "sha256": "ac3e7a4983e560d811c91b0c36a2f780e2d8590aba27cab2c74f5ea354cf4d0d"
     },
     {
       "path": "recaplib/conversation_view.py",
-      "bytes": 13736,
-      "sha256": "2a0fba71695a14d0163551f0a02e36ffa3c05ff590ed2b421a57617128311e08"
+      "bytes": 14120,
+      "sha256": "8bc1ca3c6a40daaa0c5099f910eab9efed9ee7b53944121ae56250afbdfd7242"
     },
     {
       "path": "recaplib/document_output.py",
@@ -977,6 +987,11 @@
       "path": "tests/test_runtime_check.py",
       "bytes": 17892,
       "sha256": "999000540bad7ba257da974dfe9a643c60d1309d90f0a0f1f78b45ea7e0869bc"
+    },
+    {
+      "path": "tests/test_saved_conversation_json.py",
+      "bytes": 5543,
+      "sha256": "c01907b231372b9515074e3e0b369b2f7560c1a7e2a3605177f25d5f72a91bd5"
     },
     {
       "path": "tests/test_saved_title_response.py",

@@ -630,3 +630,7 @@ See [re-import delta](REIMPORT_DELTA.md).
 `review-titles --conversation ID` may repeat to explicitly select a bounded
 identity subset before pagination. Other filters intersect; source-wide existing
 title collision checks remain. See [selected title review](SELECTED_TITLE_REVIEW.md).
+
+`show` and standalone `conversation_view.py show` accept `--output NEW_JSON`.
+They save the unchanged selected view object as UTF-8 and print only a hash/byte
+receipt. See [saved conversation JSON](SAVED_CONVERSATION_JSON.md).

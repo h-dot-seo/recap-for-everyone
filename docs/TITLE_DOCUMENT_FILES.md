@@ -136,3 +136,7 @@ Relevant existing bounded readers now preflight regular-file type and their exis
 byte budget before open, while retaining one bounded read and post-read checks.
 Symlinks to regular files retain their prior behavior; this does not change the
 separate recovery restored/object symlink policy. See [security](../SECURITY.md).
+
+For exact conversation view JSON rather than title documents, use
+`show --output NEW_JSON`; see [saved conversation JSON](SAVED_CONVERSATION_JSON.md).
+It uses a separate document kind and does not make a title approval artifact.

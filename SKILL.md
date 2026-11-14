@@ -203,3 +203,7 @@ ID samples; see docs/REIMPORT_DELTA.md. No checkpoint is advanced.
 For an operator-selected subset after a delta/search, review-titles --conversation ID
 may repeat. Selection never approves a title or writes review state; full-source
 existing-title collisions still apply. See docs/SELECTED_TITLE_REVIEW.md.
+
+Use show --output NEW_JSON to save an exact private selected conversation view
+with provenance, not a vendor export or approval. Default stdout is unchanged;
+see docs/SAVED_CONVERSATION_JSON.md for the exclusive file and receipt boundary.

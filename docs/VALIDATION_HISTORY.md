@@ -2385,3 +2385,11 @@ remain visible; default output, title/state writes and approval boundaries stay.
 Nine synthetic tests cover scope, counts, unknown/invalid IDs, page order,
 excluded-body reads, collisions, saved-queue rendering/preview, CLI/read-only behavior and an executable guide.
 No automatic delta ingestion, checkpoint, completion claim or title application.
+
+2026-11-14 Exact conversation JSON files (0.96.4-saved-conversation):
+adds show --output NEW_JSON to unified and standalone views. The unchanged view
+object, selection and provenance are serialized as readable UTF-8 to one exclusive
+private file; stdout becomes a body/ID-free byte/hash receipt. Default show stays.
+Eight synthetic tests cover Unicode, selections, provenance, no-overwrite,
+invalid/oversized output, lone-surrogate escapes, CLI parity and executed guide.
+No database mutation, sidecar, vendor export, approval or memory-bound guarantee.
