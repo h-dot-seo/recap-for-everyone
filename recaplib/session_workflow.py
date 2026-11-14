@@ -75,9 +75,18 @@ def _read_export_bytes(path, expected_export_sha256=None):
 def normalize(path, kind, include_report=False, conversation=None, expected_export_sha256=None):
     path = Path(path)
     raw = _read_export_bytes(path, expected_export_sha256)
-    rows, report = _normalize_bytes(raw, path.name, kind, include_report=True)
+    rows, report = _normalize_selected_bytes(raw, path.name, kind, conversation)
     if expected_export_sha256 is not None:
+        # Preserve the path API's historical JSON key order as well as values.
+        selection = report.pop('selection', None)
         report['expected_export_sha256'] = expected_export_sha256
+        if selection is not None:
+            report['selection'] = selection
+    return (rows, report) if include_report else rows
+
+
+def _normalize_selected_bytes(raw, label, kind, conversation=None):
+    rows, report = _normalize_bytes(raw, label, kind, include_report=True)
     if conversation is not None:
         if not isinstance(conversation, str) or not conversation:
             raise ValueError('selected conversation must be a nonempty string')
@@ -97,7 +106,7 @@ def normalize(path, kind, include_report=False, conversation=None, expected_expo
                                   coverage_scope='all other coverage counts and warnings describe the entire input file',
                                   policy='only this conversation; preserve all extracted branches or raw local records')
         rows = selected
-    return (rows, report) if include_report else rows
+    return rows, report
 
 
 def _normalize_bytes(raw, source_name, kind, include_report=False):
@@ -219,11 +228,11 @@ def inspect_export(path, kind, conversation=None, expected_export_sha256=None):
     return dict(report, mode='inspection only; no database access')
 
 
-def _normalized_bytes(rows):
+def _normalized_bytes(rows, newline=None):
     # Match the previous UTF-8 Path.write_text default newline translation,
     # including Windows CRLF artifact hashes, but keep the derived bytes in memory.
     with io.BytesIO() as buffer:
-        with io.TextIOWrapper(buffer, encoding='utf-8', newline=None) as text:
+        with io.TextIOWrapper(buffer, encoding='utf-8', newline=newline) as text:
             text.write(''.join(json.dumps(row, ensure_ascii=False) + '\n' for row in rows))
             text.flush()
             return buffer.getvalue()
@@ -236,6 +245,44 @@ def import_export(db, source, path, kind, conversation=None, expected_export_sha
     # Keep original hash/locator/branch metadata in companion provenance tables.
     result = ingest_bytes(db, source, _normalized_bytes(rows), provenance=rows)
     result['coverage'] = report
+    return result
+
+
+def import_export_bytes(db, source, raw, label, kind, conversation=None, *, newline):
+    """Replay supplied export bytes with explicit label and LF/CRLF serialization.
+
+    Writes the selected archive using normal import transactions. This is not an
+    exclusive new-DB/rebuild wrapper and does not read any input path. The caller
+    owns object-hash authorization and must supply the original parsing label.
+    """
+    _validate_source(source)
+    if not isinstance(raw, bytes):
+        raise ValueError('export input must be immutable bytes')
+    if newline not in ('lf', 'crlf'):
+        raise ValueError('replay newline must be lf or crlf')
+    if kind not in ('web', 'local', 'local-codex'):
+        raise ValueError('unsupported format')
+    if label is None and kind == 'web':
+        parser_label = ''
+    else:
+        if not isinstance(label, str) or not label:
+            raise ValueError('replay label must be nonempty text for local exports')
+        try:
+            label.encode('utf-8')
+        except UnicodeEncodeError:
+            raise ValueError('replay label must contain valid Unicode text') from None
+        parser_label = label
+    rows, report = _normalize_selected_bytes(raw, parser_label, kind, conversation)
+    result = ingest_bytes(db, source, _normalized_bytes(rows, '\n' if newline == 'lf' else '\r\n'),
+                          provenance=rows)
+    result['coverage'] = report
+    # Do not echo the potentially private label or selection in this new block.
+    # Existing coverage selection fields retain the import API's prior contract.
+    result['replay'] = dict(newline=newline, label_supplied=label is not None,
+                            input='supplied immutable export bytes',
+                            recovery_verified='NOT_ESTABLISHED',
+                            boundary='Import only; no exclusive database creation, replay-plan authorization, '
+                                     'title/review recovery or remote backup verification.')
     return result
 
 

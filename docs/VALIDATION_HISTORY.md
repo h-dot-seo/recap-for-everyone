@@ -2401,3 +2401,11 @@ verify logical rows and the newly built FTS index. Tests assert original DB
 immutability, real fresh destination, positive checks, changed-source failure and
 missing-object failure. No automatic rebuild command, replay plan, exclusive DB
 creation, local title/review recovery or remote backup guarantee is added.
+
+2026-11-14 Explicit export byte replay (0.96.6-export-byte-replay):
+adds import_export_bytes with explicit original parsing label and LF/CRLF output,
+sharing exact conversation selection and provenance logic with path imports.
+Eight synthetic tests cover all adapters, file/API parity, label identity,
+newline-sensitive digest failure, selection refusal, transactions and executed
+guide. Existing CLI serialization and output stay unchanged. No replay-plan
+validation, exclusive DB creation or automatic recovery claim is introduced.

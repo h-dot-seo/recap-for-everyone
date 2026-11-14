@@ -194,3 +194,7 @@ no SQL CPU/memory budget or protection against hostile concurrent directory
 changes. Write connections for ingest, title history and review state are unchanged
 and assume an operator-created archive. These protections do not authenticate
 content, validate all semantics or prove recovery completeness.
+
+For Python callers replaying retained export bytes, see [explicit byte replay](EXPORT_BYTE_REPLAY.md). This API supplies original parsing labels and
+LF/CRLF serialization explicitly; the existing path-based CLI remains unchanged.
+It is an import write API, not an exclusive new-DB or verified recovery command.

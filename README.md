@@ -199,3 +199,7 @@ For an actual fresh normalized-object replay rather than a live-DB self-check,
 follow the [rebuild rehearsal](docs/REBUILD_REHEARSAL.md).
 Use separate absent DB paths; ingest is a write, and this guide does not make
 existing-path ingestion exclusive or recreate title/review history.
+
+For Python callers replaying retained export bytes, see [explicit byte replay](docs/EXPORT_BYTE_REPLAY.md). This API supplies original parsing labels and
+LF/CRLF serialization explicitly; the existing path-based CLI remains unchanged.
+It is an import write API, not an exclusive new-DB or verified recovery command.
