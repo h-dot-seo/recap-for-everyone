@@ -1,7 +1,7 @@
 # Explicit read-only MCP stdio access
 
 This optional local entry point gives an operator-selected MCP client six archive
-read tools without exposing Recap's write commands. It does not install, configure
+read tools by default without exposing Recap's write commands. It does not install, configure
 or connect a client. Start it only for an archive and receiving client the operator
 has authorized. The public feature is a constrained local tool interface; no private
 account, service integration or unattended deployment is supplied.
@@ -23,7 +23,7 @@ background watcher, model calls or external provider requests. It must not be
 exposed as a network service. Nothing here approves transmitting an archive to a
 model or retaining its text in a client log.
 
-## Supported tools
+## Default archive tools
 
 | Tool | Existing operation | Excluded paths |
 |---|---|---|
@@ -36,9 +36,9 @@ model or retaining its text in a client log.
 
 Use tools/list for the exact input schemas, required identities and numeric
 bounds. The archive is fixed by the launch argument; calls cannot select another
-database. Unknown properties are rejected. No title, review-state, import, ingest,
-apply-title, rebuild, recovery declaration or file-input tool is exposed, even
-through a flag. There is no generic CLI, SQL, file or shell execution tool.
+database. Unknown properties are rejected. No title, review-state, import, ingest, apply-title, rebuild or recovery declaration
+tool is exposed. File tools are absent unless input directories are explicitly
+authorized at launch as described below. There is no generic CLI, SQL, file or shell execution tool.
 
 Each successful tool result has two text items: the existing operation's JSON,
 then a fixed privacy and authority boundary. The first item preserves the normal
@@ -98,3 +98,58 @@ and a DELETE-mode scratch tree do not guarantee absence of all sidecar effects.
 This server is not a hostile-filesystem sandbox, recovery check or privacy filter.
 EOF/process termination is not a claim that the client deleted already received
 text. No real archive is used by the included tests.
+
+## Explicit input-directory access
+
+An operator may additionally select directories containing the exact local inputs
+the receiving client is authorized to inspect. This does not install a client or
+authorize transmitting every file merely because it is in a directory. Scope the
+directory narrowly and review the client's handling of private data first. Without
+--allow-input-dir, the default six-tool interface is unchanged.
+
+```json
+{"command":"python","args":["recap_mcp.py","--db","ARCHIVE.sqlite","--allow-input-dir","INPUTS","--max-input-bytes","1048576"]}
+```
+
+Replace INPUTS with the explicitly selected existing directory. The launch flag
+may repeat. --max-input-bytes accepts 1 through 67108864 bytes and defaults to
+67108864 (64 MiB); the example deliberately lowers the admission limit to 1 MiB.
+These are launch settings, not per-call arguments. Directory names are not emitted
+in tool metadata. The archive remains fixed at launch; file tools do not open it.
+
+With at least one allowed directory, tools/list additionally exposes:
+
+| Tool | Existing read operation | Boundary |
+|---|---|---|
+| inspect | Export extraction coverage | Not permission to import or repair |
+| list-export | Export identities/titles and selection coverage | Private IDs/titles, not an import |
+| inspect-web-zip | ZIP member metadata and eligibility | No member extraction; eligibility is not source validation |
+| web-branch | Explicit web conversation branch | No inference of alternate branch approval |
+| replay-local | Existing retained-turn projection | supported=false is an error result, not partial success |
+
+Tool calls select an input path, not a directory scan or arbitrary command. Paths
+are resolved strictly before the check and must name a regular file under at least
+one canonical allowed directory. Outside traversal, sibling-prefix paths, and
+links resolving outside are refused. An inside-resolving link may be accepted.
+Files exceeding the configured size are refused before invoking the reader.
+Directories, missing files and special files are not accepted as tool inputs.
+Protocol/schema failures and file-admission errors do not echo supplied paths.
+Successful reader output can contain private text, titles, identifiers and source
+metadata; fixed error handling is not a general privacy filter.
+
+This is a preflight check, not a filesystem sandbox, path-ownership proof, immutable
+snapshot or consent guarantee. A concurrent process can replace/grow a file or
+change a directory/link after resolution/stat and before an existing reader opens
+it. The original whole-file readers are unchanged and may materialize the file
+after preflight, so the admission limit is not a strict memory bound under races.
+Use only trusted, stable local input directories; do not expose this interface to
+untrusted shared writers. There is no source rewriting, staging copy, file upload
+or backup in this path.
+
+ZIP inspection retains its own 64 MiB byte cap, directory-entry preflight and
+existing lower-only member-size controls. It does not decompress candidate members
+or bypass CRC/extraction validation for later operations. Other file tools do not
+auto-detect or decompress ZIPs. The existing 1 MiB response cap still applies to
+all tool results, including supported=false replay documents. Smaller selections
+can reduce output but do not guarantee bounded parsing time. No title proposal,
+checkpoint-file reader or write tool is added by directory authorization.

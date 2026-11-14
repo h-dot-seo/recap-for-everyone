@@ -264,5 +264,6 @@ still run as real processes; this is a test-maintenance change, not a runtime or
 performance guarantee. See [test boundaries](docs/ARCHITECTURE.md#synthetic-cli-test-boundaries).
 
 For an explicitly authorized local MCP client, [read-only stdio access](docs/MCP_SERVER.md)
-exposes six archive reads without write or file-input tools. It does not install
+exposes six archive reads by default, with optional explicitly directory-scoped
+input inspection and no write tools. It does not install
 or connect a client, and private results remain untrusted evidence.

@@ -739,3 +739,8 @@ child. Its six DB-read tools exclude writes and file inputs. This is not a unifi
 recap.py subcommand, installation or client connection. Read [MCP_SERVER.md](MCP_SERVER.md)
 for the tested JSON client configuration, pinned protocol and privacy/resource
 boundaries. EOF exits; clients own timeouts.
+
+Optional launch settings: `python recap_mcp.py --db DB --allow-input-dir DIR --max-input-bytes BYTES`.
+The directory option may repeat; without it no file tool is exposed. These settings
+only add bounded preflight for explicit local file inspection, not write authority
+or a filesystem sandbox. See [input-directory access](MCP_SERVER.md#explicit-input-directory-access).

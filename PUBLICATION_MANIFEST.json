@@ -1,12 +1,12 @@
 {
   "project": "recap-for-everyone",
-  "release": "0.99.0-readonly-mcp",
+  "release": "0.99.1-mcp-file-inspection",
   "date": "2026-11-14",
   "private_history_imported": false,
   "actual_corpora_included": false,
   "synthetic_examples_only": true,
   "license_status": "NOT_SELECTED",
-  "file_count": 306,
+  "file_count": 307,
   "files": [
     {
       "path": ".gitattributes",
@@ -30,8 +30,8 @@
     },
     {
       "path": "README.md",
-      "bytes": 19288,
-      "sha256": "ecee1e110727f68e77f00eacee57a80f360c872c6844b56007691d961b615495"
+      "bytes": 19344,
+      "sha256": "2ec6786c215727e3e6a473304d9a78c83d33d8f463229f038af343be69197d0f"
     },
     {
       "path": "RIGHTS.md",
@@ -45,13 +45,13 @@
     },
     {
       "path": "SKILL.md",
-      "bytes": 29699,
-      "sha256": "97a0cd65d57b6624b47c1a7f6fcec555ac7011c43f91560915ff49961a761760"
+      "bytes": 30225,
+      "sha256": "125fd9cadb2b8ba04be19ac788bfcaad622402dad828743d38a55088ab824af7"
     },
     {
       "path": "VALIDATION.md",
-      "bytes": 34212,
-      "sha256": "c459204e7e3fd5cfd194572924d1c1aeb99ec2d5d2b6d884ea8769e5dcc1d54c"
+      "bytes": 35916,
+      "sha256": "66b9e9db7e20ef99e6a9f41869df638a186c54cc8c624cee885c66198dc35cd3"
     },
     {
       "path": "attributed_title.py",
@@ -105,8 +105,8 @@
     },
     {
       "path": "docs/ARCHITECTURE.md",
-      "bytes": 19200,
-      "sha256": "728bbac43e2f5621f623fcb30676b06c7fd0e66d5f7354a99cd1aecc2ea99a76"
+      "bytes": 19678,
+      "sha256": "8a0488bf5a8c698858959061b1ad6c8b1bf964d72507ecb46287a2d9c6403053"
     },
     {
       "path": "docs/ATTRIBUTED_MESSAGE_SELECTION.md",
@@ -135,8 +135,8 @@
     },
     {
       "path": "docs/COMMANDS.md",
-      "bytes": 31711,
-      "sha256": "271c62092407973f62920f41790b2ed8be579713e3aa34bf476ad6f0881daae0"
+      "bytes": 32084,
+      "sha256": "09289060751c6efd96b2bb18a14f5e2ae7b19e7f913eb67defac0c3acba5dc9c"
     },
     {
       "path": "docs/COMMAND_CATALOG.md",
@@ -195,8 +195,8 @@
     },
     {
       "path": "docs/MCP_SERVER.md",
-      "bytes": 6076,
-      "sha256": "9187f52db80f768487c9ee9e14517b1d779c6fc187cbf639658e8ea92cca028b"
+      "bytes": 9632,
+      "sha256": "f0a59ed825a65a3a3188b1bc22e6b5907f2ff6e670a9c5084b29496a1b1d47bc"
     },
     {
       "path": "docs/MESSAGE_PROVENANCE.md",
@@ -225,8 +225,8 @@
     },
     {
       "path": "docs/README.ko.md",
-      "bytes": 22052,
-      "sha256": "882590d02971b02b3c00e29e2c2ca9b62ce1519d51cccc4473c6456c0099d070"
+      "bytes": 22476,
+      "sha256": "7f052f97d354bffa282a494030b68d8433f39d3f879958a4dec8bff771ddfed6"
     },
     {
       "path": "docs/REBUILD_REHEARSAL.md",
@@ -370,8 +370,8 @@
     },
     {
       "path": "docs/VALIDATION_HISTORY.md",
-      "bytes": 178317,
-      "sha256": "d2c9ad4dfe8997b188ab6e962aecb8987b53c605cf568fe1701122ad939c61b4"
+      "bytes": 179999,
+      "sha256": "41382d84b9e0e015c53edde0d3270df6b0a273fcd772a285b016626b643b9adc"
     },
     {
       "path": "docs/WEB_ZIP_INVENTORY.md",
@@ -610,8 +610,8 @@
     },
     {
       "path": "recaplib/mcp_server.py",
-      "bytes": 10211,
-      "sha256": "9f370d39fc431b2a8daf8a44adfc01653a4b637783ec6deab06f5c331e1bbff7"
+      "bytes": 15019,
+      "sha256": "620d9a657be2bc856708c73c7fee180a7b91f4e6cd6d739a85ea9433e70ecf63"
     },
     {
       "path": "recaplib/message_provenance.py",
@@ -1087,6 +1087,11 @@
       "path": "tests/test_manifest_verification.py",
       "bytes": 4433,
       "sha256": "a556cd2f86d064256a48eb1424611174ff8a0ee9e92a0552d926c83430b4d83e"
+    },
+    {
+      "path": "tests/test_mcp_files.py",
+      "bytes": 13168,
+      "sha256": "857989ec2fffd76098f58699bd8be3463dccbede2f2a2db72e147f081d3dbc80"
     },
     {
       "path": "tests/test_mcp_server.py",
