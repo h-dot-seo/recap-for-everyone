@@ -1,10 +1,24 @@
 # Validation record
 
-Current release: `0.97.1-review-view-checkpoint`, dated 2026-11-14.
+Current release: `0.97.2-accepted-artifact-cutoff`, dated 2026-11-14.
 This file is the current snapshot. Every dated entry since the first release is kept
 unchanged and in order in [docs/VALIDATION_HISTORY.md](docs/VALIDATION_HISTORY.md).
 
 ## Latest change
+
+2026-11-14 Accepted-artifact import cutoff (0.97.2-accepted-artifact-cutoff):
+adds declare-checkpoint and counts-only changed-since for one explicit source.
+A private unsigned artifact declaration binds original accepted message rows with
+recovery-compatible logical digests. Comparison verifies the declared subset in
+one read snapshot before reporting mutually exclusive conversation classes; any
+mismatch returns CUTOFF_NOT_VERIFIED with no delta and CLI exit 1. New artifacts
+are permitted without changing ingest receipts or recovery-manifest semantics.
+No source/conversation IDs or excerpts enter stdout, no DB mutation, approval,
+completeness, review completion, archive identity or automatic advancement is
+claimed. Exact bounded schemas, exclusive output, tamper refusal, CLI parity,
+executed guide and explicit SQLite connection closure are checked.
+
+Previous change:
 
 2026-11-14 Source-wide review view cutoff (0.97.1-review-view-checkpoint):
 adds declare-review-checkpoint and opt-in review-titles --since-checkpoint.

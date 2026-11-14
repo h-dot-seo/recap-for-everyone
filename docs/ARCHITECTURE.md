@@ -213,3 +213,9 @@ explicit unsigned source snapshot, not review completion or batch approval.
 Content/title comparisons and private-file limits are described in
 [the checkpoint guide](REVIEW_CHECKPOINT.md). Existing per-conversation review-state
 decisions remain independent; no checkpoint changes the archive.
+
+For import-lineage incremental counts, use `declare-checkpoint` then `changed-since`
+with the same explicit source. Continue only on `CUTOFF_VERIFIED`; an unverified
+subset reports no delta. This is distinct from the title/content review view cutoff,
+not review completion or import permission. Never advance automatically. See
+[accepted-artifact cutoff](IMPORT_CHECKPOINT.md).
