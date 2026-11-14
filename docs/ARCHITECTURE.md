@@ -255,3 +255,9 @@ title changes and review decisions remain separate authorized write paths;
 new-file publication and rebuild retain their existing partial-failure boundaries.
 The optional release label is declared metadata, not manifest verification.
 See [command catalogue](COMMAND_CATALOG.md).
+
+Command effect regressions execute all declared default-read unified commands on
+synthetic fixtures before checking full scratch-tree byte/path invariance. Explicit
+conditional writes are tested separately. The archive fixture uses DELETE journal
+mode and is closed between operations; this evidence is not a universal no-sidecar
+or hostile-filesystem guarantee. See [command catalogue](COMMAND_CATALOG.md).

@@ -1,12 +1,12 @@
 {
   "project": "recap-for-everyone",
-  "release": "0.97.8-command-catalog",
+  "release": "0.97.9-command-effect-matrix",
   "date": "2026-11-14",
   "private_history_imported": false,
   "actual_corpora_included": false,
   "synthetic_examples_only": true,
   "license_status": "NOT_SELECTED",
-  "file_count": 294,
+  "file_count": 295,
   "files": [
     {
       "path": ".gitattributes",
@@ -50,8 +50,8 @@
     },
     {
       "path": "VALIDATION.md",
-      "bytes": 27174,
-      "sha256": "12a444c2e1f8088d630c0df4a9a2e305604b5e0abc3acc7aab6ef990e9d246d7"
+      "bytes": 28055,
+      "sha256": "7d4a57516f5cb0c82a1a7123cd6565639a215f3f3dc1d9e0847b106e1eccb0c9"
     },
     {
       "path": "attributed_title.py",
@@ -105,8 +105,8 @@
     },
     {
       "path": "docs/ARCHITECTURE.md",
-      "bytes": 15998,
-      "sha256": "0541dbb1fcc2286d71b770052fcfa1542cd7c36edcdb5c60bad42610ff327ed2"
+      "bytes": 16407,
+      "sha256": "f3a2eb4c790d343030bb968c3ba0fa2026a116691479a472c072515122103491"
     },
     {
       "path": "docs/ATTRIBUTED_MESSAGE_SELECTION.md",
@@ -140,8 +140,8 @@
     },
     {
       "path": "docs/COMMAND_CATALOG.md",
-      "bytes": 3187,
-      "sha256": "15cb703a1b64d849a9210c38375afaf57b2f5a0897c6b996933cb1fbcf21fe34"
+      "bytes": 4416,
+      "sha256": "ae4cafcf180154a32710168d48b75d94c7f4a403b3f7341df03681550d2939a3"
     },
     {
       "path": "docs/ERROR_DIAGNOSTICS.md",
@@ -360,8 +360,8 @@
     },
     {
       "path": "docs/VALIDATION_HISTORY.md",
-      "bytes": 171351,
-      "sha256": "b4e947ee7e2b23d308bd300056236b45d8f69f4c3a20fe06fcdeca486a5b57d1"
+      "bytes": 172211,
+      "sha256": "89270667ea47cda96cb436b1d9e3c71d176dbcb2ee5729fd13d1c067b6177e22"
     },
     {
       "path": "docs/WEB_ZIP_INVENTORY.md",
@@ -882,6 +882,11 @@
       "path": "tests/test_command_catalog.py",
       "bytes": 8708,
       "sha256": "9fe074c947a532f5c9213fd09109623b8a4cccdfb539b1dffe33b0efdb0ea3eb"
+    },
+    {
+      "path": "tests/test_command_effects.py",
+      "bytes": 13584,
+      "sha256": "f192306a8871913fb7195a3e2371428190f0a6d8b210730f0142a1e18299cd9e"
     },
     {
       "path": "tests/test_command_usage.py",
