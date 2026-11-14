@@ -2464,3 +2464,15 @@ no Git, deployment or CI permission change is performed. This is not an atomic
 filesystem snapshot or a hostile concurrent-namespace sandbox.
 
 Prepublication independent review caught a candidate-metadata audit gap: supplied release/date text had not been checked against publication patterns. Candidate encoded bytes now receive the same pattern checks, with value-free errors and plan/write regression coverage. Nothing was published before this correction.
+
+## 2026-11-14 Safe low-level CLI diagnostics (0.97.4-safe-cli-diagnostics):
+shares fixed diagnostics for already-caught OS, SQLite, JSON-decoder and Unicode-
+decoder errors across unified and existing standalone entry points. Established
+validation messages, adapter codes, caught exception sets, exit statuses and
+stdout result-level failure documents remain unchanged. Exact code-authored safe
+publication/protection messages are retained; rebuild receipt failure after DB
+publication retains the published/preserved warning without the destination path.
+Synthetic actual and injected failures, output collisions, missing parents,
+private markers, fixed-message parity and the executed error guide are tested.
+No JSON envelope, new flag, global data-sanitization or no-mutation-on-error claim
+is introduced. Argparse and unexpected programming-error behavior are unchanged.

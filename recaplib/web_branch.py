@@ -1,4 +1,5 @@
 """Read one explicit web export branch; never open or modify an archive."""
+from recaplib.cli_errors import safe_diagnostic
 import argparse
 import json
 from pathlib import Path
@@ -61,7 +62,7 @@ def main():
     try:
         result = branch_view(args.input, args.conversation, args.node)
     except (ValueError, OSError, KeyError, TypeError) as error:
-        parser.exit(1, str(error) + '\n')
+        parser.exit(1, safe_diagnostic(error) + '\n')
     print(json.dumps(result, ensure_ascii=True, indent=2))
 
 

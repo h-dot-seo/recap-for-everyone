@@ -1,4 +1,5 @@
 """Declare a live archive for backup and rehearse recovery of a restored copy read-only."""
+from recaplib.cli_errors import safe_diagnostic
 import argparse
 import hashlib
 import json
@@ -713,7 +714,7 @@ def main():
             result = rehearse_recovery(args.manifest, args.restored_db, args.output, args.objects)
         rendered = render_text(result) if args.text else json.dumps(result, ensure_ascii=True, indent=2) + '\n'
     except (ValueError, OSError, KeyError, TypeError, sqlite3.Error) as error:
-        parser.exit(1, str(error) + '\n')
+        parser.exit(1, safe_diagnostic(error) + '\n')
     print(rendered, end='')
     if args.command == 'rehearse' and result['status'] != PASSED:
         raise SystemExit(1)

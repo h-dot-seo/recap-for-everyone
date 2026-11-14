@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 """Local-only archive import, inspection, search and checked title workflows."""
+from recaplib.cli_errors import safe_diagnostic
 import argparse
 import json
 import sqlite3
@@ -344,7 +345,7 @@ def main():
             else:
                 rendered = render_text(result)
     except (OSError, ValueError, KeyError, TypeError, sqlite3.Error) as exc:
-        p.exit(1, str(exc) + '\n')
+        p.exit(1, safe_diagnostic(exc) + '\n')
     # JSON escapes preserve Unicode data even when the terminal is ASCII-only.
     # In particular, a committed title change must not look failed at print time.
     # The optional recovery text summary is quoted ASCII for the same reason.
