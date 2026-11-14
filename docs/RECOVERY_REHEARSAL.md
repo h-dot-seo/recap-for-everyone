@@ -236,3 +236,12 @@ can reproduce these ID-only ledgers through explicit import; without those bytes
 text-only occurrence rows cannot reconstruct missing roots, tips or pointers.
 This does not change any existing v1 digest, check or result field. See
 [archive branches](ARCHIVE_BRANCH.md).
+
+## Explicit v2 declarations
+
+The v1 contract above remains the default and remains accepted unchanged.
+`--manifest-version 2` explicitly declares revision ordering, review decisions,
+legacy provenance, full occurrence rows and recorded web topology. See the
+[separate v2 guide](RECOVERY_V2.md) for exact added scope, v1 compatibility and
+the restored-copy-only boundary. Existing v1 manifests are never relabelled or
+automatically re-sealed.

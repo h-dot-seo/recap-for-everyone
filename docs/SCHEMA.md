@@ -299,3 +299,9 @@ validate graph structure, counts and selected-export occurrence agreement rather
 than inferring a missing path. These tables have no NOT NULL constraints; malformed
 or incomplete values are not accepted as branch evidence. Recovery v1 does not
 compare either table. There is no automatic repair, DROP or migration.
+
+## Explicit logical ledger comparison
+
+[Recovery v2](RECOVERY_V2.md) optionally binds history revision IDs and all
+provenance/topology row columns. This adds no SQLite tables, migration, index,
+archive stamp or schema-stability promise. Default recovery v1 stays unchanged.

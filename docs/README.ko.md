@@ -285,3 +285,7 @@ do not establish authorship, consent, retrieval or publication evidence. See
 명시적으로 가져온 웹 내보내기의 기록된 경로는 `show --branch`로 읽습니다.
 [보관소 분기 읽기](ARCHIVE_BRANCH.md)에 현재 노드·명시 노드 선택, 이전 보관소의
 원본 재가져오기와 복구 매니페스트 v1의 미검증 범위를 설명합니다.
+
+복원 사본의 제목·검토 이력 순서와 전체 출처·분기 원장을 비교하려면
+[명시적 복구 v2](RECOVERY_V2.md)를 사용합니다. 기본 v1 선언은 그대로이며
+백업 생성이나 v2 원본 재구축을 뜻하지 않습니다.

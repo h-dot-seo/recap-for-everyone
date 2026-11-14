@@ -274,3 +274,7 @@ using the existing queue checks without exposing application or output writes.
 For one retained web-export path, use `show --branch` after explicit import.
 See [archive branch reading](docs/ARCHIVE_BRANCH.md) for current-node and explicit
 selection, legacy reimport and recovery-v1 limitations.
+
+For an explicitly chosen restored-copy check of ordered history and complete
+provenance/topology ledgers, see [recovery v2](docs/RECOVERY_V2.md). Default v1
+declarations remain unchanged; this does not add a backup or a v2 rebuild.
