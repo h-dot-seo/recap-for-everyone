@@ -1,10 +1,25 @@
 # Validation record
 
-Current release: `0.97.6-single-pass-adapter-import`, dated 2026-11-14.
+Current release: `0.97.7-synthetic-scaling-observations`, dated 2026-11-14.
 This file is the current snapshot. Every dated entry since the first release is kept
 unchanged and in order in [docs/VALIDATION_HISTORY.md](docs/VALIDATION_HISTORY.md).
 
 ## Latest change
+
+2026-11-14 Private synthetic scaling observations (0.97.7-synthetic-scaling-observations):
+adds a deterministic bounded fictional fixture generator and a standalone local
+benchmark. Exact regeneration, strict manifest bytes and file hashes gate every
+input; a caller-supplied synthetic flag alone is not trusted. A new scratch
+archive receives real title revisions and review decisions, and 19 import/query/
+review/recovery operations run separately for time and Python allocation peaks.
+Private exclusive receipts bind code and fixture identities, archive size/counts,
+repetitions and uncontrolled-cache/native-memory limitations; stdout is counts-only.
+Deterministic ZIP bytes, tampered fixtures, path collisions, traced failures,
+SQLite connection closure and the N50 executed guide are covered. No existing
+archive, new schema/index, streaming, timing threshold, speed guarantee, rights
+inference or publication of local measurements is introduced.
+
+Previous change:
 
 2026-11-14 Single-pass adapter admission (0.97.6-single-pass-adapter-import):
 removes the repeated normalized JSON decode after web/local/local-codex adapters

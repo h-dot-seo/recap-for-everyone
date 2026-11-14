@@ -255,3 +255,9 @@ do not establish authorship, consent, retrieval or publication evidence. See
 Adapter import and explicit byte replay reuse validated rows, but still retain the
 source, rows and derived JSONL bytes in memory. No new flag is needed. Do not infer
 bounded memory or a speed guarantee; see `docs/ADAPTER_IMPORT_COST.md`.
+
+For cost questions, use `examples/make_scale_fixture.py` and `benchmark.py` as
+documented in `docs/SCALING.md`. They generate and verify deterministic synthetic
+input, create new scratch archives and save private local observations. Never
+substitute a personal archive or publish runtime/timing receipts. This does not
+change input bounds or establish a performance guarantee.
