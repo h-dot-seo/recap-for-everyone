@@ -2763,3 +2763,11 @@ file, SQLite and socket I/O during version dispatch; normal Python import reads
 are not claimed to disappear. All 133 existing sh blocks remain unchanged.
 Manifest 313 files, limited audit 314 files, compile, Python 3.10 syntax and
 whitespace checks passed. Version information is not an integrity attestation.
+
+Initial Python 3.15 CI (43609793700, head d8976d8) found one failure in the
+new post-import I/O audit: argparse lazily imported its standard-library color
+formatter only when formatting the version. The test now warms an independent
+standard-library version parser before installing the unchanged open/SQLite/socket
+audit. It does not call recap version during warmup or allow archive/manifest I/O.
+Real missing-manifest and different-directory subprocess checks remain unchanged;
+no production code change was needed for this test portability correction.

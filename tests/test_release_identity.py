@@ -44,7 +44,14 @@ class ReleaseIdentityTests(unittest.TestCase):
     def test_no_io_after_imports_and_parser_initialization(self):
         # Imports themselves read Python source/bytecode. Warm those normal imports
         # first, then audit the actual version dispatch for all opens/DB/network.
-        code="""import sys, textwrap
+        code="""import sys, argparse, contextlib, io
+# Exercise the standard-library version formatter before installing the audit.
+# This resolves interpreter-specific lazy imports without calling recap version.
+warm = argparse.ArgumentParser()
+warm.add_argument('--version', action='version', version='synthetic')
+with contextlib.redirect_stdout(io.StringIO()):
+    try: warm.parse_args(['--version'])
+    except SystemExit: pass
 import recap
 from recaplib import command_catalog, title_document_output
 recap.build_parser()
