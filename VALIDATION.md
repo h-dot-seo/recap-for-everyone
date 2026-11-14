@@ -1,10 +1,28 @@
 # Validation record
 
-Current release: `0.99.8-archive-web-branches`, dated 2026-11-14.
+Current release: `0.99.9-timing-number-validation`, dated 2026-11-14.
 This file is the current snapshot. Every dated entry since the first release is kept
 unchanged and in order in [docs/VALIDATION_HISTORY.md](docs/VALIDATION_HISTORY.md).
 
 ## Latest change
+
+2026-11-14 Bounded timing-number validation (0.99.9-timing-number-validation):
+fixes the synthetic test observer's receipt validation when a JSON integer used
+as a duration exceeds the floating-point range. It now rejects that malformed
+observation through the existing fixed failure JSON and exit 1 instead of leaking
+OverflowError. Module and total durations are both covered, including negative,
+non-finite and boolean values. No product data path, test execution semantics,
+receipt shape or normal timing calculation changes; observations remain local
+measurements, not performance guarantees.
+
+Validation: all 1,484 tests passed (one environment-dependent skip), focused
+observer tests 10 and independent observer/harness checks 16 passed. The original
+huge-integer parent injection now returns exact fixed failure JSON with exit 1;
+normal finite integers/floats and outcome/return-code checks remain unchanged.
+Compilation, Python 3.10 grammar and 134 existing shell examples passed. Manifest
+317 / audit 318 passed. No product behavior or private data was exercised.
+
+Previous change:
 
 2026-11-14 Recorded archive web branches (0.99.8-archive-web-branches):
 adds ID-only export_nodes and export_conversations ledgers within explicit web

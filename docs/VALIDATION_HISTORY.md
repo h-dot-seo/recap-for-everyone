@@ -2849,3 +2849,19 @@ contradictions are now rejected, including off-path occurrences of the chosen
 export. Other-export text membership remains separate. Both entry points saved
 exact branch JSON with exclusive no-overwrite receipts. Python 3.10 grammar,
 compilation and 133 existing shell blocks passed; manifest 317 / audit 318 passed.
+
+## 2026-11-14 Bounded timing-number validation (0.99.9-timing-number-validation):
+fixes the synthetic test observer's receipt validation when a JSON integer used
+as a duration exceeds the floating-point range. It now rejects that malformed
+observation through the existing fixed failure JSON and exit 1 instead of leaking
+OverflowError. Module and total durations are both covered, including negative,
+non-finite and boolean values. No product data path, test execution semantics,
+receipt shape or normal timing calculation changes; observations remain local
+measurements, not performance guarantees.
+
+Validation: all 1,484 tests passed (one environment-dependent skip), focused
+observer tests 10 and independent observer/harness checks 16 passed. The original
+huge-integer parent injection now returns exact fixed failure JSON with exit 1;
+normal finite integers/floats and outcome/return-code checks remain unchanged.
+Compilation, Python 3.10 grammar and 134 existing shell examples passed. Manifest
+317 / audit 318 passed. No product behavior or private data was exercised.

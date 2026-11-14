@@ -34,3 +34,7 @@ These are local observations, not benchmark guarantees, performance claims or a
 promise that every CI job fits its budget. Do not commit receipt output. Keep only
 appropriate prose totals in validation records. No network operation, product
 schema, publication or default CI command is added by this observer.
+
+Malformed observer receipts, including duration integers outside floating-point
+range, are rejected with the same fixed failure JSON and exit 1. This is receipt
+validation, not a new runtime limit, performance budget or timer guarantee.

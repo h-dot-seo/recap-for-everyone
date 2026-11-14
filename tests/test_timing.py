@@ -94,6 +94,25 @@ with patch.object(unittest.TestLoader,'loadTestsFromName',return_value=unittest.
         self.assertNotIn('PRIVATE',out.getvalue())
         self.assertEqual(json.loads(out.getvalue())['total']['failures'],1)
 
+    def test_unrepresentable_duration_is_a_fixed_failure_not_traceback(self):
+        import copy
+        class Loader:
+            def loadTestsFromName(inner,name):return unittest.TestSuite()
+        receipt=timing.observe(['tests.test_timing'],Loader())
+        for target in ('module','total'):
+            for seconds in (10**400,-10**400,float('nan'),float('inf'),-float('inf'),True):
+                with self.subTest(target=target,kind=type(seconds).__name__):
+                    bad=copy.deepcopy(receipt)
+                    row=bad['modules'][0] if target=='module' else bad['total']
+                    row['seconds']=seconds
+                    self.assertFalse(timing._valid_receipt(bad,['tests.test_timing'],0))
+                    process=subprocess.CompletedProcess([],0,json.dumps(bad).encode(),b'PRIVATE')
+                    out=io.StringIO();err=io.StringIO()
+                    with patch.object(timing.subprocess,'run',return_value=process),contextlib.redirect_stdout(out),contextlib.redirect_stderr(err):
+                        self.assertEqual(timing.main(['tests.test_timing']),1)
+                    self.assertEqual(json.loads(out.getvalue()),timing._fixed_error())
+                    self.assertEqual(err.getvalue(),'')
+
     def test_empty_module_counts_and_corrupted_receipts(self):
         class Loader:
             def loadTestsFromName(inner,name):return unittest.TestSuite()
