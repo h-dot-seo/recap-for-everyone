@@ -173,7 +173,7 @@ samples and cursor pages. Guides: [search excerpts](SEARCH_EXCERPTS.md),
 #### `show`
 
 ```text
-usage: recap.py show [-h] --source SOURCE --conversation CONVERSATION [--output OUTPUT] [--limit LIMIT] [--offset OFFSET] [--message MESSAGE] [--around-message AROUND_MESSAGE] [--before BEFORE] [--after AFTER]
+usage: recap.py show [-h] --source SOURCE --conversation CONVERSATION [--branch] [--node NODE] [--export-sha256 EXPORT_SHA256] [--output OUTPUT] [--limit LIMIT] [--offset OFFSET] [--message MESSAGE] [--around-message AROUND_MESSAGE] [--before BEFORE] [--after AFTER]
 ```
 
 Read one conversation, one exact message, a bounded page or neighbors around a
@@ -404,7 +404,7 @@ Guides: [search excerpts](SEARCH_EXCERPTS.md), [search pagination](SEARCH_PAGINA
 ```text
 usage: conversation_view.py [-h] [--json-errors] --db DB {list,show} ...
 usage: conversation_view.py list [-h] [--source SOURCE] [--limit LIMIT] [--offset OFFSET] [--order {recent,oldest}] [--from FROM_DATE] [--until UNTIL_DATE]
-usage: conversation_view.py --db DB show [-h] --source SOURCE --conversation CONVERSATION [--limit LIMIT] [--offset OFFSET] [--message MESSAGE] [--around-message AROUND_MESSAGE] [--before BEFORE] [--after AFTER]
+usage: conversation_view.py --db DB show [-h] --source SOURCE --conversation CONVERSATION [--limit LIMIT] [--offset OFFSET] [--message MESSAGE] [--around-message AROUND_MESSAGE] [--before BEFORE] [--after AFTER] [--branch] [--node NODE] [--export-sha256 EXPORT_SHA256]
 ```
 
 Guide: [message selection](MESSAGE_SELECTION.md).
@@ -754,7 +754,7 @@ example, output boundaries and failure behavior.
 
 ## CLI version identity
 
-`python recap.py --version` prints `recap-for-everyone 0.99.7` and exits without
+`python recap.py --version` prints `recap-for-everyone 0.99.8` and exits without
 opening an archive or reading the publication manifest. It works outside the
 repository working directory and without the manifest. This numeric identity is
 not byte verification, authenticity or a stability guarantee. Use the documented
@@ -767,3 +767,10 @@ The sixteen standalone product parsers accept `--json-errors` at the top level;
 place it before a subcommand where one exists. It only wraps already-caught
 execution failures. Default diagnostics, usage errors and negative result documents
 are unchanged. See [JSON_ERRORS.md](JSON_ERRORS.md#standalone-product-entry-points).
+
+### Recorded archive branch selection
+
+`show --branch [--node NODE] [--export-sha256 HASH]` reads a retained web-export
+path. It is mutually exclusive with message/page/context selectors; default show
+is unchanged. See [archive branches](ARCHIVE_BRANCH.md), including legacy and
+recovery-v1 limits. This does not extend render, title generation or MCP schemas.

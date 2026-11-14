@@ -281,3 +281,7 @@ do not establish authorship, consent, retrieval or publication evidence. See
 같은 명시 입력 범위의 제안 파일은 review-titles의 proposal 배열과 supplied_only로
 검토할 수 있습니다. 기존 합산 1 MiB·파일 수·출처·중복·오래된 내용·충돌 검사를
 유지하며 READY는 사람의 승인이나 적용을 뜻하지 않습니다.
+
+명시적으로 가져온 웹 내보내기의 기록된 경로는 `show --branch`로 읽습니다.
+[보관소 분기 읽기](ARCHIVE_BRANCH.md)에 현재 노드·명시 노드 선택, 이전 보관소의
+원본 재가져오기와 복구 매니페스트 v1의 미검증 범위를 설명합니다.

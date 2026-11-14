@@ -24,6 +24,14 @@ class ConflictingIdentity(RecapError):
     code = 'CONFLICTING_IDENTITY'
 
 
+class PathUnavailable(RecapError):
+    code = 'PATH_UNAVAILABLE'
+
+
+class CurrentNodeUnavailable(RecapError):
+    code = 'CURRENT_NODE_UNAVAILABLE'
+
+
 def error_document(error):
     """Describe only explicit exception types at the existing caught boundary."""
     if isinstance(error, RecapError):

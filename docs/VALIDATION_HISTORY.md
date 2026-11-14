@@ -2826,3 +2826,26 @@ logical recovery digests and atomic rollback were checked. Compilation, Python
 3.10 grammar parsing and all 133 existing shell examples were preserved. The
 315-file manifest and 316-file publication audit passed. Synthetic before/after
 observations are documented in SCALING; absolute timings remain private.
+
+## 2026-11-14 Recorded archive web branches (0.99.8-archive-web-branches):
+adds ID-only export_nodes and export_conversations ledgers within explicit web
+import transactions and opt-in show --branch selection. Original mapping ordinals
+and extracted-text membership preserve ordering and distinguish textless nodes
+from missing selected-export occurrences; conflicting parents fail closed. Valid
+current-node pointers or explicit nodes select one recorded export hash, never a
+live UI state or guessed latest leaf. Duplicate conversation records keep their
+existing import admission but cannot supply unambiguous topology. Existing archives
+are not migrated on read: only explicit reimport of original web bytes can fill
+these additive ledgers. Default views, coverage, normalized artifact bytes and
+pre-existing tables remain unchanged; present-only schema inventory recognizes the
+new tables. Recovery manifest v1 does not declare or compare topology. No archive
+stamp, manifest-v2 policy, private-archive operation or external connection is added.
+
+Validation: all 1,483 tests passed (one environment-dependent skip), including
+19 archive-branch contract tests and an executed synthetic guide. Independent
+review passed 60 targeted tests and previous-release default show/render byte
+comparisons. Detected occurrence-loss, parent, unexpected-locator and unknown-node
+contradictions are now rejected, including off-path occurrences of the chosen
+export. Other-export text membership remains separate. Both entry points saved
+exact branch JSON with exclusive no-overwrite receipts. Python 3.10 grammar,
+compilation and 133 existing shell blocks passed; manifest 317 / audit 318 passed.

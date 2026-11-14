@@ -55,7 +55,11 @@ class AdapterSinglePassTests(unittest.TestCase):
                             actual=workflow.import_export_bytes(new,'demo',raw,name,kind,selection,newline=newline)
                         self.assertEqual({k:v for k,v in actual.items() if k not in ('coverage','replay')},expected)
                         self.assertEqual(actual['coverage'],coverage)
-                        self.assertEqual(tables(old),tables(new))
+                        actual_tables=tables(new)
+                        if kind == 'web':
+                            for name in ('export_nodes','export_conversations'):
+                                self.assertTrue(actual_tables.pop(name))
+                        self.assertEqual(tables(old),actual_tables)
                         self.assertEqual(archive.search(old,'synthetic'),archive.search(new,'synthetic'))
 
     def test_path_import_one_source_snapshot_no_normalized_decode(self):
@@ -71,7 +75,10 @@ class AdapterSinglePassTests(unittest.TestCase):
         rows,report=workflow.normalize(path,'web',include_report=True)
         expected=archive.ingest_bytes(self.root/'old.sqlite','demo',workflow._normalized_bytes(rows),rows)
         self.assertEqual(actual,dict(expected,coverage=report))
-        self.assertEqual(tables(self.root/'old.sqlite'),tables(self.root/'new.sqlite'))
+        actual_tables=tables(self.root/'new.sqlite')
+        for name in ('export_nodes','export_conversations'):
+            self.assertTrue(actual_tables.pop(name))
+        self.assertEqual(tables(self.root/'old.sqlite'),actual_tables)
 
     def test_empty_duplicates_unicode_and_physical_lines_reference(self):
         cases=[[],[row()],[row(),row()],[row(),row(message_id='m2',title='second')]]

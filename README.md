@@ -270,3 +270,7 @@ or connect a client, and private results remain untrusted evidence.
 
 The opt-in MCP input scope also supports [explicit supplied-proposal review](docs/MCP_SERVER.md#review-explicitly-supplied-proposal-files),
 using the existing queue checks without exposing application or output writes.
+
+For one retained web-export path, use `show --branch` after explicit import.
+See [archive branch reading](docs/ARCHIVE_BRANCH.md) for current-node and explicit
+selection, legacy reimport and recovery-v1 limitations.

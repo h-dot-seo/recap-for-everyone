@@ -75,10 +75,10 @@ def _read_export_bytes(path, expected_export_sha256=None):
     return raw
 
 
-def normalize(path, kind, include_report=False, conversation=None, expected_export_sha256=None):
+def normalize(path, kind, include_report=False, conversation=None, expected_export_sha256=None, *, _topology=None):
     path = Path(path)
     raw = _read_export_bytes(path, expected_export_sha256)
-    rows, report = _normalize_selected_bytes(raw, path.name, kind, conversation)
+    rows, report = _normalize_selected_bytes(raw, path.name, kind, conversation, _topology)
     if expected_export_sha256 is not None:
         # Preserve the path API's historical JSON key order as well as values.
         selection = report.pop('selection', None)
@@ -88,16 +88,16 @@ def normalize(path, kind, include_report=False, conversation=None, expected_expo
     return (rows, report) if include_report else rows
 
 
-def _normalize_selected_bytes(raw, label, kind, conversation=None):
-    rows, report = _normalize_bytes(raw, label, kind, include_report=True)
+def _normalize_selected_bytes(raw, label, kind, conversation=None, topology=None):
+    collected=[] if topology is not None or conversation is not None else None
+    rows, report = _normalize_bytes(raw, label, kind, include_report=True, _topology=collected)
     if conversation is not None:
         if not isinstance(conversation, str) or not conversation:
             raise ValueError('selected conversation must be a nonempty string')
         if kind == 'web':
-            # Reuse the immutable byte snapshot, not a second file read. Selecting
+            # Reuse topology from the same decode, not a second parse/read. Selecting
             # one identity must not silently combine duplicate export records.
-            records = loads(decode_source(raw))
-            matches = sum(aliased_identity(record, 'conversation_id') == conversation for record in records)
+            matches = sum(record['conversation']==conversation for record in collected)
             if matches != 1:
                 raise ValueError('selected conversation must identify exactly one web export record')
         selected = [row for row in rows if row['conversation_id'] == conversation]
@@ -109,10 +109,12 @@ def _normalize_selected_bytes(raw, label, kind, conversation=None):
                                   coverage_scope='all other coverage counts and warnings describe the entire input file',
                                   policy='only this conversation; preserve all extracted branches or raw local records')
         rows = selected
+    if topology is not None:
+        topology.extend(record for record in collected if conversation is None or record['conversation']==conversation)
     return rows, report
 
 
-def _normalize_bytes(raw, source_name, kind, include_report=False):
+def _normalize_bytes(raw, source_name, kind, include_report=False, *, _topology=None):
     digest = hashlib.sha256(raw).hexdigest()
     rows = []
     report = dict(format=kind, original_sha256=digest, original_bytes=len(raw))
@@ -150,6 +152,12 @@ def _normalize_bytes(raw, source_name, kind, include_report=False):
             if conv.get('title') is not None and not isinstance(conv['title'], str):
                 raise ValueError('conversation title must be text or null')
             _validate_mapping(conv['mapping'])
+            if _topology is not None:
+                pointer=conv.get('current_node')
+                valid=isinstance(pointer,str) and bool(pointer) and pointer in conv['mapping']
+                _topology.append(dict(conversation=cid,original_hash=digest,current_node=pointer if valid else None,
+                    current_node_state='valid' if valid else ('absent' if 'current_node' not in conv else 'invalid'),
+                    nodes=[(node_id,node.get('parent'),ordinal) for ordinal,(node_id,node) in enumerate(conv['mapping'].items())]))
             report['mapping_nodes'] += len(conv['mapping'])
             children = Counter(node.get('parent') for node in conv['mapping'].values()
                                if node.get('parent') is not None)
@@ -177,6 +185,13 @@ def _normalize_bytes(raw, source_name, kind, include_report=False):
                                  parent_id=node.get('parent'), origin_locator=f'mapping:{node_id}'))
     else:
         raise ValueError('unsupported format')
+    if _topology is not None:
+        # Exact extracted-row membership, not raw content/parts presence. The
+        # original hash plus node identifies text retained from this export.
+        text_nodes={(row['conversation_id'],row['message_id']) for row in rows}
+        for graph in _topology:
+            graph['nodes']=[(node,parent,ordinal,int((graph['conversation'],node) in text_nodes))
+                            for node,parent,ordinal in graph['nodes']]
     for row in rows:
         row['origin_sha256'] = digest
     report.update(extracted_messages=len(rows),
@@ -238,10 +253,11 @@ def _normalized_bytes(rows, newline=None):
 
 def import_export(db, source, path, kind, conversation=None, expected_export_sha256=None):
     _validate_source(source)
+    topology=[] if kind=='web' else None
     rows, report = normalize(path, kind, include_report=True, conversation=conversation,
-                             expected_export_sha256=expected_export_sha256)
+                             expected_export_sha256=expected_export_sha256, _topology=topology)
     # Keep original hash/locator/branch metadata in companion provenance tables.
-    result = _ingest_adapter_rows(db, source, rows)
+    result = _ingest_adapter_rows(db, source, rows, topology=topology)
     result['coverage'] = report
     return result
 
@@ -270,8 +286,9 @@ def import_export_bytes(db, source, raw, label, kind, conversation=None, *, newl
         except UnicodeEncodeError:
             raise ValueError('replay label must contain valid Unicode text') from None
         parser_label = label
-    rows, report = _normalize_selected_bytes(raw, parser_label, kind, conversation)
-    result = _ingest_adapter_rows(db, source, rows, newline='\n' if newline == 'lf' else '\r\n')
+    topology=[] if kind=='web' else None
+    rows, report = _normalize_selected_bytes(raw, parser_label, kind, conversation, topology)
+    result = _ingest_adapter_rows(db, source, rows, newline='\n' if newline == 'lf' else '\r\n', topology=topology)
     result['coverage'] = report
     # Do not echo the potentially private label or selection in this new block.
     # Existing coverage selection fields retain the import API's prior contract.

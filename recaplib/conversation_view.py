@@ -1,11 +1,14 @@
 """Read-only conversation inventory and structured evidence views; no network."""
 from recaplib.errors import add_json_errors_argument, exit_error
-from recaplib.errors import UnknownIdentity
+from recaplib.errors import UnknownIdentity, PathUnavailable, CurrentNodeUnavailable
 from recaplib.cli_errors import safe_diagnostic
 import argparse
 import json
+import re
 import sqlite3
 from recaplib.archive import readonly
+
+_UNSET_OFFSET = object()
 
 
 def _inventory(connection, source=None, conversation_id=None, limit=50, offset=0, unrenamed_only=False, after_conversation=None):
@@ -131,11 +134,99 @@ def message_provenance_rows(connection, source, conversation_id, selection_sql=N
     return provenance
 
 
-def conversation(db, source, conversation_id, limit=None, offset=0, message_id=None,
-                 around_message_id=None, before=None, after=None):
+def _branch_view(connection,source,conversation_id,summary,node,export_sha256):
+    unavailable='recorded branch path unavailable; reimport the same original web export bytes to fill the topology ledger'
+    for table in ('export_nodes','export_conversations'):
+        if not connection.execute("SELECT 1 FROM sqlite_master WHERE type='table' AND name=?",(table,)).fetchone():
+            raise PathUnavailable(unavailable)
+    graphs=connection.execute('SELECT original_hash,current_node,current_node_state,mapping_nodes FROM export_conversations WHERE source=? AND conversation=?',
+                              (source,conversation_id)).fetchall()
+    if export_sha256 is not None:graphs=[graph for graph in graphs if graph['original_hash']==export_sha256]
+    if len(graphs)!=1:
+        raise PathUnavailable('recorded branch path unavailable; select an explicit export SHA-256 when multiple recorded exports exist' if len(graphs)>1 else unavailable)
+    graph=graphs[0];digest=graph['original_hash']
+    if not isinstance(digest,str) or not re.fullmatch('[0-9a-f]{64}',digest):raise PathUnavailable(unavailable)
+    if graph['current_node_state'] not in ('valid','absent','invalid'):raise PathUnavailable(unavailable)
+    records=connection.execute('SELECT node,parent,ordinal,has_text FROM export_nodes WHERE source=? AND conversation=? AND original_hash=? ORDER BY ordinal',
+                               (source,conversation_id,digest)).fetchall()
+    if type(graph['mapping_nodes']) is not int or graph['mapping_nodes']!=len(records):raise PathUnavailable(unavailable)
+    mapping={};text_membership={}
+    for ordinal,record in enumerate(records):
+        key,parent=record['node'],record['parent']
+        if (not isinstance(key,str) or not key or key in mapping or type(record['ordinal']) is not int or record['ordinal']!=ordinal or
+                parent is not None and not isinstance(parent,str) or type(record['has_text']) is not int or record['has_text'] not in (0,1)):
+            raise PathUnavailable(unavailable)
+        mapping[key]=parent
+        text_membership[key]=bool(record['has_text'])
+    children={key:[] for key in mapping}
+    for key,parent in mapping.items():
+        if parent is not None:
+            if parent not in mapping:raise PathUnavailable(unavailable)
+            children[parent].append(key)
+    complete=set()
+    for key in mapping:
+        chain=set();current=key
+        while current is not None and current not in complete:
+            if current in chain:raise PathUnavailable(unavailable)
+            chain.add(current);current=mapping[current]
+        complete.update(chain)
+    if graph['current_node_state']=='valid':
+        if graph['current_node'] not in mapping:raise PathUnavailable(unavailable)
+    elif graph['current_node'] is not None:raise PathUnavailable(unavailable)
+    endpoint=node if node is not None else graph['current_node']
+    if endpoint is None:raise CurrentNodeUnavailable('recorded current node unavailable; select an explicit recorded node')
+    if endpoint not in mapping:raise PathUnavailable('selected node is not in the recorded export topology')
+    node_ids=[];current=endpoint
+    while current is not None:
+        node_ids.append(current);current=mapping[current]
+    node_ids.reverse()
+    if not any(connection.execute("SELECT 1 FROM sqlite_master WHERE type='table' AND name=?",(name,)).fetchone() for name in ('export_occurrences','export_provenance')):
+        raise PathUnavailable(unavailable)
+    provenance=message_provenance_rows(connection,source,conversation_id)
+    # Every occurrence attributed to the chosen export must agree, not only
+    # exact locators selected below. Other export hashes retain their own scope.
+    for key, entries in provenance.items():
+        for item in entries:
+            if item['original_sha256'] == digest and (
+                    key not in mapping or item['locator'] != 'mapping:' + key or
+                    item['parent_id'] != mapping[key] or not text_membership[key]):
+                raise PathUnavailable(unavailable)
+    # Validate retained-text membership over this recorded graph, including
+    # off-path nodes. Absence of an occurrence is not evidence of a textless node.
+    for key in mapping:
+        occurrences=[item for item in provenance.get(key,[]) if item['original_sha256']==digest and item['locator']=='mapping:'+key]
+        if bool(occurrences)!=text_membership[key] or any(item['parent_id']!=mapping[key] for item in occurrences):raise PathUnavailable(unavailable)
+    texts={}
+    for key in node_ids:
+        entries=provenance.get(key,[])
+        if text_membership[key]:
+            row=connection.execute('SELECT message_id,role,timestamp,text,title AS original_title,source_sha256,source_line FROM messages WHERE source_id=? AND conversation_id=? AND message_id=?',
+                                   (source,conversation_id,key)).fetchone()
+            if row is None:raise PathUnavailable(unavailable)
+            texts[key]=dict(row,export_provenance=entries)
+    selection=dict(mode='branch',endpoint=endpoint,endpoint_basis='explicit node' if node is not None else 'current_node',
+        export_sha256=digest,node_ids=node_ids,selected_nodes=len(node_ids),selected_nodes_without_text=sum(key not in texts for key in node_ids),
+        excluded_nodes=len(mapping)-len(node_ids),forks=[dict(node=key,children=children[key]) for key in node_ids if len(children[key])>1],
+        continuations=children[endpoint],selected_node_is_leaf=not children[endpoint])
+    return dict(**summary,messages=[texts[key] for key in node_ids if key in texts],selection=selection,
+        message_order='parent links from root to endpoint',
+        branch_scope="one recorded export path; current_node as supplied in that export at export time, not the website's live selection or UI visibility; all supported roles on the path",
+        scope='local archive only',warning='PRIVATE CONTENT: output includes conversation text and node IDs; all supported roles are included, not a UI visibility reconstruction')
+
+
+def conversation(db, source, conversation_id, limit=None, offset=_UNSET_OFFSET, message_id=None,
+                 around_message_id=None, before=None, after=None, *, branch=False, node=None, export_sha256=None):
     if (not isinstance(source, str) or not source.strip() or
             not isinstance(conversation_id, str) or not conversation_id):
         raise ValueError('source and conversation must be nonempty text identities')
+    if type(branch) is not bool:raise ValueError('branch must be boolean')
+    if not branch and (node is not None or export_sha256 is not None):raise ValueError('node and export SHA-256 require branch selection')
+    if branch and (offset is not _UNSET_OFFSET or any(value is not None for value in (limit,message_id,around_message_id,before,after))):
+        raise ValueError('branch selection excludes message, limit, offset and around-message options')
+    if node is not None and (not isinstance(node,str) or not node):raise ValueError('node must be nonempty text')
+    if export_sha256 is not None and (not isinstance(export_sha256,str) or not re.fullmatch('[0-9a-f]{64}',export_sha256)):
+        raise ValueError('export SHA-256 must be 64 lowercase hexadecimal characters')
+    offset=0 if offset is _UNSET_OFFSET else offset
     if limit is not None and (type(limit) is not int or not 1 <= limit <= 1000):
         raise ValueError('message limit must be an integer in 1..1000')
     if type(offset) is not int or not 0 <= offset <= 2**63-1:
@@ -166,6 +257,7 @@ def conversation(db, source, conversation_id, limit=None, offset=0, message_id=N
         summary = rows[0] if rows else None
         if summary is None:
             raise UnknownIdentity('unknown conversation')
+        if branch:return _branch_view(connection,source,conversation_id,summary,node,export_sha256)
         selection_sql = ' WHERE source_id=? AND conversation_id=?'
         selection_params = (source, conversation_id)
         context = None
@@ -226,16 +318,20 @@ def main():
     listing.add_argument('--from', dest='from_date')
     listing.add_argument('--until', dest='until_date')
     show = sub.add_parser('show')
+    show.add_argument('--branch',action='store_true',help='read one recorded web export path')
+    show.add_argument('--node',help='explicit recorded node; requires --branch')
+    show.add_argument('--export-sha256',help='recorded original export SHA-256; requires --branch')
     show.add_argument('--output', help='save exact show JSON to a new private UTF-8 file; print receipt only')
     show.add_argument('--source', required=True)
     show.add_argument('--conversation', required=True)
     show.add_argument('--limit', type=int, help='read at most this many messages (1..1000)')
-    show.add_argument('--offset', type=int, default=0, help='message offset; requires --limit')
+    show.add_argument('--offset', type=int, default=None, help='message offset; requires --limit')
     show.add_argument('--message', help='read exactly this message ID; excludes --limit/--offset')
     show.add_argument('--around-message', help='read bounded raw archive neighbors around this exact message ID')
     show.add_argument('--before', type=int, help='earlier archive neighbors, 0..50; default 2 with --around-message')
     show.add_argument('--after', type=int, help='later archive neighbors, 0..50; default 2 with --around-message')
     args = parser.parse_args()
+    if args.command=='show' and args.offset is None:args.offset=_UNSET_OFFSET
     try:
         if args.command == 'list':
             result = conversations(args.db, args.source, args.limit, args.offset,
@@ -243,10 +339,10 @@ def main():
         elif args.output is not None:
             from recaplib.conversation_document import save_conversation
             result = save_conversation(args.db, args.source, args.conversation, args.limit, args.offset,
-                                       args.message, args.around_message, args.before, args.after, output=args.output)
+                                       args.message, args.around_message, args.before, args.after, output=args.output, branch=args.branch, node=args.node, export_sha256=args.export_sha256)
         else:
             result = conversation(args.db, args.source, args.conversation, args.limit, args.offset,
-                                  args.message, args.around_message, args.before, args.after)
+                                  args.message, args.around_message, args.before, args.after, branch=args.branch, node=args.node, export_sha256=args.export_sha256)
     except (ValueError, OSError, sqlite3.Error) as exc:
         exit_error(parser, args, exc)
     print(json.dumps(result, ensure_ascii=True, indent=2))
