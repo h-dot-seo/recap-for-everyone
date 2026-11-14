@@ -9,8 +9,8 @@ from pathlib import Path
 from recaplib.archive import SCHEMA, _validate_source, ingest, ingest_bytes, readonly, search, validate_normalized
 
 
-def main():
-    from recaplib.title_document_output import add_output_argument, save_if_requested
+def build_parser():
+    from recaplib.title_document_output import add_output_argument
     p = argparse.ArgumentParser(description=__doc__)
     p.add_argument('--db')
     sub = p.add_subparsers(dest='command', required=True)
@@ -178,15 +178,27 @@ def main():
             command.add_argument('--offset', type=int, default=0)
             command.add_argument('--expected-revision', type=int,
                                  help='reject title history changed since an earlier page')
+    description = sub.add_parser('describe', help='describe command arguments and reviewed local effects without opening an archive')
+    description.add_argument('name', nargs='?', choices=sorted(sub.choices))
+    return p
+
+
+def main():
+    from recaplib.title_document_output import save_if_requested
+    from recaplib.command_catalog import needs_db, describe
+    p = build_parser()
     args = p.parse_args()
-    if args.command not in ('inspect', 'list-export', 'web-branch', 'replay-local', 'prepare-web-export', 'inspect-web-zip', 'rehearse-recovery', 'rebuild-archive', 'render-queue') and not args.db:
-        p.error('--db is required except for inspect, list-export, web-branch, replay-local, prepare-web-export, inspect-web-zip, rehearse-recovery, rebuild-archive and render-queue')
+    if needs_db(args.command) == 'required' and not args.db:
+        p.error('--db is required except for inspect, list-export, web-branch, replay-local, prepare-web-export, inspect-web-zip, rehearse-recovery, rebuild-archive, render-queue and describe')
     if args.command == 'render-queue' and args.db:
         p.error('render-queue reads a saved JSON file only; do not pass --db')
     if args.command == 'rebuild-archive' and args.db:
         p.error('rebuild-archive creates --new-db only; do not pass --db')
     if args.command == 'rehearse-recovery' and args.db:
         p.error('rehearse-recovery opens --restored-db only; do not pass --db')
+    if args.command == 'describe':
+        print(json.dumps(describe(p, args.name), ensure_ascii=True, indent=2))
+        return
     try:
         if args.command == 'render-queue':
             from recaplib.render_queue import render_queue

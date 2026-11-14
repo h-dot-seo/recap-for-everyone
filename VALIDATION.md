@@ -1,10 +1,25 @@
 # Validation record
 
-Current release: `0.97.7-synthetic-scaling-observations`, dated 2026-11-14.
+Current release: `0.97.8-command-catalog`, dated 2026-11-14.
 This file is the current snapshot. Every dated entry since the first release is kept
 unchanged and in order in [docs/VALIDATION_HISTORY.md](docs/VALIDATION_HISTORY.md).
 
 ## Latest change
+
+2026-11-14 Static command discovery (0.97.8-command-catalog):
+adds describe [COMMAND] for unified parser arguments, explicit DB policies,
+conditional write effects, existing output labels, result exits and guide links.
+Parser construction is separated from execution without changing existing command
+results. The catalogue is also the DB-requirement source; the missing-DB diagnostic
+adds describe to its exception list. Selected standalone workflows have scoped
+static effects rather than duplicated option parsers. The optional manifest
+release is a declaration, not verification, and unreadable metadata yields null.
+Command/option coverage, no archive opening, release fallbacks, write conditions,
+usage-document drift and the executed guide are checked with synthetic fixtures.
+No JSON error envelope, document relabelling, schema migration, permission grant,
+review authentication or provenance/rights expansion is introduced.
+
+Previous change:
 
 2026-11-14 Private synthetic scaling observations (0.97.7-synthetic-scaling-observations):
 adds a deterministic bounded fictional fixture generator and a standalone local

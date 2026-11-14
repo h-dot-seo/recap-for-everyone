@@ -261,3 +261,10 @@ documented in `docs/SCALING.md`. They generate and verify deterministic syntheti
 input, create new scratch archives and save private local observations. Never
 substitute a personal archive or publish runtime/timing receipts. This does not
 change input bounds or establish a performance guarantee.
+
+Before selecting a command, use `recap.py describe [COMMAND]` for its current
+DB requirements, conditional writes, parser arguments and result exits. Static
+metadata is not permission or proof of operator review. Preserve existing stop
+points and inspect result JSON even on documented exit 1. See
+`docs/COMMAND_CATALOG.md`; do not infer an error envelope or schema for unlabelled
+legacy outputs.

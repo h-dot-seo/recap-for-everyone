@@ -79,13 +79,15 @@ supplied proposals continue in [workflows](docs/WORKFLOWS.md#the-common-title-wo
 
 ## Commands at a glance
 
-`--db DB` precedes the subcommand; `inspect`, `list-export`, `inspect-web-zip`,
-`prepare-web-export`, `replay-local`, `web-branch` and `rehearse-recovery` run
-without a database. Nothing below contacts a service, calls a model or renames a
-conversation in its original application.
+`--db DB` precedes the subcommand. `describe` reports which commands require,
+ignore or reject it, including commands using explicit restored/new DB arguments.
+See the [command catalogue](docs/COMMAND_CATALOG.md) before choosing a write path.
+Nothing below contacts a service, calls a model or renames a conversation in its
+original application.
 
 | Task | Commands | Guide |
 |---|---|---|
+| Inspect command effects and arguments | `python recap.py describe`, `python recap.py describe title` | [Command catalogue](docs/COMMAND_CATALOG.md) |
 | Check the runtime first | `python runtime_check.py`, `python recap.py --help`, `python verify_manifest.py` | [Install](docs/INSTALL.md) |
 | Choose a part of a downloaded ZIP | `recap.py inspect-web-zip ZIP`, `recap.py prepare-web-export ZIP --member NAME --output NEW_FILE` | [ZIP inventory](docs/WEB_ZIP_INVENTORY.md) |
 | Find IDs and coverage before importing | `recap.py list-export INPUT --format FORMAT`, `recap.py inspect INPUT --format FORMAT` | [Export inventory](docs/EXPORT_INVENTORY.md) |

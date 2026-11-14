@@ -1,8 +1,9 @@
 # Command reference
 
-Every script and subcommand in this repository, with the exact usage line that its
-`--help` prints (joined onto one line), a one-line purpose and the guide that
-explains it. Run from the repository root with your chosen Python launcher in
+Scripts and subcommands in this repository, with usage summaries, a one-line
+purpose and a guide. Unified recap.py usage lines are checked against its parser
+(joined onto one line); standalone nested parser prefixes can vary with Python
+versions, so use that script's --help for the current rendered prefix. Run from the repository root with your chosen Python launcher in
 place of `python` ([installation and runtime checks](INSTALL.md)). Every command
 works on explicitly supplied local files and an operator-selected SQLite archive:
 none contacts a network service, calls a model, discovers files in private
@@ -23,12 +24,12 @@ through the repository root, which is why the commands run from there.
 ## recap.py
 
 ```text
-usage: recap.py [-h] [--db DB] {ingest,search,stats,describe-schema,inspect,list-export,inspect-web-zip,prepare-web-export,replay-local,web-branch,suggest-branch-title,suggest-replay-title,suggest-attributed-title,preview-title,apply-title,review-state,render-queue,review-titles,title-adapter-dry-run,title-adapter-simulate,export-title-plan,check-title-plan,import,check-import,export-normalized,export-provenance,check-provenance,declare-review-checkpoint,declare-checkpoint,changed-since,declare-recovery,rehearse-recovery,rebuild-archive,list,find,show,render,suggest-title,title,title-history} ...
+usage: recap.py [-h] [--db DB] {ingest,search,stats,describe-schema,inspect,list-export,inspect-web-zip,prepare-web-export,replay-local,web-branch,suggest-branch-title,suggest-replay-title,suggest-attributed-title,preview-title,apply-title,review-state,render-queue,review-titles,title-adapter-dry-run,title-adapter-simulate,export-title-plan,check-title-plan,import,check-import,export-normalized,export-provenance,check-provenance,declare-review-checkpoint,declare-checkpoint,changed-since,declare-recovery,rehearse-recovery,rebuild-archive,list,find,show,render,suggest-title,title,title-history,describe} ...
 ```
 
-The global `--db DB` precedes the subcommand and is required except for `inspect`,
-`list-export`, `web-branch`, `replay-local`, `prepare-web-export`, `inspect-web-zip`
-and `rehearse-recovery`, plus `render-queue`; the latter two reject a global `--db`. Commands that
+The global `--db DB` precedes the subcommand. `describe` lists the current required,
+ignored and rejected DB policies, including separate restored/new DB arguments.
+Commands that
 accept `--output NEW_JSON` create a UTF-8 file without overwriting an existing path
 and print only a receipt ([saved title documents](TITLE_DOCUMENT_FILES.md)).
 `export-normalized` also requires `--db`; its required `--output` writes private
@@ -101,7 +102,7 @@ metadata-only eligibility, without decompression. Guide: [ZIP inventory](WEB_ZIP
 #### `prepare-web-export`
 
 ```text
-usage: recap.py prepare-web-export [-h] --member MEMBER --output OUTPUT [--expected-archive-sha256 EXPECTED_ARCHIVE_SHA256] [--max-member-bytes MAX_MEMBER_BYTES] input
+usage: recap.py prepare-web-export [-h] --member MEMBER --output OUTPUT [--max-member-bytes MAX_MEMBER_BYTES] [--expected-archive-sha256 EXPECTED_ARCHIVE_SHA256] input
 ```
 
 Validate one explicitly selected ZIP JSON member and copy its bytes to a new local
@@ -141,7 +142,7 @@ original hashes and locators. Guide: [input scope](INPUT_SCOPE.md).
 #### `check-import`
 
 ```text
-usage: recap.py check-import [-h] --format {web,local,local-codex,normalized} --source SOURCE [--conversation CONVERSATION] [--expected-export-sha256 EXPECTED_EXPORT_SHA256] [--limit LIMIT] input
+usage: recap.py check-import [-h] --format {web,local,local-codex,normalized} --source SOURCE [--conversation CONVERSATION] [--expected-export-sha256 EXPECTED_EXPORT_SHA256] [--limit LIMIT] [--delta-output DELTA_OUTPUT] input
 ```
 
 Diagnose title-only, text and metadata identity conflicts against an existing
@@ -172,7 +173,7 @@ samples and cursor pages. Guides: [search excerpts](SEARCH_EXCERPTS.md),
 #### `show`
 
 ```text
-usage: recap.py show [-h] --source SOURCE --conversation CONVERSATION [--limit LIMIT] [--offset OFFSET] [--message MESSAGE] [--around-message AROUND_MESSAGE] [--before BEFORE] [--after AFTER]
+usage: recap.py show [-h] --source SOURCE --conversation CONVERSATION [--output OUTPUT] [--limit LIMIT] [--offset OFFSET] [--message MESSAGE] [--around-message AROUND_MESSAGE] [--before BEFORE] [--after AFTER]
 ```
 
 Read one conversation, one exact message, a bounded page or neighbors around a
@@ -709,3 +710,20 @@ usage: benchmark.py FIXTURE_DIR --work-dir NEW_DIR --output NEW_JSON [--repetiti
 The generator is `examples/make_scale_fixture.py`. The runner accepts only its
 exact regenerated synthetic bytes, creates new scratch archives and exclusively
 saves a private measurement receipt. See [SCALING](SCALING.md).
+
+## Command catalogue
+
+```text
+usage: recap.py describe [-h] [{apply-title,changed-since,check-import,check-provenance,check-title-plan,declare-checkpoint,declare-recovery,declare-review-checkpoint,describe,describe-schema,export-normalized,export-provenance,export-title-plan,find,import,ingest,inspect,inspect-web-zip,list,list-export,prepare-web-export,preview-title,rebuild-archive,rehearse-recovery,render,render-queue,replay-local,review-state,review-titles,search,show,stats,suggest-attributed-title,suggest-branch-title,suggest-replay-title,suggest-title,title,title-adapter-dry-run,title-adapter-simulate,title-history,web-branch}]
+```
+
+No archive/input access; optional release metadata is not verification. See
+[command catalogue](COMMAND_CATALOG.md).
+
+## rebuild-archive usage
+
+```text
+usage: recap.py rebuild-archive [-h] --plan PLAN --objects OBJECTS --new-db NEW_DB --output OUTPUT [--text] input
+```
+
+See [command catalogue](COMMAND_CATALOG.md) and the matching workflow guide.
