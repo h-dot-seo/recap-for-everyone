@@ -2713,3 +2713,31 @@ decoder-failure probe in a separate test, so an unavailable failing depth skips
 only nesting and cannot hide encoding/strict-JSON checks. The other invalid cases
 and all three adapter error-code expectations are preserved. Product code is
 unchanged; the corrected head requires all six CI jobs again.
+
+## 2026-11-14 Synthetic suite timing observer (0.99.4-test-timing):
+adds the opt-in python -m tests.timing observer from roadmap #17. It executes
+selected published synthetic test modules once, sequentially in one fresh worker,
+and emits one strict JSON observation on stdout. Per-module time includes loading
+and fixtures; the total includes worker orchestration, not process startup. All
+unittest outcome counts remain visible, including fixture errors and skips, and
+failure/error/unexpected success is exit 1. Diagnostics and incidental process
+output are withheld rather than copied into the receipt. No automatic receipt
+file, environment path, host, SQLite build or network operation is introduced.
+Interpreter metadata is limited to major.minor. This is a measurement aid, not
+identical discovery timing, a performance guarantee or a replacement CI gate.
+Existing test bodies, CLI helpers and product code remain unchanged.
+
+Independent review found two pre-publication protocol gaps: duplicate worker JSON
+keys could overwrite a failure flag, and decoder RecursionError escaped the fixed
+error path. The parent now uses the shared strict JSON reader, explicit UTF-8 and
+fixed recursion failure handling. Duplicate keys, non-finite JSON, invalid UTF-8,
+deep malformed JSON and injected decoder recursion are regression-tested.
+
+Validation: full synthetic suite 1,443 tests passed (one existing skip), and the
+actual full timing command independently reported 1,443 tests across 139 modules
+with the same zero failures/errors and one skip. Focused and independent 15 tests
+passed. Synthetic checks cover all unittest outcomes, fixture errors, empty suites,
+selection refusal and hidden fd output; the small documented command runs as a
+real process. All existing product and test files and 132 sh blocks are unchanged.
+Manifest 312 files, limited audit 313 files, compile, Python 3.10 syntax and
+whitespace checks passed. No private input or published timing receipt was used.
