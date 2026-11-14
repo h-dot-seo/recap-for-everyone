@@ -169,3 +169,24 @@ The derived file hash is not an original-export identity or recovery claim; see
 without changing validation or the archive layout. Synthetic characterization
 tests pin ignored members, byte/line provenance, repeated identities and titles.
 Normalized inspection and adapter examples remain separate increments.
+
+## Read-only SQLite connection protections
+
+Archive reads and metadata-only SQLite artifact inspection use connection-local
+`query_only=ON`, `trusted_schema=OFF` and `cell_size_check=ON`. Python/SQLite
+builds exposing `SQLITE_DBCONFIG_DEFENSIVE` also enable it. Settings are read back;
+unavailable features are reported as `UNAVAILABLE`, not assumed enabled. A
+supported protection that remains disabled fails the connection setup. Failed
+archive connection setup closes the connection. No persistent DB setting changes.
+
+Recovery rehearsal records these actual states inside the `integrity_check`
+check's `sqlite_protections` detail (not a new top-level receipt field). If opening
+fails before read-back, values remain `NOT_CHECKED`. A schema view that invokes
+non-innocuous functions may now be rejected, even if a plain SQLite connection
+would read it. Shipped tables and FTS queries remain supported.
+
+This is defense in depth, **not a sandbox for hostile database files**. There is
+no SQL CPU/memory budget or protection against hostile concurrent directory
+changes. Write connections for ingest, title history and review state are unchanged
+and assume an operator-created archive. These protections do not authenticate
+content, validate all semantics or prove recovery completeness.

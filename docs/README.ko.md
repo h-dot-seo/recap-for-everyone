@@ -225,3 +225,6 @@ python recap.py --db ../demo.sqlite title --source demo --conversation synthetic
 포함하는 개인 파일이며 기존 경로를 덮어쓰지 않습니다. 출처 대장, 부모 트리,
 로컬 제목 이력과 검토 상태는 제외됩니다. 원본 내보내기나 백업을 대체하지
 않습니다. [실행 가능한 안내](EXPORT_NORMALIZED.md)를 참고하세요.
+
+Read-only SQLite connections now apply and read back defense-in-depth settings;
+see [security](../SECURITY.md). Write connections are unchanged.

@@ -10,6 +10,7 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 from recaplib.strict_json import loads
+from recaplib.sqlite_safety import protect_readonly
 from recaplib.source_text import physical_lines
 from recaplib.source_identity import aliased_identity, optional_message_identity
 
@@ -181,6 +182,7 @@ def parse_artifact(path: Path, source_relative_path: str, artifact_kind: str = "
             connection = sqlite3.connect(
                 f"{path.resolve().as_uri()}?mode=ro&immutable=1", uri=True,
             )
+            protect_readonly(connection)
             if connection.execute("PRAGMA integrity_check").fetchone()[0] != "ok":
                 raise LocalImportError(f"SQLite integrity check failed: {path}")
             if list(connection.execute("PRAGMA foreign_key_check")):

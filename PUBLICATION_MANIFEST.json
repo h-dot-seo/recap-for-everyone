@@ -1,12 +1,12 @@
 {
   "project": "recap-for-everyone",
-  "release": "0.96.0-import-delta",
+  "release": "0.96.1-sqlite-read-safety",
   "date": "2026-11-08",
   "private_history_imported": false,
   "actual_corpora_included": false,
   "synthetic_examples_only": true,
   "license_status": "NOT_SELECTED",
-  "file_count": 245,
+  "file_count": 247,
   "files": [
     {
       "path": ".gitattributes",
@@ -40,8 +40,8 @@
     },
     {
       "path": "SECURITY.md",
-      "bytes": 1324,
-      "sha256": "9bcf7ee3f4b484ed2af153569946f72fadcf6d8a06a599433e4d80e8525d8f36"
+      "bytes": 2614,
+      "sha256": "dcbd9d07f9d883d4a4f6872cae96f8cc0e9042f79c6bf25459bf010b26d950b3"
     },
     {
       "path": "SKILL.md",
@@ -50,8 +50,8 @@
     },
     {
       "path": "VALIDATION.md",
-      "bytes": 13015,
-      "sha256": "8542f816a2455292c3192a04bcaece574de9366c133a823988b7515c69aa0a7b"
+      "bytes": 13671,
+      "sha256": "f7113e372ab24ff19d2f178b6eaf2bdd133ba22d80d94e152642613047e67dda"
     },
     {
       "path": "attributed_title.py",
@@ -90,8 +90,8 @@
     },
     {
       "path": "docs/ARCHITECTURE.md",
-      "bytes": 10878,
-      "sha256": "ac2be9723161f04958cc044fcde7fe26d52c65d1db7db1310036589a5573dc3a"
+      "bytes": 12168,
+      "sha256": "d6c34470b499f089b8b732b9262f40fffaeec84c17d75a44a46c184c5dccfd1a"
     },
     {
       "path": "docs/ATTRIBUTED_MESSAGE_SELECTION.md",
@@ -165,13 +165,13 @@
     },
     {
       "path": "docs/README.ko.md",
-      "bytes": 19400,
-      "sha256": "2ff8b6583274dd9b097ffe9503e176ef8255c0690d232efd7a0ff9827d64c783"
+      "bytes": 19546,
+      "sha256": "255c8321966d3a5d604b9589151ce7cb006dabaaa6b0ac31efb7f4724e8be8aa"
     },
     {
       "path": "docs/RECOVERY_REHEARSAL.md",
-      "bytes": 13690,
-      "sha256": "0af9b00aab3324f16d8faa39f0922a9b02998bcc1bf56a2afd84721298449fec"
+      "bytes": 14980,
+      "sha256": "c8b662dd026b6ef7b86ed5cf668229e209a28fd36131fda3c6301856ca9bbc32"
     },
     {
       "path": "docs/REIMPORT_DELTA.md",
@@ -285,8 +285,8 @@
     },
     {
       "path": "docs/VALIDATION_HISTORY.md",
-      "bytes": 156712,
-      "sha256": "d2c324fc14bd64fd1d57b0e419bcf668979cf13b217d4ef07ff1541b4593c377"
+      "bytes": 157344,
+      "sha256": "da35c937b9e07fadb043d2f4b3c263a2db5ece2d1fcad0825d16f47e5ddb24f5"
     },
     {
       "path": "docs/WEB_ZIP_INVENTORY.md",
@@ -295,8 +295,8 @@
     },
     {
       "path": "docs/WORKFLOWS.md",
-      "bytes": 75631,
-      "sha256": "5115339869b4453e81fb459b5aa79609a9429c705791fd08204341db19d4b0c2"
+      "bytes": 75777,
+      "sha256": "a69416f68e5634e94a04c43b1af33c7dc8d7c09604d7d4e9dd92d38a0c560c17"
     },
     {
       "path": "examples/adapter-message-focus.jsonl",
@@ -415,8 +415,8 @@
     },
     {
       "path": "recaplib/archive.py",
-      "bytes": 10926,
-      "sha256": "73f22cf2f54e4033cf534446002e16e4e87d1f7eabd55524ca60000dafc48ac2"
+      "bytes": 11034,
+      "sha256": "d6917004681e80b9632ed860a5a4b1130ab409259a482354a90ca77c6780ab29"
     },
     {
       "path": "recaplib/archive_schema.py",
@@ -465,8 +465,8 @@
     },
     {
       "path": "recaplib/local_parser.py",
-      "bytes": 23123,
-      "sha256": "d1422899570bad2a10702825f2d2a157ab7e12df1e8a2da38e8b15704c106430"
+      "bytes": 23216,
+      "sha256": "80db8969a99336ff17e6e78551f1cd6bc8c48b2fd2f67069740aba1105fc8389"
     },
     {
       "path": "recaplib/normalized_export.py",
@@ -480,8 +480,8 @@
     },
     {
       "path": "recaplib/recovery.py",
-      "bytes": 37411,
-      "sha256": "2dd13326e4d82917f645823b0e066db46646fb8b5e526b2855805db39e38c2e5"
+      "bytes": 37756,
+      "sha256": "7c350e968325105e2a942d70d76bb85d13ed2c9dc2713ee8812dc6c23dc7b981"
     },
     {
       "path": "recaplib/render_queue.py",
@@ -517,6 +517,11 @@
       "path": "recaplib/source_text.py",
       "bytes": 442,
       "sha256": "bc26322641c7315d5a00f962fce374bcbf4aff8d4a2924c6eb498f6e7e85b6e6"
+    },
+    {
+      "path": "recaplib/sqlite_safety.py",
+      "bytes": 1385,
+      "sha256": "e9de97d61dbf274bb239a0242c91a9cb5b00087e4afb0f576765b2f8da9aea83"
     },
     {
       "path": "recaplib/strict_json.py",
@@ -1007,6 +1012,11 @@
       "path": "tests/test_source_label_validation.py",
       "bytes": 10615,
       "sha256": "18b6c00a220d96b3bd0cebd3c94c35d7c8aadb2cf8315b525bc4287a7731aa72"
+    },
+    {
+      "path": "tests/test_sqlite_readonly_safety.py",
+      "bytes": 5328,
+      "sha256": "6f8ad2e763fc5231be87c8f3983aefbfc27a4316e4dd54084e4de24a7a9a2537"
     },
     {
       "path": "tests/test_start_here.py",
