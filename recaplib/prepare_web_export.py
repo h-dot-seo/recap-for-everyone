@@ -8,6 +8,7 @@ import tempfile
 import zipfile
 import zlib
 from recaplib.session_workflow import _normalize_bytes
+from recaplib.zip_preflight import check_directory
 
 MAX_ARCHIVE_BYTES = 64 * 1024 * 1024
 MAX_MEMBER_BYTES = 16 * 1024 * 1024
@@ -52,10 +53,6 @@ def archive_bytes(path):
         raw = stream.read(MAX_ARCHIVE_BYTES + 1)
     if len(raw) > MAX_ARCHIVE_BYTES:
         raise ValueError('ZIP archive exceeds the 64 MiB preparation limit')
-    # Every central-directory entry needs this signature. Count before ZipFile
-    # constructs entry objects; conservative false positives are acceptable.
-    if raw.count(b'PK\x01\x02') > MAX_ENTRIES:
-        raise ValueError('ZIP archive exceeds the 1000-entry preparation limit')
     return raw
 
 
@@ -100,6 +97,7 @@ def prepare_web_export(path, member, output, expected_archive_sha256=None, max_m
     raw = archive_bytes(path)
     archive_digest = _checked_archive_sha256(raw, expected_archive_sha256)
     try:
+        check_directory(raw, MAX_ENTRIES)
         with zipfile.ZipFile(io.BytesIO(raw)) as archive:
             entries = archive.infolist()
             if len(entries) > MAX_ENTRIES:

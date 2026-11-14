@@ -52,8 +52,8 @@ Every candidate says `content_validation: NOT_PERFORMED`. A corrupt CRC, malform
 JSON or unsupported conversation structure may still fail during preparation.
 Reported ZIP sizes and names are untrusted metadata, not authentication.
 
-The whole-archive 64 MiB / 1000-entry bounds and conservative pre-entry signature
-check are shared with preparation. Pagination limits the displayed candidates
+The whole-archive 64 MiB / 1000-entry bounds and bounded end-record/directory
+preflight are shared with preparation. Pagination limits the displayed candidates
 (default 50, maximum 100), not ZIP reading or metadata parsing. `total_candidates`
 and `other_entries_not_listed` describe the whole snapshot. `next_offset` is null at
 the end. Candidate names can themselves be private; keep the JSON output private.
@@ -139,10 +139,11 @@ list is nonempty. An empty list is not eligibility or content validation: CRC,
 JSON shape and all other safety checks still apply during explicit preparation.
 No candidate is decompressed to produce these diagnostics.
 
-The central-directory signature pre-count is unchanged and remains conservative:
-signatures inside stored attachments can count toward the entry bound. This
-increment neither fixes that false rejection nor introduces EOCD/ZIP64 parsing,
-new compression formats or chunked archive handling.
+The entry-budget preflight now walks only the declared central directory after
+checking its end records and byte bounds, before constructing ZipInfo objects.
+Signature-looking bytes in stored attachments no longer count as extra entries.
+The archive still uses one bounded immutable byte snapshot; no streaming or
+new compression format is introduced.
 
 ## Lowering the member budget
 
@@ -160,3 +161,19 @@ Preparation independently rechecks its effective member bound and reads at most
 N+1 bytes before size/CRC/JSON checks and before staging. No streaming or partial
 output is introduced. Successful `limits.member_bytes` echoes N and
 `operator_supplied` is true even when N equals the default.
+
+## Bounded directory admission
+
+The expected archive hash is checked before directory parsing. The shared
+preflight then validates EOCD, the ordinary fixed-size ZIP64 end record/locator
+when present, directory bounds, per-entry header lengths and both declared and
+actual entry counts before `ZipFile` constructs entry objects. The same 1000-entry
+and 64 MiB archive ceilings remain. Prepended bytes are supported; multi-disk
+and extensible ZIP64 end records are not. Inconsistent counts, offsets or lengths
+are rejected rather than trusted, including count mismatches and truncated EOCD
+comments that stdlib zipfile may previously have tolerated. This is structural admission, not authenticity,
+CRC or JSON validation. Selected-member validation still occurs before staging.
+
+This removes false entry-limit rejection caused by signatures inside stored
+attachments without changing the accepted member formats or raising budgets.
+The snapshot is not re-read or streamed, and no partial output is published.

@@ -2340,3 +2340,12 @@ actual limit+1 member read and receipts share the effective value. No archive,
 ratio or entry bound is raised; byte snapshot and CRC/JSON-before-staging remain.
 Eight synthetic regressions cover validation, no-read rejection, exact bound/read
 budget, runtime constants, ratio protection, defaults, hash/CRC and both CLIs.
+
+2026-11-14 ZIP directory-budget admission (0.95.5-zip-directory-budget):
+replaces whole-archive signature counting with bounded EOCD/ZIP64 and actual
+central-directory record traversal before ZipInfo construction. Stored attachment
+signatures no longer inflate entry counts. Hash lease comparison precedes parsing;
+the same immutable bytes, archive/member ceilings and CRC/JSON staging order remain.
+Seven synthetic tests cover nested signatures, empty/prefix/comment/ZIP64 archives,
+declared/actual count budgets, malformed lengths/offsets and hash-before-parse.
+No streaming, bound increase, schema or provenance changes are introduced.

@@ -1,10 +1,21 @@
 # Validation record
 
-Current release: `0.95.4-zip-member-budget`, dated 2026-11-14.
+Current release: `0.95.5-zip-directory-budget`, dated 2026-11-14.
 This file is the current snapshot. Every dated entry since the first release is kept
 unchanged and in order in [docs/VALIDATION_HISTORY.md](docs/VALIDATION_HISTORY.md).
 
 ## Latest change
+
+2026-11-14 ZIP directory-budget admission (0.95.5-zip-directory-budget):
+replaces whole-archive signature counting with bounded EOCD/ZIP64 and actual
+central-directory record traversal before ZipInfo construction. Stored attachment
+signatures no longer inflate entry counts. Hash lease comparison precedes parsing;
+the same immutable bytes, archive/member ceilings and CRC/JSON staging order remain.
+Seven synthetic tests cover nested signatures, empty/prefix/comment/ZIP64 archives,
+declared/actual count budgets, malformed lengths/offsets and hash-before-parse.
+No streaming, bound increase, schema or provenance changes are introduced.
+
+Previous change:
 
 2026-11-14 Lower-only ZIP member budget (0.95.4-zip-member-budget):
 adds --max-member-bytes to inspection/preparation, restricted to 1..the existing
