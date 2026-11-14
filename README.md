@@ -279,3 +279,7 @@ For an explicitly chosen restored-copy check of ordered history and complete
 provenance/topology ledgers, see [recovery v2](docs/RECOVERY_V2.md). Default v1
 declarations remain unchanged; a v2 declaration itself creates no backup. For the separate limited object-replay
 workflow, see [v2 rebuild](docs/REBUILD_V2.md).
+
+Read [stored original-export metadata](docs/ARCHIVE_LEDGER.md) with `ledger` to
+inspect explicit import formats, byte counts and selections without inferring
+retention or changing recovery authorization.

@@ -102,6 +102,7 @@ class CommandEffectsTests(unittest.TestCase):
             'find':['synthetic','--source','web'],
             'inspect':[self.web,'--format','web'],
             'inspect-web-zip':[self.zip],
+            'ledger':[],
             'list':['--source','web'],
             'list-export':[self.web,'--format','web'],
             'preview-title':[self.proposal],
@@ -157,7 +158,7 @@ class CommandEffectsTests(unittest.TestCase):
         entries=describe(recap.build_parser())['commands']
         expected={entry['command'] for entry in entries if not entry['writes']['default']}
         self.assertEqual(expected,set(self.cases))
-        self.assertEqual(len(expected),28)
+        self.assertEqual(len(expected),29)
         for command,args in self.cases.items():
             with self.subTest(command=command):
                 result=self.assert_readonly(command,args)

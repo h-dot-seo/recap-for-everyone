@@ -292,3 +292,6 @@ do not establish authorship, consent, retrieval or publication evidence. See
 
 별도의 [v2 재구축](REBUILD_V2.md)은 원본 객체로 재생 가능한 범위만 검사하며
 제목·검토 이력은 복원하지 않았다고 명시합니다. 전체 보관소 복원을 뜻하지 않습니다.
+
+`ledger`는 원본 내보내기의 기록된 형식·바이트 수·명시 선택을 읽습니다.
+[원본 메타데이터 원장](ARCHIVE_LEDGER.md)의 미기록·복구 미선언 한계를 확인하세요.

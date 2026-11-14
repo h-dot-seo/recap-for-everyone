@@ -252,3 +252,10 @@ An explicit v2 manifest is also supported by `rebuild-archive`; see
 [v2 rebuild](REBUILD_V2.md). Title/review history checks are explicitly excluded,
 never counted as PASS. Other provenance/topology digests remain mandatory and
 `full_archive_restored` is false. V1 contracts remain unchanged.
+
+## Original-export bookkeeping remains outside v1/v2 declaration
+
+`original_exports` is not declared or compared by either current manifest version.
+Its recorded hashes do not expand declared original objects or rebuild permission.
+A retained zero-message hash in this ledger therefore does not by itself make a
+rebuild eligible. See [archive ledger](ARCHIVE_LEDGER.md).

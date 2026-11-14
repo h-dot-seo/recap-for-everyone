@@ -22,6 +22,9 @@ def build_parser():
     find = sub.add_parser('search'); find.add_argument('query'); find.add_argument('--limit', type=int, default=20)
     stats = sub.add_parser('stats')
     stats.add_argument('--by-source', action='store_true', help='read-only per-source counts and declared timestamp coverage')
+    ledger_parser=sub.add_parser('ledger',help='read explicit import metadata and unledgered identities')
+    ledger_parser.add_argument('--source'); ledger_parser.add_argument('--limit',type=int,default=50)
+    ledger_parser.add_argument('--offset',type=int,default=0); ledger_parser.add_argument('--text',action='store_true')
     sub.add_parser('describe-schema', help='inspect a read-only archive metadata snapshot, not validate it')
     check = sub.add_parser('inspect', help='inspect export coverage without a database')
     check.add_argument('input'); check.add_argument('--format', choices=['web', 'local', 'local-codex', 'normalized'], required=True)
@@ -354,6 +357,9 @@ def main():
         elif args.command == 'changed-since':
             from recaplib.import_checkpoint import changed_since
             result = changed_since(args.db, args.source, args.checkpoint)
+        elif args.command == 'ledger':
+            from recaplib.ledger import ledger
+            result=ledger(args.db,args.source,args.limit,args.offset)
         elif args.command == 'declare-recovery':
             from recaplib.recovery import declare_recovery
             result = declare_recovery(args.db, args.output, args.declared_at, manifest_version=args.manifest_version)
@@ -371,7 +377,10 @@ def main():
         rendered = None
         if getattr(args, 'text', False):
             from recaplib.recovery import render_text
-            if args.command in ('export-provenance', 'check-provenance'):
+            if args.command=='ledger':
+                from recaplib.ledger import render_text as ledger_text
+                rendered=ledger_text(result)
+            elif args.command in ('export-provenance', 'check-provenance'):
                 from recaplib.text_summary import summary_text
                 rendered = summary_text('Private message provenance', list(result.items()))
             elif args.command in ('declare-review-checkpoint', 'declare-checkpoint', 'changed-since'):

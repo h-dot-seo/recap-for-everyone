@@ -18,7 +18,7 @@ import recap
 from recaplib import command_catalog as catalog
 
 ROOT=Path(__file__).resolve().parents[1]
-EXPECTED=set('''ingest search stats describe-schema inspect list-export inspect-web-zip prepare-web-export replay-local web-branch suggest-branch-title suggest-replay-title suggest-attributed-title preview-title apply-title review-state render-queue review-titles title-adapter-dry-run title-adapter-simulate export-title-plan check-title-plan import check-import export-normalized export-provenance check-provenance declare-review-checkpoint declare-checkpoint changed-since declare-recovery rehearse-recovery rebuild-archive list find show render suggest-title title title-history describe'''.split())
+EXPECTED=set('''ingest search stats ledger describe-schema inspect list-export inspect-web-zip prepare-web-export replay-local web-branch suggest-branch-title suggest-replay-title suggest-attributed-title preview-title apply-title review-state render-queue review-titles title-adapter-dry-run title-adapter-simulate export-title-plan check-title-plan import check-import export-normalized export-provenance check-provenance declare-review-checkpoint declare-checkpoint changed-since declare-recovery rehearse-recovery rebuild-archive list find show render suggest-title title title-history describe'''.split())
 
 
 class CommandCatalogTests(unittest.TestCase):

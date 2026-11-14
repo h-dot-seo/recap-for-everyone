@@ -3,6 +3,7 @@ from recaplib.errors import ConflictingIdentity, SourceChanged
 import hashlib
 import io
 import json
+import re
 import sqlite3
 from collections import Counter
 from pathlib import Path
@@ -173,7 +174,22 @@ def _check_encoded_keys(row, line_no):
             pending.extend(item)
 
 
-def _ingest_adapter_rows(db, source, rows, *, newline=None, topology=None):
+def _validate_origin(origin):
+    if origin is None:return None
+    if not isinstance(origin,dict) or set(origin)!={'format','original_sha256','original_bytes','selected_conversation'}:
+        raise ValueError('original export metadata must contain exactly the declared fields')
+    value=dict(origin)
+    if (value['format'] not in ('web','local','local-codex') or
+            not isinstance(value['original_sha256'],str) or not re.fullmatch('[0-9a-f]{64}',value['original_sha256']) or
+            type(value['original_bytes']) is not int or not 0<=value['original_bytes']<=2**63-1 or
+            not isinstance(value['selected_conversation'],str)):
+        raise ValueError('original export metadata is malformed')
+    try:value['selected_conversation'].encode('utf-8')
+    except UnicodeError:raise ValueError('original export selection must be valid Unicode text') from None
+    return value
+
+
+def _ingest_adapter_rows(db, source, rows, *, newline=None, topology=None, origin=None):
     """Private validated adapter path: own serialization, never accept paired raw.
 
     JSON encoding still validates serializability/Unicode of every value. Stored
@@ -182,12 +198,16 @@ def _ingest_adapter_rows(db, source, rows, *, newline=None, topology=None):
     when string data contains newlines. The rows are not decoded a second time.
     """
     _validate_source(source)
+    origin=_validate_origin(origin)
     rows = list(rows)
     raw = _normalized_bytes(rows, newline)
     for line_no, row in enumerate(rows, 1):
         _check_encoded_keys(row, line_no)
     records = _admit_incoming(_validate_record(row, line_no) for line_no, row in enumerate(rows, 1))
-    return _write_records(db, source, raw, records, rows, topology)
+    if origin is not None and any(row.get('origin_sha256')!=origin['original_sha256'] or
+            origin['selected_conversation'] and row['conversation_id']!=origin['selected_conversation'] for row in rows):
+        raise ValueError('original export metadata does not match adapter rows')
+    return _write_records(db, source, raw, records, rows, topology, origin)
 
 
 def _admit_incoming(candidates):
@@ -205,7 +225,7 @@ def _admit_incoming(candidates):
     return records
 
 
-def _write_records(db, source, raw, records, provenance, topology=None):
+def _write_records(db, source, raw, records, provenance, topology=None, origin=None):
     """Shared transaction writer; callers finish validation before entering."""
     digest = hashlib.sha256(raw).hexdigest()
     conn = sqlite3.connect(db)
@@ -222,6 +242,25 @@ def _write_records(db, source, raw, records, provenance, topology=None):
                 if occurrence_table is None:
                     # Additive upgrade: preserve the legacy table and its schema.
                     conn.execute('INSERT OR IGNORE INTO export_occurrences SELECT source,conversation,message,original_hash,locator,parent FROM export_provenance')
+            if origin is not None:
+                conn.execute("CREATE TABLE IF NOT EXISTS original_exports (source TEXT NOT NULL, original_sha256 TEXT NOT NULL, original_bytes INTEGER NOT NULL, format TEXT NOT NULL, selected_conversation TEXT NOT NULL, normalized_sha256 TEXT NOT NULL, extracted_messages INTEGER NOT NULL, PRIMARY KEY(source,original_sha256,format,selected_conversation,normalized_sha256))")
+                # Match the declared identity and required-column contract without
+                # depending on physical column order or repairing foreign tables.
+                columns={row[1]:(row[2].upper(),row[3],row[5]) for row in conn.execute('PRAGMA table_xinfo(original_exports)')}
+                expected={'source':('TEXT',1,1),'original_sha256':('TEXT',1,2),
+                          'original_bytes':('INTEGER',1,0),'format':('TEXT',1,3),
+                          'selected_conversation':('TEXT',1,4),'normalized_sha256':('TEXT',1,5),
+                          'extracted_messages':('INTEGER',1,0)}
+                if columns!=expected:raise ValueError('original export ledger layout is incompatible; no automatic repair')
+                key=(source,origin['original_sha256'],origin['format'],origin['selected_conversation'],digest)
+                old=conn.execute('SELECT original_bytes,extracted_messages FROM original_exports WHERE source=? AND original_sha256=? AND format=? AND selected_conversation=? AND normalized_sha256=?',key).fetchone()
+                if old is not None and old!=(origin['original_bytes'],len(records)):
+                    raise ConflictingIdentity('conflicting original export metadata')
+                conn.execute('INSERT OR IGNORE INTO original_exports(source,original_sha256,original_bytes,format,selected_conversation,normalized_sha256,extracted_messages) VALUES(?,?,?,?,?,?,?)',
+                    (source,origin['original_sha256'],origin['original_bytes'],origin['format'],origin['selected_conversation'],digest,len(records)))
+                written=conn.execute('SELECT original_bytes,extracted_messages FROM original_exports WHERE source=? AND original_sha256=? AND format=? AND selected_conversation=? AND normalized_sha256=?',key).fetchone()
+                if written!=(origin['original_bytes'],len(records)):
+                    raise ConflictingIdentity('original export metadata was not recorded; transaction rejected')
             if topology is not None:
                 conn.execute('CREATE TABLE IF NOT EXISTS export_nodes (source TEXT, conversation TEXT, original_hash TEXT, node TEXT, parent TEXT, ordinal INTEGER, has_text INTEGER, PRIMARY KEY(source,conversation,original_hash,node))')
                 conn.execute('CREATE TABLE IF NOT EXISTS export_conversations (source TEXT, conversation TEXT, original_hash TEXT, current_node TEXT, current_node_state TEXT, mapping_nodes INTEGER, PRIMARY KEY(source,conversation,original_hash))')

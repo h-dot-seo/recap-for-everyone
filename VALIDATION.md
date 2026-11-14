@@ -1,10 +1,37 @@
 # Validation record
 
-Current release: `0.100.1-v2-object-rebuild`, dated 2026-11-14.
+Current release: `0.100.2-original-export-ledger`, dated 2026-11-14.
 This file is the current snapshot. Every dated entry since the first release is kept
 unchanged and in order in [docs/VALIDATION_HISTORY.md](docs/VALIDATION_HISTORY.md).
 
 ## Latest change
+
+2026-11-14 Original-export metadata ledger (0.100.2-original-export-ledger):
+adds a seven-field clock-free original_exports ledger to explicit adapter imports
+and a read-only paginated ledger view. Original bytes means count, never a new
+body copy. Same-snapshot coverage supplies hash/format/selection; the writer owns
+actual normalized hash and row count. Zero-message inputs are retained, format is
+part of the primary key, same-key contradictions fail and legacy metadata is never
+inferred or backfilled on read. Stored artifacts and distinct unledgered original
+hashes share one global SQL page. Private metadata and recovery limitations are
+explicit: v1/v2 manifests neither declare this table nor authorize extra hashes.
+Named INSERT columns and required shape/identity checks prevent corruption from
+incompatible or reordered existing layouts. Plain ingest, stats, prior receipt
+shapes and recovery semantics remain unchanged.
+
+Validation: all 1,526 tests passed (one environment-dependent skip), including
+17 original-export ledger tests. Independent review passed 98 targeted tests and
+31 final catalog/readonly-effect/ledger tests, with exact v1/v2 declaration bytes
+unchanged when this undeclared table is present versus absent. The first full run
+exposed three outdated catalog/matrix expectations; adding the real ledger case
+and exact command list resolved them. Review found reordered-column corruption
+and silent INSERT OR IGNORE omission under extra constraints; named fields,
+required identity validation, and post-insert exact-key/count checks fix both.
+Generated columns and CHECK/IGNORE/extra UNIQUE failures preserve existing tables
+and roll back. Compilation, Python 3.10 grammar, manual execution of the new guide,
+and all 136 previous shell examples passed; manifest 324 / audit 325 passed.
+
+Previous change:
 
 2026-11-14 Explicit v2 replayable-content rebuild (0.100.1-v2-object-rebuild):
 accepts an explicit v2 recovery manifest for object replay and verifies the

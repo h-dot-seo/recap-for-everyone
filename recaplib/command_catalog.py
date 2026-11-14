@@ -13,7 +13,7 @@ BOUNDARY = ('Static effects with representative synthetic tests, not an exhausti
             'Read operations can reveal private contents on stdout. Writes may partially succeed before errors; '
             'no rollback guarantee is implied. No existing command execution, database access or network call occurs while describing.')
 COMMANDS = (
-    'ingest','search','stats','describe-schema','inspect','list-export','inspect-web-zip','prepare-web-export',
+    'ingest','search','stats','ledger','describe-schema','inspect','list-export','inspect-web-zip','prepare-web-export',
     'replay-local','web-branch','suggest-branch-title','suggest-replay-title','suggest-attributed-title',
     'preview-title','apply-title','review-state','render-queue','review-titles','title-adapter-dry-run',
     'title-adapter-simulate','export-title-plan','check-title-plan','import','check-import','export-normalized',
@@ -37,7 +37,7 @@ SCHEMAS = {
     'export-normalized':'recap.normalized-export-receipt.v1','export-provenance':'recap.message-provenance-export.v1',
     'check-provenance':'recap.message-provenance-check.v1','declare-review-checkpoint':'recap.review-checkpoint-declaration.v1',
     'declare-checkpoint':'recap.import-checkpoint-declaration.v1','changed-since':'recap.import-changes.v1',
-    'declare-recovery':'recap.recovery-declaration.v1','rehearse-recovery':'recap.recovery-receipt.v1','rebuild-archive':'recap.rebuild-receipt.v1'}
+    'ledger':'recap.archive-ledger.v1','declare-recovery':'recap.recovery-declaration.v1','rehearse-recovery':'recap.recovery-receipt.v1','rebuild-archive':'recap.rebuild-receipt.v1'}
 RESULT_FAILURES = {'replay-local':'supported is false','check-import':'conflicts_found is true',
                   'check-provenance':'status is not PASS','changed-since':'status is not CUTOFF_VERIFIED',
                   'rebuild-archive':'status is not REBUILD_REHEARSAL_PASSED',
@@ -116,7 +116,7 @@ def _effects(name):
                 output_schema=SCHEMAS.get(name),output_schema_conditional=schemas,notes=notes,
                 exits={'0':'normal result; not necessarily semantic approval or completeness',
                        '1':dict(caught_error=name!='describe',result_failure=RESULT_FAILURES.get(name)),
-                       '2':'argument parsing or CLI policy error'},guide='docs/COMMANDS.md')
+                       '2':'argument parsing or CLI policy error'},guide='docs/ARCHIVE_LEDGER.md' if name=='ledger' else 'docs/COMMANDS.md')
 
 
 def _options(parser):

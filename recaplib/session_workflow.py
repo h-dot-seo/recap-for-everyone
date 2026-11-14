@@ -251,13 +251,18 @@ def _normalized_bytes(rows, newline=None):
     return _serialize_normalized_rows(rows, newline)
 
 
+def _origin_report(report):
+    return dict(format=report['format'],original_sha256=report['original_sha256'],original_bytes=report['original_bytes'],
+                selected_conversation=report.get('selection',{}).get('conversation',''))
+
+
 def import_export(db, source, path, kind, conversation=None, expected_export_sha256=None):
     _validate_source(source)
     topology=[] if kind=='web' else None
     rows, report = normalize(path, kind, include_report=True, conversation=conversation,
                              expected_export_sha256=expected_export_sha256, _topology=topology)
     # Keep original hash/locator/branch metadata in companion provenance tables.
-    result = _ingest_adapter_rows(db, source, rows, topology=topology)
+    result = _ingest_adapter_rows(db, source, rows, topology=topology, origin=_origin_report(report))
     result['coverage'] = report
     return result
 
@@ -288,7 +293,7 @@ def import_export_bytes(db, source, raw, label, kind, conversation=None, *, newl
         parser_label = label
     topology=[] if kind=='web' else None
     rows, report = _normalize_selected_bytes(raw, parser_label, kind, conversation, topology)
-    result = _ingest_adapter_rows(db, source, rows, newline='\n' if newline == 'lf' else '\r\n', topology=topology)
+    result = _ingest_adapter_rows(db, source, rows, newline='\n' if newline == 'lf' else '\r\n', topology=topology, origin=_origin_report(report))
     result['coverage'] = report
     # Do not echo the potentially private label or selection in this new block.
     # Existing coverage selection fields retain the import API's prior contract.

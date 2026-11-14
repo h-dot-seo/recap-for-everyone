@@ -437,3 +437,9 @@ ordering or full provenance/topology, explicitly use `declare-recovery
 --manifest-version 2` into a new private file. Default v1 does not imply these
 checks. Rehearsal follows the supplied manifest version; v2 rebuild explicitly excludes title/review history and never claims full restoration. Never relabel or overwrite an old declaration to claim new coverage.
 Read `docs/RECOVERY_V2.md` before treating the result as evidence of preservation.
+
+For stored import bookkeeping, use `recap.py --db DB ledger [--source SOURCE]`
+and follow its single global `next_offset`. Metadata may be private. Unledgered
+does not mean never imported; do not infer missing formats, selections or byte
+counts. The new original_exports ledger is not declared by recovery v1/v2 and
+does not authorize additional object replay. See `docs/ARCHIVE_LEDGER.md`.

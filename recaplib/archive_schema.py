@@ -7,7 +7,7 @@ from recaplib.recovery import MAX_DETAIL_ITEMS, _fts_rows, _tables
 
 ARCHIVE_TABLES = (
     'artifacts', 'export_conversations', 'export_nodes', 'export_occurrences', 'export_provenance', 'messages',
-    'messages_fts', 'title_history', 'title_review_history',
+    'messages_fts', 'original_exports', 'title_history', 'title_review_history',
 )
 LAZY_TABLES = ('export_occurrences', 'export_provenance', 'title_history', 'title_review_history')
 SHADOW_TABLES = ('messages_fts_config', 'messages_fts_data', 'messages_fts_docsize', 'messages_fts_idx')
