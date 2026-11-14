@@ -326,3 +326,5 @@ and v2 do not declare or compare it. See [archive ledger](ARCHIVE_LEDGER.md).
 `original_exports` is recognized in the present-table listing only; existing
 `ledgers_present` flags remain unchanged. Presence does not imply recovery v1/v2
 coverage.
+
+`describe-schema --observe-storage` adds a separate opt-in storage observation schema around the unchanged inventory; it does not add fields to ordinary `recap.archive-describe.v1` output. See [storage observations](STORAGE_OBSERVATION.md).

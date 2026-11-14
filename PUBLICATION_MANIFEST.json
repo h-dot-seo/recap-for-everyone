@@ -1,12 +1,12 @@
 {
   "project": "recap-for-everyone",
-  "release": "0.100.4-v3-metadata-rebuild",
+  "release": "0.100.5-storage-observation",
   "date": "2026-11-14",
   "private_history_imported": false,
   "actual_corpora_included": false,
   "synthetic_examples_only": true,
   "license_status": "NOT_SELECTED",
-  "file_count": 330,
+  "file_count": 332,
   "files": [
     {
       "path": ".gitattributes",
@@ -30,8 +30,8 @@
     },
     {
       "path": "README.md",
-      "bytes": 20774,
-      "sha256": "027535be8641e6a18e4e342df55ccaef644c4c0e563ed745d4b13280330a2875"
+      "bytes": 21033,
+      "sha256": "e8c0762d8a75d0c0b27c4b1b2ec961741a4f83411f2add655ffd7194c71cc7d7"
     },
     {
       "path": "RIGHTS.md",
@@ -45,13 +45,13 @@
     },
     {
       "path": "SKILL.md",
-      "bytes": 32747,
-      "sha256": "4da5749d7d6a0b0dd28db660d5d6dd411cc004244e809fb602dd975257e230a4"
+      "bytes": 33168,
+      "sha256": "5273d40943a150659a0aae1fbd4271c7282de0850a7c9bc6e6e226bae318cfdc"
     },
     {
       "path": "VALIDATION.md",
-      "bytes": 59215,
-      "sha256": "bfe74a8712cfb0fabaa1360bbc334fd07ad647139665b66457c5e6d2872f738d"
+      "bytes": 60911,
+      "sha256": "9c37afef3a727e7b7ad438bdd679c2afee833d01d980606cd6c918157c5d6e5b"
     },
     {
       "path": "attributed_title.py",
@@ -105,8 +105,8 @@
     },
     {
       "path": "docs/ARCHITECTURE.md",
-      "bytes": 22402,
-      "sha256": "c9f3578492ce71d22367a82c1b986d2fa76f7701564683055a5cd7a9c536944a"
+      "bytes": 22791,
+      "sha256": "e119ddbacfb2ee08b965dd673e3fb5c27565c6a5338a3061c872ccf9bada092f"
     },
     {
       "path": "docs/ARCHIVE_BRANCH.md",
@@ -145,8 +145,8 @@
     },
     {
       "path": "docs/COMMANDS.md",
-      "bytes": 35098,
-      "sha256": "95549d08a1a39b4847b3ce4f36b6de329b2cc91907ecbe18648a0592489f154e"
+      "bytes": 35410,
+      "sha256": "451eae0370b42215a4b8078de9dba55847d60aac45eaf2df8955ae1f6e67ec1e"
     },
     {
       "path": "docs/COMMAND_CATALOG.md",
@@ -196,7 +196,7 @@
     {
       "path": "docs/INSTALL.md",
       "bytes": 8441,
-      "sha256": "8bbc313ba63f985f7169fb4af73492a6b15b6ceb389d0d841a1d71f28d78e952"
+      "sha256": "71c11d21ae25d4ccf347c20d9ee4bc1898a75d2fdf7769abd1a0c6a50648a4f2"
     },
     {
       "path": "docs/JSON_ERRORS.md",
@@ -235,8 +235,8 @@
     },
     {
       "path": "docs/README.ko.md",
-      "bytes": 24511,
-      "sha256": "8046a56d3e24fddda88bf849129c00e9d453cfa941053b3c913a1625df4fe71f"
+      "bytes": 24844,
+      "sha256": "e4ec37a3e3b9ffc9ac3fa25c912c6fd32648e8d1aa45e14b5b577397aafe2d75"
     },
     {
       "path": "docs/REBUILD_REHEARSAL.md",
@@ -255,8 +255,8 @@
     },
     {
       "path": "docs/RECOVERY_REHEARSAL.md",
-      "bytes": 18282,
-      "sha256": "c856d5f5581cd9cda0e66840919197728e9b9a0ae75a0832f7b50aaa05cc5e2c"
+      "bytes": 18520,
+      "sha256": "f4334a20ae0097fe48854bcbfbf68342ce9d5a8b5b08efb8ac2ed7b2e8bb6a06"
     },
     {
       "path": "docs/RECOVERY_V2.md",
@@ -310,8 +310,8 @@
     },
     {
       "path": "docs/SCHEMA.md",
-      "bytes": 16340,
-      "sha256": "a611aa71ecb65adf93629b059bbe5b59c6170a6efa71700c2c7faec96065a28a"
+      "bytes": 16582,
+      "sha256": "e43621150a4b7049fb434779343c555a01940ce8782f44e4727cfbb022849f81"
     },
     {
       "path": "docs/SEARCH_EXCERPTS.md",
@@ -342,6 +342,11 @@
       "path": "docs/START_HERE.md",
       "bytes": 12562,
       "sha256": "55bbff0a93c11b2c3718e2e8e8b5e96f46c672250150796975d937717ee4120b"
+    },
+    {
+      "path": "docs/STORAGE_OBSERVATION.md",
+      "bytes": 3528,
+      "sha256": "bf20b07139e1239fc4ae21d69182930b05b2b6a00cb3d8119c4c2a8bab3d8aab"
     },
     {
       "path": "docs/SUPPLIED_TITLE_REVIEW.md",
@@ -405,8 +410,8 @@
     },
     {
       "path": "docs/VALIDATION_HISTORY.md",
-      "bytes": 202919,
-      "sha256": "3337f2b281259fff71d0722bd5fb809f453bb8eff347fdc9e869290b6a1525b6"
+      "bytes": 204600,
+      "sha256": "52e78754bb27d431465aa79496e32150ae370a96e91c30db5463bf9ec35ecda2"
     },
     {
       "path": "docs/WEB_ZIP_INVENTORY.md",
@@ -550,8 +555,8 @@
     },
     {
       "path": "recap.py",
-      "bytes": 33814,
-      "sha256": "ce82d163c030345473dad727abe12a80ee0a2f75849474b6d8227dddf4f0a4e5"
+      "bytes": 34192,
+      "sha256": "23e7ca64002496e4d62790f35fc6c68f73f574b6b42e051154bd13aa70cbf597"
     },
     {
       "path": "recap_mcp.py",
@@ -561,7 +566,7 @@
     {
       "path": "recaplib/__init__.py",
       "bytes": 126,
-      "sha256": "06eedaeea5ec070c2db8a99563a727180aed18a34f14d0d0a691d0cf75687302"
+      "sha256": "697887a8814346aa8dd03fbbf9bf1b858554b190f459e9d0a17981dfffd0905c"
     },
     {
       "path": "recaplib/archive.py",
@@ -570,8 +575,8 @@
     },
     {
       "path": "recaplib/archive_schema.py",
-      "bytes": 5011,
-      "sha256": "f65c88e835f259633c2c7a460a59778bf6b28dbdbf993e8f3e501b689299a940"
+      "bytes": 9814,
+      "sha256": "3e4b0ae3917e90e77e519444aa3ff519c4038466d88a79daf12680601c2d8a46"
     },
     {
       "path": "recaplib/attributed_title.py",
@@ -595,8 +600,8 @@
     },
     {
       "path": "recaplib/command_catalog.py",
-      "bytes": 13952,
-      "sha256": "4283bc6b21714dd0bb8c76d250add363b48cddcf66670eae891c86230ef07f50"
+      "bytes": 14447,
+      "sha256": "5e457ddd2a938b47ade2b6d4ef61ccce4f1799af57653905b5d211cf7a3ad748"
     },
     {
       "path": "recaplib/conversation_document.py",
@@ -985,8 +990,8 @@
     },
     {
       "path": "tests/test_command_effects.py",
-      "bytes": 13609,
-      "sha256": "2d32edc7e7b7b7721e4c288a99eb12f3f0d93ed8116054ec65c25c224f12e6a5"
+      "bytes": 13959,
+      "sha256": "af7f6b4e1af70e657f599abe7e92a8005bf72299151e45da7adddb0636a63a3b"
     },
     {
       "path": "tests/test_command_usage.py",
@@ -1422,6 +1427,11 @@
       "path": "tests/test_start_here.py",
       "bytes": 8022,
       "sha256": "0d406d0e7e81d0a5ebef527bfe8f798e13a7ecb959c0de8031be10f0b711b023"
+    },
+    {
+      "path": "tests/test_storage_observation.py",
+      "bytes": 12876,
+      "sha256": "22db1162cf79d64ab313547dda1ec88906c83f03c81fafd8b2e1d67821e9b2c4"
     },
     {
       "path": "tests/test_strict_json.py",

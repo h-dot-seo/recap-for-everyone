@@ -263,3 +263,5 @@ rebuild eligible. See [archive ledger](ARCHIVE_LEDGER.md).
 Optional [v3](RECOVERY_V3.md) adds original_exports preservation and separately declared original object hashes, including zero-message imports. Default v1 and stored v1/v2 checks remain unchanged. No missing metadata is inferred; the v3 object-rebuild path requires an explicit plan.
 
 V3 object replay is now supported through the explicit plan path described in [REBUILD_V3](REBUILD_V3.md). It checks replayable metadata but excludes title/review histories. A full restored-copy rehearsal remains a separate operation.
+
+For pre-open header and sidecar metadata, use the optional [storage observation](STORAGE_OBSERVATION.md) path. It is not a backup or consistency test and performs no checkpoint. Rehearsal declarations, checks and receipts are unchanged.

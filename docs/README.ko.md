@@ -299,3 +299,5 @@ do not establish authorship, consent, retrieval or publication evidence. See
 명시적 `--manifest-version 3`는 원본 내보내기 메타데이터 원장을 선언하고 복원 사본에서 비교합니다. 기본 v1 및 저장된 v1/v2는 그대로이며 v3 객체 재생에는 명시 계획이 필요합니다. [범위와 예제](RECOVERY_V3.md)를 참고하세요.
 
 v3 선언의 원본 메타데이터와 0건 내보내기도 명시 계획으로 새 DB에 재생·비교합니다. 제목·검토 이력은 복원하지 않으며 전체 복원 완료를 뜻하지 않습니다. [v3 재생](REBUILD_V3.md).
+
+`describe-schema --observe-storage`는 SQLite 연결 전 헤더·사이드카 종류/크기와 이후 메타데이터 읽기 결과를 분리합니다. 읽기 전용 연결도 사이드카를 바꿀 수 있으며 안전한 복사나 복구 필요 여부를 판정하지 않습니다. [저장 상태 관찰](STORAGE_OBSERVATION.md).

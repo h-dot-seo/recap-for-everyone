@@ -1,10 +1,35 @@
 # Validation record
 
-Current release: `0.100.4-v3-metadata-rebuild`, dated 2026-11-14.
+Current release: `0.100.5-storage-observation`, dated 2026-11-14.
 This file is the current snapshot. Every dated entry since the first release is kept
 unchanged and in order in [docs/VALIDATION_HISTORY.md](docs/VALIDATION_HISTORY.md).
 
 ## Latest change
+
+2026-11-14 Pre-open SQLite storage observations (0.100.5-storage-observation):
+adds opt-in describe-schema --observe-storage without changing ordinary inventory
+output. At most 100 main-header bytes and fixed WAL/SHM/journal metadata are
+observed before SQLite access. Nonregular main/sidecars are refused before opening;
+observation, connection and later inventory failures retain redacted pre-open facts.
+The complete output is bounded and oversized inventory is dropped with OUTPUT_LIMIT.
+No checkpoint, repair, copy-safety/recovery verdict, schema stamp, atomic snapshot
+or all-files-unchanged claim is made. Read-only SQLite can change sidecars. Private
+schema names/types remain subject to the existing inventory privacy boundary.
+
+Validation: all 1,571 tests passed (one environment-dependent skip), including
+14 storage-observation tests and the opt-in readonly command-effect case. Independent
+core review passed 25 tests and an actual prior/current default CLI byte comparison;
+the default main DB remained unchanged. Actual synthetic WAL pre-open/first-query
+sidecar differences and interrupted-transaction hot journals were exercised. Open
+and inventory failures, preflight stat/header failures, nonregular main/sidecars,
+redacted errors, connection closure and the complete 16 MiB output boundary passed.
+The initial WAL test observed immediately after connect; observation was corrected
+to the first metadata query where SQLite actually creates the sidecars. Product
+semantics were not changed to satisfy that timing assumption. Python 3.10 grammar,
+compilation, 139 previous shell examples and manual new-guide execution passed.
+Manifest 332 / audit 333 passed.
+
+Previous change:
 
 2026-11-14 Explicit v3 metadata-preserving object replay (0.100.4-v3-metadata-rebuild):
 accepts a v3 manifest and explicit replay plan, validates adapter steps against
