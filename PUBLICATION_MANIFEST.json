@@ -50,8 +50,8 @@
     },
     {
       "path": "VALIDATION.md",
-      "bytes": 17909,
-      "sha256": "6cfe05c163e8344280b6a14c8c602c70a0ce89da5c58d8c3f2726428c355e325"
+      "bytes": 18259,
+      "sha256": "c0f2b1c5b32fcb576cecae57dfa1a556ce9c9de51b2a68cf29bcf913c5ddf903"
     },
     {
       "path": "attributed_title.py",
@@ -310,8 +310,8 @@
     },
     {
       "path": "docs/VALIDATION_HISTORY.md",
-      "bytes": 161469,
-      "sha256": "257d9f918372d9dabedd85a0694766f82d64e740d2cc30182583b4a4e137a90d"
+      "bytes": 161819,
+      "sha256": "e840c12fc1349d19e76e47c8d3dd191fb6be981304712abe0c1ef0c0fd7c7525"
     },
     {
       "path": "docs/WEB_ZIP_INVENTORY.md",
@@ -945,8 +945,8 @@
     },
     {
       "path": "tests/test_rebuild_archive.py",
-      "bytes": 18218,
-      "sha256": "60b3ca175424be27a72cac85e41877db158dfce5b03d9e68555b7b87d489f026"
+      "bytes": 18496,
+      "sha256": "b4ca27295920881eb3b3d3b054d6f1370d4f1dbfe3c8e4d3d1dd98fe54bbc12b"
     },
     {
       "path": "tests/test_rebuild_rehearsal.py",

@@ -165,12 +165,17 @@ class RebuildTests(unittest.TestCase):
     def test_link_failure_cleans_private_staging_and_retains_receipt(self):
         self.declare([self.step()])
         link = os.link
+        injected = []
         def fail_db(source, destination):
-            if Path(destination) == self.db:
+            # Windows TEMP may use an 8.3 alias; production resolves its parent.
+            if Path(destination).resolve() == self.db.resolve():
+                injected.append(destination)
                 raise OSError('synthetic link unavailable')
             return link(source, destination)
         with patch.object(os, 'link', side_effect=fail_db):
             result = self.run_rebuild()
+        self.assertEqual(len(injected), 1)
+        self.assertEqual(result['status'], rebuild.FAILED, result)
         self.assertEqual(result['failure']['phase'], 'DATABASE_PUBLICATION')
         self.assertFalse(self.db.exists())
         self.assertFalse(list(self.root.glob('.recap-*')))

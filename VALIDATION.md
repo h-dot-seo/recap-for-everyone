@@ -309,3 +309,5 @@ From the repository root, with your chosen launcher in place of `python`
   publication, and recovery is never marked verified from a Git ref or push message.
 - The supported runtimes are the CI interpreters. Observations under other interpreters
   are recorded in the history as observations, not as support.
+
+Windows repair validation follow-up: the first repair passed rebuild success paths but exposed one remaining link-failure injection error on Windows. The test compared an unresolved TEMP alias with the resolved publication path. Its matcher now resolves both paths and asserts exactly one injected failure; production publication code is unchanged.
