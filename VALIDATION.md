@@ -16,6 +16,8 @@ HTML and fresh previews. No archive mutation, approval, completion, batch skip,
 authentication, provenance comparison or automatic checkpoint advancement is
 claimed. Existing no-checkpoint outputs and tested guide commands are preserved.
 
+2026-11-14 Windows CI follow-up: PR29 head ee86fc40c53048e592beb98f44fd4ef6c066a253, run 43571478278, passed both Ubuntu lanes but Windows Python 3.12 reported one temporary-directory cleanup error (WinError 32). The new missing-entry test used SQLite transaction context management without closing its connection. It now explicitly closes the connection after committing and asserts that further SQL is rejected. No product code, fsync, data checks or cleanup assertion is weakened.
+
 Previous change:
 
 2026-11-14 Declared-object archive rebuild (0.97.0-declared-object-rebuild):
@@ -323,3 +325,5 @@ From the repository root, with your chosen launcher in place of `python`
   are recorded in the history as observations, not as support.
 
 Windows repair validation follow-up: the first repair passed rebuild success paths but exposed one remaining link-failure injection error on Windows. The test compared an unresolved TEMP alias with the resolved publication path. Its matcher now resolves both paths and asserts exactly one injected failure; production publication code is unchanged.
+
+New-test portability checklist: enumerate every new sqlite3.connect/readonly call; require closing or try/finally close for owned connections, verify caller-owned wrappers are closed by the production caller, and retain an explicit closed-connection regression assertion. All new checkpoint test connections were checked; the WAL setup now also closes on errors.

@@ -127,8 +127,10 @@ class CheckpointCoreTests(unittest.TestCase):
     def test_single_read_snapshot_across_paged_enumeration(self):
         self.seed([(f'page-{i:03}', 'm', 'Synthetic page') for i in range(101)])
         c = sqlite3.connect(self.db)
-        c.execute('PRAGMA journal_mode=WAL')
-        c.close()
+        try:
+            c.execute('PRAGMA journal_mode=WAL')
+        finally:
+            c.close()
         original = checkpoint._inventory
         calls = []
         def concurrent(connection, source, **kwargs):

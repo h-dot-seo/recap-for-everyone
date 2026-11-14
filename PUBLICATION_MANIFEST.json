@@ -50,8 +50,8 @@
     },
     {
       "path": "VALIDATION.md",
-      "bytes": 18984,
-      "sha256": "ea00f6901c0b9536cf19834e6654abd578ed2dcb63d5782cbd1ef0d84c846749"
+      "bytes": 19833,
+      "sha256": "0a51a676d9228da8500f6182372ae1b876b7852ab764ffffd90096792b908291"
     },
     {
       "path": "attributed_title.py",
@@ -315,8 +315,8 @@
     },
     {
       "path": "docs/VALIDATION_HISTORY.md",
-      "bytes": 162530,
-      "sha256": "1a8e6c97a9ebec999954d46f03dcbf332329404b15da86e01bb188d0fb19c8c1"
+      "bytes": 163379,
+      "sha256": "e477f15787b751a9f9f15b10b8df406fac3c2493fe3d092f1f323439fd33e337"
     },
     {
       "path": "docs/WEB_ZIP_INVENTORY.md",
@@ -1020,13 +1020,13 @@
     },
     {
       "path": "tests/test_review_checkpoint_core.py",
-      "bytes": 13477,
-      "sha256": "a948dd00e377e138488bc901c7a930fb9544eb026237c4deb62830c6b884207a"
+      "bytes": 13515,
+      "sha256": "3770baf4f6b9c7a97d9c3de9e01fea5bccdc68efca7986bde03b2642ad52571c"
     },
     {
       "path": "tests/test_review_checkpoint_queue.py",
-      "bytes": 7167,
-      "sha256": "d3cf773e3c1007fffca055dc74f0e8d211dd56addd52205483497368aa7f68ef"
+      "bytes": 7339,
+      "sha256": "222e1cb83159d49601532e2bbe2b57681688369a1149af402072874397e75fdc"
     },
     {
       "path": "tests/test_review_selected_ids.py",

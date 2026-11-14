@@ -1,5 +1,6 @@
 """A private snapshot cutoff is a view, never a decision or collision scope."""
 import json
+from contextlib import closing
 from pathlib import Path
 import shlex
 import sqlite3
@@ -72,7 +73,11 @@ class CheckpointQueueTests(unittest.TestCase):
 
     def test_missing_other_source_and_invalid_before_database(self):
         self.declare()
-        with sqlite3.connect(self.db) as con: con.execute("DELETE FROM messages WHERE conversation_id='b'")
+        with closing(sqlite3.connect(self.db)) as con:
+            with con:
+                con.execute("DELETE FROM messages WHERE conversation_id='b'")
+        with self.assertRaises(sqlite3.ProgrammingError):
+            con.execute("SELECT 1")
         self.assertEqual(self.queue()['checkpoint_comparison']['missing_from_archive'],1)
         with patch('recaplib.title_batch.readonly',side_effect=AssertionError('not opened')):
             with self.assertRaises(ValueError):review_queue(self.db,'other',checkpoint=self.cp)
