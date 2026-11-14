@@ -230,3 +230,9 @@ The operator advances it by creating a new file after scoped work. Preserve
 normal preview/apply and whole-source collision checks; omit --unrenamed-only
 when renamed conversations with new messages must remain visible. See
 [the checkpoint guide](docs/REVIEW_CHECKPOINT.md).
+
+For import-lineage incremental counts, use `declare-checkpoint` then `changed-since`
+with the same explicit source. Continue only on `CUTOFF_VERIFIED`; an unverified
+subset reports no delta. This is distinct from the title/content review view cutoff,
+not review completion or import permission. Never advance automatically. See
+[accepted-artifact cutoff](docs/IMPORT_CHECKPOINT.md).

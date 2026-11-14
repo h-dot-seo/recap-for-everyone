@@ -2438,3 +2438,15 @@ claimed. Existing no-checkpoint outputs and tested guide commands are preserved.
 2026-11-14 Windows CI follow-up: PR29 head ee86fc40c53048e592beb98f44fd4ef6c066a253, run 43571478278, passed both Ubuntu lanes but Windows Python 3.12 reported one temporary-directory cleanup error (WinError 32). The new missing-entry test used SQLite transaction context management without closing its connection. It now explicitly closes the connection after committing and asserts that further SQL is rejected. No product code, fsync, data checks or cleanup assertion is weakened.
 
 New-test portability checklist: enumerate every new sqlite3.connect/readonly call; require closing or try/finally close for owned connections, verify caller-owned wrappers are closed by the production caller, and retain an explicit closed-connection regression assertion. All new checkpoint test connections were checked; the WAL setup now also closes on errors.
+
+## 2026-11-14 Accepted-artifact import cutoff (0.97.2-accepted-artifact-cutoff):
+adds declare-checkpoint and counts-only changed-since for one explicit source.
+A private unsigned artifact declaration binds original accepted message rows with
+recovery-compatible logical digests. Comparison verifies the declared subset in
+one read snapshot before reporting mutually exclusive conversation classes; any
+mismatch returns CUTOFF_NOT_VERIFIED with no delta and CLI exit 1. New artifacts
+are permitted without changing ingest receipts or recovery-manifest semantics.
+No source/conversation IDs or excerpts enter stdout, no DB mutation, approval,
+completeness, review completion, archive identity or automatic advancement is
+claimed. Exact bounded schemas, exclusive output, tamper refusal, CLI parity,
+executed guide and explicit SQLite connection closure are checked.

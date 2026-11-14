@@ -23,7 +23,7 @@ through the repository root, which is why the commands run from there.
 ## recap.py
 
 ```text
-usage: recap.py [-h] [--db DB] {ingest,search,stats,describe-schema,inspect,list-export,inspect-web-zip,prepare-web-export,replay-local,web-branch,suggest-branch-title,suggest-replay-title,suggest-attributed-title,preview-title,apply-title,review-state,render-queue,review-titles,title-adapter-dry-run,title-adapter-simulate,export-title-plan,check-title-plan,import,check-import,export-normalized,declare-review-checkpoint,declare-recovery,rehearse-recovery,rebuild-archive,list,find,show,render,suggest-title,title,title-history} ...
+usage: recap.py [-h] [--db DB] {ingest,search,stats,describe-schema,inspect,list-export,inspect-web-zip,prepare-web-export,replay-local,web-branch,suggest-branch-title,suggest-replay-title,suggest-attributed-title,preview-title,apply-title,review-state,render-queue,review-titles,title-adapter-dry-run,title-adapter-simulate,export-title-plan,check-title-plan,import,check-import,export-normalized,declare-review-checkpoint,declare-checkpoint,changed-since,declare-recovery,rehearse-recovery,rebuild-archive,list,find,show,render,suggest-title,title,title-history} ...
 ```
 
 The global `--db DB` precedes the subcommand and is required except for `inspect`,
@@ -660,3 +660,16 @@ Read one source snapshot and write a new private unsigned view cutoff, not a
 review decision. `review-titles --since-checkpoint FILE` compares the entire
 source before intersecting other filters; no archive mutation or automatic
 advancement. See [checkpoint semantics and workflow](REVIEW_CHECKPOINT.md).
+
+## Accepted-artifact cutoff
+
+```text
+usage: recap.py declare-checkpoint [-h] --source SOURCE --output OUTPUT [--declared-at DECLARED_AT] [--text]
+```
+
+```text
+usage: recap.py changed-since [-h] --source SOURCE --checkpoint CHECKPOINT [--text]
+```
+
+Both commands require global `--db`; changed-since exits 1 with no delta when
+the declared subset is not verified. See [IMPORT_CHECKPOINT](IMPORT_CHECKPOINT.md).

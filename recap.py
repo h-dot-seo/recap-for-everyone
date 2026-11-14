@@ -110,6 +110,12 @@ def main():
     checkpoint = sub.add_parser('declare-review-checkpoint', help='save a private source-wide read snapshot; no review decision')
     checkpoint.add_argument('--source', required=True); checkpoint.add_argument('--output', required=True)
     checkpoint.add_argument('--declared-at'); checkpoint.add_argument('--text', action='store_true')
+    cutoff = sub.add_parser('declare-checkpoint', help='declare a private accepted-artifact cutoff; no review decision')
+    cutoff.add_argument('--source', required=True); cutoff.add_argument('--output', required=True)
+    cutoff.add_argument('--declared-at'); cutoff.add_argument('--text', action='store_true')
+    changed = sub.add_parser('changed-since', help='verify a source artifact cutoff and report counts only')
+    changed.add_argument('--source', required=True); changed.add_argument('--checkpoint', required=True)
+    changed.add_argument('--text', action='store_true')
     declare = sub.add_parser('declare-recovery', help='write a recovery manifest describing the live archive without changing it')
     declare.add_argument('--output', required=True, help='new manifest JSON path outside the archive; existing paths are refused')
     declare.add_argument('--declared-at', help='YYYY-MM-DD recorded as supplied text; no clock is read')
@@ -309,6 +315,12 @@ def main():
         elif args.command == 'declare-review-checkpoint':
             from recaplib.review_checkpoint import declare_review_checkpoint
             result = declare_review_checkpoint(args.db, args.source, args.output, args.declared_at)
+        elif args.command == 'declare-checkpoint':
+            from recaplib.import_checkpoint import declare_checkpoint
+            result = declare_checkpoint(args.db, args.source, args.output, args.declared_at)
+        elif args.command == 'changed-since':
+            from recaplib.import_checkpoint import changed_since
+            result = changed_since(args.db, args.source, args.checkpoint)
         elif args.command == 'declare-recovery':
             from recaplib.recovery import declare_recovery
             result = declare_recovery(args.db, args.output, args.declared_at)
@@ -326,9 +338,9 @@ def main():
         rendered = None
         if getattr(args, 'text', False):
             from recaplib.recovery import render_text
-            if args.command == 'declare-review-checkpoint':
+            if args.command in ('declare-review-checkpoint', 'declare-checkpoint', 'changed-since'):
                 from recaplib.text_summary import summary_text
-                rendered = summary_text('Review view checkpoint declaration', list(result.items()))
+                rendered = summary_text('Review view checkpoint declaration' if args.command == 'declare-review-checkpoint' else 'Accepted-artifact cutoff', list(result.items()))
             else:
                 rendered = render_text(result)
     except (OSError, ValueError, KeyError, TypeError, sqlite3.Error) as exc:
@@ -341,6 +353,8 @@ def main():
     else:
         print(json.dumps(result, ensure_ascii=True, indent=2))
     if args.command == 'check-import' and result['conflicts_found']:
+        raise SystemExit(1)
+    if args.command == 'changed-since' and result['status'] != 'CUTOFF_VERIFIED':
         raise SystemExit(1)
     if args.command == 'rebuild-archive' and result['status'] != 'REBUILD_REHEARSAL_PASSED':
         raise SystemExit(1)

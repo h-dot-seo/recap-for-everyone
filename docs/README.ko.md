@@ -242,3 +242,9 @@ explicit unsigned source snapshot, not review completion or batch approval.
 Content/title comparisons and private-file limits are described in
 [the checkpoint guide](REVIEW_CHECKPOINT.md). Existing per-conversation review-state
 decisions remain independent; no checkpoint changes the archive.
+
+## Accepted-artifact import cutoff
+
+`declare-checkpoint` and `changed-since` verify a declared source artifact subset
+before returning ID-free import-delta counts. They do not approve imports, record
+review completion or mutate the archive. See [the cutoff guide](IMPORT_CHECKPOINT.md).
