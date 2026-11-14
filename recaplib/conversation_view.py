@@ -93,6 +93,42 @@ def _context_window(connection, source, conversation_id, anchor, before, after):
             later[-1]['message_pk'] if later else pk, selection)
 
 
+def message_provenance_rows(connection, source, conversation_id, selection_sql=None, selection_params=(), max_bytes=None):
+    """Read the existing deduplicated ledger union in the caller-owned snapshot.
+
+    selection_sql is an internally constructed messages selection, not user SQL.
+    Omitting it preserves the full conversation ledger used by unpaged show.
+    """
+    provenance = {}
+    used = 0
+    tables = [name for name in ('export_provenance', 'export_occurrences') if connection.execute(
+        "SELECT 1 FROM sqlite_master WHERE type='table' AND name=?", (name,)).fetchone()]
+    if tables:
+        # Union preserves legacy-only archives and deduplicates backfilled rows.
+        # Restrict provenance in SQL too: a one-message view must not buffer
+        # the whole conversation's occurrence ledger before discarding it.
+        provenance_filter = ' WHERE source=? AND conversation=?'
+        provenance_params = (source, conversation_id)
+        if selection_sql is not None:
+            provenance_filter += ' AND message IN (SELECT message_id FROM messages' + selection_sql + ')'
+            provenance_params += selection_params
+        query = ' UNION '.join('SELECT message,original_hash,locator,parent FROM ' + name +
+                               provenance_filter for name in tables)
+        for row in connection.execute(
+            query + ' ORDER BY message,original_hash,locator,parent',
+            provenance_params * len(tables)):
+            entry = dict(original_sha256=row['original_hash'], locator=row['locator'], parent_id=row['parent'])
+            if max_bytes is not None:
+                try:
+                    used += len(json.dumps(entry, ensure_ascii=True).encode('ascii'))
+                except (TypeError, ValueError, UnicodeError):
+                    raise ValueError('message provenance metadata is not serializable') from None
+                if used > max_bytes:
+                    raise ValueError('message provenance exceeds the byte limit')
+            provenance.setdefault(row['message'], []).append(entry)
+    return provenance
+
+
 def conversation(db, source, conversation_id, limit=None, offset=0, message_id=None,
                  around_message_id=None, before=None, after=None):
     if (not isinstance(source, str) or not source.strip() or
@@ -148,25 +184,10 @@ def conversation(db, source, conversation_id, limit=None, offset=0, message_id=N
             'source_sha256,source_line FROM messages' + selection_sql, selection_params)]
         if message_id is not None and not messages:
             raise ValueError('unknown message in conversation')
-        provenance = {}
-        tables = [name for name in ('export_provenance', 'export_occurrences') if connection.execute(
-            "SELECT 1 FROM sqlite_master WHERE type='table' AND name=?", (name,)).fetchone()]
-        if tables and messages:
-            # Union preserves legacy-only archives and deduplicates backfilled rows.
-            # Restrict provenance in SQL too: a one-message view must not buffer
-            # the whole conversation's occurrence ledger before discarding it.
-            provenance_filter = ' WHERE source=? AND conversation=?'
-            provenance_params = (source, conversation_id)
-            if limit is not None or message_id is not None or context is not None:
-                provenance_filter += ' AND message IN (SELECT message_id FROM messages' + selection_sql + ')'
-                provenance_params += selection_params
-            query = ' UNION '.join('SELECT message,original_hash,locator,parent FROM ' + name +
-                                   provenance_filter for name in tables)
-            for row in connection.execute(
-                query + ' ORDER BY message,original_hash,locator,parent',
-                provenance_params * len(tables)):
-                provenance.setdefault(row['message'], []).append(dict(
-                    original_sha256=row['original_hash'], locator=row['locator'], parent_id=row['parent']))
+        provenance = message_provenance_rows(
+            connection, source, conversation_id,
+            selection_sql if limit is not None or message_id is not None or context is not None else None,
+            selection_params) if messages else {}
         for message in messages:
             message['export_provenance'] = provenance.get(message['message_id'], [])
         result = dict(**summary, messages=messages, message_order='archive insertion order',

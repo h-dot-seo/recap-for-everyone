@@ -1,12 +1,12 @@
 {
   "project": "recap-for-everyone",
-  "release": "0.97.4-safe-cli-diagnostics",
+  "release": "0.97.5-message-provenance-cards",
   "date": "2026-11-08",
   "private_history_imported": false,
   "actual_corpora_included": false,
   "synthetic_examples_only": true,
   "license_status": "NOT_SELECTED",
-  "file_count": 279,
+  "file_count": 283,
   "files": [
     {
       "path": ".gitattributes",
@@ -30,8 +30,8 @@
     },
     {
       "path": "README.md",
-      "bytes": 17228,
-      "sha256": "c82c8d71257abdd9e848c3d9ef0c4873270230f6e4d2885597f04827b7895379"
+      "bytes": 17518,
+      "sha256": "ff64b97096e41b47831afecfc70aab8208e137afaa98b115638eb6ce1b69f72f"
     },
     {
       "path": "RIGHTS.md",
@@ -45,13 +45,13 @@
     },
     {
       "path": "SKILL.md",
-      "bytes": 17215,
-      "sha256": "76c8930d09187eb711c9367f9607289f358e560c870fcd19753d9d75dc96e123"
+      "bytes": 17505,
+      "sha256": "92cb41a0815062cbfb77467022510c3525e91917a1efe01061722b800c36b1f7"
     },
     {
       "path": "VALIDATION.md",
-      "bytes": 22963,
-      "sha256": "6f190846118ef15fcf3cd2ae119e4b2d7be905c9c39b129084ba22f7677c3701"
+      "bytes": 24285,
+      "sha256": "290130af0d2afaae10f63fb9622460abcb5eb541e7a8e728eca0f76bd335dac5"
     },
     {
       "path": "attributed_title.py",
@@ -95,8 +95,8 @@
     },
     {
       "path": "docs/ARCHITECTURE.md",
-      "bytes": 14594,
-      "sha256": "120f4fa0a685a8baba891e4b1bfdc87543843abbc7248d2472e82f1ce851be1b"
+      "bytes": 14879,
+      "sha256": "f6c901fe0f78a73b6d9b5bd550a31219e1999a1fd9241d5fb237fc1a81039411"
     },
     {
       "path": "docs/ATTRIBUTED_MESSAGE_SELECTION.md",
@@ -125,8 +125,8 @@
     },
     {
       "path": "docs/COMMANDS.md",
-      "bytes": 29102,
-      "sha256": "32a417752755fcbb84c3282b5736d518718d861e104c33c8f7f589c7d4e004bd"
+      "bytes": 29520,
+      "sha256": "ff0ab2584936dbea780bea980a6d55f7688e75da8c8e4cb5c62742bca07b4d94"
     },
     {
       "path": "docs/ERROR_DIAGNOSTICS.md",
@@ -174,6 +174,11 @@
       "sha256": "9f2ecd477edaaf9ce5d95556a3a33bd536eac3724757a609160804b7952498e9"
     },
     {
+      "path": "docs/MESSAGE_PROVENANCE.md",
+      "bytes": 3853,
+      "sha256": "ffecd5d6f49f15caa247b7795ce2d11df9b7914d5ab7535fff85b9cbc4def8d8"
+    },
+    {
       "path": "docs/MESSAGE_SELECTION.md",
       "bytes": 7561,
       "sha256": "c82137448baad2dd7628054d98497e6ac025af4adde66368ba687aefb7a68a31"
@@ -195,8 +200,8 @@
     },
     {
       "path": "docs/README.ko.md",
-      "bytes": 21177,
-      "sha256": "025d6ada91555b6aad5ef201f14931ead7689843cc0df433b777f548cdfd6176"
+      "bytes": 21462,
+      "sha256": "1b352c2cfa5002af7d9dee1dd62bde5ad14a9ffcf5fa1131a1ba0839f5bdf1ee"
     },
     {
       "path": "docs/REBUILD_REHEARSAL.md",
@@ -335,8 +340,8 @@
     },
     {
       "path": "docs/VALIDATION_HISTORY.md",
-      "bytes": 166314,
-      "sha256": "7944eee2f76dfb8696ea34e9b53635fd18fc45bf4e6eb5fc6dd42188e4e324de"
+      "bytes": 167617,
+      "sha256": "5911eb12ec40cd7bb2674700686adde9b43720195cbd69928d346b58011d5090"
     },
     {
       "path": "docs/WEB_ZIP_INVENTORY.md",
@@ -345,8 +350,8 @@
     },
     {
       "path": "docs/WORKFLOWS.md",
-      "bytes": 77104,
-      "sha256": "01ed01b7f659d6730365d1534a3476355a075662900646fe93943c74f5d83b12"
+      "bytes": 77389,
+      "sha256": "07cfac8454b9116ad55a195527977779083e5ba82f15275e769036fb71d08730"
     },
     {
       "path": "examples/adapter-message-focus.jsonl",
@@ -465,8 +470,8 @@
     },
     {
       "path": "recap.py",
-      "bytes": 30101,
-      "sha256": "ca5648d0ebe047b27238e0fcbbb4c4711ef42227a2775fab4bafd501a197f675"
+      "bytes": 31521,
+      "sha256": "3ec76a5a199d6015707c690e3a0fd7bd13e40986a0c1d4792640f707257c54ec"
     },
     {
       "path": "recaplib/__init__.py",
@@ -510,8 +515,8 @@
     },
     {
       "path": "recaplib/conversation_view.py",
-      "bytes": 14180,
-      "sha256": "0aa6ffb22946b950dc511bfee042e547974057e83c1c8ae40cc7d1964604aed0"
+      "bytes": 15143,
+      "sha256": "974a8d073f3084433d43848f35b04fd1c6e4d1a29ef74aff9721b0a6bd5626e9"
     },
     {
       "path": "recaplib/document_output.py",
@@ -547,6 +552,11 @@
       "path": "recaplib/local_parser.py",
       "bytes": 23216,
       "sha256": "80db8969a99336ff17e6e78551f1cd6bc8c48b2fd2f67069740aba1105fc8389"
+    },
+    {
+      "path": "recaplib/message_provenance.py",
+      "bytes": 8744,
+      "sha256": "3b425136806f5d901c8c68dcefb7039f506448bf399e76f4861373ea84770dae"
     },
     {
       "path": "recaplib/normalized_export.py",
@@ -972,6 +982,16 @@
       "path": "tests/test_manifest_verification.py",
       "bytes": 4433,
       "sha256": "a556cd2f86d064256a48eb1424611174ff8a0ee9e92a0552d926c83430b4d83e"
+    },
+    {
+      "path": "tests/test_message_provenance.py",
+      "bytes": 11357,
+      "sha256": "c69b56cec6bbe09743bae51788e8406d86b5e9c05b6c94b9a23712e7b8544b23"
+    },
+    {
+      "path": "tests/test_message_provenance_cli.py",
+      "bytes": 4081,
+      "sha256": "30f67df85496d779702eddf330168af460d3e952f782d7939ee772ca21a8293d"
     },
     {
       "path": "tests/test_metadata_inventory_contract.py",

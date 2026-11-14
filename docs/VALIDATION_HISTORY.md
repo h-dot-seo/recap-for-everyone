@@ -2476,3 +2476,17 @@ Synthetic actual and injected failures, output collisions, missing parents,
 private markers, fixed-message parity and the executed error guide are tested.
 No JSON envelope, new flag, global data-sanitization or no-mutation-on-error claim
 is introduced. Argparse and unexpected programming-error behavior are unchanged.
+
+## 2026-11-14 Private message provenance cards (0.97.5-message-provenance-cards):
+adds export-provenance and check-provenance for one exact source/conversation/
+message tuple. A private unsigned bounded card contains text hashes and byte
+counts, normalized locators and the same legacy/complete occurrence UNION as
+show, without message bodies, titles or title revisions. A shared caller-snapshot
+helper preserves show pagination and context selection. Rechecks compare exact
+current metadata, reporting PASS or STALE without private values and without
+changing the archive or card. Exclusive creation, schema/size gates, deterministic
+bytes, legacy/plain ingest, changed occurrences, Unicode, exact identities and
+executed guide are tested. A locator is not evidence of validity, authorship,
+consent, retrieval or publication status; no cross-repository mapping is added.
+
+Prepublication independent review found a SQLite BLOB locator escaping the intended stale-check boundary as a serialization TypeError. The bounded card projection now converts only serialization/type failures to a fixed ValueError so a valid saved card recheck reports STALE; genuine SQLite/query errors still propagate and unbounded show behavior is unchanged. A BLOB-anchor regression verifies no output or database mutation.

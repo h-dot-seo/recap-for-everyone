@@ -23,7 +23,7 @@ through the repository root, which is why the commands run from there.
 ## recap.py
 
 ```text
-usage: recap.py [-h] [--db DB] {ingest,search,stats,describe-schema,inspect,list-export,inspect-web-zip,prepare-web-export,replay-local,web-branch,suggest-branch-title,suggest-replay-title,suggest-attributed-title,preview-title,apply-title,review-state,render-queue,review-titles,title-adapter-dry-run,title-adapter-simulate,export-title-plan,check-title-plan,import,check-import,export-normalized,declare-review-checkpoint,declare-checkpoint,changed-since,declare-recovery,rehearse-recovery,rebuild-archive,list,find,show,render,suggest-title,title,title-history} ...
+usage: recap.py [-h] [--db DB] {ingest,search,stats,describe-schema,inspect,list-export,inspect-web-zip,prepare-web-export,replay-local,web-branch,suggest-branch-title,suggest-replay-title,suggest-attributed-title,preview-title,apply-title,review-state,render-queue,review-titles,title-adapter-dry-run,title-adapter-simulate,export-title-plan,check-title-plan,import,check-import,export-normalized,export-provenance,check-provenance,declare-review-checkpoint,declare-checkpoint,changed-since,declare-recovery,rehearse-recovery,rebuild-archive,list,find,show,render,suggest-title,title,title-history} ...
 ```
 
 The global `--db DB` precedes the subcommand and is required except for `inspect`,
@@ -685,3 +685,16 @@ manifest candidate. See [Build manifest](BUILD_MANIFEST.md).
 
 Handled low-level execution failures use [fixed stderr diagnostics](ERROR_DIAGNOSTICS.md).
 CLI usage and result-document failure statuses are unchanged.
+
+## Message provenance cards
+
+```text
+usage: recap.py export-provenance [-h] --source SOURCE --conversation CONVERSATION --message MESSAGE --output OUTPUT [--declared-at DECLARED_AT] [--text]
+```
+
+```text
+usage: recap.py check-provenance [-h] [--text] input
+```
+
+Both require global `--db`; check-provenance returns exit 1 for STALE.
+See [message provenance](MESSAGE_PROVENANCE.md).
