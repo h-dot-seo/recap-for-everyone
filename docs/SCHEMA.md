@@ -141,6 +141,17 @@ assert that the original export was complete or that its hash authenticates it.
 
 Created on first `title --set` or `apply-title`.
 
+An explicit title write also requests the non-unique `title_history_identity`
+index on `(source, conversation, id)` inside the same transaction as history-table
+creation and the new history row. Reads do not create it. Existing archives gain
+it only on their next successful explicitly requested title write, not by opening
+or inspecting the database. Stale guards or failed writes do not install it.
+There is no new table, row format, user_version change or automatic maintenance.
+`IF NOT EXISTS` preserves an existing index with that name, including one with a
+different definition or table; it is never dropped or silently repaired. Query
+plan benefits are conditional on the intended index actually being created.
+The index is not a timing guarantee and does not change title revision semantics.
+
 - `id`: local integer primary key and title revision order.
 - `source`: source label.
 - `conversation`: conversation identifier.

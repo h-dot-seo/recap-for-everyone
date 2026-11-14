@@ -74,8 +74,45 @@ A conservative construction budget may reject a combination before the final
 byte total is built. Seeds are integers 0..4,294,967,295; repetitions are 1..5.
 These limits are safety limits, not statements that every size
 will be fast or fit the user's available memory. Increase sizes deliberately in
-separate new directories. This release does not raise ZIP limits, add a database
-index, change the one-snapshot contract or implement streaming.
+separate new directories. This release does not raise ZIP limits, change the
+one-snapshot contract or implement streaming. The lazy title-history index below
+changes lookup cost only after an explicit title write.
+
+## Lazy title-history index: synthetic observation
+
+An explicit title write creates `title_history_identity` on
+`title_history(source,conversation,id)` inside its existing transaction if absent.
+Read-only commands leave older archives untouched. A conflicting existing index
+name is preserved, not repaired; the optimization is not guaranteed in that case.
+There is no archive-version prerequisite, new row format or automatic migration.
+The index adds storage and write-maintenance cost and does not make inventories,
+source-wide checks, sorting or literal substring scans bounded.
+
+A deterministic seed-43 fixture with 1,000 conversations, 4,000 messages, 1,500
+title-history rows and 500 review-history rows was measured before and after this
+change, using three repetitions per operation and separate traced-memory runs.
+The ratio of before/after median elapsed time in this local observation was:
+
+| Operation | Before / after median |
+| --- | ---: |
+| Plain review queue | 18.9 |
+| Unrenamed review queue | 107.2 |
+| Review-state filter | 6.2 |
+| Offset conversation list | 1.9 |
+| Title history | 1.3 |
+
+The synthetic archive grew from 3,670,016 to 3,735,552 bytes (65,536 bytes).
+Tests also inspect the actual reader SQL with `EXPLAIN QUERY PLAN`, verifying
+index use for all four title-history lookup shapes and identical logical rows,
+reader results and recovery digests. Stale/unknown targets and injected failures
+leave no newly committed index or history row; same-name conflicting indexes
+remain unchanged.
+
+These ratios are observations from one environment, not a public timing benchmark,
+performance threshold or prediction for another archive. Cache state was not
+controlled. Absolute timings and runtime identity remain in private synthetic
+receipts. Queries, data distribution, index availability and write costs matter;
+no speedup is promised, including for operations not targeted by this index.
 
 ## Failure and retention boundary
 
