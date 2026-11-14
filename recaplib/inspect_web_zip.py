@@ -17,6 +17,7 @@ def inspect_web_zip(path, limit=50, offset=0, expected_archive_sha256=None, max_
     raw = preparation.archive_bytes(path)
     archive_digest = preparation._checked_archive_sha256(raw, expected_archive_sha256)
     try:
+        preparation.check_directory(raw, preparation.MAX_ENTRIES)
         with zipfile.ZipFile(io.BytesIO(raw)) as archive:
             entries = archive.infolist()
             if len(entries) > preparation.MAX_ENTRIES:
