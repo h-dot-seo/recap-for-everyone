@@ -1,12 +1,12 @@
 {
   "project": "recap-for-everyone",
-  "release": "0.100.3-original-export-recovery-v3",
+  "release": "0.100.4-v3-metadata-rebuild",
   "date": "2026-11-14",
   "private_history_imported": false,
   "actual_corpora_included": false,
   "synthetic_examples_only": true,
   "license_status": "NOT_SELECTED",
-  "file_count": 326,
+  "file_count": 330,
   "files": [
     {
       "path": ".gitattributes",
@@ -30,8 +30,8 @@
     },
     {
       "path": "README.md",
-      "bytes": 20558,
-      "sha256": "df92066f7f73cb4e88beaa10d35755a1daa4b7bbcfb8f1e6232d7db64fe9b5cc"
+      "bytes": 20774,
+      "sha256": "027535be8641e6a18e4e342df55ccaef644c4c0e563ed745d4b13280330a2875"
     },
     {
       "path": "RIGHTS.md",
@@ -45,13 +45,13 @@
     },
     {
       "path": "SKILL.md",
-      "bytes": 32407,
-      "sha256": "e1f8f134f97d9b4c327917d262b226c67daaecfa4d5cb2f0824fb90c0c7c4ea5"
+      "bytes": 32747,
+      "sha256": "4da5749d7d6a0b0dd28db660d5d6dd411cc004244e809fb602dd975257e230a4"
     },
     {
       "path": "VALIDATION.md",
-      "bytes": 57420,
-      "sha256": "045575e63aabc5e411407f359f5a627258d6f2f96fae0f8241b3be53fd8c33df"
+      "bytes": 59215,
+      "sha256": "bfe74a8712cfb0fabaa1360bbc334fd07ad647139665b66457c5e6d2872f738d"
     },
     {
       "path": "attributed_title.py",
@@ -105,8 +105,8 @@
     },
     {
       "path": "docs/ARCHITECTURE.md",
-      "bytes": 22112,
-      "sha256": "66834ef14f51a195c8f5d32c95247ed977e8ed5be70c9464662792bed9e55a44"
+      "bytes": 22402,
+      "sha256": "c9f3578492ce71d22367a82c1b986d2fa76f7701564683055a5cd7a9c536944a"
     },
     {
       "path": "docs/ARCHIVE_BRANCH.md",
@@ -115,8 +115,8 @@
     },
     {
       "path": "docs/ARCHIVE_LEDGER.md",
-      "bytes": 5023,
-      "sha256": "5d36e9524417f2ca17cc1a136b6f8e9aecea79aad1c5fd696c64f803c078017a"
+      "bytes": 5241,
+      "sha256": "a705f4e2737197f08603965e5a1533c0426f10937ab1583c9a2f5db5d0eb6038"
     },
     {
       "path": "docs/ATTRIBUTED_MESSAGE_SELECTION.md",
@@ -145,8 +145,8 @@
     },
     {
       "path": "docs/COMMANDS.md",
-      "bytes": 35003,
-      "sha256": "0cf5622c7ff1caeff49bfb3703f028301bc0706b8457faaeb6da0805d0cfb6ec"
+      "bytes": 35098,
+      "sha256": "95549d08a1a39b4847b3ce4f36b6de329b2cc91907ecbe18648a0592489f154e"
     },
     {
       "path": "docs/COMMAND_CATALOG.md",
@@ -196,7 +196,7 @@
     {
       "path": "docs/INSTALL.md",
       "bytes": 8441,
-      "sha256": "4394426ce9def385fc5d02377eae174c5f94a2e4cdcae13f2a02970285ba6b29"
+      "sha256": "8bbc313ba63f985f7169fb4af73492a6b15b6ceb389d0d841a1d71f28d78e952"
     },
     {
       "path": "docs/JSON_ERRORS.md",
@@ -235,8 +235,8 @@
     },
     {
       "path": "docs/README.ko.md",
-      "bytes": 24261,
-      "sha256": "79ca1dcd80aca14fa17435ab9bd904dd794b1ab7049f0e8d784bc298326b9664"
+      "bytes": 24511,
+      "sha256": "8046a56d3e24fddda88bf849129c00e9d453cfa941053b3c913a1625df4fe71f"
     },
     {
       "path": "docs/REBUILD_REHEARSAL.md",
@@ -249,9 +249,14 @@
       "sha256": "28b396ed083474016398410d07c253f33a7951c95744fd5766c3d1ba31f24bd9"
     },
     {
+      "path": "docs/REBUILD_V3.md",
+      "bytes": 4167,
+      "sha256": "3335fb22dbc14c3f321f235a10c2ac8fffeb26eeb37113a2faac3959f74c325a"
+    },
+    {
       "path": "docs/RECOVERY_REHEARSAL.md",
-      "bytes": 18046,
-      "sha256": "fecfd05bedef5f99216515231447dca78be67eac5e3403920925c2ec3c02078a"
+      "bytes": 18282,
+      "sha256": "c856d5f5581cd9cda0e66840919197728e9b9a0ae75a0832f7b50aaa05cc5e2c"
     },
     {
       "path": "docs/RECOVERY_V2.md",
@@ -260,8 +265,8 @@
     },
     {
       "path": "docs/RECOVERY_V3.md",
-      "bytes": 4353,
-      "sha256": "0f4a0db4eb205bc8d3861f60e8752d8b4b8a30cec30ca66f206609efa7e6e409"
+      "bytes": 4664,
+      "sha256": "7bcf409269c6144c5469d77a8ec71068ba1fe0d810320260d0f9b262a3ab574f"
     },
     {
       "path": "docs/REIMPORT_DELTA.md",
@@ -400,8 +405,8 @@
     },
     {
       "path": "docs/VALIDATION_HISTORY.md",
-      "bytes": 201131,
-      "sha256": "ced160935153118f4ad5a6a41de7a332252dc57f305ba5af4dc293db67f33b20"
+      "bytes": 202919,
+      "sha256": "3337f2b281259fff71d0722bd5fb809f453bb8eff347fdc9e869290b6a1525b6"
     },
     {
       "path": "docs/WEB_ZIP_INVENTORY.md",
@@ -479,6 +484,11 @@
       "sha256": "81249521976422bbc97ae38667a6e5ebe05c6facc83dba525eaef98d8156df33"
     },
     {
+      "path": "examples/rebuild-v3-empty-plan.json",
+      "bytes": 288,
+      "sha256": "9ece13cc5e277cafe1d6f11125e8e450835362e344975d7a7eb4f1ede93522f3"
+    },
+    {
       "path": "examples/render-adversarial.jsonl",
       "bytes": 540,
       "sha256": "828208b1eb341a5c9b2f52353cdf5cb7153732799517c947f5c380dbfe38b162"
@@ -492,6 +502,11 @@
       "path": "examples/source-attributed-session.jsonl",
       "bytes": 844,
       "sha256": "36145b5a6ae4b5a2dc03418f4ece23291601f202ef26358baa75fd2e29fe82e4"
+    },
+    {
+      "path": "examples/synthetic-empty-web-export.json",
+      "bytes": 3,
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570"
     },
     {
       "path": "examples/synthetic-title-response.json",
@@ -535,8 +550,8 @@
     },
     {
       "path": "recap.py",
-      "bytes": 33795,
-      "sha256": "61e6281b2e8297a130a35b55f1098e9d49e59e73072f317b2ee0bbc4c035d11a"
+      "bytes": 33814,
+      "sha256": "ce82d163c030345473dad727abe12a80ee0a2f75849474b6d8227dddf4f0a4e5"
     },
     {
       "path": "recap_mcp.py",
@@ -546,7 +561,7 @@
     {
       "path": "recaplib/__init__.py",
       "bytes": 126,
-      "sha256": "4c147fa160b3ebc01a280b7642ef971381e98469896442eb065e549b180d4190"
+      "sha256": "06eedaeea5ec070c2db8a99563a727180aed18a34f14d0d0a691d0cf75687302"
     },
     {
       "path": "recaplib/archive.py",
@@ -580,8 +595,8 @@
     },
     {
       "path": "recaplib/command_catalog.py",
-      "bytes": 13829,
-      "sha256": "44e7de601b1afce84f6bc947d1a117820ff767cf711a16aa3f2869b7344cd4be"
+      "bytes": 13952,
+      "sha256": "4283bc6b21714dd0bb8c76d250add363b48cddcf66670eae891c86230ef07f50"
     },
     {
       "path": "recaplib/conversation_document.py",
@@ -665,13 +680,13 @@
     },
     {
       "path": "recaplib/rebuild.py",
-      "bytes": 14079,
-      "sha256": "666fa362cb887018fb92671e7a0e83940d90e019e37f8497b26b36f23bf9118a"
+      "bytes": 15757,
+      "sha256": "b91bef1691c3482828204c53e8f6361db2769fea6d83d2b1ef81cb0d6113bb93"
     },
     {
       "path": "recaplib/recovery.py",
-      "bytes": 52053,
-      "sha256": "3c905419d895cd50e0909b1ac916be664eaf2e3678cd341fe794fbe34c3342c7"
+      "bytes": 51990,
+      "sha256": "dcebe4fca397906fb293a0cb2cbe6ba1b7f04a771220c02adbd89d581d9e4925"
     },
     {
       "path": "recaplib/render_queue.py",
@@ -1224,6 +1239,11 @@
       "sha256": "ccdc87fb134aa17c8429bb81485aa97e9dfbdbff7f52d6804533120f5f1edd6f"
     },
     {
+      "path": "tests/test_rebuild_v3.py",
+      "bytes": 11959,
+      "sha256": "a41d6c9a4669ce04314b1d37f62737e317eeff3049760a3000fb79ae2be98f7e"
+    },
+    {
       "path": "tests/test_recap.py",
       "bytes": 3136,
       "sha256": "8484ba0d1bbd95c070a90837fdb41778955aade86b8f89e68526fdd2521cf633"
@@ -1240,8 +1260,8 @@
     },
     {
       "path": "tests/test_recovery_v3.py",
-      "bytes": 15269,
-      "sha256": "d03c87418733aac984932afd118911e3bb337167775c94376b9e4b47108bc27d"
+      "bytes": 15218,
+      "sha256": "495678b85beb9183e082695175aa243661a6172e666c8f6ce38659053473f147"
     },
     {
       "path": "tests/test_release_identity.py",

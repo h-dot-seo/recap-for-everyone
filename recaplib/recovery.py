@@ -755,7 +755,6 @@ def _archive_checks(manifest, restored_db, exclude_history=False):
     """Shared read-only checks; rebuild can explicitly exclude unreplayable history."""
     v2=manifest['schema'] in (MANIFEST_SCHEMA_V2,MANIFEST_SCHEMA_V3)
     v3=manifest['schema']==MANIFEST_SCHEMA_V3
-    if v3 and exclude_history:raise ValueError('v3 recovery manifests support restored-copy rehearsal only')
     excluded={'title_history','title_review_history'} if v2 and exclude_history else ({'title_history'} if exclude_history else set())
     checks = []
     connection = None
@@ -848,7 +847,7 @@ def rehearse_recovery(manifest_path, restored_db, output, objects=None):
 
 def render_text(result):
     header = ('Recovery manifest declaration' if result.get('schema') in (DECLARATION_SCHEMA,DECLARATION_SCHEMA_V2,DECLARATION_SCHEMA_V3)
-              else 'Archive rebuild receipt' if result.get('schema') in ('recap.rebuild-receipt.v1','recap.rebuild-receipt.v2')
+              else 'Archive rebuild receipt' if result.get('schema') in ('recap.rebuild-receipt.v1','recap.rebuild-receipt.v2','recap.rebuild-receipt.v3')
               else 'Recovery rehearsal receipt')
     items = []
     for key, value in result.items():
@@ -868,7 +867,7 @@ def main():
     declare = commands.add_parser('declare', help='write a recovery manifest describing the live archive without changing it')
     declare.add_argument('--db', required=True)
     declare.add_argument('--output', required=True, help='new manifest JSON path outside the archive; existing paths are refused')
-    declare.add_argument('--manifest-version',type=int,choices=(1,2,3),default=1,help='explicit manifest version; default 1, versions 2/3 declare additional ledgers; version 3 is restored-copy rehearsal only')
+    declare.add_argument('--manifest-version',type=int,choices=(1,2,3),default=1,help='explicit manifest version; default 1, versions 2/3 declare additional ledgers; version 3 also supports rebuild with an explicit replay plan')
     declare.add_argument('--declared-at', help='YYYY-MM-DD recorded as supplied text; no clock is read')
     rehearse = commands.add_parser('rehearse', help='verify a restored archive copy against a declared manifest and write a receipt')
     rehearse.add_argument('manifest', help='recovery manifest JSON written by declare')

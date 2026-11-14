@@ -55,9 +55,12 @@ v3 adds the explicitly recorded original hash, not a new normalized requirement.
 counts are metadata, not a new SIZE_MISMATCH object state. Hash matches do not
 establish origin, permission, or completeness.
 
-`rebuild-archive` rejects v3 before reading the replay plan or creating outputs.
-This version supports declarations and restored-copy rehearsal, not a new replay
-or migration contract. v1/v2 rebuild behavior is unchanged; receipts still report the actual implementation
+`rebuild-archive` now accepts v3 with an explicit supplied replay plan; see
+[metadata-preserving replay](REBUILD_V3.md). It compares all replayable ledgers
+and excludes title/review histories, never claiming full restoration. Both existing and newly generated v3 declarations retain the earlier
+restored-copy-only scope text for byte compatibility. The current limited replay
+behavior is described by the v3 rebuild receipt and guide, not that historical
+text; no saved description is rewritten. v1/v2 rebuild behavior is unchanged; receipts still report the actual implementation
 hash, which changes when implementation bytes change, and the derived receipt hash. No automatic resealing,
 existing manifest rewrite, policy change, or full-archive restoration claim occurs.
 

@@ -284,4 +284,6 @@ Read [stored original-export metadata](docs/ARCHIVE_LEDGER.md) with `ledger` to
 inspect explicit import formats, byte counts and selections without inferring
 retention or changing recovery authorization.
 
-Explicit recovery manifest v3 additionally declares every original-export metadata field and checks a restored copy. Default v1 and stored v1/v2 contracts remain unchanged; v3 object replay is not supported. See [v3 preservation](docs/RECOVERY_V3.md).
+Explicit recovery manifest v3 additionally declares every original-export metadata field and checks a restored copy. Default v1 and stored v1/v2 contracts remain unchanged; v3 replay uses an explicit supplied plan. See [v3 preservation](docs/RECOVERY_V3.md).
+
+V3 declarations can now drive an explicit metadata-preserving replay into a new DB, including zero-message imports. Title/review decisions remain excluded, not restored. See [v3 rebuild](docs/REBUILD_V3.md).

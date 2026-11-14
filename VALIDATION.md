@@ -1,10 +1,36 @@
 # Validation record
 
-Current release: `0.100.3-original-export-recovery-v3`, dated 2026-11-14.
+Current release: `0.100.4-v3-metadata-rebuild`, dated 2026-11-14.
 This file is the current snapshot. Every dated entry since the first release is kept
 unchanged and in order in [docs/VALIDATION_HISTORY.md](docs/VALIDATION_HISTORY.md).
 
 ## Latest change
+
+2026-11-14 Explicit v3 metadata-preserving object replay (0.100.4-v3-metadata-rebuild):
+accepts a v3 manifest and explicit replay plan, validates adapter steps against
+source/hash/format/selection origin rows, and checks every original-export metadata
+field against actual replay. Zero-message origins are retained. Labels, newline
+and import order remain supplied parameters; none are inferred. Title/review
+histories remain excluded and full_archive_restored stays false. No legacy union,
+metadata repair, automatic resealing, migration or policy wording change is made.
+V1/v2/v3 declaration and restored-copy bytes remain unchanged; v1/v2 rebuild
+results retain their contract except actual implementation/receipt hash changes.
+
+Validation: final full suite passed all 1,556 tests (one environment-dependent
+skip), including 15 new v3 rebuild tests. Independent review passed 67 focused
+rebuild/recovery tests and independently compared prior/current v1/v2/v3 declaration
+and rehearsal bytes with an unchanged original DB. V1/v2 rebuild success/failure
+comparisons differed only in actual implementation hashes and derived receipt hash;
+successful DB bytes and side effects were identical. Review found stale v3-only
+help text; both CLI helps and the historical-scope explanation were corrected.
+Existing and newly generated v3 declarations retain their historical scope string
+for byte compatibility; actual replay scope is stated by its receipt and guide.
+All seven replayed origin fields, explicit format/selection, zero-message rows,
+plan order/newline, exclusions, missing objects, publication/cleanup failures and
+private-error redaction were exercised. Compilation, Python 3.10 grammar, 138 old
+shell examples, manual new-guide execution, manifest 330 and audit 331 passed.
+
+Previous change:
 
 2026-11-14 Explicit original-export recovery metadata (0.100.3-original-export-recovery-v3):
 adds opt-in recovery manifest/declaration/receipt v3. All seven original_exports
