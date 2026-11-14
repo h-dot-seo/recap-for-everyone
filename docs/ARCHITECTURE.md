@@ -83,7 +83,11 @@ exact artifact rows, counts, digests, ledgers and the FTS index in place, option
 confirms that every declared object hash is present in a fetched-object directory,
 and writes a receipt with `RECOVERY_REHEARSAL_PASSED` or `RECOVERY_REHEARSAL_FAILED`.
 The clean destination remains the operator's responsibility and is recorded as not
-established; the index is verified, not rebuilt. Remote fetch, decryption, key custody
+established; this command verifies the index in place. The separate
+[normalized-object rebuild rehearsal](REBUILD_REHEARSAL.md) exercises a new database
+and index via retained JSONL on supported platforms. Adapter replay additionally
+requires matching format, selection, label, order and platform newline behavior;
+no automatic rebuild command or complete replay plan is supplied. Remote fetch, decryption, key custody
 and backup scheduling stay outside the repository. See
 [the recovery rehearsal guide](RECOVERY_REHEARSAL.md).
 

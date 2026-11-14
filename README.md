@@ -194,3 +194,8 @@ Only synthetic examples are distributed. Do not commit your resulting database.
 No third-party code, book text, article corpus or private database was deliberately
 bundled in this extraction. No license has been selected by the owner yet;
 public visibility is not an open-source license. See [rights](RIGHTS.md).
+
+For an actual fresh normalized-object replay rather than a live-DB self-check,
+follow the [rebuild rehearsal](docs/REBUILD_REHEARSAL.md).
+Use separate absent DB paths; ingest is a write, and this guide does not make
+existing-path ingestion exclusive or recreate title/review history.
