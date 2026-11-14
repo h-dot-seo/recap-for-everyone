@@ -1,12 +1,12 @@
 {
   "project": "recap-for-everyone",
-  "release": "0.99.3-current-python-ci",
+  "release": "0.99.4-test-timing",
   "date": "2026-11-14",
   "private_history_imported": false,
   "actual_corpora_included": false,
   "synthetic_examples_only": true,
   "license_status": "NOT_SELECTED",
-  "file_count": 309,
+  "file_count": 312,
   "files": [
     {
       "path": ".gitattributes",
@@ -50,8 +50,8 @@
     },
     {
       "path": "VALIDATION.md",
-      "bytes": 39794,
-      "sha256": "5f05f04587d00d656d861004a51da2a3135730ea006ff7182ee45f37129a3e9d"
+      "bytes": 41788,
+      "sha256": "d98f2428a97c57834aafda87b91d47eb4720d9e79550708266b45f52198a7b58"
     },
     {
       "path": "attributed_title.py",
@@ -135,8 +135,8 @@
     },
     {
       "path": "docs/COMMANDS.md",
-      "bytes": 32084,
-      "sha256": "09289060751c6efd96b2bb18a14f5e2ae7b19e7f913eb67defac0c3acba5dc9c"
+      "bytes": 32419,
+      "sha256": "128396e9d9a435f6d9b7585cca3d924e5746ebb9b304eefb61827bd62490a6f3"
     },
     {
       "path": "docs/COMMAND_CATALOG.md",
@@ -319,6 +319,11 @@
       "sha256": "9d54de0b77c2d47dad6adc7602af02f5113f5dd4fb32b973f5a05aa9b4ba586d"
     },
     {
+      "path": "docs/TESTING.md",
+      "bytes": 2122,
+      "sha256": "c959b6975da4856023a88df128c1e543068a54da987cc8de43ee59cf751d8a5e"
+    },
+    {
       "path": "docs/TITLE_ADAPTER.md",
       "bytes": 13422,
       "sha256": "3b979ccefdce7b63ac8c86538e6c666e57e74ae9e629b8eaf960c359e03b279e"
@@ -370,8 +375,8 @@
     },
     {
       "path": "docs/VALIDATION_HISTORY.md",
-      "bytes": 183666,
-      "sha256": "44c8d6f7c0e4529cb2e7bab6bf4059104ca93367ebcb323e68b1089a86b82968"
+      "bytes": 185651,
+      "sha256": "ca0cfb74cd6408748d4e364e8cfefc432c681c46276ec7715c49da5be06b27f7"
     },
     {
       "path": "docs/WEB_ZIP_INVENTORY.md",
@@ -1364,6 +1369,11 @@
       "sha256": "0f4d8b4daa697e9dce4079f1c969d1d0bd250ea61ad40769feac2bc2964e60ec"
     },
     {
+      "path": "tests/test_timing.py",
+      "bytes": 8603,
+      "sha256": "0ee09b078699f13d8572ba70c5e90f648d872592eed1f667d6ef762b4040a9b1"
+    },
+    {
       "path": "tests/test_title_adapter.py",
       "bytes": 12984,
       "sha256": "66d4cb1280581e94a9b1afeee5bd87bc95ba04a97e59bc28bfa86047e78677fa"
@@ -1517,6 +1527,11 @@
       "path": "tests/test_zip_lower_member_limit.py",
       "bytes": 4955,
       "sha256": "eba82c72359e60edbff47d939ec59bb3b450d5496294b9326039b29bca81adf7"
+    },
+    {
+      "path": "tests/timing.py",
+      "bytes": 5354,
+      "sha256": "ac536ca76919a751ce0a4111e926a6aa1b546abde9cd10e2226d513889c3fea5"
     },
     {
       "path": "title_adapter.py",

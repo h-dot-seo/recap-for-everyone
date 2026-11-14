@@ -744,3 +744,10 @@ Optional launch settings: `python recap_mcp.py --db DB --allow-input-dir DIR --m
 The directory option may repeat; without it no file tool is exposed. These settings
 only add bounded preflight for explicit local file inspection, not write authority
 or a filesystem sandbox. See [input-directory access](MCP_SERVER.md#explicit-input-directory-access).
+
+## Optional synthetic test observation
+
+`python -m tests.timing [tests.test_MODULE ...]` reports local module durations and
+all unittest outcome counts as stdout JSON only. It is not a product command or
+replacement for the CI gate. See [TESTING.md](TESTING.md) for the small runnable
+example, output boundaries and failure behavior.
