@@ -94,8 +94,10 @@ def _effects(name):
         opens.extend((_open('request'),_open('approval')))
     if name=='declare-recovery':
         schemas.append(dict(when='with --manifest-version 2',schema='recap.recovery-declaration.v2'))
+        schemas.append(dict(when='with --manifest-version 3',schema='recap.recovery-declaration.v3'))
     if name=='rehearse-recovery':
         schemas.append(dict(when='input manifest schema is recap.recovery-manifest.v2',schema='recap.recovery-receipt.v2'))
+        schemas.append(dict(when='input manifest schema is recap.recovery-manifest.v3',schema='recap.recovery-receipt.v3'))
         opens.extend((_open('--restored-db'),_open('--objects','read','with --objects')))
     if name=='rebuild-archive':
         schemas.append(dict(when='input manifest schema is recap.recovery-manifest.v2',schema='recap.rebuild-receipt.v2'))

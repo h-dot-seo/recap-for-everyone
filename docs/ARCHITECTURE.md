@@ -351,3 +351,5 @@ selection beside the normalized artifact hash/count, including zero-message
 imports. This is an additive, clock-free subset of the collection ledger, not a
 collection-run record or full provenance guarantee. `ledger` reads that metadata
 without changing recovery v1/v2 object authorization. See [archive ledger](ARCHIVE_LEDGER.md).
+
+The optional recovery v3 contract declares the seven-column original_exports ledger with exact rows, count and logical digest. Its separate explicit original_export_hashes set covers zero-message imports without reinterpreting legacy source hash fields. It compares restored copies, not replayed or inferred import metadata. See [v3](RECOVERY_V3.md).

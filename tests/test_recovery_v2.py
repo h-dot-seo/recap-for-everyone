@@ -113,7 +113,7 @@ class RecoveryV2Tests(unittest.TestCase):
         self.assertEqual([c['check'] for c in result['checks']],list(recovery.CHECKS))
 
     def test_bad_versions_and_exact_v2_fields_rejected(self):
-        for version in (True,False,0,3,'2',None):
+        for version in (True,False,0,4,'2',None):
             output=self.path('bad.json');before=self.db.read_bytes()
             with self.assertRaises(ValueError):recovery.declare_recovery(self.db,output,manifest_version=version)
             self.assertFalse(output.exists());self.assertEqual(self.db.read_bytes(),before)
@@ -142,7 +142,7 @@ class RecoveryV2Tests(unittest.TestCase):
         from unittest.mock import patch
         from recaplib import rebuild
         path,_,_=self.declare();target=self.path('rebuilt.sqlite');output=self.path('rebuild.json')
-        malformed=json.loads(path.read_text());malformed['schema']='recap.recovery-manifest.v3'
+        malformed=json.loads(path.read_text());malformed['schema']='recap.recovery-manifest.v4'
         path.write_text(json.dumps(malformed))
         before=self.db.read_bytes()
         with patch.object(rebuild,'_read_plan',side_effect=AssertionError('plan must not be read')):

@@ -1,10 +1,37 @@
 # Validation record
 
-Current release: `0.100.2-original-export-ledger`, dated 2026-11-14.
+Current release: `0.100.3-original-export-recovery-v3`, dated 2026-11-14.
 This file is the current snapshot. Every dated entry since the first release is kept
 unchanged and in order in [docs/VALIDATION_HISTORY.md](docs/VALIDATION_HISTORY.md).
 
 ## Latest change
+
+2026-11-14 Explicit original-export recovery metadata (0.100.3-original-export-recovery-v3):
+adds opt-in recovery manifest/declaration/receipt v3. All seven original_exports
+fields, logical count/digest and exact ordered rows are declared; absent and empty
+tables differ. A separate original_export_hashes list is derived only from these
+rows, including zero-message imports. Restored-copy rehearsal checks the ledger
+and optional objects scan uses the explicit hash set without reinterpreting legacy
+sources or normalized artifact optionality. Duplicate identities, contradictory
+same-hash byte metadata and malformed declarations fail closed. Default v1 and
+stored v1/v2 declaration/rehearsal bytes and checks remain unchanged. V3 rebuild is rejected before reading
+its plan or creating outputs. No original authenticity, complete collection,
+automatic resealing, archive migration or real-data transmission is claimed.
+
+Validation: all 1,541 tests passed (one environment-dependent skip), including
+15 new v3 tests. Independent review passed 37 core/recovery tests plus 23 final
+catalog/usage/v3 tests; recomputed-digest contradictory manifests were also rejected.
+Actual prior/current CLI comparison preserved v1/v2 declaration and rehearsal
+stdout, stderr and saved bytes exactly. V1/v2 rebuild success and missing-object
+failure comparisons differed only in actual implementation_sha256 and the derived
+receipt_sha256; all other fields, check order, side effects and successful DB bytes
+matched. Both hashes were recalculated from their real inputs, not frozen.
+The first full run found the previous unsupported-v3 fixture and the not-yet-updated
+release manifest; these were corrected to unsupported v4 and the current manifest.
+Final compilation, Python 3.10 grammar, 137 preserved shell examples and manual
+execution of the new guide passed. Manifest 326 / audit 327 passed.
+
+Previous change:
 
 2026-11-14 Original-export metadata ledger (0.100.2-original-export-ledger):
 adds a seven-field clock-free original_exports ledger to explicit adapter imports

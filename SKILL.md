@@ -443,3 +443,5 @@ and follow its single global `next_offset`. Metadata may be private. Unledgered
 does not mean never imported; do not infer missing formats, selections or byte
 counts. The new original_exports ledger is not declared by recovery v1/v2 and
 does not authorize additional object replay. See `docs/ARCHIVE_LEDGER.md`.
+
+Use `declare-recovery --manifest-version 3` only when explicitly choosing the original-export metadata preservation contract. It records all seven stored fields and zero-message original hashes for restored-copy rehearsal; v3 rebuild is rejected. Do not infer missing metadata, broaden legacy object authorization, or treat private metadata as permission to transmit. See [v3 scope](docs/RECOVERY_V3.md).

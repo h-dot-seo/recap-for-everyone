@@ -24,6 +24,9 @@ RECEIPT_SCHEMA = 'recap.recovery-receipt.v1'
 MANIFEST_SCHEMA_V2 = 'recap.recovery-manifest.v2'
 DECLARATION_SCHEMA_V2 = 'recap.recovery-declaration.v2'
 RECEIPT_SCHEMA_V2 = 'recap.recovery-receipt.v2'
+MANIFEST_SCHEMA_V3 = 'recap.recovery-manifest.v3'
+DECLARATION_SCHEMA_V3 = 'recap.recovery-declaration.v3'
+RECEIPT_SCHEMA_V3 = 'recap.recovery-receipt.v3'
 PASSED = 'RECOVERY_REHEARSAL_PASSED'
 FAILED = 'RECOVERY_REHEARSAL_FAILED'
 MAX_MANIFEST_BYTES = 64 * 1024 * 1024
@@ -41,6 +44,10 @@ MANIFEST_FIELDS = ('schema', 'declared_at', 'sources', 'artifacts', 'optional_ar
 V2_LEDGER_FIELDS = ('title_review_history','export_provenance','export_nodes','export_conversations')
 MANIFEST_FIELDS_V2 = MANIFEST_FIELDS + V2_LEDGER_FIELDS + ('export_occurrences_sha256',)
 CHECKS_V2 = CHECKS[:7] + V2_LEDGER_FIELDS + CHECKS[7:]
+MANIFEST_FIELDS_V3 = MANIFEST_FIELDS_V2 + ('original_exports','original_export_hashes')
+CHECKS_V3 = CHECKS_V2[:-2] + ('original_exports',) + CHECKS_V2[-2:]
+ORIGINAL_EXPORT_FIELDS = ('source','original_sha256','original_bytes','format','selected_conversation','normalized_sha256','extracted_messages')
+ORIGINAL_EXPORT_KEY = ('source','original_sha256','format','selected_conversation','normalized_sha256')
 # Only program-owned constant identifiers are interpolated into SQL.
 V2_LEDGER_COLUMNS = {
     'title_history': ('source','conversation','id','previous','title','changed_at'),
@@ -96,6 +103,19 @@ MANIFEST_SCOPE_V2 = ('one read-only archive snapshot: v1 artifact, source, messa
     'export_occurrences-only semantics; declaring legacy provenance does not expand original_hashes or '
     'optional_artifacts. Sidecars are not observed or declared; read-only SQLite access can create WAL/SHM '
     'sidecars, without intentionally modifying the main archive bytes.')
+
+DIGEST_SEMANTICS_V3 = (DIGEST_SEMANTICS_V2 + ' original_exports.sha256: compact ASCII JSON arrays containing '
+    '[source, original_sha256, original_bytes, format, selected_conversation, normalized_sha256, extracted_messages] '
+    'followed by LF, ordered by source, original_sha256, format, selected_conversation, normalized_sha256 '
+    'under SQLite BINARY collation. Rows are retained in the declaration, duplicate primary identities are '
+    'rejected, and counts/digest/hash list must agree. The empty selection string means whole export. '
+    'Original byte counts are declared import metadata, not independently measured retained-object sizes.')
+MANIFEST_SCOPE_V3 = ('one read-only archive snapshot with v2 ledger checks and exact original_exports rows. '
+    'The separate original_export_hashes list is derived only from these declared rows and adds required '
+    'hashes for optional object checking, including zero-message imports. Existing sources.original_hashes, '
+    'artifact optionality and legacy provenance semantics are unchanged. No missing metadata is inferred. '
+    'Version 3 is restored-copy rehearsal only, not object rebuild. Sidecars are not observed or declared; '
+    'SQLite read access can create WAL/SHM sidecars without intentionally changing main archive bytes.')
 
 _HEX64 = re.compile(r'[0-9a-f]{64}')
 _DATE = re.compile(r'[0-9]{4}-[0-9]{2}-[0-9]{2}')
@@ -317,6 +337,57 @@ def _first_token(text):
     return None if start is None else text[start:]
 
 
+def _validate_original_exports(value,artifacts):
+    if value is None:return []
+    if (not isinstance(value,dict) or set(value)!={'count','sha256','rows'} or not _count(value['count']) or
+            not _hex64(value['sha256']) or not isinstance(value['rows'],list) or value['count']!=len(value['rows'])):
+        raise ValueError('original export declaration is malformed')
+    known={(row['source_id'],row['sha256']):row['record_count'] for row in artifacts}
+    keys=[];sizes={};digest=hashlib.sha256()
+    for row in value['rows']:
+        if (not isinstance(row,dict) or set(row)!=set(ORIGINAL_EXPORT_FIELDS) or
+                not isinstance(row['source'],str) or not row['source'].strip() or
+                not _hex64(row['original_sha256']) or not _hex64(row['normalized_sha256']) or
+                type(row['original_bytes']) is not int or not 0<=row['original_bytes']<=2**63-1 or
+                row['format'] not in ('web','local','local-codex') or not isinstance(row['selected_conversation'],str) or
+                type(row['extracted_messages']) is not int or not 0<=row['extracted_messages']<=2**63-1):
+            raise ValueError('original export declaration rows are malformed')
+        try:
+            row['source'].encode('utf-8');row['selected_conversation'].encode('utf-8')
+        except UnicodeError:raise ValueError('original export identities must be Unicode text') from None
+        if known.get((row['source'],row['normalized_sha256']))!=row['extracted_messages']:
+            raise ValueError('original export rows must match declared normalized artifacts')
+        identity=tuple(row[field] for field in ORIGINAL_EXPORT_KEY);keys.append(identity)
+        original=row['original_sha256']
+        if original in sizes and sizes[original]!=row['original_bytes']:
+            raise ValueError('original export byte metadata conflicts for one hash')
+        sizes[original]=row['original_bytes']
+        digest.update(_canonical_line([row[field] for field in ORIGINAL_EXPORT_FIELDS]))
+    if keys!=sorted(set(keys)) or digest.hexdigest()!=value['sha256']:
+        raise ValueError('original export rows must be ordered, distinct and match their digest')
+    return sorted(sizes)
+
+
+def _original_exports(connection,tables,artifacts):
+    if 'original_exports' not in tables:return None
+    query='SELECT '+','.join(ORIGINAL_EXPORT_FIELDS)+' FROM original_exports ORDER BY '+','.join(key+' COLLATE BINARY' for key in ORIGINAL_EXPORT_KEY)
+    rows=[];digest=hashlib.sha256()
+    for values in connection.execute(query):
+        rows.append(dict(zip(ORIGINAL_EXPORT_FIELDS,values)))
+        digest.update(_canonical_line(list(values)))
+    result=dict(count=len(rows),sha256=digest.hexdigest(),rows=rows)
+    _validate_original_exports(result,artifacts)
+    return result
+
+
+def _original_export_check(manifest,connection,tables):
+    found=_original_exports(connection,tables,_artifact_rows(connection))
+    declared=manifest['original_exports']
+    state=_ledger_state(declared,found is not None)
+    summary=lambda value:None if value is None else dict(count=value['count'],sha256=value['sha256'])
+    return (state=='both absent' or state=='compared' and found==declared),dict(state=state,declared=summary(declared),found=summary(found))
+
+
 def _describe(connection, manifest_version=1):
     tables = _tables(connection)
     missing = [name for name in EXPECTED_TABLES if name not in tables]
@@ -329,18 +400,22 @@ def _describe(connection, manifest_version=1):
                 messages=messages, conversations=conversations,
                 messages_sha256=_messages_digest(connection), export_occurrences=occurrences,
                 title_history=_title_history(connection, tables) if manifest_version==1 else _v2_ledger(connection,tables,'title_history'), fts_rows=_fts_rows(connection, tables)[0])
-    if manifest_version==2:
+    if manifest_version>=2:
         result.update({name:_v2_ledger(connection,tables,name) for name in V2_LEDGER_FIELDS})
         occurrence_digest=_v2_ledger(connection,tables,'export_occurrences')
         result['export_occurrences_sha256']=None if occurrence_digest is None else occurrence_digest['sha256']
+    if manifest_version==3:
+        result['original_exports']=_original_exports(connection,tables,artifacts)
+        result['original_export_hashes']=_validate_original_exports(result['original_exports'],artifacts)
     return result
 
 
 def declare_recovery(db, output, declared_at=None, *, manifest_version=1):
     """Write a new manifest describing the live archive; the archive is only read."""
-    if type(manifest_version) is not int or manifest_version not in (1,2):
-        raise ValueError('manifest_version must be 1 or 2')
-    v2=manifest_version==2
+    if type(manifest_version) is not int or manifest_version not in (1,2,3):
+        raise ValueError('manifest_version must be 1, 2 or 3')
+    v2=manifest_version>=2
+    v3=manifest_version==3
     declared_at = _validate_declared_at(declared_at)
     _reject_existing(output)
     connection = readonly(db)
@@ -349,14 +424,14 @@ def declare_recovery(db, output, declared_at=None, *, manifest_version=1):
         description = _describe(connection,manifest_version)
     finally:
         connection.close()
-    manifest = dict(schema=MANIFEST_SCHEMA_V2 if v2 else MANIFEST_SCHEMA, declared_at=declared_at, **description,
-                    digest_semantics=DIGEST_SEMANTICS_V2 if v2 else DIGEST_SEMANTICS, scope=MANIFEST_SCOPE_V2 if v2 else MANIFEST_SCOPE, boundary=MANIFEST_BOUNDARY)
+    manifest = dict(schema=MANIFEST_SCHEMA_V3 if v3 else MANIFEST_SCHEMA_V2 if v2 else MANIFEST_SCHEMA, declared_at=declared_at, **description,
+                    digest_semantics=DIGEST_SEMANTICS_V3 if v3 else DIGEST_SEMANTICS_V2 if v2 else DIGEST_SEMANTICS, scope=MANIFEST_SCOPE_V3 if v3 else MANIFEST_SCOPE_V2 if v2 else MANIFEST_SCOPE, boundary=MANIFEST_BOUNDARY)
     raw = _encode(manifest)
     if len(raw) > MAX_MANIFEST_BYTES:
         raise ValueError('recovery manifest exceeds the 64 MiB limit')
     publication = _publish_new_file(output, raw, '.recap-recovery-manifest-')
     history = description['title_history']
-    result = dict(schema=DECLARATION_SCHEMA_V2 if v2 else DECLARATION_SCHEMA, status='DECLARED', manifest_schema=manifest['schema'],
+    result = dict(schema=DECLARATION_SCHEMA_V3 if v3 else DECLARATION_SCHEMA_V2 if v2 else DECLARATION_SCHEMA, status='DECLARED', manifest_schema=manifest['schema'],
                 manifest_bytes=len(raw), manifest_sha256=hashlib.sha256(raw).hexdigest(),
                 declared_at=declared_at, sources=len(description['sources']),
                 artifacts=len(description['artifacts']), optional_artifacts=len(description['optional_artifacts']),
@@ -371,6 +446,9 @@ def declare_recovery(db, output, declared_at=None, *, manifest_version=1):
                       'no backup, upload, repair or archive change',
                 boundary=MANIFEST_BOUNDARY)
     if v2:result.update({name:None if description[name] is None else description[name]['count'] for name in V2_LEDGER_FIELDS})
+    if v3:
+        result['original_exports']=None if description['original_exports'] is None else description['original_exports']['count']
+        result['original_export_hashes']=len(description['original_export_hashes'])
     return result
 
 
@@ -391,9 +469,9 @@ def _read_manifest(path):
 def _validate_manifest(value):
     if not isinstance(value, dict):
         raise ValueError('recovery manifest must be a JSON object')
-    if value.get('schema') not in (MANIFEST_SCHEMA,MANIFEST_SCHEMA_V2):
+    if value.get('schema') not in (MANIFEST_SCHEMA,MANIFEST_SCHEMA_V2,MANIFEST_SCHEMA_V3):
         raise ValueError('unsupported recovery manifest schema; expected ' + MANIFEST_SCHEMA)
-    if set(value) != set(MANIFEST_FIELDS_V2 if value['schema']==MANIFEST_SCHEMA_V2 else MANIFEST_FIELDS):
+    if set(value) != set(MANIFEST_FIELDS_V3 if value['schema']==MANIFEST_SCHEMA_V3 else MANIFEST_FIELDS_V2 if value['schema']==MANIFEST_SCHEMA_V2 else MANIFEST_FIELDS):
         raise ValueError('recovery manifest must contain exactly the declared fields')
     _validate_declared_at(value['declared_at'])
     if (not all(_count(value[key]) for key in ('messages', 'conversations', 'fts_rows')) or
@@ -435,7 +513,7 @@ def _validate_manifest(value):
     if history is not None and (not isinstance(history, dict) or set(history) != {'count', 'sha256'} or
                                 not _count(history['count']) or not _hex64(history['sha256'])):
         raise ValueError('recovery manifest title_history must be null or a count with a digest')
-    if value['schema']==MANIFEST_SCHEMA_V2:
+    if value['schema'] in (MANIFEST_SCHEMA_V2,MANIFEST_SCHEMA_V3):
         occurrence_digest=value['export_occurrences_sha256']
         if (value['export_occurrences'] is None and occurrence_digest is not None or
                 value['export_occurrences'] is not None and not _hex64(occurrence_digest)):
@@ -444,6 +522,10 @@ def _validate_manifest(value):
             ledger=value[name]
             if ledger is not None and (not isinstance(ledger,dict) or set(ledger)!={'count','sha256'} or not _count(ledger['count']) or not _hex64(ledger['sha256'])):
                 raise ValueError('recovery manifest '+name+' must be null or a count with a digest')
+    if value['schema']==MANIFEST_SCHEMA_V3:
+        hashes=_validate_original_exports(value['original_exports'],value['artifacts'])
+        if not isinstance(value['original_export_hashes'],list) or value['original_export_hashes']!=hashes:
+            raise ValueError('original export hashes must exactly match declared ledger rows')
     return value
 
 
@@ -530,7 +612,7 @@ def _occurrence_check(manifest, entries, total, tables, connection=None):
                         declared_hashes=sum(len(h) for _, h in declared.values()),
                         found_hashes=sum(len(h) for _, h in found.values()),
                         mismatched_sources=mismatched[:MAX_DETAIL_ITEMS], mismatched_count=len(mismatched))
-    if manifest['schema']==MANIFEST_SCHEMA_V2:
+    if manifest['schema'] in (MANIFEST_SCHEMA_V2,MANIFEST_SCHEMA_V3):
         digest=_v2_ledger(connection,tables,'export_occurrences')['sha256']
         detail.update(declared_sha256=manifest['export_occurrences_sha256'],found_sha256=digest)
         passed=passed and digest==manifest['export_occurrences_sha256']
@@ -598,6 +680,10 @@ def _objects_check(manifest, directory, supplied, paths_by_hash=None):
     for source in manifest['sources']:
         for value in source['original_hashes'] or ():
             kinds.setdefault(value, set()).add('original_export')
+            required.add(value)
+    if manifest['schema']==MANIFEST_SCHEMA_V3:
+        for value in manifest['original_export_hashes']:
+            kinds.setdefault(value,set()).add('original_export')
             required.add(value)
     refusals, files, unreadable = set(), [], []
 
@@ -667,7 +753,9 @@ def _objects_check(manifest, directory, supplied, paths_by_hash=None):
 
 def _archive_checks(manifest, restored_db, exclude_history=False):
     """Shared read-only checks; rebuild can explicitly exclude unreplayable history."""
-    v2=manifest['schema']==MANIFEST_SCHEMA_V2
+    v2=manifest['schema'] in (MANIFEST_SCHEMA_V2,MANIFEST_SCHEMA_V3)
+    v3=manifest['schema']==MANIFEST_SCHEMA_V3
+    if v3 and exclude_history:raise ValueError('v3 recovery manifests support restored-copy rehearsal only')
     excluded={'title_history','title_review_history'} if v2 and exclude_history else ({'title_history'} if exclude_history else set())
     checks = []
     connection = None
@@ -695,6 +783,7 @@ def _archive_checks(manifest, restored_db, exclude_history=False):
                 ('export_occurrences', manifest['export_occurrences']), ('title_history', manifest['title_history']))
                 if declared is not None and name not in excluded]
             if v2:expected.extend(name for name in V2_LEDGER_FIELDS if manifest[name] is not None and name not in excluded)
+            if v3 and manifest['original_exports'] is not None:expected.append('original_exports')
             missing = [name for name in expected if name not in tables]
             checks.append(dict(check='expected_tables', status='PASS' if not missing else 'FAIL',
                                expected=expected, missing=missing))
@@ -717,10 +806,11 @@ def _archive_checks(manifest, restored_db, exclude_history=False):
                 for name in V2_LEDGER_FIELDS:
                     if name in excluded:continue
                     checks.append(_run_check(name,lambda name=name:_v2_ledger_check(manifest,connection,tables,name)))
+            if v3:checks.append(_run_check('original_exports',lambda:_original_export_check(manifest,connection,tables)))
             checks.append(_run_check('fts_rows', lambda: _fts_count_check(manifest, connection, tables)))
             checks.append(_run_check('fts_match_sample', lambda: _fts_sample_check(connection)))
         else:
-            checks.extend(dict(check=name, status='FAIL', detail=NOT_RUN) for name in (CHECKS_V2 if v2 else CHECKS)[1:]
+            checks.extend(dict(check=name, status='FAIL', detail=NOT_RUN) for name in (CHECKS_V3 if v3 else CHECKS_V2 if v2 else CHECKS)[1:]
                           if name not in excluded)
     finally:
         if connection is not None:
@@ -741,7 +831,7 @@ def rehearse_recovery(manifest_path, restored_db, output, objects=None):
     if objects is not None:
         checks.append(_run_check(OBJECTS_CHECK, lambda: _objects_check(manifest, Path(objects), str(objects))))
     failed = [check['check'] for check in checks if check['status'] != 'PASS']
-    receipt = dict(schema=RECEIPT_SCHEMA_V2 if manifest['schema']==MANIFEST_SCHEMA_V2 else RECEIPT_SCHEMA, status=PASSED if not failed else FAILED, failed_checks=failed,
+    receipt = dict(schema=RECEIPT_SCHEMA_V3 if manifest['schema']==MANIFEST_SCHEMA_V3 else RECEIPT_SCHEMA_V2 if manifest['schema']==MANIFEST_SCHEMA_V2 else RECEIPT_SCHEMA, status=PASSED if not failed else FAILED, failed_checks=failed,
                    checks_run=len(checks),
                    manifest=dict(path=str(manifest_path), bytes=len(raw), sha256=hashlib.sha256(raw).hexdigest(),
                                  schema=manifest['schema'], declared_at=manifest['declared_at']),
@@ -757,7 +847,7 @@ def rehearse_recovery(manifest_path, restored_db, output, objects=None):
 
 
 def render_text(result):
-    header = ('Recovery manifest declaration' if result.get('schema') in (DECLARATION_SCHEMA,DECLARATION_SCHEMA_V2)
+    header = ('Recovery manifest declaration' if result.get('schema') in (DECLARATION_SCHEMA,DECLARATION_SCHEMA_V2,DECLARATION_SCHEMA_V3)
               else 'Archive rebuild receipt' if result.get('schema') in ('recap.rebuild-receipt.v1','recap.rebuild-receipt.v2')
               else 'Recovery rehearsal receipt')
     items = []
@@ -778,7 +868,7 @@ def main():
     declare = commands.add_parser('declare', help='write a recovery manifest describing the live archive without changing it')
     declare.add_argument('--db', required=True)
     declare.add_argument('--output', required=True, help='new manifest JSON path outside the archive; existing paths are refused')
-    declare.add_argument('--manifest-version',type=int,choices=(1,2),default=1,help='explicit manifest version; default 1, version 2 also declares ordered history and auxiliary ledgers')
+    declare.add_argument('--manifest-version',type=int,choices=(1,2,3),default=1,help='explicit manifest version; default 1, versions 2/3 declare additional ledgers; version 3 is restored-copy rehearsal only')
     declare.add_argument('--declared-at', help='YYYY-MM-DD recorded as supplied text; no clock is read')
     rehearse = commands.add_parser('rehearse', help='verify a restored archive copy against a declared manifest and write a receipt')
     rehearse.add_argument('manifest', help='recovery manifest JSON written by declare')

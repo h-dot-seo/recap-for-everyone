@@ -78,3 +78,5 @@ hash here does not authorize it in an old recovery declaration. A future explici
 versioned contract would need to bind and use this metadata; do not relabel or
 re-seal existing manifests. No source authenticity, rights or complete recovery
 is established by the new rows.
+
+Optional [recovery v3](RECOVERY_V3.md) now declares this table and its explicit hash set. This does not alter the v1/v2 limitations above or retroactively protect an existing older manifest.
