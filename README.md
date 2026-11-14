@@ -243,3 +243,7 @@ Adapter imports avoid decoding their generated JSONL a second time while preserv
 artifact hashes, source lines and admission checks. See
 [adapter import cost and boundaries](docs/ADAPTER_IMPORT_COST.md); this is not a
 bounded-memory or speed guarantee.
+
+Use the optional [synthetic scaling observations](docs/SCALING.md) to measure
+import, query, review and recovery operations on generated fictional input in new
+scratch archives. Measurements stay in a private receipt, not a speed guarantee.

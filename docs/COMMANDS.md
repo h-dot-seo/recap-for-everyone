@@ -698,3 +698,14 @@ usage: recap.py check-provenance [-h] [--text] input
 
 Both require global `--db`; check-provenance returns exit 1 for STALE.
 See [message provenance](MESSAGE_PROVENANCE.md).
+
+## Synthetic scaling checks and examples
+
+```text
+usage: make_scale_fixture.py OUTPUT_DIR --conversations N --messages M --seed INT
+usage: benchmark.py FIXTURE_DIR --work-dir NEW_DIR --output NEW_JSON [--repetitions N]
+```
+
+The generator is `examples/make_scale_fixture.py`. The runner accepts only its
+exact regenerated synthetic bytes, creates new scratch archives and exclusively
+saves a private measurement receipt. See [SCALING](SCALING.md).

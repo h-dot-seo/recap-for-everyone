@@ -237,3 +237,12 @@ For a private pointer without message text or titles, use `export-provenance`
 for one explicit message and `check-provenance` to recheck it. Locator hashes
 do not establish authorship, consent, retrieval or publication evidence. See
 [message provenance cards](MESSAGE_PROVENANCE.md).
+
+## Synthetic cost observations
+
+The optional benchmark uses deterministic generated input only, verified by exact
+regeneration as well as hashes. Separate timing/allocation runs operate on new
+scratch archives, not an existing user archive. Local receipts bind fixture and
+implementation bytes and state uncontrolled-cache and native-memory limits. They
+do not change archive contracts or establish speed, correctness or recovery
+guarantees. See [SCALING](SCALING.md).

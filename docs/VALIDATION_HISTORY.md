@@ -2503,3 +2503,29 @@ forms; a work-count oracle and executed guide cover the removed decode pass.
 No new CLI flag, schema, provenance meaning, authorization, streaming, timing or
 bounded-memory guarantee is introduced. Source, rows and derived bytes still
 remain in memory. Newly owned SQLite test connections close explicitly.
+
+## 2026-11-14 Private synthetic scaling observations (0.97.7-synthetic-scaling-observations):
+adds a deterministic bounded fictional fixture generator and a standalone local
+benchmark. Exact regeneration, strict manifest bytes and file hashes gate every
+input; a caller-supplied synthetic flag alone is not trusted. A new scratch
+archive receives real title revisions and review decisions, and 19 import/query/
+review/recovery operations run separately for time and Python allocation peaks.
+Private exclusive receipts bind code and fixture identities, archive size/counts,
+repetitions and uncontrolled-cache/native-memory limitations; stdout is counts-only.
+Deterministic ZIP bytes, tampered fixtures, path collisions, traced failures,
+SQLite connection closure and the N50 executed guide are covered. No existing
+archive, new schema/index, streaming, timing threshold, speed guarantee, rights
+inference or publication of local measurements is introduced.
+
+Prepublication fixture testing found missing local-codex content-type labels, which
+made that synthetic import extract no messages. The recipe now labels input/output
+text explicitly; every imported measurement database is checked for the expected
+conversation and message counts. Nothing was published with the incomplete recipe.
+
+Prepublication independent review reproduced a hidden final-receipt staging file
+after injected cleanup failure. Intermediate publication cleanup failures now
+stop with published scratch files preserved; final receipt publication reports
+its actual cleanup outcome and generated remainder in stdout. Review also caught
+result-level recovery failure being timed without a functional gate. Import
+counts, conflict status and recovery success are now checked after measurement,
+so a fast failure cannot silently become a normal-operation observation.
