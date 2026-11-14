@@ -12,7 +12,7 @@ contain private text, titles and IDs; keep it outside the public repository.
 ## Layout
 
 The repository root holds only the entry points: `recap.py`, the standalone scripts
-listed below, `runtime_check.py`, `verify_manifest.py` and `audit_publication.py`. Each
+listed below, `runtime_check.py`, `verify_manifest.py`, `audit_publication.py` and `build_manifest.py`. Each
 standalone script at the root is a thin compatibility entry point that imports `main`
 from the implementation module of the same name in `recaplib/`, so every command in
 this reference runs exactly as written. The implementation lives in the `recaplib/`
@@ -673,3 +673,12 @@ usage: recap.py changed-since [-h] --source SOURCE --checkpoint CHECKPOINT [--te
 
 Both commands require global `--db`; changed-since exits 1 with no delta when
 the declared subset is not verified. See [IMPORT_CHECKPOINT](IMPORT_CHECKPOINT.md).
+
+## build_manifest.py
+
+```text
+usage: build_manifest.py [-h] [--root ROOT] [--release RELEASE] [--date DATE] [--write NEW_PATH] [--expected-plan-sha256 HEX]
+```
+
+Read-only plan by default; a reviewed plan hash permits only a new outside-tree
+manifest candidate. See [Build manifest](BUILD_MANIFEST.md).

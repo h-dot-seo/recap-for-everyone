@@ -109,7 +109,7 @@ python recap.py --db ../demo.sqlite title --source demo --conversation synthetic
 해시는 바뀌지 않습니다.
 
 저장소 루트에는 진입점만 있습니다: `recap.py`, 위 표와 [명령 참조](COMMANDS.md)의
-독립 스크립트, `runtime_check.py`, `verify_manifest.py`, `audit_publication.py`. 루트의
+독립 스크립트, `runtime_check.py`, `verify_manifest.py`, `audit_publication.py`, `build_manifest.py`. 루트의
 독립 스크립트는 같은 이름의 `recaplib/` 모듈을 불러오는 호환 진입점이므로 문서의 명령은
 그대로 동작합니다. 구현 모듈은 `recaplib/` 패키지에, 테스트는 `tests/` 패키지에 있고,
 테스트는 루트에서 `python -m unittest discover -v`로 실행합니다.
@@ -248,3 +248,8 @@ decisions remain independent; no checkpoint changes the archive.
 `declare-checkpoint` and `changed-since` verify a declared source artifact subset
 before returning ID-free import-delta counts. They do not approve imports, record
 review completion or mutate the archive. See [the cutoff guide](IMPORT_CHECKPOINT.md).
+
+For contributor byte inventories, `build_manifest.py` reports a read-only plan.
+After reviewing it, an exact plan hash can create a separate new candidate outside
+the checkout, never overwrite the manifest or approve publication. See
+[manifest generation](BUILD_MANIFEST.md).

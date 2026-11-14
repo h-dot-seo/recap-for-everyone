@@ -1,10 +1,24 @@
 # Validation record
 
-Current release: `0.97.2-accepted-artifact-cutoff`, dated 2026-11-14.
+Current release: `0.97.3-reviewed-manifest-builder`, dated 2026-11-14.
 This file is the current snapshot. Every dated entry since the first release is kept
 unchanged and in order in [docs/VALIDATION_HISTORY.md](docs/VALIDATION_HISTORY.md).
 
 ## Latest change
+
+2026-11-14 Reviewed manifest candidate builder (0.97.3-reviewed-manifest-builder):
+adds public build_manifest.py with read-only added/removed/changed-path plans and
+exact plan-hash leases for exclusively new outside-tree candidates. Base bytes
+and complete candidate bytes bind each plan; existing metadata is retained except
+explicit release/date text. The existing verifier accepts a candidate object for
+shared validation without changing its default CLI. Limited audit, portable paths,
+CR/symlink/special-file refusals and repeat scans guard publication. A fictional
+contributor guide exercises plan review and candidate creation. No manifest is
+overwritten, no privacy/rights approval or license/tag policy is inferred, and
+no Git, deployment or CI permission change is performed. This is not an atomic
+filesystem snapshot or a hostile concurrent-namespace sandbox.
+
+Previous change:
 
 2026-11-14 Accepted-artifact import cutoff (0.97.2-accepted-artifact-cutoff):
 adds declare-checkpoint and counts-only changed-since for one explicit source.
@@ -341,3 +355,8 @@ From the repository root, with your chosen launcher in place of `python`
 Windows repair validation follow-up: the first repair passed rebuild success paths but exposed one remaining link-failure injection error on Windows. The test compared an unresolved TEMP alias with the resolved publication path. Its matcher now resolves both paths and asserts exactly one injected failure; production publication code is unchanged.
 
 New-test portability checklist: enumerate every new sqlite3.connect/readonly call; require closing or try/finally close for owned connections, verify caller-owned wrappers are closed by the production caller, and retain an explicit closed-connection regression assertion. All new checkpoint test connections were checked; the WAL setup now also closes on errors.
+
+Contributor inventory entry point: `build_manifest.py` plans by default and only
+creates new outside-tree candidates with an exact reviewed plan hash.
+
+Prepublication independent review caught a candidate-metadata audit gap: supplied release/date text had not been checked against publication patterns. Candidate encoded bytes now receive the same pattern checks, with value-free errors and plan/write regression coverage. Nothing was published before this correction.

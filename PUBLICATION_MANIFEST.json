@@ -1,12 +1,12 @@
 {
   "project": "recap-for-everyone",
-  "release": "0.97.2-accepted-artifact-cutoff",
+  "release": "0.97.3-reviewed-manifest-builder",
   "date": "2026-11-08",
   "private_history_imported": false,
   "actual_corpora_included": false,
   "synthetic_examples_only": true,
   "license_status": "NOT_SELECTED",
-  "file_count": 270,
+  "file_count": 275,
   "files": [
     {
       "path": ".gitattributes",
@@ -30,8 +30,8 @@
     },
     {
       "path": "README.md",
-      "bytes": 16656,
-      "sha256": "265993449684cde5ec5a773c1feae80bd3666fcedbcf406c8b298728cd23553d"
+      "bytes": 16959,
+      "sha256": "2c1e4b1cc5f05d58f24520b423f2a6abe51d9931331d88414fd96faa1d20148e"
     },
     {
       "path": "RIGHTS.md",
@@ -45,13 +45,13 @@
     },
     {
       "path": "SKILL.md",
-      "bytes": 16664,
-      "sha256": "fbedf19021a70d21e0dbdbfd5a8a763405d19d34d77daa1c87021b49689e66bb"
+      "bytes": 16946,
+      "sha256": "a413e7b02248aece11e60a7530c7eb5f699bb0feab7f5cfc7115d4d618dc2347"
     },
     {
       "path": "VALIDATION.md",
-      "bytes": 20715,
-      "sha256": "cee7a3140e2608d8c6bf38cb983a336e8282e99ac5b4f6f9d2ba0262219a5270"
+      "bytes": 22076,
+      "sha256": "64f5acfc3af605e167c23aab6aba5c753e949d2da43e21b0999e39c254ba56d8"
     },
     {
       "path": "attributed_title.py",
@@ -67,6 +67,11 @@
       "path": "branch_title.py",
       "bytes": 165,
       "sha256": "382f19cfbd53705c5ef365df0c219de93b23bd5d4488bc5d7aae5c4b665b045c"
+    },
+    {
+      "path": "build_manifest.py",
+      "bytes": 9273,
+      "sha256": "3177cbffb401a01098a79f7ede6374cad39982265106e47bd886cb5b1420bd2a"
     },
     {
       "path": "conversation_search.py",
@@ -90,8 +95,8 @@
     },
     {
       "path": "docs/ARCHITECTURE.md",
-      "bytes": 14032,
-      "sha256": "e297258279e4f180254053c9677005bccbf67a59c8132b16428f360e253df6d5"
+      "bytes": 14330,
+      "sha256": "423cfd39a3e9d40b4ae582489811eb951add4837273f49ce7b8d0a851816a93a"
     },
     {
       "path": "docs/ATTRIBUTED_MESSAGE_SELECTION.md",
@@ -109,14 +114,19 @@
       "sha256": "83f4b38dc226bfc6465346ad4c3aad62d7aca128413d3c30111ac8d7730f3986"
     },
     {
+      "path": "docs/BUILD_MANIFEST.md",
+      "bytes": 3603,
+      "sha256": "f2efd9edf635d96031da93d25d8cc049589fac8c17012dc8718d304cab7516ab"
+    },
+    {
       "path": "docs/CANONICAL_UNICODE_SEARCH.md",
       "bytes": 5094,
       "sha256": "1dcb318d72f939e659f749bb74b5b90355e6c69d544a73b7078221a7d9f56e3f"
     },
     {
       "path": "docs/COMMANDS.md",
-      "bytes": 28624,
-      "sha256": "cf53753462dee66cf58c402b81690906c57d9caae0ef8886a00524e327f3f687"
+      "bytes": 28948,
+      "sha256": "62c2c486899556d3a3a99028739a4a9ebf7a5c8483fc03f1c1cb846265e8fa1a"
     },
     {
       "path": "docs/EXPORT_BYTE_REPLAY.md",
@@ -180,8 +190,8 @@
     },
     {
       "path": "docs/README.ko.md",
-      "bytes": 20615,
-      "sha256": "87ed8bb5f32c3b6a4cccbb74a24cbca3716411dd77801ce9e8fb999eea5aa4f9"
+      "bytes": 20913,
+      "sha256": "3fde2001485ac28c62059b959be052b9af9c13904695a1193abe19d888bb31ae"
     },
     {
       "path": "docs/REBUILD_REHEARSAL.md",
@@ -320,8 +330,8 @@
     },
     {
       "path": "docs/VALIDATION_HISTORY.md",
-      "bytes": 164244,
-      "sha256": "de21fe3ab3b3379bfd2b6a91b0687a6c693336bce3e846ba1b4af73d6328d0d9"
+      "bytes": 165437,
+      "sha256": "e2486180d541d721fadd1f083d15a3dd74a86e9d1f8b96297365cadac92328b3"
     },
     {
       "path": "docs/WEB_ZIP_INVENTORY.md",
@@ -330,8 +340,8 @@
     },
     {
       "path": "docs/WORKFLOWS.md",
-      "bytes": 76563,
-      "sha256": "2e57cab99a38018673d7367eae15edee718b1cbe1bf0436817c3e0bea7d8149f"
+      "bytes": 76840,
+      "sha256": "d6275ff968c39e8252153422948ae206bca87b0747a95fc7ace0f023c6a41d2c"
     },
     {
       "path": "examples/adapter-message-focus.jsonl",
@@ -372,6 +382,11 @@
       "path": "examples/local-session.jsonl",
       "bytes": 233,
       "sha256": "6871774f2e373f6901ddf6be72a74979dddde786792b30321c5fe15fc0820460"
+    },
+    {
+      "path": "examples/make_manifest_demo.py",
+      "bytes": 1395,
+      "sha256": "2ff66efa1700d7d29e266a29593b27283b216b910cb5673f08fc3e435d921e16"
     },
     {
       "path": "examples/make_review_demo.py",
@@ -779,6 +794,11 @@
       "sha256": "a812b8af3a3375ca0074c35ff3e99f70e85f3c6b030d5c32b1d2b06a26dae38f"
     },
     {
+      "path": "tests/test_build_manifest.py",
+      "bytes": 10087,
+      "sha256": "7ab5effd32ad63b7ae2f20e1c8fd2dfa969abd45c66e293c1bf9be1db5c1c6b7"
+    },
+    {
       "path": "tests/test_canonical_search.py",
       "bytes": 13891,
       "sha256": "99dafdb926a3fb9b19387630057f621f1d93d567b8062df9ffc26ebb4b1076ce"
@@ -922,6 +942,11 @@
       "path": "tests/test_local_validation.py",
       "bytes": 6972,
       "sha256": "6cfc87a67fa2f79a9f21f850396dd800f85778d3a934c8ed9c6861e177ccf3fe"
+    },
+    {
+      "path": "tests/test_manifest_generator_workflow.py",
+      "bytes": 2136,
+      "sha256": "697cbd070118591bebd55257aeaa67e14b69ebd4ef74a554dc84349e4bd238ff"
     },
     {
       "path": "tests/test_manifest_verification.py",
@@ -1350,8 +1375,8 @@
     },
     {
       "path": "verify_manifest.py",
-      "bytes": 3632,
-      "sha256": "635568a44f64088758d569f5906502a764fd115eb1c3b23fb3351f472400ddae"
+      "bytes": 3696,
+      "sha256": "7f85784ced8c60dbcda2e731d37886b4a2ef2f22e88ef81454fd5a91214c14b5"
     },
     {
       "path": "web_branch.py",
