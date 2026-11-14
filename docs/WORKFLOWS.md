@@ -1179,3 +1179,6 @@ This is not a source-archive backup; see [the tested guide](EXPORT_NORMALIZED.md
 Conversation listing uses binary ordering by default. Optional `--order` and UTC
 `--from`/`--until` expose the declared `recap.timestamp.v1` query interpretation,
 not rewritten timestamps or a new ingestion order. See [browse by time](BROWSE_BY_TIME.md).
+
+Read-only SQLite connections now apply and read back defense-in-depth settings;
+see [security](../SECURITY.md). Write connections are unchanged.

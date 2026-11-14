@@ -597,20 +597,24 @@ def rehearse_recovery(manifest_path, restored_db, output, objects=None):
     restored = _regular_file(restored_db, 'restored archive')
     checks = []
     connection = None
+    sqlite_protections = dict(trusted_schema='NOT_CHECKED', cell_size_check='NOT_CHECKED', defensive='NOT_CHECKED')
     try:
         try:
             connection = readonly(restored_db)
+            from recaplib.sqlite_safety import safety_status
+            sqlite_protections = safety_status(connection)
             connection.execute('BEGIN')
             rows = [row[0] for row in connection.execute('PRAGMA integrity_check')]
         except sqlite3.Error as error:
             checks.append(dict(check='integrity_check', status='FAIL', result='OPEN_ERROR',
-                               error=_error_text(error), message_count=0, messages=[]))
+                               error=_error_text(error), message_count=0, messages=[], sqlite_protections=sqlite_protections))
             opened = False
         else:
             opened = rows == ['ok']
             checks.append(dict(check='integrity_check', status='PASS' if opened else 'FAIL',
                                result='ok' if opened else 'NOT_OK', message_count=len(rows),
-                               messages=[] if opened else [str(row) for row in rows[:MAX_DETAIL_ITEMS]]))
+                               messages=[] if opened else [str(row) for row in rows[:MAX_DETAIL_ITEMS]],
+                               sqlite_protections=sqlite_protections))
         if opened:
             tables = _tables(connection)
             expected = list(EXPECTED_TABLES) + [name for name, declared in (

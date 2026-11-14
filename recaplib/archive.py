@@ -4,6 +4,7 @@ import sqlite3
 from collections import Counter
 from pathlib import Path
 from recaplib.strict_json import loads
+from recaplib.sqlite_safety import protect_readonly
 from recaplib.source_text import BOM_UTF8, physical_lines
 
 SCHEMA = '''
@@ -184,7 +185,11 @@ def ingest_bytes(db, source, raw, provenance=None, *, expected_sha256=None):
 def readonly(db):
     conn = sqlite3.connect(Path(db).resolve().as_uri() + '?mode=ro', uri=True)
     conn.row_factory = sqlite3.Row
-    conn.execute('PRAGMA query_only=ON')
+    try:
+        protect_readonly(conn)
+    except Exception:
+        conn.close()
+        raise
     return conn
 
 

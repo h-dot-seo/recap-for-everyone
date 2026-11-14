@@ -2358,3 +2358,12 @@ source/selection boundaries and conflict exit1 remain; ingest/provenance unchang
 Eight synthetic tests and a two-file walkthrough cover priority, duplicates,
 scope, snapshot consistency, byte bounds, no-overwrite, privacy and CLI parity.
 No activity inference, automatic import, checkpoint or archive-only category.
+
+2026-11-14 Read-only SQLite protections (0.96.1-sqlite-read-safety):
+adds connection-local trusted_schema OFF, cell_size_check ON and available
+DEFENSIVE to read-only archive and metadata-only SQLite artifact inspection.
+Actual read-back states appear in recovery integrity-check detail; unsupported
+features are not claimed active. Existing top-level output, schema and writes stay.
+Eight synthetic regressions cover settings, non-innocuous hostile views, FTS and
+continued ingest, local parser, receipt detail, unavailable APIs and setup cleanup.
+These controls are defense in depth, not a hostile-DB sandbox or resource budget.
