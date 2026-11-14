@@ -754,7 +754,7 @@ example, output boundaries and failure behavior.
 
 ## CLI version identity
 
-`python recap.py --version` prints `recap-for-everyone 0.100.0` and exits without
+`python recap.py --version` prints `recap-for-everyone 0.100.1` and exits without
 opening an archive or reading the publication manifest. It works outside the
 repository working directory and without the manifest. This numeric identity is
 not byte verification, authenticity or a stability guarantee. Use the documented
@@ -779,5 +779,5 @@ recovery-v1 limits. This does not extend render, title generation or MCP schemas
 
 `declare-recovery --manifest-version 2` opts into ordered history and complete
 provenance/topology digests. Default v1 is unchanged. Rehearsal reads the selected
-manifest version; rebuild currently rejects v2 before creating outputs. See
+manifest version; rebuild v2 checks only the replayable subset with histories explicitly excluded. See
 [explicit v2 recovery](RECOVERY_V2.md).

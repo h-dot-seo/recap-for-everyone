@@ -1,10 +1,34 @@
 # Validation record
 
-Current release: `0.100.0-ledger-recovery-v2`, dated 2026-11-14.
+Current release: `0.100.1-v2-object-rebuild`, dated 2026-11-14.
 This file is the current snapshot. Every dated entry since the first release is kept
 unchanged and in order in [docs/VALIDATION_HISTORY.md](docs/VALIDATION_HISTORY.md).
 
 ## Latest change
+
+2026-11-14 Explicit v2 replayable-content rebuild (0.100.1-v2-object-rebuild):
+accepts an explicit v2 recovery manifest for object replay and verifies the
+message/artifact/source/FTS and full provenance/topology subset. Title and review
+history are excluded from checks and expected tables, never marked PASS; the
+v2 receipt names exclusions, declared non-rebuildable histories, actual manifest
+schema and full_archive_restored:false. No decisions are invented. Existing
+object authorization and null/empty ledger distinctions remain; legacy-only or
+zero-message original hashes are not guessed from topology. V1 fields, order,
+outcomes and side effects remain unchanged, except actual implementation hashes
+and their derived receipt hashes necessarily reflect changed code. Default v1
+declaration/rehearsal bytes remain compatible. No full insertion-order restoration,
+archive migration, stamp, fingerprint, policy change or automatic resealing claim.
+
+Validation: all 1,509 tests passed (one environment-dependent skip), including
+10 v2 rebuild tests and the executed synthetic guide. Independent review passed
+65 targeted tests and exact previous/current v1 rebuild comparison apart from
+verified actual implementation hashes and their receipt hash. Default v1 declare
+and rehearse stdout/stderr and stored bytes matched the previous release exactly.
+Corrupt-DB checks exclude both histories without marking them passed. Compilation,
+Python 3.10 grammar and 135 existing shell examples were preserved; manifest
+321 / audit 322 passed.
+
+Previous change:
 
 2026-11-14 Explicit ledger-preserving recovery v2 (0.100.0-ledger-recovery-v2):
 adds opt-in --manifest-version 2 for restored-copy rehearsal while preserving

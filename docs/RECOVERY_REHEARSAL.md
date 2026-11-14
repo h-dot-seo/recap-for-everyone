@@ -245,3 +245,10 @@ legacy provenance, full occurrence rows and recorded web topology. See the
 [separate v2 guide](RECOVERY_V2.md) for exact added scope, v1 compatibility and
 the restored-copy-only boundary. Existing v1 manifests are never relabelled or
 automatically re-sealed.
+
+## V2 replayable-content rebuild
+
+An explicit v2 manifest is also supported by `rebuild-archive`; see
+[v2 rebuild](REBUILD_V2.md). Title/review history checks are explicitly excluded,
+never counted as PASS. Other provenance/topology digests remain mandatory and
+`full_archive_restored` is false. V1 contracts remain unchanged.

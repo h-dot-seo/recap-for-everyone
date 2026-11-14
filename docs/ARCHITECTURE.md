@@ -339,3 +339,7 @@ history and full legacy/occurrence/topology rows. It compares a supplied restore
 copy, not a source-object rebuild, and does not create a backup or remote receipt.
 Default declarations and saved v1 checks remain unchanged. See
 [recovery v2](RECOVERY_V2.md).
+
+V2 object rebuild is a separate, limited path: it validates the replayable
+provenance/topology subset, explicitly excludes both decision histories and
+reports `full_archive_restored: false`. See [v2 rebuild](REBUILD_V2.md).

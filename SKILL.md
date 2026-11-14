@@ -435,6 +435,5 @@ new ledgers. See `docs/ARCHIVE_BRANCH.md`.
 When the requested restored-copy check must include review decisions, revision
 ordering or full provenance/topology, explicitly use `declare-recovery
 --manifest-version 2` into a new private file. Default v1 does not imply these
-checks. Rehearsal follows the supplied manifest version; v2 rebuild is deliberately
-unsupported. Never relabel or overwrite an old declaration to claim new coverage.
+checks. Rehearsal follows the supplied manifest version; v2 rebuild explicitly excludes title/review history and never claims full restoration. Never relabel or overwrite an old declaration to claim new coverage.
 Read `docs/RECOVERY_V2.md` before treating the result as evidence of preservation.

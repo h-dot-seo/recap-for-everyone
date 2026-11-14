@@ -16,6 +16,7 @@ from recaplib.strict_json import loads
 
 PLAN_SCHEMA = 'recap.rebuild-plan.v1'
 RECEIPT_SCHEMA = 'recap.rebuild-receipt.v1'
+RECEIPT_SCHEMA_V2 = 'recap.rebuild-receipt.v2'
 PASSED = 'REBUILD_REHEARSAL_PASSED'
 FAILED = 'REBUILD_REHEARSAL_FAILED'
 MAX_PLAN_BYTES = 64 * 1024 * 1024
@@ -31,6 +32,17 @@ BOUNDARY = ('Rebuilt declared message objects only, not a full archive restorati
             'operator-supplied, not authenticated. New database and receipt publication are not a '
             'two-file atomic transaction. No defense against a hostile concurrent path namespace or '
             'whole-process memory limit is established.')
+
+BOUNDARY_V2 = ('Rebuilt declared replayable message objects and checked declared provenance/topology rows only, '
+    'not a full archive restoration. Title history and review decisions are not restored or compared; '
+    'use rehearse-recovery on a retained database copy to check them. PASSED applies only to the checks '
+    'actually listed, not the excluded history checks. Explicit replay plan order does not establish '
+    'the original archive insertion order. Original-object coverage is unchanged: legacy-only and '
+    'zero-message exports may lack declared original hashes and cannot be guessed. No remote backup, '
+    'decryption-key, clean-directory or future-recovery verification. Plans and manifests are '
+    'operator-supplied, not authenticated. New database and receipt publication are not a '
+    'two-file atomic transaction. No defense against a hostile concurrent path namespace or '
+    'whole-process memory limit is established.')
 
 
 def _read_plan(path):
@@ -118,13 +130,12 @@ def rebuild_archive(manifest_path, plan_path, objects, new_db, output):
     """Create only a verified new DB; never open or mutate the original archive."""
     destination, output = _destinations(new_db, output)
     raw_manifest, manifest = recovery._read_manifest(manifest_path)
-    if manifest['schema'] != recovery.MANIFEST_SCHEMA:
-        raise ValueError('v2 recovery manifests support restored-copy rehearsal only; object rebuild requires v1')
+    v2=manifest['schema']==recovery.MANIFEST_SCHEMA_V2
     raw_plan, plan = _read_plan(plan_path)
     store = Path(objects)
     if store.is_symlink() or not store.is_dir():
         raise ValueError('objects path must be an existing directory, not a symlink')
-    receipt = dict(schema=RECEIPT_SCHEMA, status=FAILED, checks=[], steps=[], objects_used=[],
+    receipt = dict(schema=RECEIPT_SCHEMA_V2 if v2 else RECEIPT_SCHEMA, status=FAILED, checks=[], steps=[], objects_used=[],
                    manifest=dict(sha256=hashlib.sha256(raw_manifest).hexdigest(), bytes=len(raw_manifest)),
                    plan=dict(sha256=hashlib.sha256(raw_plan).hexdigest(), bytes=len(raw_plan), steps=len(plan['steps'])),
                    new_database=str(destination), new_database_created_exclusively=False,
@@ -138,7 +149,14 @@ def rebuild_archive(manifest_path, plan_path, objects, new_db, output):
                    implementation_sha256={name: hashlib.sha256((Path(__file__).parent / name).read_bytes()).hexdigest()
                                           for name in IMPLEMENTATIONS},
                    scope='replay plan order, retained object hashes, declared logical rows and sampled FTS checks',
-                   boundary=BOUNDARY)
+                   boundary=BOUNDARY_V2 if v2 else BOUNDARY)
+    if v2:
+        receipt['manifest']['schema']=manifest['schema']
+        receipt['excluded_checks']=['title_history','title_review_history']
+        receipt['full_archive_restored']=False
+        receipt['not_rebuildable_from_objects']=[name for name in receipt['excluded_checks'] if manifest[name] is not None]
+        receipt['review_state']='NOT_REBUILDABLE_FROM_OBJECTS' if manifest['title_review_history'] is not None else 'NOT_DECLARED'
+        receipt['scope']='explicit replay plan order, retained object hashes, declared replayable logical rows and sampled FTS checks; title and review histories excluded'
     staging = None
     remaining = []
     phase = 'PLAN_OBJECT_DECLARATION'

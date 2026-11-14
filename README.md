@@ -277,4 +277,5 @@ selection, legacy reimport and recovery-v1 limitations.
 
 For an explicitly chosen restored-copy check of ordered history and complete
 provenance/topology ledgers, see [recovery v2](docs/RECOVERY_V2.md). Default v1
-declarations remain unchanged; this does not add a backup or a v2 rebuild.
+declarations remain unchanged; a v2 declaration itself creates no backup. For the separate limited object-replay
+workflow, see [v2 rebuild](docs/REBUILD_V2.md).

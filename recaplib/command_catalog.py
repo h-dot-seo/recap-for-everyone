@@ -98,7 +98,8 @@ def _effects(name):
         schemas.append(dict(when='input manifest schema is recap.recovery-manifest.v2',schema='recap.recovery-receipt.v2'))
         opens.extend((_open('--restored-db'),_open('--objects','read','with --objects')))
     if name=='rebuild-archive':
-        notes.append('Accepts v1 recovery manifests only; v2 is restored-copy rehearsal only and is rejected before rebuilding.')
+        schemas.append(dict(when='input manifest schema is recap.recovery-manifest.v2',schema='recap.rebuild-receipt.v2'))
+        notes.append('V2 rebuild excludes title and review histories explicitly; a passing receipt is not full archive restoration.')
         opens.extend((_open('--plan'),_open('--objects'),_open('--new-db','exclusive-create')))
         writes.append('--new-db')
         notes.append('Uses staging databases/files. A verified new DB can remain published if receipt publication fails; inspect it before retrying.')

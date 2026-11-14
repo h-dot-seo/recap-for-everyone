@@ -69,12 +69,12 @@ changes a schema stamp, chooses a license nor automatically re-seals prior work.
 Existing output files and dangling links are refused. Existing cleanup and
 partial-publication diagnostics still apply.
 
-This increment is for restored-copy rehearsal only. `rebuild-archive` explicitly
-rejects v2 before creating a database or receipt. Replaying source objects cannot
-restore title/review decisions and must not claim to satisfy their v2 digests.
-The existing v1 rebuild workflow remains unchanged. Sidecar observations and
-legacy-only object-inventory improvements are not added here; existing file-copy,
-WAL and source-retention cautions still apply.
+`rebuild-archive` can separately replay the declared object-derived subset under
+v2, but explicitly excludes title/review decisions and reports
+`full_archive_restored: false`. See [v2 rebuild](REBUILD_V2.md); its success is not
+a full restored-copy rehearsal. The existing v1 rebuild workflow remains unchanged.
+Sidecar observations and legacy-only object-inventory improvements are not added
+here; existing file-copy, WAL and source-retention cautions still apply.
 
 A matching digest is a comparison with supplied declarations, not proof of source
 authenticity, consent, rights, completeness, remote retention, safe keys or future
