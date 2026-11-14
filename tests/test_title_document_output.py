@@ -1,6 +1,9 @@
 """Synthetic, offline tests for private no-overwrite title JSON publication."""
 import errno
 import hashlib
+from tests._cli import run_cli
+import recap
+from recaplib import session_workflow, title_suggestion, branch_title, replay_title, attributed_title, title_proposal
 import json
 import os
 import stat
@@ -210,8 +213,12 @@ class TitleDocumentOutputCliTests(unittest.TestCase):
         import_export(self.db, 'attributed', self.attributed, 'local-codex')
 
     def call(self, *args, script='recap.py', success=True, db=None):
-        result = subprocess.run([sys.executable, script, '--db', str(db or self.db), *map(str, args)],
-                                capture_output=True, env=dict(os.environ, PYTHONIOENCODING='ascii'), timeout=30)
+        entry = {'recap.py': recap.main, 'title_suggestion.py': title_suggestion.main,
+                 'branch_title.py': branch_title.main, 'replay_title.py': replay_title.main,
+                 'attributed_title.py': attributed_title.main, 'title_proposal.py': title_proposal.main}[script]
+        result = run_cli(entry, ['--db', str(db or self.db), *map(str, args)])
+        # Preserve this module's existing bytes-based subprocess assertions.
+        result.stdout = result.stdout.encode('ascii'); result.stderr = result.stderr.encode('ascii')
         self.assertEqual(result.returncode == 0, success, result.stderr.decode('ascii', errors='replace'))
         self.assertNotIn(b'Traceback', result.stderr)
         result.stdout.decode('ascii')
