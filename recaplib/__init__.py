@@ -1,3 +1,3 @@
 """Implementation package for the local recap command and checkout entry points."""
 
-__version__ = '0.100.15'
+__version__ = '0.100.16'
