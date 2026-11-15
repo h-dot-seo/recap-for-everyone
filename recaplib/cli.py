@@ -128,6 +128,7 @@ def build_parser(prog=None):
     checkpoint.add_argument('--declared-at'); checkpoint.add_argument('--text', action='store_true')
     cutoff = sub.add_parser('declare-checkpoint', help='declare a private accepted-artifact cutoff; no review decision')
     cutoff.add_argument('--source', required=True); cutoff.add_argument('--output', required=True)
+    cutoff.add_argument('--checkpoint-version', type=int, choices=(1, 2), default=1, help='explicit identity membership v2; default artifact cutoff v1')
     cutoff.add_argument('--declared-at'); cutoff.add_argument('--text', action='store_true')
     changed = sub.add_parser('changed-since', help='verify a source artifact cutoff and report counts only')
     changed.add_argument('--delta-output', help='exclusive new private file for bounded verified-cutoff conversation ID samples')
@@ -366,7 +367,8 @@ def _run(prog, archive_functions):
             result = declare_review_checkpoint(args.db, args.source, args.output, args.declared_at)
         elif args.command == 'declare-checkpoint':
             from recaplib.import_checkpoint import declare_checkpoint
-            result = declare_checkpoint(args.db, args.source, args.output, args.declared_at)
+            version_args = {'checkpoint_version': args.checkpoint_version} if args.checkpoint_version != 1 else {}
+            result = declare_checkpoint(args.db, args.source, args.output, args.declared_at, **version_args)
         elif args.command == 'changed-since':
             from recaplib.import_checkpoint import changed_since
             result = changed_since(args.db, args.source, args.checkpoint, delta_output=args.delta_output, limit=args.limit)
@@ -398,7 +400,10 @@ def _run(prog, archive_functions):
                 rendered = summary_text('Private message provenance', list(result.items()))
             elif args.command in ('declare-review-checkpoint', 'declare-checkpoint', 'changed-since'):
                 from recaplib.text_summary import summary_text
-                rendered = summary_text('Review view checkpoint declaration' if args.command == 'declare-review-checkpoint' else 'Accepted-artifact cutoff', list(result.items()))
+                headline = ('Review view checkpoint declaration' if args.command == 'declare-review-checkpoint' else
+                            'Accepted-identity membership cutoff' if result.get('checkpoint_schema') == 'recap.import-checkpoint.v2' else
+                            'Accepted-artifact cutoff')
+                rendered = summary_text(headline, list(result.items()))
             else:
                 rendered = render_text(result)
     except (OSError, ValueError, KeyError, TypeError, sqlite3.Error) as exc:

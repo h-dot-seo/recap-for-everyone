@@ -325,3 +325,6 @@ rebuild-plan shape. They do not replace consumer checks or authorize replay.
 
 [Selected normalized ingest and replay](docs/SELECTED_NORMALIZED.md) retains the
 whole input artifact while explicitly selecting conversations, with plan.v2 replay.
+
+Explicit opt-in identity membership checkpoints cover later selections from the same
+artifact; the default v1 cutoff remains unchanged. See [membership checkpoints](docs/MEMBERSHIP_CHECKPOINT.md).

@@ -87,7 +87,11 @@ def _effects(name):
     if name=='review-state':
         opens.append(_open('--from-queue','read','with --from-queue and --set'))
         notes.append('--from-queue alone is invalid: it requires --set and excludes explicit expected-value flags.')
+    if name=='declare-checkpoint':
+        schemas.append(dict(when='with --checkpoint-version 2',schema='recap.import-checkpoint-declaration.v2'))
     if name=='changed-since':
+        schemas.append(dict(when='input checkpoint schema is recap.import-checkpoint.v2',schema='recap.import-changes.v2'))
+        notes.append('A v2 checkpoint uses explicit saved identity membership; its optional delta file is recap.import-changes-delta.v2. Default v1 artifact-cutoff semantics are unchanged.')
         opens.append(_open('--checkpoint'))
         notes.append('--delta-output publishes bounded private ID samples only after cutoff verification; unverified cutoffs do not publish a file. File publication precedes stdout delivery.')
     if name in ('check-title-plan','title-adapter-dry-run'):
