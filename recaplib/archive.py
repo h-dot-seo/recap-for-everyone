@@ -1,5 +1,5 @@
 """Archive core shared by recap.py and the recaplib modules: schema, normalized JSONL ingest, read-only connections and FTS search."""
-from recaplib.input_files import require_source_file
+from recaplib.input_files import check_source_size, require_source_file
 from recaplib.errors import ConflictingIdentity, SourceChanged
 import hashlib
 import io
@@ -141,6 +141,7 @@ class _HashingReader(io.RawIOBase):
         chunk = self.stream.read(len(buffer))
         self.digest.update(chunk)
         self.size += len(chunk)
+        check_source_size(self.size)
         self.prefix = (self.prefix + chunk[:3])[:3]
         buffer[:len(chunk)] = chunk
         return len(chunk)
@@ -188,7 +189,9 @@ def ingest(db, source, path, provenance=None, *, expected_sha256=None):
     _validate_source(source)
     require_source_file(path)
     if provenance is not None:
-        return ingest_bytes(db, source, Path(path).read_bytes(), provenance, expected_sha256=expected_sha256)
+        raw = Path(path).read_bytes()
+        check_source_size(len(raw))
+        return ingest_bytes(db, source, raw, provenance, expected_sha256=expected_sha256)
     with Path(path).open('rb', buffering=0) as stream:
         first, incoming = {}, {}
         for row, title, line_no in _stream_records(stream, first, defer_errors=True):

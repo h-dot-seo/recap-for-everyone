@@ -41,7 +41,9 @@ passes without detection. Use stable operator-controlled inputs. The old read-on
 snapshot test is intentionally replaced for this file path, not for the retained
 byte/adapter paths. Parsing and writing still require memory for a complete line,
 the largest decoded record, and one identity/digest per distinct incoming message.
-There is no total process memory bound, new input ceiling or raised product limit.
+There is no total process memory bound. The later source admission increment
+adds a 2 GiB inclusive input ceiling, checked by stat and cumulative raw bytes
+in both passes; see SOURCE_FILE_ADMISSION.md. Existing smaller limits are not raised.
 
 ## Synthetic allocation observation
 

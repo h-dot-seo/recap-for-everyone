@@ -375,7 +375,8 @@ fields remain unchanged. See [ZIP preparation](PREPARE_WEB_EXPORT.md).
 
 Source entry-point admission uses stat (following existing regular symlinks), then
 S_ISREG before the existing reader. Snapshot read_bytes seams and two-pass ingest
-remain unchanged. No open-time inode binding or source byte ceiling is implied;
+remain unchanged. The later 2 GiB source admission limit is a refusal threshold, not a memory
+ceiling. No open-time inode binding is implied;
 the namespace may change after preflight. See [source admission](SOURCE_FILE_ADMISSION.md).
 
 Explicit Python provenance arguments are validated before SQLite connection; see [provenance admission](PROVENANCE_ADMISSION.md). This checks shape and current-input identity membership, not origin authenticity.

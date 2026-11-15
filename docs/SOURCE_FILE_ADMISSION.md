@@ -33,13 +33,37 @@ normalized file ingest retains its one-handle two-pass verification. No successf
 receipt is emitted for rejected nonregular input, and source-first rejection does
 not open or create a database.
 
+## Source size admission
+
+The eight entry points above now share a 2 GiB inclusive source limit:
+`2 * 1024**3 = 2147483648` bytes. Exactly that count is admitted; one byte
+more is refused. This intentionally narrows previously unbounded regular-source
+acceptance, following roadmap #23 and its reader adjustment 5. There is no new
+override option. ZIP preparation retains its smaller 64 MiB archive/16 MiB member
+limits, and title/plan/transfer documents retain 8 MiB or their smaller existing
+budgets. These inputs have different parsing and operational scopes.
+
+Stat checks the size before opening. Snapshot paths retain one Path.read_bytes
+call and then check the actual byte length. Normalized file ingest retains one
+open descriptor and checks accumulated raw bytes in each hashing pass. The
+provenance file-API fallback checks its snapshot, while direct ingest_bytes and
+adapter byte APIs keep their existing contracts. The diagnostic is a fixed,
+path-free size refusal, translated by each module as before.
+
+An oversized preflight never opens the input or database. Growth beyond the limit
+in pass one is rejected before SQLite opens; pass-two refusal rolls back the
+existing write transaction. As before, a newly created empty schema file can
+remain after a pass-two failure. Do not infer that every failure leaves no file.
+
 ## Limits
 
 Stat and open are separate operations. A hostile process can replace a path in
 between; this is NOT an atomic lease, inode binding, sandbox or comprehensive
-TOCTOU defense. This change adds no maximum source byte count, no parsing-memory
-ceiling and no override option. Large regular source files may still consume
-substantial memory. It grants no collection, transmission or write authorization.
+TOCTOU defense. The source byte refusal limit is not a parsing-memory ceiling. A file that grows
+after stat can be fully allocated by Path.read_bytes before its actual-length
+check rejects it. JSON decoding, rows and SQLite can consume additional memory.
+No 2 GiB allocation or full-process memory benchmark is claimed. Large admitted
+regular source files may still consume substantial memory. It grants no collection, transmission or write authorization.
 
 Before this change, synthetic FIFO `ingest` and web `inspect` subprocesses did not
 finish within a one-second test timeout. Tests now require these same operations
