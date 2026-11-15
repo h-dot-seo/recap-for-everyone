@@ -1,12 +1,12 @@
 {
   "project": "recap-for-everyone",
-  "release": "0.100.6-streamed-zip-validation",
+  "release": "0.100.7-ci-timeout-budget",
   "date": "2026-11-15",
   "private_history_imported": false,
   "actual_corpora_included": false,
   "synthetic_examples_only": true,
   "license_status": "NOT_SELECTED",
-  "file_count": 334,
+  "file_count": 335,
   "files": [
     {
       "path": ".gitattributes",
@@ -16,7 +16,7 @@
     {
       "path": ".github/workflows/tests.yml",
       "bytes": 756,
-      "sha256": "2ba15bcc02cb1ddcb177aba5d1a46d6fbddcaded26a45b77ad45e83f798fd79a"
+      "sha256": "41d946c92a9e5dac8f109c77bc97ea26df246d80513599c7f507221987d94fa1"
     },
     {
       "path": ".gitignore",
@@ -30,8 +30,8 @@
     },
     {
       "path": "README.md",
-      "bytes": 21285,
-      "sha256": "74e41dab3ad562caeb22c7939acb9776084f9d22d226f995264d4629f730c345"
+      "bytes": 21415,
+      "sha256": "0fc1eada7931fac42794ecc202841d1c38c636625dc1e1a8ccffb14826fe52d7"
     },
     {
       "path": "RIGHTS.md",
@@ -50,8 +50,8 @@
     },
     {
       "path": "VALIDATION.md",
-      "bytes": 62531,
-      "sha256": "d45fe614daeec3875d740f582efca8b140062a62d25f1cf944bf192a1ac5f2a3"
+      "bytes": 63995,
+      "sha256": "59d16746c0ebf069fdac2c0ada01d098218d6941bfaa929425124f48180fb8b7"
     },
     {
       "path": "attributed_title.py",
@@ -144,9 +144,14 @@
       "sha256": "1dcb318d72f939e659f749bb74b5b90355e6c69d544a73b7078221a7d9f56e3f"
     },
     {
+      "path": "docs/CI_TIMEOUT_BUDGET.md",
+      "bytes": 3622,
+      "sha256": "d2b2dc9c36afb45c2915b247f2b53bfb67624f21450695f5bba5ec373b8bcffb"
+    },
+    {
       "path": "docs/COMMANDS.md",
       "bytes": 35674,
-      "sha256": "657810efdf675f003a7c4151e6af8e6ea1718140507e15749e4dcb498933ada2"
+      "sha256": "2f3a7f1d1978191517c2ae0ac6390d4381518e812117cd47165483640930df48"
     },
     {
       "path": "docs/COMMAND_CATALOG.md",
@@ -196,7 +201,7 @@
     {
       "path": "docs/INSTALL.md",
       "bytes": 8441,
-      "sha256": "4cac7c46828f06384a97aef7bd64feac8eb5a87a2057865104af483f128a59a3"
+      "sha256": "b820ac65cba193f2b1b27ce520664701069bc4bf777a22e67152e6ce4574d02a"
     },
     {
       "path": "docs/JSON_ERRORS.md",
@@ -410,8 +415,8 @@
     },
     {
       "path": "docs/VALIDATION_HISTORY.md",
-      "bytes": 206201,
-      "sha256": "e002ce8958c0f2e39e32bf651001b1769d26fdfb1c606a8be4c6b9811191000e"
+      "bytes": 207656,
+      "sha256": "acc93b104c2b69f162abc16e4aa5303dac8270baf20bcb25160d410e4d292f61"
     },
     {
       "path": "docs/WEB_ZIP_INVENTORY.md",
@@ -571,7 +576,7 @@
     {
       "path": "recaplib/__init__.py",
       "bytes": 126,
-      "sha256": "ea70a32543f9e0a09836d9bce31ccfa72a45f852ee25319616bb38c3c1743e7d"
+      "sha256": "9f26a5f4a6e39ca37b06ff08ed179c82dd71c5223c6e15c0b1f2d53633cfed7e"
     },
     {
       "path": "recaplib/archive.py",
@@ -965,8 +970,8 @@
     },
     {
       "path": "tests/test_ci_contract.py",
-      "bytes": 4699,
-      "sha256": "08ad08009b9a2ef9df5e4182644cde312448a5964ca8ec1e8c3c8e0b00dc66ef"
+      "bytes": 4778,
+      "sha256": "e25301847c6d522606e45148390d7b36090a62836fcfa8d96d5e3b77fe4ed786"
     },
     {
       "path": "tests/test_cli_diagnostics.py",
