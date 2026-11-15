@@ -24,9 +24,13 @@ This release rejects that conflict; it does not silently choose a newer record.
 
 ## Import transaction
 
-The normalized-file CLI reads its explicitly selected input once; the byte API
-accepts an immutable snapshot. Both validate all normalized records and incoming
-identity conflicts before opening SQLite, then use the same archive write path.
+The normalized-file CLI uses two passes on one open file object; the byte API
+accepts an immutable snapshot. File preflight validates the entire input and
+identity conflicts before opening SQLite; the second pass must reproduce its
+hash, size and record count before the shared write transaction commits.
+Explicit provenance API calls retain their snapshot fallback. This is not an
+immutable file snapshot or hostile concurrent-writer defense. Both paths use
+the same archive write transaction; see [file ingest](STREAMED_INGEST.md).
 Artifact, message, original-export provenance and FTS changes share the data
 transaction. Schema initialization remains a separate earlier step: this is not a
 promise that every possible failure leaves no new database file or schema.

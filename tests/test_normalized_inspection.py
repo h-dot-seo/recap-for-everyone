@@ -188,15 +188,25 @@ class NormalizedInspectionTests(unittest.TestCase):
                 ingest_bytes(self.db, 'fictional', raw, expected_sha256=digest)
         self.assertFalse(self.db.exists())
 
-    def test_single_read_for_each_path(self):
+    def test_snapshot_inspection_and_same_handle_file_ingest(self):
         raw = self.write(self.row())
         digest = hashlib.sha256(raw).hexdigest()
+        ingest_bytes(self.db, 'fictional', raw)
         for call in (lambda: inspect_export(self.path, 'normalized', expected_export_sha256=digest),
-                     lambda: ingest(self.db, 'fictional', self.path, expected_sha256=digest),
                      lambda: check_import(self.db, 'fictional', self.path, 'normalized', expected_export_sha256=digest)):
             with patch.object(Path, 'read_bytes', return_value=raw) as read:
                 call()
                 self.assertEqual(read.call_count, 1)
+        opener = Path.open
+        handles = []
+        def opened(path, *args, **kwargs):
+            stream = opener(path, *args, **kwargs)
+            if path == self.path: handles.append(stream)
+            return stream
+        with patch.object(Path, 'open', opened):
+            result = ingest(self.db, 'fictional', self.path, expected_sha256=digest)
+        self.assertEqual(len(handles), 1); self.assertTrue(handles[0].closed)
+        self.assertEqual(result['source_sha256'], digest)
 
     def test_cli_inspection_parity(self):
         self.write(self.row(), self.row(text='different'))

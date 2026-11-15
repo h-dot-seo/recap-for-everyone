@@ -62,13 +62,16 @@ class NormalizedByteIngestTests(unittest.TestCase):
             result = ingest_bytes(self.db, 'demo', raw)
         self.assertEqual(result['inserted'], 1); self.assertTrue(self.db.exists())
 
-    def test_file_wrapper_reads_one_snapshot_and_preserves_original_bytes(self):
-        raw = encoded([row()]); self.path.write_bytes(raw); reader = Path.read_bytes; calls = []
-        def read(path):
-            calls.append(path); return reader(path)
-        with patch.object(Path, 'read_bytes', read):
+    def test_file_wrapper_uses_one_handle_and_preserves_original_bytes(self):
+        raw = encoded([row()]); self.path.write_bytes(raw); opener = Path.open; calls = []
+        def opened(path, *args, **kwargs):
+            stream = opener(path, *args, **kwargs)
+            if path == self.path: calls.append(stream)
+            return stream
+        with patch.object(Path, 'open', opened):
             result = ingest(self.db, 'demo', self.path)
-        self.assertEqual(calls, [self.path]); self.assertEqual(result['source_sha256'], hashlib.sha256(raw).hexdigest())
+        self.assertEqual(len(calls), 1); self.assertTrue(calls[0].closed)
+        self.assertEqual(result['source_sha256'], hashlib.sha256(raw).hexdigest())
         self.assertEqual(self.path.read_bytes(), raw)
 
     def test_nonbyte_input_and_nontext_sources_fail_before_file_or_database_access(self):
