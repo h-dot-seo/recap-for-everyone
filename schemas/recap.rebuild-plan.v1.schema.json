@@ -1,0 +1,79 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Recap explicit rebuild plan v1",
+  "description": "Structural authoring aid only, not runtime admission or authorization. The consumer also enforces valid Unicode, a 64 MiB UTF-8 byte limit, nonblank source text, and cross-field rules: local/local-codex require a non-null label; normalized requires null label and conversation. Rebuild separately checks manifest membership, retained object bytes and reconstructed archive state. Order, parsing labels and newline choices are operator supplied, never inferred. Schema conformance does not authenticate an operator or establish restoration success.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "steps"
+  ],
+  "properties": {
+    "schema": {
+      "const": "recap.rebuild-plan.v1"
+    },
+    "steps": {
+      "type": "array",
+      "maxItems": 10000,
+      "description": "Explicit replay order. Empty plans are structurally admitted; this does not establish that a manifest can be rebuilt.",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "source",
+          "kind",
+          "object_sha256",
+          "label",
+          "conversation",
+          "newline"
+        ],
+        "properties": {
+          "source": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Consumer requires nonblank source.strip() and valid Unicode. There is no separate source character-count maximum; the whole document byte budget still applies."
+          },
+          "kind": {
+            "type": "string",
+            "enum": [
+              "normalized",
+              "web",
+              "local",
+              "local-codex"
+            ]
+          },
+          "object_sha256": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$",
+            "minLength": 64,
+            "maxLength": 64,
+            "description": "Lowercase SHA-256 spelling only; no proof of object presence or integrity."
+          },
+          "label": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "minLength": 1,
+            "description": "Nonempty valid Unicode or null. Local formats require a label; normalized requires null. These cross-field rules are enforced by the consumer, not this schema."
+          },
+          "conversation": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "minLength": 1,
+            "description": "Nonempty valid Unicode or null. Normalized requires null. Selection membership is checked separately by rebuild."
+          },
+          "newline": {
+            "type": "string",
+            "enum": [
+              "lf",
+              "crlf"
+            ]
+          }
+        }
+      }
+    }
+  }
+}

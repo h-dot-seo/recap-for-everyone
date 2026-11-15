@@ -1,28 +1,27 @@
 # Validation record
 
-Current release: `0.100.16-find-excerpt-budget`, dated 2026-11-15.
+Current release: `0.100.17-rebuild-plan-shape`, dated 2026-11-15.
 Prior entries remain in [validation history](docs/VALIDATION_HISTORY.md).
 
-## 2026-11-15 Off-page search excerpts (0.100.16-find-excerpt-budget):
+## 2026-11-15 Rebuild plan documentation shape (0.100.17-rebuild-plan-shape):
 
-Roadmap #24 measured-cost follow-up: skip only excerpt construction for a
-conversation that cannot enter the current rank/cursor page. Full term matching,
-counts, order digest, sample masks and every SQL/provenance query remain unchanged.
-The early prototype skipped more sampling and queries; it was narrowed before
-publication to retain errors from hidden corrupted provenance queries.
+Roadmap #25 narrowed to the already-labelled, operator-authored rebuild-plan.v1.
+One documentation JSON Schema describes existing required fields, types, enums,
+nullable text, hash spelling and max10000 steps; empty steps remain allowed.
+Runtime/CLI/default outputs and consumer validation are unchanged. No generic
+schema validator, external reference retrieval, approval label or CI dependency
+was added. The existing consumer remains authoritative: source identity, Unicode,
+file bytes, local/normalized cross-fields, declared objects and replay are stronger.
 
-Implementation review compared 4745 results exactly across 12 synthetic seeds,
-rank/cursor/AND/Unicode/role/limit combinations, with no mismatch. Existing search76
-and new targeted6 tests pass. An initial new test supplied provenance fixture keys
-using storage column names; corrected to the public origin_* API fields and
-reran successfully. The first performance probe used an empty required timestamp;
-corrected its synthetic fixture before measuring. Neither was a product failure.
-Independent core82 tests PASS; actual prior/current API364 results and two CLI
-raw outputs match exactly. Actual narrowed code remeasurement (three untraced
-runs plus separate traced memory) is in SCALING.md: 1000 ->20 excerpt calls;
-ASCII ratio1.17, non-ASCII9.63, canonical25.93, heap almost unchanged. These are
-synthetic late-hit observations, not general speed or memory guarantees.
-Full:1671 tests in75.980 seconds PASS (two environment-dependent skips).
-All146 prior sh blocks preserved; Python3.10 AST compatibility passes.
-Final manifest/audit and independent tree are verified before ready/merge;
-hosted six-row CI is pending.
+New8 plus existing rebuild tests:60 PASS. Local already-installed standard
+jsonschema4.26.0 Draft202012Validator checked the metaschema, six valid plans,
+19 structural negatives and five intentionally schema-admitted but consumer-refused
+cases with socket creation blocked. The standalone cross-check script and result
+are retained outside the public checkout; this is not a new CI support claim.
+An initial focused command named a nonexistent test_rebuild module; corrected to
+the actual modules before the passing60 run. No product defect was implicated.
+Full1679 tests in71.864 seconds PASS (two environment-dependent skips).
+Independent core8 tests and78 standard-validator checks pass with socket creation
+blocked. Product57 module bytes are unchanged except release-version metadata.
+All146 prior sh blocks preserved and Python3.10 AST passes. Final manifest/audit
+and independent tree are checked before ready/merge; hosted six-row CI pending.
