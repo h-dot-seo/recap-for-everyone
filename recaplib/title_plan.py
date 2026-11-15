@@ -1,5 +1,5 @@
 """Export and recheck a manual title-change plan, without remote execution."""
-from recaplib.input_files import require_source_file, read_document_text
+from recaplib.input_files import check_source_size, require_source_file, read_document_text
 from recaplib.errors import add_json_errors_argument, exit_error
 from recaplib.errors import Stale
 from recaplib.cli_errors import safe_diagnostic
@@ -24,6 +24,7 @@ def make_plan(db, source, conversation, path, kind):
     path = Path(path)
     require_source_file(path)
     raw = path.read_bytes()
+    check_source_size(len(raw))
     rows, coverage = _normalize_bytes(raw, path.name, kind, include_report=True)
     if kind == 'web':
         matches = [c for c in loads(decode_source(raw))

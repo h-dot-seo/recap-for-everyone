@@ -1,5 +1,5 @@
 """Explicit export adapters and reversible local title organization (no network)."""
-from recaplib.input_files import require_source_file
+from recaplib.input_files import check_source_size, require_source_file
 from recaplib.errors import add_json_errors_argument, exit_error
 from recaplib.errors import SourceChanged, Stale, UnknownIdentity
 from recaplib.cli_errors import safe_diagnostic
@@ -72,6 +72,7 @@ def _read_export_bytes(path, expected_export_sha256=None):
         raise ValueError('expected export hash must be a lowercase SHA-256 hex digest')
     require_source_file(path)
     raw = Path(path).read_bytes()
+    check_source_size(len(raw))
     if expected_export_sha256 is not None and hashlib.sha256(raw).hexdigest() != expected_export_sha256:
         raise SourceChanged('export changed after inspection; inspect and select again')
     return raw

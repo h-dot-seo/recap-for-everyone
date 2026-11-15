@@ -1,7 +1,7 @@
 # noqa: SIZE_OK
 from __future__ import annotations
 
-from recaplib.input_files import require_source_file
+from recaplib.input_files import check_source_size, require_source_file
 import hashlib
 import json
 import math
@@ -198,9 +198,15 @@ def parse_artifact(path: Path, source_relative_path: str, artifact_kind: str = "
         raise LocalImportError(f"unsupported local artifact kind: {artifact_kind}")
     try:
         require_source_file(path)
-    except ValueError:
-        raise LocalImportError('source must be an existing regular file') from None
-    return _parse_jsonl_records(_records(path.read_bytes(), path), path, source_relative_path, content_profile)
+    except ValueError as error:
+        # Admission helper messages are fixed; do not append the source path.
+        raise LocalImportError(str(error)) from None
+    raw = path.read_bytes()
+    try:
+        check_source_size(len(raw))
+    except ValueError as error:
+        raise LocalImportError(str(error)) from None
+    return _parse_jsonl_records(_records(raw, path), path, source_relative_path, content_profile)
 
 
 def parse_jsonl_bytes(raw: bytes, source_relative_path: str,

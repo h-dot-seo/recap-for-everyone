@@ -1,5 +1,5 @@
 """Bridge verified local source occurrences to a retained-turn title proposal."""
-from recaplib.input_files import require_source_file
+from recaplib.input_files import check_source_size, require_source_file
 from recaplib.errors import add_json_errors_argument, exit_error
 from recaplib.cli_errors import safe_diagnostic
 import argparse
@@ -21,6 +21,7 @@ def replay_evidence(db, source, conversation, path):
     path = Path(path)
     require_source_file(path)
     raw = path.read_bytes()
+    check_source_size(len(raw))
     projection = reconstruct_bytes(raw)
     if not projection['supported']:
         raise ValueError('unsupported projection: ' + projection['reason_code'])

@@ -16,14 +16,25 @@ def require_regular_file(path, *, max_bytes, label, too_large):
         raise ValueError(too_large)
 
 
-def require_source_file(path):
-    """Admit an unbounded source read, following regular-file symlinks.
+MAX_EXPORT_BYTES = 2 * 1024 * 1024 * 1024
 
-    No size bound, immutable lease or protection against namespace races is added.
-    Missing paths retain the stat call's existing FileNotFoundError behavior.
+
+def check_source_size(byte_count):
+    """Inclusive source-file admission budget, not a total-memory guarantee."""
+    if byte_count > MAX_EXPORT_BYTES:
+        raise ValueError('source exceeds the 2 GiB input limit')
+
+
+def require_source_file(path):
+    """Preflight source type and size, following regular-file symlinks.
+
+    Readers must still check observed bytes after stat. No immutable lease or
+    protection against concurrent namespace changes is established.
     """
-    if not stat.S_ISREG(Path(path).stat().st_mode):
+    metadata = Path(path).stat()
+    if not stat.S_ISREG(metadata.st_mode):
         raise ValueError('source must be an existing regular file')
+    check_source_size(metadata.st_size)
 
 
 MAX_DOCUMENT_BYTES = 8 * 1024 * 1024

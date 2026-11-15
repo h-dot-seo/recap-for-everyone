@@ -66,8 +66,10 @@ universal input admission or a sandbox. It preserves their current behavior.
 
 The source readers listed in [source file admission](docs/SOURCE_FILE_ADMISSION.md)
 stat before opening and reject nonregular files. This closes ordinary FIFO/device
-input paths, not hostile stat/open races. Regular symlinks are followed; no new
-size limit, content trust, SQLite write protection or permission is established.
+input paths, not hostile stat/open races. Regular symlinks are followed. A subsequent 2 GiB inclusive source admission
+limit narrows prior acceptance; it establishes no memory ceiling, content trust,
+SQLite write protection or permission. Snapshot growth can allocate beyond the
+limit before rejection.
 Existing bounded ZIP/document and recovery symlink policies are separate.
 
 [Saved title/plan/manual-transfer inputs](docs/TITLE_DOCUMENT_FILES.md) now have an 8 MiB

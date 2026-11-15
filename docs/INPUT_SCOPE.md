@@ -512,8 +512,9 @@ plans accept normalized input. See [contract and diagnostics](NORMALIZED_JSONL.m
 Explicit source readers now reject directories, FIFOs, devices and sockets before
 opening them. Regular-file symlinks retain their original parsing label and read
 path. Missing files keep their original error behavior; ordinary read results and
-receipts are unchanged. This does not cap source bytes, prevent path races, change
-byte-only APIs or change recovery symlink policies. See [source file admission](SOURCE_FILE_ADMISSION.md).
+receipts are unchanged. These paths now reject sources over 2 GiB (2147483648 bytes), including
+post-read length checks; this is not a memory bound or path-race defense.
+Byte-only APIs and recovery symlink policies are unchanged. See [source file admission](SOURCE_FILE_ADMISSION.md).
 
 Explicit Python provenance arguments are validated before SQLite connection; see [provenance admission](PROVENANCE_ADMISSION.md). This checks shape and current-input identity membership, not origin authenticity.
 
