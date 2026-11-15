@@ -379,3 +379,7 @@ remain unchanged. No open-time inode binding or source byte ceiling is implied;
 the namespace may change after preflight. See [source admission](SOURCE_FILE_ADMISSION.md).
 
 Explicit Python provenance arguments are validated before SQLite connection; see [provenance admission](PROVENANCE_ADMISSION.md). This checks shape and current-input identity membership, not origin authenticity.
+
+[Saved title/plan/manual-transfer inputs](TITLE_DOCUMENT_FILES.md) now have an 8 MiB
+inclusive regular-file admission limit. Existing smaller adapter/batch limits
+remain; stat/read races and total memory usage are not bounded by this preflight.

@@ -2,6 +2,7 @@
 """Local-only archive import, inspection, search and checked title workflows."""
 from recaplib.cli_errors import safe_diagnostic
 from recaplib import __version__
+from recaplib.input_files import read_document_text
 import argparse
 import json
 import sqlite3
@@ -254,7 +255,7 @@ def main():
             from recaplib.title_transfer import dry_run, simulate, MockTitleAdapter
             from recaplib.strict_json import loads
             def document(path):
-                return loads(Path(path).read_text(encoding='utf-8'))
+                return loads(read_document_text(path))
             target = document(args.target)
             if args.command == 'title-adapter-dry-run':
                 result = dry_run(args.db, args.input, document(args.plan), target)
@@ -279,7 +280,7 @@ def main():
         elif args.command == 'check-title-plan':
             from recaplib.title_plan import check_plan
             from recaplib.strict_json import loads
-            result = check_plan(args.db, args.input, loads(Path(args.plan).read_text(encoding='utf-8')))
+            result = check_plan(args.db, args.input, loads(read_document_text(args.plan)))
         elif args.command == 'suggest-branch-title':
             from recaplib.branch_title import suggest_branch
             result = suggest_branch(args.db, args.source, args.conversation, args.input, args.node, args.message)

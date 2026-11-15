@@ -1,5 +1,5 @@
 """Export and recheck a manual title-change plan, without remote execution."""
-from recaplib.input_files import require_source_file
+from recaplib.input_files import require_source_file, read_document_text
 from recaplib.errors import add_json_errors_argument, exit_error
 from recaplib.errors import Stale
 from recaplib.cli_errors import safe_diagnostic
@@ -76,7 +76,7 @@ def main():
     args = parser.parse_args()
     try:
         result = (make_plan(args.db, args.source, args.conversation, args.input, args.format)
-                  if args.command == 'export' else check_plan(args.db, args.input, loads(args.plan.read_text(encoding='utf-8'))))
+                  if args.command == 'export' else check_plan(args.db, args.input, loads(read_document_text(args.plan))))
     except (ValueError, OSError, KeyError, TypeError, sqlite3.Error) as error:
         exit_error(parser, args, error)
     print(json.dumps(result, ensure_ascii=True, indent=2))
