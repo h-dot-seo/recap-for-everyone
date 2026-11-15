@@ -319,3 +319,6 @@ dependencies remain standard-library only; installation uses a pinned build back
 [Private cutoff delta files](docs/CHECKPOINT_DELTA.md) optionally expose bounded conversation
 ID samples after verified `changed-since`, for manual follow-up only. Default
 stdout remains counts-only and no checkpoint/review action advances automatically.
+
+[Documentation schemas](docs/DOCUMENT_SCHEMAS.md) describe the existing explicit
+rebuild-plan shape. They do not replace consumer checks or authorize replay.
