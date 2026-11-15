@@ -1,10 +1,33 @@
 # Validation record
 
-Current release: `0.100.6-streamed-zip-validation`, dated 2026-11-15.
+Current release: `0.100.7-ci-timeout-budget`, dated 2026-11-15.
 This file is the current snapshot. Every dated entry since the first release is kept
 unchanged and in order in [docs/VALIDATION_HISTORY.md](docs/VALIDATION_HISTORY.md).
 
 ## Latest change
+
+2026-11-15 CI completion headroom (0.100.7-ci-timeout-budget):
+changes the workflow job timeout from 10 to 20 minutes and its two exact CI-test
+expectations, plus release identity
+and documentation. Two observed Windows jobs were cancelled near the prior
+600-second ceiling, during different existing tests; both later passed a single
+manual rerun. Original cancellations remain recorded. Product tests, six-row OS/Python
+matrix, pinned actions, triggers, read-only contents permission and credential
+persistence remain unchanged. No automatic retry, new runner, paid configuration,
+network exposure or product resource-bound change is introduced.
+
+Validation evidence and per-step elapsed seconds are in docs/CI_TIMEOUT_BUDGET.md.
+This adds runtime headroom, not a performance guarantee or permission to disregard
+failures. Standard runners on this public repository remain in the documented
+free scope; no billing setting is changed. Initial full verification caught two
+CI assertions that still required ten minutes; only their expected timeout was
+updated, preserving the original baseline and all other exact assertions. Final
+full verification passed all 1,582 tests (one environment-dependent skip); five
+focused CI contract tests passed. Independent review verified the one-value
+workflow diff and all fourteen job/step timing rows against GitHub timestamps.
+Python 3.10 grammar, compilation, 141 prior sh blocks, manifest335/audit336 passed.
+
+Previous change:
 
 2026-11-15 Same-handle streamed ZIP validation (0.100.6-streamed-zip-validation):
 removes whole-archive allocation from inspect/prepare. Bounded chunk hashes before

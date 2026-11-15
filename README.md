@@ -293,3 +293,6 @@ Use `describe-schema --observe-storage` to observe SQLite header/sidecar metadat
 ZIP inspection/preparation now uses bounded same-handle reads and two digest checks,
 not an immutable byte snapshot. Fixed safety limits and receipts are unchanged.
 See [streamed ZIP validation](docs/ZIP_STREAMING.md) for its limits and measurements.
+
+See [CI timeout budget](docs/CI_TIMEOUT_BUDGET.md) for observed Windows runtime
+variation and unchanged validation requirements.

@@ -36,6 +36,7 @@ class CiContractTests(unittest.TestCase):
 
     def test_only_approved_workflow_changes(self):
         expected=BASELINE.replace('  pull_request:\n','  pull_request:\n  workflow_dispatch:\n').replace('["3.10", "3.12"]','["3.10", "3.12", "3.15"]')
+        expected=expected.replace('timeout-minutes: 10','timeout-minutes: 20')
         self.assertEqual(self.workflow(),expected)
 
     def test_pins_permissions_timeout_and_verification_gates(self):
@@ -45,7 +46,7 @@ class CiContractTests(unittest.TestCase):
             'actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065'])
         self.assertIn('permissions:\n  contents: read\n',text)
         self.assertIn('persist-credentials: false',text)
-        self.assertIn('timeout-minutes: 10',text);self.assertIn('fail-fast: false',text)
+        self.assertIn('timeout-minutes: 20',text);self.assertIn('fail-fast: false',text)
         self.assertEqual(re.findall(r'- run: (.*)',text),[
             'python -m unittest discover -v','python audit_publication.py','python verify_manifest.py'])
         self.assertIn('branches: ["main", "codex/core-workflows-20261103"]',text)
