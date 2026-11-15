@@ -1,4 +1,5 @@
 """Bridge verified local source occurrences to a retained-turn title proposal."""
+from recaplib.input_files import require_source_file
 from recaplib.errors import add_json_errors_argument, exit_error
 from recaplib.cli_errors import safe_diagnostic
 import argparse
@@ -18,6 +19,7 @@ from recaplib.source_text import physical_lines
 def replay_evidence(db, source, conversation, path):
     """Return verified retained rows, the whole archive digest, and descriptive context."""
     path = Path(path)
+    require_source_file(path)
     raw = path.read_bytes()
     projection = reconstruct_bytes(raw)
     if not projection['supported']:

@@ -1,4 +1,5 @@
 """Propose a local title from explicitly source-labeled user text in a pinned export."""
+from recaplib.input_files import require_source_file
 from recaplib.errors import add_json_errors_argument, exit_error
 from recaplib.cli_errors import safe_diagnostic
 import argparse
@@ -76,6 +77,7 @@ def attributed_evidence(db, source, conversation, path):
     of the same archive message can label different content parts as user text.
     """
     path = Path(path)
+    require_source_file(path)
     raw = path.read_bytes()
     normalized, extraction = _normalize_bytes(raw, path.name, 'local-codex', include_report=True)
     selected = [row for row in normalized if row['conversation_id'] == conversation]
