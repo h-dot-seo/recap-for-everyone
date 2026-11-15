@@ -1,12 +1,12 @@
 {
   "project": "recap-for-everyone",
-  "release": "0.100.18-selected-normalized",
+  "release": "0.100.19-membership-checkpoint",
   "date": "2026-11-15",
   "private_history_imported": false,
   "actual_corpora_included": false,
   "synthetic_examples_only": true,
   "license_status": "NOT_SELECTED",
-  "file_count": 359,
+  "file_count": 361,
   "files": [
     {
       "path": ".gitattributes",
@@ -30,8 +30,8 @@
     },
     {
       "path": "README.md",
-      "bytes": 23288,
-      "sha256": "8598cd22f6a72d0cc14c11f3dc1536d78a1f29ef8ad955969b1b35ae3bca7f26"
+      "bytes": 23486,
+      "sha256": "e29e0b3381f7d2cc5994e07b688b53480f6168e8165a44e5ad876764561a076f"
     },
     {
       "path": "RIGHTS.md",
@@ -50,8 +50,8 @@
     },
     {
       "path": "VALIDATION.md",
-      "bytes": 4157,
-      "sha256": "f7620670c5b0123d38890bb02602c7bbb61b5ecf4566cbd34313fcf6710e643d"
+      "bytes": 2650,
+      "sha256": "206741c15a62d8016ad021e7f9dcaa4710279f37b711f92ced247d127e5b5104"
     },
     {
       "path": "attributed_title.py",
@@ -145,8 +145,8 @@
     },
     {
       "path": "docs/CHECKPOINT_DELTA.md",
-      "bytes": 3130,
-      "sha256": "12fe8e6b399915afaf25e0424eea7a13b6cb5b47d6064253444bf6cdaf07d263"
+      "bytes": 3323,
+      "sha256": "73875c7f737217519f7fcccb515330d89098f0dab3d25aa5cc406b20f5bac124"
     },
     {
       "path": "docs/CI_TIMEOUT_BUDGET.md",
@@ -155,8 +155,8 @@
     },
     {
       "path": "docs/COMMANDS.md",
-      "bytes": 35800,
-      "sha256": "1c5c280c370a14844e514397a8736e6b3b9eed78ead4471ccb7d11fb63ca34f4"
+      "bytes": 35829,
+      "sha256": "c2651924fb1db18cc59349f51cb417d27a1bd2b22ac367d460967a1e048c7534"
     },
     {
       "path": "docs/COMMAND_CATALOG.md",
@@ -195,8 +195,8 @@
     },
     {
       "path": "docs/IMPORT_CHECKPOINT.md",
-      "bytes": 4620,
-      "sha256": "7dfb488a38ad13667493056a3777f0635cce2f7212d96808e54ca0f0731cbf8a"
+      "bytes": 4813,
+      "sha256": "bb8bc99851c75f3a1a34c5a202ed7001947eef0c01048874eea1ca8f7b41fa16"
     },
     {
       "path": "docs/IMPORT_CONFLICTS.md",
@@ -211,7 +211,7 @@
     {
       "path": "docs/INSTALL.md",
       "bytes": 8548,
-      "sha256": "6381f1c23e62fe8ae748f969a922fbcd82be7d9735fd4687c0f002c90131cbd4"
+      "sha256": "fd6ae7fbd6228cea3498252c7479e7610387fee0ee7e1ec371058e01b1ee676d"
     },
     {
       "path": "docs/JSON_ERRORS.md",
@@ -222,6 +222,11 @@
       "path": "docs/MCP_SERVER.md",
       "bytes": 12471,
       "sha256": "ffabd7581569b7ebf5bcab727df1e3cc6b2c77bf4f59a7e94d16a73f7a681360"
+    },
+    {
+      "path": "docs/MEMBERSHIP_CHECKPOINT.md",
+      "bytes": 4298,
+      "sha256": "53210cf164ac6bfa69820d84c97186b88d67d5e1401e6ad3fcafbf05bd462f5d"
     },
     {
       "path": "docs/MESSAGE_PROVENANCE.md",
@@ -455,8 +460,8 @@
     },
     {
       "path": "docs/VALIDATION_HISTORY.md",
-      "bytes": 229515,
-      "sha256": "8b05d7e67d9dbad38be19e51b0c4c4a0cded42dbdd2dc9a15758ea738fc4f89b"
+      "bytes": 232001,
+      "sha256": "cd5fac76f33fc6a54f5eff0c1981068f4064afe3bd2d767f9e743de59c295c54"
     },
     {
       "path": "docs/WEB_ZIP_INVENTORY.md",
@@ -621,7 +626,7 @@
     {
       "path": "recaplib/__init__.py",
       "bytes": 110,
-      "sha256": "c008436fea997b4093c43d6d0ee679788d0473ca8583a21263d7208238451773"
+      "sha256": "60474888f5358ec5df076e1a788dc3f1ec51398a1c5982727c600eb6d1db2cd5"
     },
     {
       "path": "recaplib/__main__.py",
@@ -655,8 +660,8 @@
     },
     {
       "path": "recaplib/cli.py",
-      "bytes": 35109,
-      "sha256": "27c9bf7de44f00b69c61e1c622291626b967fd62a0b8882428fe5bcbb30f1c57"
+      "bytes": 35597,
+      "sha256": "3b327056e8c7949d55f1b480753e0fcff0f8f53759f200be1162c31aeefcfa20"
     },
     {
       "path": "recaplib/cli_errors.py",
@@ -665,8 +670,8 @@
     },
     {
       "path": "recaplib/command_catalog.py",
-      "bytes": 15108,
-      "sha256": "5ecb61394ba3768c5bc982d8dc2d6ebf189a87206d64d7db51f510fedf4f20ae"
+      "bytes": 15571,
+      "sha256": "6cae937620edb102708f516c49130ed87b51fc2dbe816ef6655443fbf5a594d9"
     },
     {
       "path": "recaplib/conversation_document.py",
@@ -705,8 +710,8 @@
     },
     {
       "path": "recaplib/import_checkpoint.py",
-      "bytes": 11317,
-      "sha256": "d41878e32dfbb6a5a01b4a4d818df8d15c445aa5447fe38aa79b2d4e9f17c7c9"
+      "bytes": 15818,
+      "sha256": "4449ec6f6dd6e2635fe8bf9ddfa6220f84c89549bd77d4790c423b06538a88b9"
     },
     {
       "path": "recaplib/input_files.py",
@@ -1032,6 +1037,11 @@
       "path": "tests/test_checkpoint_delta.py",
       "bytes": 6521,
       "sha256": "05cce069d5c051920eb5e6053560a9f5c4388802d62f2f80750efa6b82f32a50"
+    },
+    {
+      "path": "tests/test_checkpoint_membership.py",
+      "bytes": 10792,
+      "sha256": "59432f2ee343b9d08796026cb1624f16eebeee02a113ae78c7426062a1bc4adc"
     },
     {
       "path": "tests/test_ci_contract.py",

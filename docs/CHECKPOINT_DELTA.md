@@ -46,3 +46,6 @@ python recap.py --db OUTPUT/archive.sqlite changed-since --source synthetic-delt
 python recap.py --db OUTPUT/archive.sqlite show --source synthetic-delta --conversation epoch
 python recap.py --db OUTPUT/archive.sqlite review-titles --source synthetic-delta --conversation epoch
 ```
+
+Explicit opt-in identity membership checkpoints cover later selections from the same
+artifact; the default v1 cutoff remains unchanged. See [membership checkpoints](MEMBERSHIP_CHECKPOINT.md).

@@ -67,3 +67,6 @@ python recap.py --db "OUTPUT/archive.sqlite" changed-since --source synthetic-cu
 [Private cutoff delta files](CHECKPOINT_DELTA.md) optionally expose bounded conversation
 ID samples after verified `changed-since`, for manual follow-up only. Default
 stdout remains counts-only and no checkpoint/review action advances automatically.
+
+Explicit opt-in identity membership checkpoints cover later selections from the same
+artifact; the default v1 cutoff remains unchanged. See [membership checkpoints](MEMBERSHIP_CHECKPOINT.md).
