@@ -123,9 +123,98 @@ def _check_expected_sha256(raw, expected_sha256):
             raise SourceChanged('normalized input changed after inspection; inspect again')
 
 
+class _HashingReader(io.RawIOBase):
+    """Hash bounded reads without owning the caller's one open binary handle."""
+    def __init__(self, stream):
+        super().__init__()
+        self.stream = stream
+        self.digest = hashlib.sha256()
+        self.size = 0
+        self.prefix = b''
+
+    def readable(self):
+        return True
+
+    def readinto(self, buffer):
+        chunk = self.stream.read(len(buffer))
+        self.digest.update(chunk)
+        self.size += len(chunk)
+        self.prefix = (self.prefix + chunk[:3])[:3]
+        buffer[:len(chunk)] = chunk
+        return len(chunk)
+
+    def drain(self):
+        buffer = bytearray(64 * 1024)
+        while self.readinto(buffer):
+            pass
+
+
+def _stream_records(stream, state, defer_errors=False):
+    stream.seek(0)
+    reader = _HashingReader(stream)
+    state.update(records=0, row_error=None, unicode_error=None)
+    try:
+        with io.TextIOWrapper(io.BufferedReader(reader), encoding='utf-8-sig', newline=None) as text:
+            for line_no, line in enumerate(text, 1):
+                if state['row_error'] is not None or not line.strip():
+                    continue
+                try:
+                    try:
+                        row = loads(line)
+                    except ValueError as error:
+                        raise ValueError(f'invalid JSON record at line {line_no}') from error
+                    record = _validate_record(row, line_no)
+                except (ValueError, TypeError, KeyError) as error:
+                    if not defer_errors:
+                        raise
+                    state['row_error'] = error
+                    continue
+                state['records'] += 1
+                yield record
+    except UnicodeDecodeError as error:
+        if not defer_errors:
+            raise
+        state['unicode_error'] = error
+        # Decoder read-ahead is already hashed; finish the remaining raw bytes.
+        reader.drain()
+    finally:
+        state.update(sha256=reader.digest.hexdigest(), bytes=reader.size,
+                     bom=reader.prefix.startswith(BOM_UTF8))
+
+
 def ingest(db, source, path, provenance=None, *, expected_sha256=None):
     _validate_source(source)
-    return ingest_bytes(db, source, Path(path).read_bytes(), provenance, expected_sha256=expected_sha256)
+    if provenance is not None:
+        return ingest_bytes(db, source, Path(path).read_bytes(), provenance, expected_sha256=expected_sha256)
+    with Path(path).open('rb', buffering=0) as stream:
+        first, incoming = {}, {}
+        for row, title, line_no in _stream_records(stream, first, defer_errors=True):
+            key = (row['conversation_id'], row['message_id'])
+            value = hashlib.sha256(json.dumps((row['role'], row['timestamp'], title, row['text']),
+                                              ensure_ascii=True, separators=(',', ':')).encode('ascii')).digest()
+            if key in incoming and incoming[key] != value:
+                first['row_error'] = ConflictingIdentity(f'conflicting message identity at line {line_no}')
+            incoming[key] = value
+        if expected_sha256 is not None and (not isinstance(expected_sha256, str) or len(expected_sha256) != 64 or
+                any(ch not in '0123456789abcdef' for ch in expected_sha256)):
+            raise ValueError('expected hash must be a lowercase SHA-256 hex digest')
+        if expected_sha256 is not None and first['sha256'] != expected_sha256:
+            raise SourceChanged('normalized input changed after inspection; inspect again')
+        if first['unicode_error'] is not None:
+            raise first['unicode_error']
+        if first['row_error'] is not None:
+            raise first['row_error']
+        del incoming
+        second = {}
+        records = _stream_records(stream, second)
+        def verify():
+            if any(first[name] != second[name] for name in ('sha256', 'bytes', 'records', 'bom')):
+                raise SourceChanged('normalized input changed during ingest; inspect again')
+        try:
+            return _write_record_stream(db, source, first['sha256'], first['bytes'], first['records'],
+                                        first['bom'], records, None, verify=verify)
+        finally:
+            records.close()
 
 
 def ingest_bytes(db, source, raw, provenance=None, *, expected_sha256=None):
@@ -228,6 +317,13 @@ def _admit_incoming(candidates):
 def _write_records(db, source, raw, records, provenance, topology=None, origin=None):
     """Shared transaction writer; callers finish validation before entering."""
     digest = hashlib.sha256(raw).hexdigest()
+    return _write_record_stream(db, source, digest, len(raw), len(records), raw.startswith(BOM_UTF8),
+                                records, provenance, topology, origin)
+
+
+def _write_record_stream(db, source, digest, byte_count, record_count, bom, records,
+                         provenance, topology=None, origin=None, verify=None):
+    """Consume validated rows under the write lock; verify before committing."""
     conn = sqlite3.connect(db)
     try:
         conn.execute('PRAGMA foreign_keys=ON')
@@ -254,12 +350,12 @@ def _write_records(db, source, raw, records, provenance, topology=None, origin=N
                 if columns!=expected:raise ValueError('original export ledger layout is incompatible; no automatic repair')
                 key=(source,origin['original_sha256'],origin['format'],origin['selected_conversation'],digest)
                 old=conn.execute('SELECT original_bytes,extracted_messages FROM original_exports WHERE source=? AND original_sha256=? AND format=? AND selected_conversation=? AND normalized_sha256=?',key).fetchone()
-                if old is not None and old!=(origin['original_bytes'],len(records)):
+                if old is not None and old!=(origin['original_bytes'],record_count):
                     raise ConflictingIdentity('conflicting original export metadata')
                 conn.execute('INSERT OR IGNORE INTO original_exports(source,original_sha256,original_bytes,format,selected_conversation,normalized_sha256,extracted_messages) VALUES(?,?,?,?,?,?,?)',
-                    (source,origin['original_sha256'],origin['original_bytes'],origin['format'],origin['selected_conversation'],digest,len(records)))
+                    (source,origin['original_sha256'],origin['original_bytes'],origin['format'],origin['selected_conversation'],digest,record_count))
                 written=conn.execute('SELECT original_bytes,extracted_messages FROM original_exports WHERE source=? AND original_sha256=? AND format=? AND selected_conversation=? AND normalized_sha256=?',key).fetchone()
-                if written!=(origin['original_bytes'],len(records)):
+                if written!=(origin['original_bytes'],record_count):
                     raise ConflictingIdentity('original export metadata was not recorded; transaction rejected')
             if topology is not None:
                 conn.execute('CREATE TABLE IF NOT EXISTS export_nodes (source TEXT, conversation TEXT, original_hash TEXT, node TEXT, parent TEXT, ordinal INTEGER, has_text INTEGER, PRIMARY KEY(source,conversation,original_hash,node))')
@@ -278,7 +374,7 @@ def _write_records(db, source, raw, records, provenance, topology=None, origin=N
                         conn.executemany('INSERT OR IGNORE INTO export_nodes VALUES(?,?,?,?,?,?,?)',
                             [(source,cid,digest_key,node,parent,ordinal,has_text) for node,parent,ordinal,has_text in graph['nodes']])
             conn.execute('INSERT OR IGNORE INTO artifacts VALUES(?,?,?,?)',
-                         (source, digest, len(raw), len(records)))
+                         (source, digest, byte_count, record_count))
             for row, title, line_no in records:
                 key = (source, row['conversation_id'], row['message_id'])
                 values = (row['role'], row['timestamp'], title, row['text'])
@@ -296,8 +392,10 @@ def _write_records(db, source, raw, records, provenance, topology=None, origin=N
                 conn.executemany('INSERT OR IGNORE INTO export_provenance VALUES(?,?,?,?,?,?)',
                                  occurrences)
                 conn.executemany('INSERT OR IGNORE INTO export_occurrences VALUES(?,?,?,?,?,?)', occurrences)
-        result = {'source_sha256': digest, 'records': len(records), 'inserted': inserted}
-        if raw.startswith(BOM_UTF8):
+            if verify is not None:
+                verify()
+        result = {'source_sha256': digest, 'records': record_count, 'inserted': inserted}
+        if bom:
             result['utf8_bom_present'] = True
         return result
     finally:

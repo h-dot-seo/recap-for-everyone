@@ -461,3 +461,10 @@ cannot publish a successful result. Equal first/last hashes are not an immutable
 snapshot or protection against hostile concurrent rewriting. Fixed limits and
 explicit member selection still apply; no automatic selection, import or approval
 is added. See [ZIP preparation](docs/PREPARE_WEB_EXPORT.md).
+
+For normalized file `ingest`, use an operator-controlled stable input. The file
+path uses two same-handle passes; validation precedes SQLite and a matching final
+hash precedes commit. Byte/adapter/rebuild inputs and explicit provenance calls
+retain snapshots. A failed second pass can leave a newly initialized empty DB
+schema; do not infer no filesystem changes or retry blindly. See
+[two-pass file ingest](docs/STREAMED_INGEST.md).

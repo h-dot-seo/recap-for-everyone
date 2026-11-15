@@ -59,13 +59,13 @@ recipe and operation before attributing a difference to a code change.
 | Operation | Work that remains |
 |---|---|
 | Adapter import | Entire input parsing, rows and derived normalized bytes remain in memory; one redundant JSON decode was removed. SQLite still checks each message identity and writes its index and ledgers. |
-| Normalized ingest | Reads one complete immutable byte snapshot, validates all records and incoming conflicts, then writes the selected archive. |
+| Normalized ingest | File entry uses two same-handle passes, with complete preflight before SQLite and final hash comparison before commit. Byte/provenance APIs retain snapshots. |
 | Literal `find` | Casefolded substring scans preserve semantics; no tokenized FTS prefilter is substituted. A small result page does not imply small input work. |
 | FTS `search` | Uses the FTS index; results have token-query semantics, not literal substring equivalence. |
 | `list`, `show`, review queues | Output can be bounded or paged, while inventories, title-history lookups, source-wide checks and sorting can still process much more data. |
 | Title history | Counts and reads matching history; repeated title revisions affect cost. |
 | `check-import`, `list-export` | Parse the chosen input; pagination does not make source parsing incremental. |
-| ZIP inspect/prepare | Current fixed archive/member/entry limits still apply; the full ZIP snapshot is retained. Preparation validates a selected member before publishing it. |
+| ZIP inspect/prepare | Fixed archive/member/entry limits still apply; same-handle chunk hashes bracket ZIP processing. The selected member and JSON remain in memory; validation precedes publication. |
 | Recovery declaration/rehearsal | Reads and compares declared logical rows/index checks; not a constant-memory or constant-time backup operation. |
 
 Counts allow 1..50,000 conversations and 1..1,000 messages per conversation,
@@ -74,8 +74,9 @@ A conservative construction budget may reject a combination before the final
 byte total is built. Seeds are integers 0..4,294,967,295; repetitions are 1..5.
 These limits are safety limits, not statements that every size
 will be fast or fit the user's available memory. Increase sizes deliberately in
-separate new directories. This release does not raise ZIP limits, change the
-one-snapshot contract or implement streaming. The lazy title-history index below
+separate new directories. Fixed ZIP limits are not raised. File ingest and ZIP
+processing now use same-handle hash observations, not immutable snapshots; adapter
+and byte APIs still use snapshots. The lazy title-history index below
 changes lookup cost only after an explicit title write.
 
 ## Lazy title-history index: synthetic observation

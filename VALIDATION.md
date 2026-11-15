@@ -1,10 +1,44 @@
 # Validation record
 
-Current release: `0.100.7-ci-timeout-budget`, dated 2026-11-15.
+Current release: `0.100.8-streamed-file-ingest`, dated 2026-11-15.
 This file is the current snapshot. Every dated entry since the first release is kept
 unchanged and in order in [docs/VALIDATION_HISTORY.md](docs/VALIDATION_HISTORY.md).
 
 ## Latest change
+
+2026-11-15 Two-pass normalized file ingest (0.100.8-streamed-file-ingest):
+file ingest without explicit provenance validates and hashes through one open
+handle before SQLite, then replays rows and verifies hash/bytes/count/BOM before
+commit. The identity map stores canonical value digests, not all message bodies.
+Byte, adapter, rebuild and explicit provenance APIs retain snapshot paths and
+receipts. Schema initialization remains outside the transaction: second-pass
+failure can leave a new empty database/schema, while transactional rows roll back.
+No input staging, new ceiling, larger limit, automatic retry or snapshot/hostile
+concurrency guarantee is introduced. Error priority remains I/O, expected hash,
+UTF8 and then first row/identity error. Historical snapshot records remain intact.
+
+Validation includes synthetic BOM/physical newline/chunk boundaries, payload
+identity comparisons, error precedence, no-DB preflight, final-hash-before-commit,
+rollback/close, byte/FTS/receipt parity and the guide. A transient change restored
+between passes is intentionally shown to evade observation. Three identical
+10,000-row allocation trials observed median Python heap peaks 44,374,728 before
+and 2,570,633 bytes after; these are not RSS or runtime guarantees. Two old
+read_bytes oracles were explicitly changed only for file ingest to one-handle
+semantics; inspection/check-import keep their single-read assertions. The first
+full run exposed the second stale oracle (one failure). Separating that test
+initially omitted its check-import DB fixture; explicit byte-ingest setup fixed
+that test-only error before final verification. One new test's
+surrogate fixture initially failed during fixture encoding; escaped JSON corrected
+that test input, without changing product behavior. Stale SCALING ZIP snapshot
+prose from the earlier release was corrected. Final full suite passed all 1,596
+tests (one environment-dependent skip). Independent core27 + adapter/rebuild68
+and final63 focused tests passed; actual prior/current ingest, web/local/local-codex
+imports and explicit provenance fallback had identical CLI receipts and DB/FTS
+tables. Actual normalized rebuild comparisons differed only in implementation and
+derived receipt hashes plus separately selected temporary destination paths, not
+checks or DB tables. Grammar/compile, old141 sh blocks, manifest337/audit338 passed.
+
+Previous change:
 
 2026-11-15 CI completion headroom (0.100.7-ci-timeout-budget):
 changes the workflow job timeout from 10 to 20 minutes and its two exact CI-test

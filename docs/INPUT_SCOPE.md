@@ -143,7 +143,10 @@ and an explicit non-whitespace, valid Unicode source label. Labels remain exact,
 trimmed, normalized or converted from numbers/bytes. Invalid source labels fail
 before file reads in `ingest(...)`, `import_export(...)` and `check_import(...)`,
 and before database access in these and the byte-ingestion entry point. The file
-entry point remains supported and reads its input once before using the byte path.
+entry point uses two passes on one open file object when provenance is omitted.
+The first validates all input before SQLite; the second is re-hashed before commit.
+Calls supplying provenance retain the read-once byte fallback. See
+[streamed file ingest](STREAMED_INGEST.md) for the changed snapshot boundary.
 
 Source labels arrive separately from decoded JSON. Surrogate code points
 can occur in Python strings or in Unix command arguments decoded from invalid
@@ -499,6 +502,7 @@ selection. They report repeated-identity conflicts; ingest still rejects them.
 bytes; records are private `(decoded_row, effective_title, physical_line)` tuples.
 Coverage omits content and counts silent acceptances. `ingest`/`ingest_bytes` accept
 keyword-only `expected_sha256=None` and CLI ingest accepts `--expected-sha256`.
-The optional guard checks the exact byte snapshot before database access; default
-behavior is unchanged. Neither shared adapter normalization, list-export nor title
+The optional guard checks the first file pass or supplied byte snapshot before
+database access. File ingestion additionally verifies the second pass before commit;
+byte ingestion retains its immutable input contract. Neither shared adapter normalization, list-export nor title
 plans accept normalized input. See [contract and diagnostics](NORMALIZED_JSONL.md).

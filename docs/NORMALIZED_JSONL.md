@@ -90,9 +90,10 @@ python recap.py --db DB ingest INPUT --source SOURCE --expected-sha256 LOWERCASE
 ```
 
 Use `original_sha256` from inspection as `LOWERCASE_HASH`. Inspection and
-check-import also accept `--expected-export-sha256 LOWERCASE_HASH`. Each command
-reads the file once; the hash covers the exact bytes parsed or ingested, including
-BOM and line endings. A malformed/mismatched ingest guard fails before SQLite
+check-import also accept `--expected-export-sha256 LOWERCASE_HASH` and retain a
+single byte snapshot. File ingest uses two passes on one handle, comparing raw
+hash/size/count before commit. Hashes include BOM and line endings; this is not
+an immutable file snapshot. See [file ingest](STREAMED_INGEST.md). A malformed/mismatched ingest guard fails before SQLite
 access. Omitting the guard preserves existing behavior and receipts. A hash binds
 bytes, not provenance, authorization, semantic validity or a conflict-free archive.
 The archive can change after inspection; ingest rechecks conflicts under its lock.

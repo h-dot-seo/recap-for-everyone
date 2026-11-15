@@ -296,3 +296,7 @@ See [streamed ZIP validation](docs/ZIP_STREAMING.md) for its limits and measurem
 
 See [CI timeout budget](docs/CI_TIMEOUT_BUDGET.md) for observed Windows runtime
 variation and unchanged validation requirements.
+
+Normalized file ingest now validates and replays through one file object without
+retaining the whole input. See [two-pass file ingest](docs/STREAMED_INGEST.md) for
+rollback, retained snapshot APIs and concurrent-change limits.
