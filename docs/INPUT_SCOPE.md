@@ -516,3 +516,7 @@ receipts are unchanged. This does not cap source bytes, prevent path races, chan
 byte-only APIs or change recovery symlink policies. See [source file admission](SOURCE_FILE_ADMISSION.md).
 
 Explicit Python provenance arguments are validated before SQLite connection; see [provenance admission](PROVENANCE_ADMISSION.md). This checks shape and current-input identity membership, not origin authenticity.
+
+[Normalized inventory](NORMALIZED_INVENTORY.md) supports read-only `list-export --format normalized`,
+with whole-file validation and metadata/filter counts. Normalized selected ingest
+and inspection remain unsupported; inventory does not grant write permission.

@@ -114,7 +114,7 @@ staging; no whole-archive byte snapshot is retained. Guide: [prepare a web expor
 #### `list-export`
 
 ```text
-usage: recap.py list-export [-h] --format {web,local,local-codex} [--limit LIMIT] [--offset OFFSET] [--expected-export-sha256 EXPECTED_EXPORT_SHA256] [--contains CONTAINS | --text-contains TEXT_CONTAINS] [--text-role {user,assistant,system,tool}] [--canonical-unicode] input
+usage: recap.py list-export [-h] --format {web,local,local-codex,normalized} [--limit LIMIT] [--offset OFFSET] [--expected-export-sha256 EXPECTED_EXPORT_SHA256] [--contains CONTAINS | --text-contains TEXT_CONTAINS] [--text-role {user,assistant,system,tool}] [--canonical-unicode] input
 ```
 
 List exact IDs, existing web titles, extraction counts and selection blockers
@@ -381,7 +381,7 @@ Explicit export adapters and reversible local title organization. Guide:
 ### `export_inventory.py` (`list-export`)
 
 ```text
-usage: export_inventory.py [-h] [--json-errors] --format {web,local,local-codex} [--limit LIMIT] [--offset OFFSET] [--expected-export-sha256 EXPECTED_EXPORT_SHA256] [--contains CONTAINS | --text-contains TEXT_CONTAINS] [--text-role {user,assistant,system,tool}] [--canonical-unicode] input
+usage: export_inventory.py [-h] [--json-errors] --format {web,local,local-codex,normalized} [--limit LIMIT] [--offset OFFSET] [--expected-export-sha256 EXPECTED_EXPORT_SHA256] [--contains CONTAINS | --text-contains TEXT_CONTAINS] [--text-role {user,assistant,system,tool}] [--canonical-unicode] input
 ```
 
 Guide: [export inventory](EXPORT_INVENTORY.md).
@@ -757,7 +757,7 @@ example, output boundaries and failure behavior.
 
 ## CLI version identity
 
-`python recap.py --version` prints `recap-for-everyone 0.100.10` and exits without
+`python recap.py --version` prints `recap-for-everyone 0.100.11` and exits without
 opening an archive or reading the publication manifest. It works outside the
 repository working directory and without the manifest. This numeric identity is
 not byte verification, authenticity or a stability guarantee. Use the documented

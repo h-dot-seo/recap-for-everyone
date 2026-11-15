@@ -32,7 +32,7 @@ def build_parser():
     check.add_argument('--conversation', help='inspect an explicit conversation selection without writing')
     check.add_argument('--expected-export-sha256', help='require the exact original whole-file hash from earlier inspection')
     inventory = sub.add_parser('list-export', help='list export IDs, titles and selection support without importing')
-    inventory.add_argument('input'); inventory.add_argument('--format', choices=['web', 'local', 'local-codex'], required=True)
+    inventory.add_argument('input'); inventory.add_argument('--format', choices=['web', 'local', 'local-codex', 'normalized'], required=True)
     inventory.add_argument('--limit', type=int, default=50); inventory.add_argument('--offset', type=int, default=0)
     inventory.add_argument('--expected-export-sha256', help='require the same original whole-file hash as an earlier page')
     filters = inventory.add_mutually_exclusive_group()

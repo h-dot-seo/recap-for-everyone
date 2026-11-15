@@ -474,3 +474,7 @@ branch/title and local projection paths now stat before opening and refuse
 nonregular objects, preventing ordinary FIFO waits. Regular symlinks remain
 accepted; this is not an atomic filesystem check, byte budget or privacy clearance.
 See [source file admission](docs/SOURCE_FILE_ADMISSION.md).
+
+[Normalized inventory](docs/NORMALIZED_INVENTORY.md) supports read-only `list-export --format normalized`,
+with whole-file validation and metadata/filter counts. Normalized selected ingest
+and inspection remain unsupported; inventory does not grant write permission.
