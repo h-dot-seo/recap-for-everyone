@@ -145,10 +145,10 @@ class NormalizedInspectionTests(unittest.TestCase):
         self.assertFalse(self.db.exists())
 
     def test_shared_adapter_dispatcher_remains_closed(self):
+        # Inventory is now a separate read-only normalized path, not an adapter.
         self.write(self.row())
         for call in (lambda: normalize(self.path, 'normalized'),
                      lambda: import_export(self.db, 'fictional', self.path, 'normalized'),
-                     lambda: list_export(self.path, 'normalized'),
                      lambda: make_plan(self.db, 'fictional', 'private-fictional-chat', self.path, 'normalized')):
             with self.assertRaises(ValueError):
                 call()
@@ -240,8 +240,7 @@ class NormalizedInspectionTests(unittest.TestCase):
     def test_cli_rejects_selection_and_other_format_paths(self):
         self.write(self.row())
         for args in (['inspect', self.path, '--format', 'normalized', '--conversation', 'fictional'],
-                     ['--db', self.db, 'import', self.path, '--format', 'normalized', '--source', 'fictional'],
-                     ['list-export', self.path, '--format', 'normalized']):
+                     ['--db', self.db, 'import', self.path, '--format', 'normalized', '--source', 'fictional']):
             result = self.run_cli('recap.py', *args)
             self.assertNotEqual(result.returncode, 0)
         self.assertFalse(self.db.exists())

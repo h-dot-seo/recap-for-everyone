@@ -149,3 +149,7 @@ does not infer fields, authorize collection, transmit data, select a reuse licen
 or invite copying repository code; [RIGHTS.md](../RIGHTS.md) remains applicable.
 Synthetic characterization tests establish these local behaviors, not real vendor
 compatibility, authenticity, completeness, privacy clearance or semantic accuracy.
+
+[Normalized inventory](NORMALIZED_INVENTORY.md) supports read-only `list-export --format normalized`,
+with whole-file validation and metadata/filter counts. Normalized selected ingest
+and inspection remain unsupported; inventory does not grant write permission.

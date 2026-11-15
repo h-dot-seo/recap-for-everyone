@@ -8,6 +8,7 @@ from collections import Counter
 from pathlib import Path
 
 from recaplib.session_workflow import _normalize_bytes, _read_export_bytes
+from recaplib.archive import validate_normalized
 from recaplib.strict_json import loads
 from recaplib.source_text import decode_source, physical_lines
 from recaplib.source_identity import aliased_identity
@@ -20,7 +21,7 @@ def list_export(path, kind, limit=50, offset=0, expected_export_sha256=None, *,
         raise ValueError('limit must be an integer in 1..1000')
     if type(offset) is not int or not 0 <= offset <= 2**63 - 1:
         raise ValueError('offset must be an integer in 0..9223372036854775807')
-    if kind not in ('web', 'local', 'local-codex'):
+    if kind not in ('web', 'local', 'local-codex', 'normalized'):
         raise ValueError('unsupported format')
     if type(canonical_unicode) is not bool:
         raise ValueError('canonical_unicode must be boolean')
@@ -42,7 +43,11 @@ def list_export(path, kind, limit=50, offset=0, expected_export_sha256=None, *,
     fold = canonical_fold if canonical_unicode else str.casefold
     path = Path(path)
     raw = _read_export_bytes(path, expected_export_sha256)
-    rows, coverage = _normalize_bytes(raw, path.name, kind, include_report=True)
+    if kind == 'normalized':
+        records, coverage = validate_normalized(raw)
+        rows = [row for row, _, _ in records]
+    else:
+        rows, coverage = _normalize_bytes(raw, path.name, kind, include_report=True)
     if expected_export_sha256 is not None:
         coverage['expected_export_sha256'] = expected_export_sha256
     items = {}
@@ -54,7 +59,10 @@ def list_export(path, kind, limit=50, offset=0, expected_export_sha256=None, *,
         if title is not None and title not in item['original_titles']:
             item['original_titles'].append(title)
 
-    if kind == 'web':
+    if kind == 'normalized':
+        for row, title, _ in records:
+            register(row['conversation_id'], title)
+    elif kind == 'web':
         for record in loads(decode_source(raw)):
             register(aliased_identity(record, 'conversation_id'), record.get('title') or '')
     elif coverage.get('parser_admission_status') != 'accepted_metadata_only':
@@ -82,7 +90,7 @@ def list_export(path, kind, limit=50, offset=0, expected_export_sha256=None, *,
     for identity, item in items.items():
         item['role_counts'] = dict(sorted(roles.get(identity, {}).items()))
         item['extracted_messages'] = sum(item['role_counts'].values())
-        item['selection_blocker'] = ('AMBIGUOUS_WEB_ID' if kind == 'web' and item['metadata_records'] > 1
+        item['selection_blocker'] = ('NOT_SUPPORTED' if kind == 'normalized' else 'AMBIGUOUS_WEB_ID' if kind == 'web' and item['metadata_records'] > 1
                                      else 'NO_EXTRACTED_TEXT' if not item['extracted_messages'] else None)
         item['selection_supported'] = item['selection_blocker'] is None
         if text_contains is not None:
@@ -109,6 +117,10 @@ def list_export(path, kind, limit=50, offset=0, expected_export_sha256=None, *,
         coverage=coverage,
         scope='read-only export inventory; full file parsed; no database access or effective-history reconstruction',
         warning='PRIVATE METADATA: titles and IDs may be sensitive. No message body fields are included; titles are not redacted or verified. Selection support describes parser output, not import authorization or conflict-free database insertion.')
+    if kind == 'normalized':
+        result['warning'] += (' Normalized selected ingest and inspection are not supported. '
+                              'Inventory results do not establish admission; repeated identity conflicts '
+                              'remain in coverage and may block ingest.')
     if contains is not None:
         result['filter'] = dict(contains=contains, fields=['conversation', 'original_titles'],
             matching='literal substring within one case-folded metadata field',
@@ -129,6 +141,11 @@ def list_export(path, kind, limit=50, offset=0, expected_export_sha256=None, *,
         result['filter']['text_role'] = text_role
         result['filter']['message_scope'] = ('only extracted messages with the exact requested role; '
             'all web branches and raw local records, not effective history or source-attributed user text')
+    if kind == 'normalized' and text_contains is not None:
+        result['filter']['message_scope'] = (
+            ('only supplied normalized record occurrences with the exact requested role'
+             if text_role is not None else 'all supplied normalized record occurrences') +
+            '; repeated identities are counted as supplied, not effective history or verified authorship')
     if 'filter' in result and canonical_unicode:
         result['filter'].update(normalization='NFC(NFD(text).casefold())',
                                 unicode_version=unicodedata.unidata_version)
@@ -139,7 +156,7 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     add_json_errors_argument(parser)
     parser.add_argument('input')
-    parser.add_argument('--format', choices=['web', 'local', 'local-codex'], required=True)
+    parser.add_argument('--format', choices=['web', 'local', 'local-codex', 'normalized'], required=True)
     parser.add_argument('--limit', type=int, default=50)
     parser.add_argument('--offset', type=int, default=0)
     parser.add_argument('--expected-export-sha256', help='require the same original whole-file hash as an earlier page')

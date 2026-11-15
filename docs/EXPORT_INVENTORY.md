@@ -317,3 +317,7 @@ can still be private. A user role is a source label, not proof of human authorsh
 this searches all raw local records or web branches, not retained history or
 source-attributed user evidence. Import and title review remain separate actions.
 Omitting the selector preserves the previous all-extracted-role behavior.
+
+[Normalized inventory](NORMALIZED_INVENTORY.md) supports read-only `list-export --format normalized`,
+with whole-file validation and metadata/filter counts. Normalized selected ingest
+and inspection remain unsupported; inventory does not grant write permission.
