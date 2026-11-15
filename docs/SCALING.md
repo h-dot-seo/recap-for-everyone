@@ -132,3 +132,45 @@ not retry against the already-published receipt path.
 These measurements establish neither private archive completeness, recovery
 readiness, retention, rights, consent nor suitability for a particular machine.
 Existing import receipts, queries and source/provenance meanings are unchanged.
+
+## Literal search: off-page excerpt construction
+
+The literal matcher still folds and checks every selected message, counts every
+matching conversation, and computes the full result-order digest in one read-only
+snapshot. It does not substitute tokenized FTS semantics, an approximate filter,
+or a new index. A small result page still does not bound input work.
+
+Each conversation's current-title/historical-title/body rank is determined before
+its message samples. If its rank bucket already contains the requested number of
+earlier matches, or its identity is not after the cursor, that conversation cannot
+enter this page. Only its excerpt construction is skipped. Term masks, sample
+selection, message counts and provenance queries still run, including database
+errors; no hidden corrupted provenance query is silently bypassed.
+
+This especially avoids mapping casefolded or canonically normalized match offsets
+back into long Unicode bodies for snippets that would never be returned. Emitted
+source slices, offsets, coverage, ranking, cursors and default output are unchanged.
+It does not avoid reading or folding those bodies and makes no general speed or
+heap-memory guarantee.
+
+A same-machine synthetic comparison of the actual narrowed implementation used
+1,000 conversations, one user message each, limit20 and an `orchard` hit at the
+end of every body. Prefixes were 4,000 ASCII x characters, 500 repetitions of
+`Straße `, or 350 repetitions of `Straße e` plus combining acute accent and space
+(the last case enables canonical Unicode). Titles did not match. Three untraced
+elapsed runs supplied medians; one separate traced run supplied each Python-heap
+peak. Inputs, DB and output dictionaries were identical before/after.
+
+| Synthetic prefix/mode | Excerpt calls | Before/after median elapsed ratio | Python heap peak bytes before -> after |
+| --- | ---: | ---: | ---: |
+| ascii | 1000 -> 20 | 1.17 | 49960 -> 49460 |
+| unicode | 1000 -> 20 | 9.63 | 91567 -> 91051 |
+| canonical | 1000 -> 20 | 25.93 | 99801 -> 99161 |
+
+The ASCII improvement was small and heap peaks were nearly unchanged. Unicode
+ratios reflect intentionally long offset mapping for a late hit, not typical
+searches or a general speed promise. Canonical folding and every selected-message
+scan still run. Caches were not controlled, repeats were sequential on one machine,
+and traced peaks exclude SQLite native memory and RSS. Local absolute timings
+remain observations, not published support thresholds. The earlier broader
+prototype is not the shipped code and its measurements are not used in this table.

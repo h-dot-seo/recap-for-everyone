@@ -296,7 +296,14 @@ def find(db, query, source=None, limit=20, include_title_history=False, export_s
                     continue
                 match = dict(message_id=row['message_id'], role=row['role'],
                              source_sha256=row['source_sha256'], source_line=row['source_line'])
-                match.update(_matching_excerpt(row['text'], text, terms, canonical_unicode=canonical_unicode))
+                rank = 0 if item['matched_title'] else 1 if item.get('matched_historical_title') else 2
+                bucket = title_hits if rank == 0 else historical_hits if rank == 1 else text_hits
+                # Rank is fixed at conversation start. A full rank bucket or a
+                # cursor-preceding identity can never reach the returned page.
+                # Only excerpt construction is skipped: masks, sampling and
+                # provenance queries (including their failures) remain unchanged.
+                if len(bucket) < limit and (position is None or (rank, key[0], key[1]) > position):
+                    match.update(_matching_excerpt(row['text'], text, terms, canonical_unicode=canonical_unicode))
                 if export_sha256 is not None:
                     samples,count = _matching_export_provenance(c, provenance_tables, key[0], key[1], row['message_id'], export_sha256)
                     match.update(export_provenance=samples, export_provenance_count=count, export_provenance_truncated=count>3)
