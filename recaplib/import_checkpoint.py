@@ -12,6 +12,8 @@ from recaplib.strict_json import loads
 
 SCHEMA = 'recap.import-checkpoint.v1'
 MAX_CHECKPOINT_BYTES = 64 * 1024 * 1024
+MAX_DELTA_BYTES = 8 * 1024 * 1024
+DELTA_CATEGORIES = ('new_conversations', 'has_new_identities', 'no_new_identities')
 SCOPE = 'one explicit source, all declared artifacts and accepted message identities in one read-only snapshot'
 DIGEST_SEMANTICS = ('SHA-256 over compact ASCII JSON arrays [source_id,conversation_id,message_id,role,timestamp,title,text,source_sha256,source_line] followed by LF; ordered by source_id,conversation_id,message_id under SQLite BINARY collation. Local title and review histories are excluded; original message title is included.')
 BOUNDARY = ('Unsigned operator-declared artifact cutoff, not authentication, archive UUID, backup, completeness, approval or review completion. Counts concern accepted identities, not export occurrences or conversations changed in the upstream service. Empty sources are allowed and do not establish source existence. No automatic advance or archive mutation.')
@@ -113,7 +115,7 @@ def declare_checkpoint(db, source, output, declared_at=None):
                 contains_message_text=False, scope=SCOPE, boundary=BOUNDARY, warning=PRIVACY, **publication)
 
 
-def changed_since(db, source, checkpoint):
+def changed_since(db, source, checkpoint, *, delta_output=None, limit=20):
     """Verify a saved cutoff then summarize disjoint conversation categories.
 
     checkpoint may be a decoded document or a path. A valid document whose
@@ -121,6 +123,10 @@ def changed_since(db, source, checkpoint):
     """
     if not _identity(source, source=True):
         raise ValueError('explicit nonempty source required')
+    if type(limit) is not int or not 1 <= limit <= 1000:
+        raise ValueError('limit must be an integer in 1..1000')
+    if delta_output is not None:
+        _reject_existing(delta_output)
     checkpoint = validate_checkpoint(checkpoint, source) if isinstance(checkpoint, dict) else load_checkpoint(checkpoint, source)
     declared = {row['sha256']: row for row in checkpoint['artifacts']}
     result = dict(schema='recap.import-changes.v1', status='CUTOFF_NOT_VERIFIED', delta=None,
@@ -128,6 +134,7 @@ def changed_since(db, source, checkpoint):
                   scope=SCOPE, boundary=BOUNDARY)
     connection = readonly(db)
     digest, count = hashlib.sha256(), 0
+    samples = {name: [] for name in DELTA_CATEGORIES}
     delta = dict(new_conversations=0, has_new_identities=0, no_new_identities=0, accepted_after_cutoff_messages=0)
     try:
         connection.execute('BEGIN')
@@ -146,6 +153,8 @@ def changed_since(db, source, checkpoint):
             if previous is not None:
                 key = 'has_new_identities' if old and new else 'no_new_identities' if old else 'new_conversations'
                 delta[key] += 1
+                if delta_output is not None and len(samples[key]) < limit:
+                    samples[key].append(previous)
         for row in _message_rows(connection, source):
             if row['source_sha256'] not in current_hashes:
                 return result
@@ -162,6 +171,21 @@ def changed_since(db, source, checkpoint):
         finish()
         if count != checkpoint['accepted_messages'] or digest.hexdigest() != checkpoint['messages_sha256']:
             return result
-        return dict(result, status='CUTOFF_VERIFIED', delta=delta)
+        result = dict(result, status='CUTOFF_VERIFIED', delta=delta)
     finally:
         connection.close()
+    if delta_output is not None:
+        document = dict(schema='recap.import-changes-delta.v1', source=source,
+                        status=result['status'], delta=delta, sample_limit_per_category=limit,
+                        samples=samples, omitted={name: delta[name]-len(samples[name]) for name in DELTA_CATEGORIES},
+                        archive_mutation=False, remote_mutation=False, network_access=False,
+                        contains_message_text=False, scope=SCOPE, boundary=BOUNDARY,
+                        warning='PRIVATE CONVERSATION IDS. Bounded samples from one verified cutoff comparison, not review approval, completeness or automatic checkpoint advancement.')
+        raw = (json.dumps(document, ensure_ascii=True, sort_keys=True, indent=2)+'\n').encode('ascii')
+        if len(raw) > MAX_DELTA_BYTES:
+            raise ValueError('delta document exceeds byte limit; reduce --limit')
+        publication = _publish_new_file(delta_output, raw, '.recap-import-changes-')
+        result['delta_document'] = dict(schema=document['schema'], bytes=len(raw),
+            sha256=hashlib.sha256(raw).hexdigest(), **publication,
+            warning='Private conversation IDs were written to the explicitly selected new file. File publication precedes stdout delivery; a stdout failure does not remove the published file.')
+    return result

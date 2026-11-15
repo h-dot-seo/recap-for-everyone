@@ -315,3 +315,7 @@ and inspection remain unsupported; inventory does not grant write permission.
 [Optional isolated command installation](docs/PACKAGE_INSTALL.md) adds `recap` and
 `python -m recaplib` without installing checkout examples or audit tools. Runtime
 dependencies remain standard-library only; installation uses a pinned build backend.
+
+[Private cutoff delta files](docs/CHECKPOINT_DELTA.md) optionally expose bounded conversation
+ID samples after verified `changed-since`, for manual follow-up only. Default
+stdout remains counts-only and no checkpoint/review action advances automatically.

@@ -63,3 +63,7 @@ python recap.py --db "OUTPUT/archive.sqlite" declare-checkpoint --source synthet
 python recap.py --db "OUTPUT/archive.sqlite" import OUTPUT/second.json --source synthetic-cutoff --format web
 python recap.py --db "OUTPUT/archive.sqlite" changed-since --source synthetic-cutoff --checkpoint "OUTPUT/cutoff.json"
 ```
+
+[Private cutoff delta files](CHECKPOINT_DELTA.md) optionally expose bounded conversation
+ID samples after verified `changed-since`, for manual follow-up only. Default
+stdout remains counts-only and no checkpoint/review action advances automatically.

@@ -79,7 +79,7 @@ def _effects(name):
         conditional.append(dict(flag='--output',writes=['--output']))
         opens.append(_open('--output','exclusive-create','with --output'))
         schemas.append(dict(when='with --output',schema='recap.saved-document.v1' if name=='show' else 'recap.saved-title-json.v1'))
-    if name=='check-import':
+    if name in ('check-import','changed-since'):
         conditional.append(dict(flag='--delta-output',writes=['--delta-output']))
         opens.append(_open('--delta-output','exclusive-create','with --delta-output'))
     if name=='review-titles':
@@ -89,6 +89,7 @@ def _effects(name):
         notes.append('--from-queue alone is invalid: it requires --set and excludes explicit expected-value flags.')
     if name=='changed-since':
         opens.append(_open('--checkpoint'))
+        notes.append('--delta-output publishes bounded private ID samples only after cutoff verification; unverified cutoffs do not publish a file. File publication precedes stdout delivery.')
     if name in ('check-title-plan','title-adapter-dry-run'):
         opens.append(_open('plan'))
     if name in ('title-adapter-dry-run','title-adapter-simulate'):

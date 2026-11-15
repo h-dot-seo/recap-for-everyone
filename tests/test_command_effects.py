@@ -191,7 +191,7 @@ class CommandEffectsTests(unittest.TestCase):
         expected={(entry['command'],condition['flag']) for entry in entries
                   for condition in entry['writes']['conditional'] if condition['flag']!='--set'}
         cases={(name,'--output') for name in ('show','suggest-title','suggest-branch-title','suggest-replay-title','suggest-attributed-title','preview-title','review-titles')}
-        cases.add(('check-import','--delta-output'))
+        cases.update({('check-import','--delta-output'), ('changed-since','--delta-output')})
         self.assertEqual(cases,expected)
         for command,flag in sorted(cases):
             with self.subTest(command=command,flag=flag):

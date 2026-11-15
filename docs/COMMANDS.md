@@ -673,7 +673,7 @@ usage: recap.py declare-checkpoint [-h] --source SOURCE --output OUTPUT [--decla
 ```
 
 ```text
-usage: recap.py changed-since [-h] --source SOURCE --checkpoint CHECKPOINT [--text]
+usage: recap.py changed-since [-h] [--delta-output DELTA_OUTPUT] [--limit LIMIT] --source SOURCE --checkpoint CHECKPOINT [--text]
 ```
 
 Both commands require global `--db`; changed-since exits 1 with no delta when
@@ -758,7 +758,7 @@ example, output boundaries and failure behavior.
 
 ## CLI version identity
 
-`python recap.py --version` prints `recap-for-everyone 0.100.13` and exits without
+`python recap.py --version` prints `recap-for-everyone 0.100.14` and exits without
 opening an archive or reading the publication manifest. It works outside the
 repository working directory and without the manifest. This numeric identity is
 not byte verification, authenticity or a stability guarantee. Use the documented
