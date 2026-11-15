@@ -110,7 +110,8 @@ Every script and subcommand with its exact usage line is in the
 `conversation_search.py`, `title_proposal.py` and the others listed there) remain
 supported with equivalent behavior. Layout: the repository root holds the entry points
 only (`recap.py`, the standalone scripts, `runtime_check.py`, `verify_manifest.py`,
-`audit_publication.py`, `build_manifest.py`); the implementation modules live in the `recaplib/` package and
+`audit_publication.py`, `build_manifest.py`); the unified CLI now lives in `recaplib/cli.py` behind the root compatibility entry;
+the implementation modules live in the `recaplib/` package and
 the test suite in the `tests/` package, both reached from the root, where
 `python -m unittest discover -v` still runs the whole suite.
 
@@ -310,3 +311,7 @@ Explicit Python provenance arguments are validated before SQLite connection; see
 [Normalized inventory](docs/NORMALIZED_INVENTORY.md) supports read-only `list-export --format normalized`,
 with whole-file validation and metadata/filter counts. Normalized selected ingest
 and inspection remain unsupported; inventory does not grant write permission.
+
+[Optional isolated command installation](docs/PACKAGE_INSTALL.md) adds `recap` and
+`python -m recaplib` without installing checkout examples or audit tools. Runtime
+dependencies remain standard-library only; installation uses a pinned build backend.

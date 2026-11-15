@@ -301,3 +301,7 @@ do not establish authorship, consent, retrieval or publication evidence. See
 v3 선언의 원본 메타데이터와 0건 내보내기도 명시 계획으로 새 DB에 재생·비교합니다. 제목·검토 이력은 복원하지 않으며 전체 복원 완료를 뜻하지 않습니다. [v3 재생](REBUILD_V3.md).
 
 `describe-schema --observe-storage`는 SQLite 연결 전 헤더·사이드카 종류/크기와 이후 메타데이터 읽기 결과를 분리합니다. 읽기 전용 연결도 사이드카를 바꿀 수 있으며 안전한 복사나 복구 필요 여부를 판정하지 않습니다. [저장 상태 관찰](STORAGE_OBSERVATION.md).
+
+체크아웃 실행은 그대로이며, 선택적으로 격리 환경에 `recap` 명령을 설치할 수 있습니다.
+설치는 고정된 빌드 백엔드를 다운로드하지만 실행 시 외부 패키지 의존은 없습니다.
+[설치 경계](PACKAGE_INSTALL.md)를 참고하세요. 라이선스나 재배포 허가는 추가되지 않습니다.
