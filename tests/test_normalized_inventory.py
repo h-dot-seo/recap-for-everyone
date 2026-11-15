@@ -23,10 +23,10 @@ class NormalizedInventoryTests(unittest.TestCase):
     def test_titles_order_counts_and_conflicts_are_not_silently_merged(self):
         raw=self.write([self.row,self.row,dict(self.row,text='changed',title='Second'),dict(self.row,message_id='n',title=''),dict(self.row,conversation_id='a',title='Other')])
         with patch('sqlite3.connect',side_effect=AssertionError('no database')):result=list_export(self.path,'normalized')
-        self.assertEqual(result['coverage'],validate_normalized(raw)[1]);self.assertEqual(result['selectable_conversations'],0)
+        self.assertEqual(result['coverage'],validate_normalized(raw)[1]);self.assertEqual(result['selectable_conversations'],2)
         a,c=result['conversations'];self.assertEqual(c['original_titles'],['First','Second',''])
         self.assertEqual(c['metadata_records'],4);self.assertEqual(c['extracted_messages'],4);self.assertEqual(c['role_counts'],{'user':4})
-        self.assertFalse(c['selection_supported']);self.assertEqual(c['selection_blocker'],'NOT_SUPPORTED')
+        self.assertTrue(c['selection_supported']);self.assertIsNone(c['selection_blocker'])
         self.assertNotIn('PRIVATE BODY',json.dumps(result));self.assertEqual(result['coverage']['repeated_input'],{'identical':1,'conflicting':1})
     def test_empty_bom_and_physical_newlines(self):
         for raw in (b'',b'\xef\xbb\xbf\r\n',b'\xef\xbb\xbf'+json.dumps(self.row).encode()+b'\r'+json.dumps(dict(self.row,message_id='n')).encode()+b'\r\n'):
@@ -36,7 +36,7 @@ class NormalizedInventoryTests(unittest.TestCase):
         self.write([self.row,dict(self.row,title='Second'),dict(self.row,conversation_id='d')])
         result=list_export(self.path,'normalized',contains='first',limit=1)
         self.assertEqual(result['conversations'][0]['original_titles'],['First','Second']);self.assertEqual(result['next_offset'],1)
-        self.assertEqual(result['filter']['matched_conversations'],2);self.assertEqual(result['filter']['matched_selectable_conversations'],0)
+        self.assertEqual(result['filter']['matched_conversations'],2);self.assertEqual(result['filter']['matched_selectable_conversations'],2)
         self.assertEqual(list_export(self.path,'normalized',contains='first',offset=1)['conversations'][0]['conversation'],'d')
     def test_text_role_and_canonical_unicode_counts_not_body(self):
         self.write([dict(self.row,text='Cafe\u0301 private'),dict(self.row,message_id='n',role='assistant',text='Café private')])
@@ -62,11 +62,13 @@ class NormalizedInventoryTests(unittest.TestCase):
         a=subprocess.run([sys.executable,'recap.py','list-export',*args],cwd=ROOT,capture_output=True)
         b=subprocess.run([sys.executable,'export_inventory.py',*args],cwd=ROOT,capture_output=True)
         self.assertEqual(a.returncode,0,a.stderr);self.assertEqual((a.returncode,a.stdout,a.stderr),(b.returncode,b.stdout,b.stderr))
-    def test_import_plan_and_selected_inspection_remain_closed(self):
+    def test_import_and_plan_remain_closed_but_selected_inspection_opens(self):
         self.write([self.row]);db=self.root/'absent.sqlite'
         with patch('sqlite3.connect',side_effect=AssertionError('no database')):
-            for call in (lambda:import_export(db,'s',self.path,'normalized'),lambda:make_plan(db,'s','c',self.path,'normalized'),lambda:inspect_normalized(self.path,'c')):
+            for call in (lambda:import_export(db,'s',self.path,'normalized'),lambda:make_plan(db,'s','c',self.path,'normalized')):
                 with self.assertRaises(ValueError):call()
+        rows,report=inspect_normalized(self.path,'c')
+        self.assertEqual(len(rows),1);self.assertEqual(report['selection']['conversation'],'c')
         self.assertFalse(db.exists())
     def test_guide_commands(self):
         import re,shlex

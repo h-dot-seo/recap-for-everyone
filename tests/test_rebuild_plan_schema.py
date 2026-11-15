@@ -118,7 +118,7 @@ class RebuildPlanSchemaTests(unittest.TestCase):
 
     def test_exact_top_and_step_fields(self):
         base = plan_fixture()
-        cases = [[], {}, {'schema': 'recap.rebuild-plan.v2', 'steps': []},
+        cases = [[], {}, {'schema': 'recap.rebuild-plan.v3', 'steps': []},
                  {'schema': rebuild.PLAN_SCHEMA, 'steps': {},},
                  {'schema': rebuild.PLAN_SCHEMA, 'steps': [None]}]
         for field in base:

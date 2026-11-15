@@ -230,11 +230,19 @@ def _normalize_bytes(raw, source_name, kind, include_report=False, *, _topology=
 def inspect_normalized(path, conversation=None, expected_export_sha256=None):
     # Deliberately separate from normalize/_normalize_bytes: import and title
     # plans must not acquire a new format through a shared dispatcher.
-    from recaplib.archive import validate_normalized
-    if conversation is not None:
-        raise ValueError('normalized format does not support conversation selection')
+    from recaplib.archive import validate_normalized, _validate_conversation_selection, _normalized_selection
+    _validate_conversation_selection(conversation)
     raw = _read_export_bytes(path, expected_export_sha256)
     records, report = validate_normalized(raw)
+    if conversation is not None:
+        selected = [record for record in records if record[0]['conversation_id'] == conversation]
+        report['selection'] = _normalized_selection(conversation, len(records),
+                                                    Counter(row['role'] for row, _, _ in selected))
+        if report['repeated_input']['conflicting']:
+            report['warnings'] = [warning for warning in report['warnings']
+                                  if warning != 'Conflicting repeated identities will block ingest; inspection is not admission.']
+            report['warnings'].append('Whole-file repeated identity conflicts are reported; only conflicts within the selected conversation block selected ingest. Inspection is not admission.')
+        records = selected
     if expected_export_sha256 is not None:
         report['expected_export_sha256'] = expected_export_sha256
     return [row for row, _, _ in records], report

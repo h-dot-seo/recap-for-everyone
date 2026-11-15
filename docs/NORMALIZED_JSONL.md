@@ -99,10 +99,10 @@ bytes, not provenance, authorization, semantic validity or a conflict-free archi
 The archive can change after inspection; ingest rechecks conflicts under its lock.
 
 `session_workflow.py inspect` and `import_check.py` provide equivalent standalone
-entry points. `normalized` is accepted **only** by inspect/check-import, not
-`list-export`, `import`, `export-title-plan` or `check-title-plan`. Those still use
-`web`, `local`, and `local-codex`. Normalized inspection rejects `--conversation`;
-there is no selected-conversation ingest or automatic format detection.
+entry points. `normalized` is accepted by inspect/list-export/check-import.
+Explicit `--conversation` is supported with ingest and these inspection paths;
+`import` and title-plan adapters remain limited to web/local/local-codex. There is
+no automatic format detection. See [selection and replay](SELECTED_NORMALIZED.md).
 
 ### What inspection means
 
@@ -151,5 +151,5 @@ Synthetic characterization tests establish these local behaviors, not real vendo
 compatibility, authenticity, completeness, privacy clearance or semantic accuracy.
 
 [Normalized inventory](NORMALIZED_INVENTORY.md) supports read-only `list-export --format normalized`,
-with whole-file validation and metadata/filter counts. Normalized selected ingest
-and inspection remain unsupported; inventory does not grant write permission.
+with whole-file validation and metadata/filter counts. Explicit normalized selected ingest and inspection are supported; inventory
+does not grant write permission. See [selection and replay](SELECTED_NORMALIZED.md).

@@ -19,6 +19,7 @@ def build_parser(prog=None):
     p.add_argument('--json-errors', action='store_true', help='emit structured stderr for caught execution failures only; usage and result failures are unchanged')
     sub = p.add_subparsers(dest='command', required=True)
     imp = sub.add_parser('ingest'); imp.add_argument('input'); imp.add_argument('--source', required=True)
+    imp.add_argument('--conversation', help='ingest only this conversation after validating the whole normalized file')
     imp.add_argument('--expected-sha256', help='require the normalized whole-file hash from inspection before writing')
     find = sub.add_parser('search'); find.add_argument('query'); find.add_argument('--limit', type=int, default=20)
     stats = sub.add_parser('stats')
@@ -297,7 +298,8 @@ def _run(prog, archive_functions):
             from recaplib.web_branch import branch_view
             result = branch_view(args.input, args.conversation, args.node)
         elif args.command == 'ingest':
-            result = ingest(args.db, args.source, args.input, expected_sha256=args.expected_sha256)
+            selection_args = {'conversation': args.conversation} if args.conversation is not None else {}
+            result = ingest(args.db, args.source, args.input, expected_sha256=args.expected_sha256, **selection_args)
         elif args.command == 'search':
             result = search(args.db, args.query, args.limit)
         elif args.command == 'describe-schema':

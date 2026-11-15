@@ -322,3 +322,6 @@ stdout remains counts-only and no checkpoint/review action advances automaticall
 
 [Documentation schemas](docs/DOCUMENT_SCHEMAS.md) describe the existing explicit
 rebuild-plan shape. They do not replace consumer checks or authorize replay.
+
+[Selected normalized ingest and replay](docs/SELECTED_NORMALIZED.md) retains the
+whole input artifact while explicitly selecting conversations, with plan.v2 replay.

@@ -185,8 +185,32 @@ def _stream_records(stream, state, defer_errors=False):
                      bom=reader.prefix.startswith(BOM_UTF8))
 
 
-def ingest(db, source, path, provenance=None, *, expected_sha256=None):
+def _validate_conversation_selection(conversation, provenance=None):
+    if conversation is None:
+        return
+    if not isinstance(conversation, str) or not conversation:
+        raise ValueError('selected conversation must be a nonempty string')
+    try:
+        conversation.encode('utf-8')
+    except UnicodeError:
+        raise ValueError('selected conversation must contain valid Unicode text') from None
+    if provenance is not None:
+        raise ValueError('conversation selection cannot be combined with supplied provenance')
+
+
+def _normalized_selection(conversation, total, roles):
+    selected = sum(roles.values())
+    if not selected:
+        raise ValueError('no extracted messages for selected conversation; inspect the full input')
+    return dict(conversation=conversation, selected_messages=selected,
+                excluded_messages=total-selected, selected_role_counts=dict(sorted(roles.items())),
+                coverage_scope='all other coverage counts and warnings describe the entire input file',
+                policy='only this conversation; preserve supplied normalized record occurrences and physical source lines')
+
+
+def ingest(db, source, path, provenance=None, *, expected_sha256=None, conversation=None):
     _validate_source(source)
+    _validate_conversation_selection(conversation, provenance)
     require_source_file(path)
     if provenance is not None:
         raw = Path(path).read_bytes()
@@ -194,12 +218,22 @@ def ingest(db, source, path, provenance=None, *, expected_sha256=None):
         return ingest_bytes(db, source, raw, provenance, expected_sha256=expected_sha256)
     with Path(path).open('rb', buffering=0) as stream:
         first, incoming = {}, {}
+        selected_roles = Counter()
+        selected_conflict = None
         for row, title, line_no in _stream_records(stream, first, defer_errors=True):
+            if conversation is not None and row['conversation_id'] != conversation:
+                continue
+            selected_roles[row['role']] += 1
             key = (row['conversation_id'], row['message_id'])
             value = hashlib.sha256(json.dumps((row['role'], row['timestamp'], title, row['text']),
                                               ensure_ascii=True, separators=(',', ':')).encode('ascii')).digest()
             if key in incoming and incoming[key] != value:
-                first['row_error'] = ConflictingIdentity(f'conflicting message identity at line {line_no}')
+                error = ConflictingIdentity(f'conflicting message identity at line {line_no}')
+                if conversation is None:
+                    first['row_error'] = error
+                elif selected_conflict is None:
+                    # Selection still validates the entire file before admission.
+                    selected_conflict = error
             incoming[key] = value
         if expected_sha256 is not None and (not isinstance(expected_sha256, str) or len(expected_sha256) != 64 or
                 any(ch not in '0123456789abcdef' for ch in expected_sha256)):
@@ -210,6 +244,10 @@ def ingest(db, source, path, provenance=None, *, expected_sha256=None):
             raise first['unicode_error']
         if first['row_error'] is not None:
             raise first['row_error']
+        if selected_conflict is not None:
+            raise selected_conflict
+        selection = (_normalized_selection(conversation, first['records'], selected_roles)
+                     if conversation is not None else None)
         del incoming
         second = {}
         records = _stream_records(stream, second)
@@ -217,24 +255,37 @@ def ingest(db, source, path, provenance=None, *, expected_sha256=None):
             if any(first[name] != second[name] for name in ('sha256', 'bytes', 'records', 'bom')):
                 raise SourceChanged('normalized input changed during ingest; inspect again')
         try:
-            return _write_record_stream(db, source, first['sha256'], first['bytes'], first['records'],
-                                        first['bom'], records, None, verify=verify)
+            admitted = (record for record in records if record[0]['conversation_id'] == conversation) if conversation is not None else records
+            result = _write_record_stream(db, source, first['sha256'], first['bytes'], first['records'],
+                                         first['bom'], admitted, None, verify=verify)
+            if selection is not None:
+                result['selection'] = selection
+            return result
         finally:
             records.close()
 
 
-def ingest_bytes(db, source, raw, provenance=None, *, expected_sha256=None):
+def ingest_bytes(db, source, raw, provenance=None, *, expected_sha256=None, conversation=None):
     """Validate and ingest one immutable normalized JSONL byte snapshot.
 
     Uses the same transaction, identity and provenance rules as file ingestion.
     This writes the explicitly selected SQLite archive, not a temporary input file.
     """
     _validate_source(source)
+    _validate_conversation_selection(conversation, provenance)
     if not isinstance(raw, bytes):
         raise ValueError('normalized input must be immutable bytes')
     _check_expected_sha256(raw, expected_sha256)
-    records = _admit_incoming(_normalized_records(raw))
-    return _write_records(db, source, raw, records, provenance)
+    if conversation is None:
+        records = _admit_incoming(_normalized_records(raw))
+        return _write_records(db, source, raw, records, provenance)
+    all_records = list(_normalized_records(raw))
+    records = _admit_incoming(record for record in all_records if record[0]['conversation_id'] == conversation)
+    selection = _normalized_selection(conversation, len(all_records), Counter(row['role'] for row, _, _ in records))
+    result = _write_record_stream(db, source, hashlib.sha256(raw).hexdigest(), len(raw),
+                                 len(all_records), raw.startswith(BOM_UTF8), records, None)
+    result['selection'] = selection
+    return result
 
 
 def _normalized_bytes(rows, newline=None):

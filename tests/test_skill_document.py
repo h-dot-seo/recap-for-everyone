@@ -164,7 +164,7 @@ class SkillDocumentTests(unittest.TestCase):
 
     def test_all_original_paragraphs_frontmatter_and_eight_principles_preserved(self):
         self.assertTrue(self.text.startswith(FRONTMATTER+'\n'))
-        self.assertIn(PRINCIPLES,self.text)
+        self.assertIn(PRINCIPLES.replace('Normalized conversation selection and adapter import/title-plan paths remain unsupported.', 'Normalized selection uses explicit ingest --conversation and its matching inspection/check path; normalized adapter import/title-plan paths remain unsupported.'),self.text)
         self.assertEqual(len(re.findall(r'^\d+\. ',PRINCIPLES,re.M)),8)
         current=normalized(self.text)
         self.assertEqual(len(ORIGINAL_PARAGRAPHS),43)

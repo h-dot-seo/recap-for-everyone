@@ -11,7 +11,7 @@ fetch or automatic write.
 
 | Existing label | File | Who supplies it | Consumer and stronger checks |
 | --- | --- | --- | --- |
-| `recap.rebuild-plan.v1` | [rebuild plan schema](../schemas/recap.rebuild-plan.v1.schema.json) | Operator writes explicit replay steps | `rebuild-recovery`: exact bounded plan reading, manifest membership, object hashes, explicit parsing/selection choices, replay and declared comparisons |
+| `recap.rebuild-plan.v1` | [rebuild plan schema](../schemas/recap.rebuild-plan.v1.schema.json) | Operator writes explicit replay steps | `rebuild-archive`: exact bounded plan reading, manifest membership, object hashes, explicit parsing/selection choices, replay and declared comparisons |
 
 Only this already-labelled hand-authored input is covered. General stdout views,
 receipts, proposals and previews do not gain labels or stability promises. This
@@ -73,3 +73,7 @@ Sources: [JSON Schema numeric types](https://json-schema.org/understanding-json-
 and [python-jsonschema validation](https://python-jsonschema.readthedocs.io/en/stable/validate/).
 The schemas are deliberately incomplete structural descriptions; consumer tests
 remain necessary even when an external standard validator reports no errors.
+
+Explicit plan.v2 permits normalized selection but has no documentation schema
+artifact here yet. The v1 schema is unchanged and must not be used to label v2.
+See [selected normalized replay](SELECTED_NORMALIZED.md).

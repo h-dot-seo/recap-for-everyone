@@ -519,8 +519,8 @@ Byte-only APIs and recovery symlink policies are unchanged. See [source file adm
 Explicit Python provenance arguments are validated before SQLite connection; see [provenance admission](PROVENANCE_ADMISSION.md). This checks shape and current-input identity membership, not origin authenticity.
 
 [Normalized inventory](NORMALIZED_INVENTORY.md) supports read-only `list-export --format normalized`,
-with whole-file validation and metadata/filter counts. Normalized selected ingest
-and inspection remain unsupported; inventory does not grant write permission.
+with whole-file validation and metadata/filter counts. Explicit normalized selected ingest and inspection are supported; inventory
+does not grant write permission. See [selection and replay](SELECTED_NORMALIZED.md).
 
 [Saved title/plan/manual-transfer inputs](TITLE_DOCUMENT_FILES.md) now have an 8 MiB
 inclusive regular-file admission limit. Existing smaller adapter/batch limits

@@ -63,3 +63,7 @@ restored-copy-only scope wording for byte compatibility. That unchanged descript
 does not describe the current rebuild support: the actual v3 rebuild receipt and
 this guide define its limited replay checks. Saved manifests are not rewritten.
 No automatic resealing, stamp, fingerprint, licensing or policy wording is changed.
+
+Explicit plan.v2 also supports selected normalized replay without changing the
+v3 manifest. Plan.v1 is unchanged; older releases refuse v2. See
+[normalized selection](SELECTED_NORMALIZED.md) for full-artifact counts and limits.
