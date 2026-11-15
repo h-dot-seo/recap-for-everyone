@@ -135,12 +135,12 @@ class NormalizedInspectionTests(unittest.TestCase):
         self.assertEqual(check_import(self.db, 'fictional', self.path, 'normalized')['archive_comparison']['identical'], 1)
         self.assertEqual(check_import(self.db, 'another', self.path, 'normalized')['archive_comparison']['new'], 1)
 
-    def test_normalized_selection_rejected_before_read_or_database(self):
-        for conversation in ('private-fictional-chat', '', False):
+    def test_invalid_normalized_selection_rejected_before_read_or_database(self):
+        for conversation in ('', False):
             with self.subTest(conversation=conversation):
-                with self.assertRaisesRegex(ValueError, 'does not support conversation'):
+                with self.assertRaises(ValueError):
                     inspect_export(self.path, 'normalized', conversation)
-                with self.assertRaisesRegex(ValueError, 'does not support conversation'):
+                with self.assertRaises(ValueError):
                     check_import(self.db, 'fictional', self.path, 'normalized', conversation)
         self.assertFalse(self.db.exists())
 
@@ -237,7 +237,7 @@ class NormalizedInspectionTests(unittest.TestCase):
         self.assertEqual(passed.returncode, 0, passed.stderr)
         self.assertEqual(json.loads(passed.stdout)['inserted'], 1)
 
-    def test_cli_rejects_selection_and_other_format_paths(self):
+    def test_cli_rejects_missing_selection_and_other_format_paths(self):
         self.write(self.row())
         for args in (['inspect', self.path, '--format', 'normalized', '--conversation', 'fictional'],
                      ['--db', self.db, 'import', self.path, '--format', 'normalized', '--source', 'fictional']):

@@ -113,6 +113,10 @@ def _effects(name):
         notes.append('Uses staging databases/files. A verified new DB can remain published if receipt publication fails; inspect it before retrying.')
     if name in ('ingest','import'):
         notes.append('Can create the archive/schema; schema initialization precedes the data transaction. Invalid input and failures do not imply universal rollback.')
+    if name=='ingest':
+        notes.append('--conversation inserts only that normalized conversation after whole-file syntax validation; artifact hash, bytes and record count still cover the full file. Selection is not import authorization.')
+    if name=='rebuild-archive':
+        notes.append('Explicit plan.v2 permits normalized conversation selection; plan.v1 still requires null normalized selection. No automatic replay plan is inferred.')
     if name=='stats':
         schemas.append(dict(when='with --by-source',schema=None))
         notes.append('--by-source changes the JSON shape to include source/time coverage; neither form declares a schema identifier.')

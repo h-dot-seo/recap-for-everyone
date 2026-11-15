@@ -15,6 +15,7 @@ from recaplib.source_text import decode_source
 from recaplib.strict_json import loads
 
 PLAN_SCHEMA = 'recap.rebuild-plan.v1'
+PLAN_SCHEMA_V2 = 'recap.rebuild-plan.v2'
 RECEIPT_SCHEMA = 'recap.rebuild-receipt.v1'
 RECEIPT_SCHEMA_V2 = 'recap.rebuild-receipt.v2'
 RECEIPT_SCHEMA_V3 = 'recap.rebuild-receipt.v3'
@@ -66,7 +67,7 @@ def _read_plan(path):
     if len(raw) > MAX_PLAN_BYTES:
         raise ValueError('rebuild plan exceeds its byte limit')
     plan = loads(decode_source(raw))
-    if not isinstance(plan, dict) or set(plan) != {'schema', 'steps'} or plan['schema'] != PLAN_SCHEMA:
+    if not isinstance(plan, dict) or set(plan) != {'schema', 'steps'} or plan['schema'] not in (PLAN_SCHEMA, PLAN_SCHEMA_V2):
         raise ValueError('rebuild plan must have exactly schema and steps with recap.rebuild-plan.v1')
     if not isinstance(plan['steps'], list) or len(plan['steps']) > MAX_STEPS:
         raise ValueError('rebuild plan steps must be an array within the step limit')
@@ -89,7 +90,8 @@ def _read_plan(path):
                     raise ValueError('rebuild fields must contain valid Unicode text') from None
         if step['kind'] in ('local', 'local-codex') and step['label'] is None:
             raise ValueError('local replay requires its original parsing label')
-        if step['kind'] == 'normalized' and (step['label'] is not None or step['conversation'] is not None):
+        if step['kind'] == 'normalized' and (step['label'] is not None or
+                (plan['schema'] == PLAN_SCHEMA and step['conversation'] is not None)):
             raise ValueError('normalized replay requires null label and conversation')
     return raw, plan
 
@@ -172,6 +174,8 @@ def rebuild_archive(manifest_path, plan_path, objects, new_db, output):
                                           for name in IMPLEMENTATIONS},
                    scope='replay plan order, retained object hashes, declared logical rows and sampled FTS checks',
                    boundary=BOUNDARY_V3 if v3 else BOUNDARY_V2 if v2 else BOUNDARY)
+    if plan['schema'] == PLAN_SCHEMA_V2:
+        receipt['plan']['schema'] = PLAN_SCHEMA_V2
     if v2:
         receipt['manifest']['schema']=manifest['schema']
         receipt['excluded_checks']=['title_history','title_review_history']
@@ -202,12 +206,16 @@ def rebuild_archive(manifest_path, plan_path, objects, new_db, output):
         for index, step in enumerate(plan['steps']):
             raw = _object_bytes(paths[step['object_sha256']], step['object_sha256'])
             if step['kind'] == 'normalized':
-                result = ingest_bytes(staging, step['source'], raw, expected_sha256=step['object_sha256'])
+                selection_args = {'conversation': step['conversation']} if plan['schema'] == PLAN_SCHEMA_V2 else {}
+                result = ingest_bytes(staging, step['source'], raw, expected_sha256=step['object_sha256'], **selection_args)
             else:
                 result = import_export_bytes(staging, step['source'], raw, step['label'], step['kind'],
                                              step['conversation'], newline=step['newline'])
             receipt['steps'].append(dict(index=index, kind=step['kind'], object_sha256=step['object_sha256'],
                                          newline=step['newline'], records=result['records'], inserted=result['inserted']))
+            if plan['schema'] == PLAN_SCHEMA_V2 and step['kind'] == 'normalized':
+                receipt['steps'][-1]['conversation'] = step['conversation']
+                receipt['steps'][-1]['selection'] = result.get('selection')
             if step['object_sha256'] not in receipt['objects_used']:
                 receipt['objects_used'].append(step['object_sha256'])
         phase = 'ARCHIVE_VERIFICATION'

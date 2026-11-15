@@ -14,12 +14,11 @@ string. Conversation ordering and pagination retain Unicode code-point ID order.
 The shared coverage report retains identical/conflicting repeated-identity counts.
 Conflicts do not prevent inventory but can prevent subsequent ingest.
 
-Every normalized item has `selection_supported: false` and
-`selection_blocker: NOT_SUPPORTED`. Selected normalized ingest and selected
-normalized inspection are not supported. Listing an ID does not enable those
-operations, change import authorization, or predict a conflict-free write.
-`import --format normalized` and normalized title plans remain unavailable.
-Use ordinary `ingest` for the complete normalized file after checking it.
+Normalized items now report `selection_supported: true` and a null blocker.
+Selectable counts describe parser capability even when repeated identity conflicts
+may prevent ingest. Selected inspection/check-import and `ingest --conversation`
+are supported; `import --format normalized` and normalized title plans remain
+unavailable. See [explicit selection and replay](SELECTED_NORMALIZED.md).
 
 Metadata filters match IDs or titles. Text filters match individual supplied
 normalized message occurrences, optionally by role; only counts and metadata are

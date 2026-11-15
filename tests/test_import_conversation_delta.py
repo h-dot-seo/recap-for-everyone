@@ -60,8 +60,9 @@ class ImportDeltaTests(unittest.TestCase):
 
     def test_selection_and_source_scope(self):
         self.input.write_bytes(encoded([row('same'),row('new')]))
-        with self.assertRaisesRegex(ValueError,'does not support conversation selection'):
-            check_import(self.db,'synthetic',self.input,'normalized',conversation='same')
+        selected=check_import(self.db,'synthetic',self.input,'normalized',conversation='same')
+        self.assertEqual(selected['conversation_delta']['conversations'],1)
+        self.assertEqual(selected['conversation_delta']['counts']['no_new_identities'],1)
         with patch('recaplib.import_check.normalize',return_value=([row('same')],{})):
             result=check_import(self.db,'synthetic',self.input,'web',conversation='same')
         self.assertEqual(result['conversation_delta']['conversations'],1)

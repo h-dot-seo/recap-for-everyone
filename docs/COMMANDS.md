@@ -54,7 +54,7 @@ private. No content output, mutation, validation or stability promise. See
 #### `ingest`
 
 ```text
-usage: recap.py ingest [-h] --source SOURCE [--expected-sha256 EXPECTED_SHA256] input
+usage: recap.py ingest [-h] --source SOURCE [--conversation CONVERSATION] [--expected-sha256 EXPECTED_SHA256] input
 ```
 
 Optionally require inspected bytes with `--expected-sha256 HASH` before database
@@ -758,7 +758,7 @@ example, output boundaries and failure behavior.
 
 ## CLI version identity
 
-`python recap.py --version` prints `recap-for-everyone 0.100.17` and exits without
+`python recap.py --version` prints `recap-for-everyone 0.100.18` and exits without
 opening an archive or reading the publication manifest. It works outside the
 repository working directory and without the manifest. This numeric identity is
 not byte verification, authenticity or a stability guarantee. Use the documented

@@ -90,7 +90,7 @@ def list_export(path, kind, limit=50, offset=0, expected_export_sha256=None, *,
     for identity, item in items.items():
         item['role_counts'] = dict(sorted(roles.get(identity, {}).items()))
         item['extracted_messages'] = sum(item['role_counts'].values())
-        item['selection_blocker'] = ('NOT_SUPPORTED' if kind == 'normalized' else 'AMBIGUOUS_WEB_ID' if kind == 'web' and item['metadata_records'] > 1
+        item['selection_blocker'] = ('AMBIGUOUS_WEB_ID' if kind == 'web' and item['metadata_records'] > 1
                                      else 'NO_EXTRACTED_TEXT' if not item['extracted_messages'] else None)
         item['selection_supported'] = item['selection_blocker'] is None
         if text_contains is not None:
@@ -118,7 +118,7 @@ def list_export(path, kind, limit=50, offset=0, expected_export_sha256=None, *,
         scope='read-only export inventory; full file parsed; no database access or effective-history reconstruction',
         warning='PRIVATE METADATA: titles and IDs may be sensitive. No message body fields are included; titles are not redacted or verified. Selection support describes parser output, not import authorization or conflict-free database insertion.')
     if kind == 'normalized':
-        result['warning'] += (' Normalized selected ingest and inspection are not supported. '
+        result['warning'] += (' Normalized selection uses ingest, not export import. '
                               'Inventory results do not establish admission; repeated identity conflicts '
                               'remain in coverage and may block ingest.')
     if contains is not None:
