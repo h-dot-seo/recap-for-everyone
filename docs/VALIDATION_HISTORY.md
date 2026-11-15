@@ -3201,3 +3201,21 @@ Before/after outside wheel build and install, all 350 checkout file paths/hashes
 were identical (excluding normal .git/__pycache__). AST3.10/compile/diff, old144
 sh blocks, manifest349/audit350 pass. Existing test monkeypatch targets were not
 changed. No files, commands or package were uploaded to a package index.
+
+Initial PR CI run 43673890642 Windows3.12 job132689689440 failed one new
+version-output assertion: actual platform CRLF was compared with fixed LF.
+The test now expects os.linesep; product output is unchanged. Ubuntu3 rows had
+passed; Windows failure is retained here, not counted as a successful first run.
+
+After the newline oracle correction: full1,645 tests /74.866s PASS (same2
+local environment skips). All new subprocess byte assertions were reviewed:
+printed version text uses exactly os.linesep; root/module parity compares raw
+bytes on the same platform, without replace/strip; stable usage checks inspect
+prefixes rather than rewriting CRLF. Synthetic inputs and docs use explicit
+UTF-8. No expected full temporary path or Windows 8.3 spelling is hard-coded.
+Final checklist: distinguish print text/platform newline from binary-buffer LF
+before adding raw subprocess assertions, and retain platform failure history.
+
+The first PR run ultimately failed all three Windows rows at that same sole
+CRLF assertion (3.10 job132689689427, 3.12 job132689689440, 3.15 job132689689482);
+all three Ubuntu rows passed. No product failure was found in those logs.

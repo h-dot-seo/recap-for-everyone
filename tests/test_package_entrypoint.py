@@ -24,7 +24,7 @@ class PackageEntrypointTests(unittest.TestCase):
         return subprocess.run([sys.executable,'-m','recaplib',*map(str,args)],cwd=self.cwd,env=env or self.env,capture_output=True,timeout=30)
     def test_module_help_version_and_usage_outside_checkout(self):
         from recaplib import __version__
-        r=self.invoke('--version');self.assertEqual(r.returncode,0,r.stderr);self.assertEqual(r.stdout,('recap-for-everyone '+__version__+'\n').encode())
+        r=self.invoke('--version');self.assertEqual(r.returncode,0,r.stderr);self.assertEqual(r.stdout,('recap-for-everyone '+__version__+os.linesep).encode())
         r=self.invoke('--help');self.assertEqual(r.returncode,0);self.assertIn(b'usage: python -m recaplib',r.stdout)
         r=self.invoke('unknown-command');self.assertEqual(r.returncode,2);self.assertIn(b'usage: python -m recaplib',r.stderr)
     def test_synthetic_ingest_find_show_and_database_parity(self):
