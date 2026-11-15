@@ -69,7 +69,7 @@ class WebZipHashLeaseTests(unittest.TestCase):
     def test_invalid_hashes_reject_before_file_read(self):
         values = (True, False, 0, 1, [], {}, b'a' * 64, '', 'a' * 63, 'a' * 65,
                   'A' * 64, 'g' * 64, ' ' + 'a' * 63, 'a' * 63 + '\n')
-        with patch.object(preparation, 'archive_bytes', side_effect=AssertionError('must validate before read')):
+        with patch.object(preparation, 'checked_archive', side_effect=AssertionError('must validate before read')):
             for value in values:
                 with self.subTest(value=value):
                     with self.assertRaisesRegex(ValueError, '^expected archive hash must be a lowercase SHA-256 hex digest$'):
@@ -100,24 +100,21 @@ class WebZipHashLeaseTests(unittest.TestCase):
             with self.assertRaisesRegex(ValueError, 'changed after inspection'):
                 inspect_web_zip(self.path, expected_archive_sha256='0' * 64)
 
-    def test_one_immutable_read_and_no_decompression_database_or_writes(self):
-        expected = inspect_web_zip(self.path)
+    def test_two_hashes_detect_change_without_decompression_database_or_outputs(self):
         raw = self.path.read_bytes()
-        original = preparation.archive_bytes
+        original = preparation._hash_archive_stream
         calls = []
-        def read_then_replace(path):
-            calls.append(path)
-            content = original(path)
-            Path(path).write_bytes(b'synthetic changed after read')
-            return content
-        with patch.object(preparation, 'archive_bytes', side_effect=read_then_replace), \
+        def hash_then_change(stream):
+            calls.append(stream)
+            if len(calls)==2:self.path.write_bytes(b'synthetic changed after metadata')
+            return original(stream)
+        with patch.object(preparation, '_hash_archive_stream', side_effect=hash_then_change), \
              patch.object(zipfile.ZipFile, 'open', side_effect=AssertionError('no decompression')), \
              patch.object(sqlite3, 'connect', side_effect=AssertionError('no database')):
-            actual = inspect_web_zip(self.path, expected_archive_sha256=hashlib.sha256(raw).hexdigest())
-        self.assertEqual(actual, expected)
-        self.assertEqual(calls, [self.path])
+            with self.assertRaisesRegex(ValueError,'changed'):
+                inspect_web_zip(self.path, expected_archive_sha256=hashlib.sha256(raw).hexdigest())
+        self.assertEqual(len(calls),2);self.assertIs(calls[0],calls[1]);self.assertTrue(calls[0].closed)
         self.assertEqual(list(self.directory.iterdir()), [self.path])
-        self.assertFalse(actual['files_written'])
 
     def test_matching_lease_preserves_metadata_and_size_bounds(self):
         digest = inspect_web_zip(self.path)['archive_sha256']

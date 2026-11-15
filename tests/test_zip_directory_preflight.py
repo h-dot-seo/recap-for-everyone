@@ -1,4 +1,4 @@
-"""Directory-only entry budgets preserve one immutable archive snapshot."""
+"""Directory-only entry budgets precede ZIP metadata allocation."""
 import io
 from pathlib import Path
 import struct
@@ -86,6 +86,6 @@ class DirectoryPreflightTests(unittest.TestCase):
     def test_hash_mismatch_still_precedes_directory_preflight(self):
         with tempfile.TemporaryDirectory() as tmp:
             path=Path(tmp)/'synthetic.zip';path.write_bytes(b'invalid zip')
-            with patch.object(p,'check_directory',side_effect=AssertionError('hash first')):
+            with patch.object(p,'check_directory_stream',side_effect=AssertionError('hash first')):
                 with self.assertRaisesRegex(ValueError,'changed after inspection'):inspect_web_zip(path,expected_archive_sha256='0'*64)
                 with self.assertRaisesRegex(ValueError,'changed after inspection'):p.prepare_web_export(path,'conversations.json',Path(tmp)/'no',expected_archive_sha256='0'*64)

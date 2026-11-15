@@ -1,6 +1,5 @@
 """Read-only metadata inventory of conventionally named web conversation parts."""
 from collections import Counter
-import io
 from pathlib import PurePosixPath
 import re
 import zipfile
@@ -14,36 +13,35 @@ def inspect_web_zip(path, limit=50, offset=0, expected_archive_sha256=None, max_
     if type(limit) is not int or not 1 <= limit <= 100 or type(offset) is not int or not 0 <= offset <= 2**63-1:
         raise ValueError('limit must be 1..100 and offset must be an integer in 0..9223372036854775807')
     preparation._validate_expected_archive_sha256(expected_archive_sha256)
-    raw = preparation.archive_bytes(path)
-    archive_digest = preparation._checked_archive_sha256(raw, expected_archive_sha256)
-    try:
-        preparation.check_directory(raw, preparation.MAX_ENTRIES)
-        with zipfile.ZipFile(io.BytesIO(raw)) as archive:
-            entries = archive.infolist()
-            if len(entries) > preparation.MAX_ENTRIES:
-                raise ValueError('ZIP archive exceeds the 1000-entry preparation limit')
-            names = Counter(entry.filename for entry in entries)
-            candidates = []
-            for index, entry in enumerate(entries):
-                match = _NAME.fullmatch(PurePosixPath(entry.filename).name)
-                if match is None:
-                    continue
-                problem = preparation.member_problem(entry, max_member_bytes)
-                if names[entry.filename] != 1:
-                    problem = ('DUPLICATE_MEMBER', 'member name identifies multiple ZIP entries')
-                candidates.append(dict(member=entry.orig_filename, archive_entry_index=index,
-                                       numbered_part_hint=match.group(1),
-                                       compressed_bytes=entry.compress_size, declared_bytes=entry.file_size,
-                                       metadata_eligible=problem is None, reason_code=problem[0] if problem else None,
-                                       duplicate_name_count=names[entry.filename],
-                                       content_validation='NOT_PERFORMED',
-                                       exceeded_limits=preparation.exceeded_member_limits(entry, max_member_bytes)))
-    except (zipfile.BadZipFile, zipfile.LargeZipFile, RuntimeError, NotImplementedError) as error:
-        raise ValueError('invalid or unsupported ZIP archive metadata') from error
+    with preparation.checked_archive(path, expected_archive_sha256) as (archive_stream, archive_digest, archive_size):
+        try:
+            preparation.check_directory_stream(archive_stream, archive_size, preparation.MAX_ENTRIES)
+            with zipfile.ZipFile(archive_stream) as archive:
+                entries = archive.infolist()
+                if len(entries) > preparation.MAX_ENTRIES:
+                    raise ValueError('ZIP archive exceeds the 1000-entry preparation limit')
+                names = Counter(entry.filename for entry in entries)
+                candidates = []
+                for index, entry in enumerate(entries):
+                    match = _NAME.fullmatch(PurePosixPath(entry.filename).name)
+                    if match is None:
+                        continue
+                    problem = preparation.member_problem(entry, max_member_bytes)
+                    if names[entry.filename] != 1:
+                        problem = ('DUPLICATE_MEMBER', 'member name identifies multiple ZIP entries')
+                    candidates.append(dict(member=entry.orig_filename, archive_entry_index=index,
+                                           numbered_part_hint=match.group(1),
+                                           compressed_bytes=entry.compress_size, declared_bytes=entry.file_size,
+                                           metadata_eligible=problem is None, reason_code=problem[0] if problem else None,
+                                           duplicate_name_count=names[entry.filename],
+                                           content_validation='NOT_PERFORMED',
+                                           exceeded_limits=preparation.exceeded_member_limits(entry, max_member_bytes)))
+        except (zipfile.BadZipFile, zipfile.LargeZipFile, RuntimeError, NotImplementedError) as error:
+            raise ValueError('invalid or unsupported ZIP archive metadata') from error
     page = candidates[offset:offset+limit]
     return dict(schema='recap.web-zip-candidates.v1', archive_sha256=archive_digest,
                 limits=preparation.resource_limits(max_member_bytes),
-                archive_bytes=len(raw), total_entries=len(entries), total_candidates=len(candidates),
+                archive_bytes=archive_size, total_entries=len(entries), total_candidates=len(candidates),
                 other_entries_not_listed=len(entries)-len(candidates), limit=limit, offset=offset,
                 next_offset=offset+len(page) if offset+len(page)<len(candidates) else None,
                 candidates=page, candidate_order='central-directory order, not part chronology',

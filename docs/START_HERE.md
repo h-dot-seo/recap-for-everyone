@@ -26,6 +26,9 @@ before 2026-11-08 does not include all workflow commands shown here.
 
 Never guess a format from `.jsonl` alone. Inspect coverage/warnings first. Empty or
 failed extraction is not permission to fabricate content or collect from an account.
+ZIP inspection/preparation uses bounded same-handle hashing before and after
+processing, not an immutable archive snapshot. Preparation validates the member
+and final hash before staging; fixed limits still apply.
 Keep original files. Choose a stable `--source` label and the exact same `--db` when
 returning. Source labels are your archive grouping, not verified account identities.
 Do not use one label for unrelated inputs with conflicting conversation/message IDs.

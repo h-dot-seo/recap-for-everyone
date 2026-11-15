@@ -55,7 +55,7 @@ Before any output is staged, preparation requires:
 - Bounded decompression, consistent declared/result size and ZIP CRC validation.
 - UTF-8 strict JSON and successful validation by the existing web-export normalizer.
 
-The archive is read once into a bounded byte snapshot. Bounded end-record and
+The archive is hashed in 1 MiB chunks through one open file handle. Bounded end-record and
 central-directory traversal occurs before ZIP entry objects are constructed;
 attachment signatures do not count as entries. Unselected members are not decoded,
 shape-validated or extracted; unsafe unrelated names are harmless here because no
@@ -109,8 +109,8 @@ Successful v1 receipts now include `limits`: `member_bytes` (16777216),
 `ratio` (200), `entries` (1000), `archive_ceiling` (67108864), and
 `operator_supplied` (false). These disclose existing fixed safety bounds; the default ceiling is unchanged. An operator may lower the member bound as
 described below; no limit increase is permitted. Invalid or over-budget archives still
-fail without a successful receipt. Archive bytes are still read once into the
-same bounded immutable in-memory snapshot. This is not streaming support.
+fail without a successful receipt. Archive hashing uses bounded chunks from the same
+open handle before and after processing; no whole-archive byte copy is retained.
 
 Inventory candidates additionally carry `exceeded_limits`, an ordered list of
 `member_bytes` and/or `ratio` derived only from declared metadata. The ratio test
@@ -124,8 +124,8 @@ No candidate is decompressed to produce these diagnostics.
 The entry-budget preflight now walks only the declared central directory after
 checking its end records and byte bounds, before constructing ZipInfo objects.
 Signature-looking bytes in stored attachments no longer count as extra entries.
-The archive still uses one bounded immutable byte snapshot; no streaming or
-new compression format is introduced.
+The directory preflight uses bounded seek/read operations on the same open handle.
+No new compression format is introduced.
 
 ## Lowering the member budget
 
@@ -134,14 +134,14 @@ N must be an integer from 1 through 16777216 (the existing 16 MiB hard maximum).
 Omitting the option retains the previous default. The value is validated before
 archive access. It can reduce the decompressed-member byte budget on a constrained
 computer; it cannot raise any safety bound or make a rejected large member eligible.
-It does not cap total process memory: the ZIP snapshot and decoded JSON also use
-memory. Archive-size, entry-count and 200:1 ratio bounds stay unchanged.
+It does not cap total process memory: central-directory metadata, the selected
+member and decoded JSON also use memory. Archive-size, entry-count and 200:1 ratio bounds stay unchanged.
 
 Repeat the selected value in both commands when carrying a metadata selection to
 preparation. `--expected-archive-sha256` binds archive bytes, not this option.
 Preparation independently rechecks its effective member bound and reads at most
-N+1 bytes before size/CRC/JSON checks and before staging. No streaming or partial
-output is introduced. Successful `limits.member_bytes` echoes N and
+N+1 bytes before size/CRC/JSON checks and before staging. Member extraction is not
+streamed into staging, and no partial output is introduced. Successful `limits.member_bytes` echoes N and
 `operator_supplied` is true even when N equals the default.
 
 ## Bounded directory admission
@@ -158,9 +158,30 @@ CRC or JSON validation. Selected-member validation still occurs before staging.
 
 This removes false entry-limit rejection caused by signatures inside stored
 attachments without changing the accepted member formats or raising budgets.
-The snapshot is not re-read or streamed, and no partial output is published.
+The same open handle is rehashed before a successful result; no partial output is published.
 
 Relevant existing bounded readers now preflight regular-file type and their existing
-byte budget before open, while retaining one bounded read and post-read checks.
+byte budget before open. ZIP processing then uses bounded chunk hashing and a final rehash.
 Symlinks to regular files retain their prior behavior; this does not change the
 separate recovery restored/object symlink policy. See [security](../SECURITY.md).
+
+
+## Same-handle streaming boundary
+
+Both commands open the archive once and hash it in chunks of at most 1 MiB. The
+optional expected hash is checked first, followed by bounded EOCD/ZIP64 and
+central-directory preflight, then `ZipFile` on that same handle. Preparation reads
+the chosen member into bounded memory and completes size, CRC and JSON validation;
+inspection does not decompress or validate member content. Before a successful
+result, the same handle is rewound and hashed again, comparing both digest and byte
+count. Preparation starts staging only after this final comparison succeeds.
+
+A detected change raises `SourceChanged` without a successful receipt or prepared
+file. Parsing failures can skip the final hash, but likewise produce no successful
+result or publication. Matching first and last hashes do not prove an immutable
+snapshot and do not defend against hostile concurrent rewrites that restore the
+original bytes. Path replacement and concurrent filesystem changes are not a
+security boundary. The archive/member/entry/ratio limits, lower-only member option,
+CLI arguments and successful receipt fields are unchanged. Whole-archive byte
+copying is removed; central-directory and member/JSON allocations remain bounded
+by the existing byte ceilings, not a whole-process memory guarantee.

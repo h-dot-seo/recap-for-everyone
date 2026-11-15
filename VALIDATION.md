@@ -1,10 +1,34 @@
 # Validation record
 
-Current release: `0.100.5-storage-observation`, dated 2026-11-14.
+Current release: `0.100.6-streamed-zip-validation`, dated 2026-11-15.
 This file is the current snapshot. Every dated entry since the first release is kept
 unchanged and in order in [docs/VALIDATION_HISTORY.md](docs/VALIDATION_HISTORY.md).
 
 ## Latest change
+
+2026-11-15 Same-handle streamed ZIP validation (0.100.6-streamed-zip-validation):
+removes whole-archive allocation from inspect/prepare. Bounded chunk hashes before
+and after successful processing use one open file object with EOCD/ZIP64 preflight
+and ZipFile. Expected-hash rejection precedes metadata; selected CRC/JSON and the
+final comparison precede staging. Fixed bounds, CLI and receipt fields remain.
+Equal observed hashes are not an immutable snapshot or malicious-writer defense;
+change-and-restore is explicitly demonstrated. Parse errors close without output
+and do not claim a final digest check. No upper-bound policy is changed.
+
+Validation: 11 new synthetic tests cover chunk caps, same handle, late change,
+growth, parsing closure, directory parity/truncation and the documented command.
+Existing immutable-snapshot tests were deliberately replaced for this roadmap
+contract. Independent core review passed 46 tests and actual prior/current inspect
+CLI byte comparison. Three fresh-process trials per operation on one 32 MiB
+synthetic attachment ZIP observed median Python heap peaks of 67,114,645 bytes
+before, versus 2,147,983 inspect and 2,150,473 prepare afterward. These tracemalloc
+observations are not RSS, throughput or memory guarantees; member/JSON/directory
+allocations remain. The initial full run had one release-label mismatch because
+this validation entry was not yet updated; no product failure was identified.
+Final full suite: 1,582 tests passed (one environment-dependent skip).
+Python 3.10 grammar, compilation, 140 old shell blocks and manifest/audit passed.
+
+Previous change:
 
 2026-11-14 Pre-open SQLite storage observations (0.100.5-storage-observation):
 adds opt-in describe-schema --observe-storage without changing ordinary inventory

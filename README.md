@@ -289,3 +289,7 @@ Explicit recovery manifest v3 additionally declares every original-export metada
 V3 declarations can now drive an explicit metadata-preserving replay into a new DB, including zero-message imports. Title/review decisions remain excluded, not restored. See [v3 rebuild](docs/REBUILD_V3.md).
 
 Use `describe-schema --observe-storage` to observe SQLite header/sidecar metadata before opening the inventory. Read-only SQLite access may still change sidecars; this is not copy-safety verification. See [storage observations](docs/STORAGE_OBSERVATION.md).
+
+ZIP inspection/preparation now uses bounded same-handle reads and two digest checks,
+not an immutable byte snapshot. Fixed safety limits and receipts are unchanged.
+See [streamed ZIP validation](docs/ZIP_STREAMING.md) for its limits and measurements.

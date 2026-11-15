@@ -1,7 +1,7 @@
 """Prepare one explicitly chosen ZIP member as a new local web-export file."""
 from recaplib.errors import SourceChanged
 import hashlib
-import io
+from contextlib import contextmanager
 import os
 from pathlib import Path, PurePosixPath
 import stat
@@ -9,7 +9,7 @@ import tempfile
 import zipfile
 import zlib
 from recaplib.session_workflow import _normalize_bytes
-from recaplib.zip_preflight import check_directory
+from recaplib.zip_preflight import check_directory, check_directory_stream
 from recaplib.input_files import require_regular_file
 
 MAX_ARCHIVE_BYTES = 64 * 1024 * 1024
@@ -60,6 +60,39 @@ def archive_bytes(path):
     return raw
 
 
+def _hash_archive_stream(stream):
+    stream.seek(0)
+    digest = hashlib.sha256()
+    size = 0
+    while True:
+        chunk = stream.read(min(1024 * 1024, MAX_ARCHIVE_BYTES + 1 - size))
+        if not chunk:
+            break
+        size += len(chunk)
+        if size > MAX_ARCHIVE_BYTES:
+            raise ValueError('ZIP archive exceeds the 64 MiB preparation limit')
+        digest.update(chunk)
+    return digest.hexdigest(), size
+
+
+@contextmanager
+def checked_archive(path, expected=None):
+    """One open handle with bounded hashes before/after use, not an immutable lease."""
+    require_regular_file(path, max_bytes=MAX_ARCHIVE_BYTES, label='ZIP archive',
+                         too_large='ZIP archive exceeds the 64 MiB preparation limit')
+    with Path(path).open('rb', buffering=0) as stream:
+        digest, size = _hash_archive_stream(stream)
+        if expected is not None and digest != expected:
+            raise SourceChanged('ZIP archive changed after inspection; inspect and select again')
+        yield stream, digest, size
+        try:
+            final = _hash_archive_stream(stream)
+        except ValueError:
+            raise SourceChanged('ZIP archive changed during reading; inspect and select again') from None
+        if final != (digest, size):
+            raise SourceChanged('ZIP archive changed during reading; inspect and select again')
+
+
 def _validate_expected_archive_sha256(expected):
     if expected is not None and (not isinstance(expected, str) or len(expected) != 64 or any(ch not in '0123456789abcdef' for ch in expected)):
         raise ValueError('expected archive hash must be a lowercase SHA-256 hex digest')
@@ -98,34 +131,33 @@ def prepare_web_export(path, member, output, expected_archive_sha256=None, max_m
     member = _safe_member(member)
     if not member.lower().endswith('.json'):
         raise ValueError('select one JSON member, not an HTML page or attachment')
-    raw = archive_bytes(path)
-    archive_digest = _checked_archive_sha256(raw, expected_archive_sha256)
-    try:
-        check_directory(raw, MAX_ENTRIES)
-        with zipfile.ZipFile(io.BytesIO(raw)) as archive:
-            entries = archive.infolist()
-            if len(entries) > MAX_ENTRIES:
-                raise ValueError('ZIP archive exceeds the 1000-entry preparation limit')
-            selected = [entry for entry in entries if entry.filename == member]
-            if len(selected) != 1:
-                raise ValueError('member must identify exactly one ZIP entry; no member is selected automatically')
-            info = selected[0]
-            problem = member_problem(info, max_member_bytes)
-            if problem is not None:
-                if max_member_bytes is not None and problem[0] == 'MEMBER_EXPANSION_LIMIT':
-                    raise ValueError('selected member exceeds effective limits: ' + ', '.join(exceeded_member_limits(info, max_member_bytes)) + '; member_bytes=' + str(member_limit) + '; ratio=' + str(MAX_RATIO))
-                raise ValueError(problem[1])
-            with archive.open(info) as stream:
-                content = stream.read(member_limit + 1)
-            if len(content) > member_limit or len(content) != info.file_size:
-                raise ValueError('selected member size is inconsistent or exceeds the limit')
-            # read() reaches EOF for accepted members and validates the CRC.
-    except (zipfile.BadZipFile, zipfile.LargeZipFile, RuntimeError, NotImplementedError, zlib.error) as error:
-        raise ValueError('invalid or unsupported ZIP member') from error
-    try:
-        _, coverage = _normalize_bytes(content, PurePosixPath(member).name, 'web', include_report=True)
-    except (ValueError, KeyError, TypeError, UnicodeError, RecursionError) as error:
-        raise ValueError('selected JSON member is not a supported web export') from error
+    with checked_archive(path, expected_archive_sha256) as (archive_stream, archive_digest, archive_size):
+        try:
+            check_directory_stream(archive_stream, archive_size, MAX_ENTRIES)
+            with zipfile.ZipFile(archive_stream) as archive:
+                entries = archive.infolist()
+                if len(entries) > MAX_ENTRIES:
+                    raise ValueError('ZIP archive exceeds the 1000-entry preparation limit')
+                selected = [entry for entry in entries if entry.filename == member]
+                if len(selected) != 1:
+                    raise ValueError('member must identify exactly one ZIP entry; no member is selected automatically')
+                info = selected[0]
+                problem = member_problem(info, max_member_bytes)
+                if problem is not None:
+                    if max_member_bytes is not None and problem[0] == 'MEMBER_EXPANSION_LIMIT':
+                        raise ValueError('selected member exceeds effective limits: ' + ', '.join(exceeded_member_limits(info, max_member_bytes)) + '; member_bytes=' + str(member_limit) + '; ratio=' + str(MAX_RATIO))
+                    raise ValueError(problem[1])
+                with archive.open(info) as stream:
+                    content = stream.read(member_limit + 1)
+                if len(content) > member_limit or len(content) != info.file_size:
+                    raise ValueError('selected member size is inconsistent or exceeds the limit')
+                # read() reaches EOF for accepted members and validates the CRC.
+        except (zipfile.BadZipFile, zipfile.LargeZipFile, RuntimeError, NotImplementedError, zlib.error) as error:
+            raise ValueError('invalid or unsupported ZIP member') from error
+        try:
+            _, coverage = _normalize_bytes(content, PurePosixPath(member).name, 'web', include_report=True)
+        except (ValueError, KeyError, TypeError, UnicodeError, RecursionError) as error:
+            raise ValueError('selected JSON member is not a supported web export') from error
     destination = Path(output)
     parent = destination.parent.resolve(strict=True)
     destination = parent / destination.name
@@ -150,7 +182,7 @@ def prepare_web_export(path, member, output, expected_archive_sha256=None, max_m
                 cleanup_complete = False
     return dict(schema='recap.prepared-web-export.v1', archive_sha256=archive_digest,
                 limits=resource_limits(max_member_bytes),
-                archive_bytes=len(raw), selected_member=member, prepared_sha256=hashlib.sha256(content).hexdigest(),
+                archive_bytes=archive_size, selected_member=member, prepared_sha256=hashlib.sha256(content).hexdigest(),
                 prepared_bytes=len(content), coverage=coverage, database_access=False, remote_mutation=False,
                 staging_cleanup_complete=cleanup_complete,
                 remaining_staging_file=Path(temporary).name if not cleanup_complete else None,
