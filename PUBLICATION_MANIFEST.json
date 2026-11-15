@@ -1,12 +1,12 @@
 {
   "project": "recap-for-everyone",
-  "release": "0.100.12-document-admission",
+  "release": "0.100.13-package-entrypoint",
   "date": "2026-11-15",
   "private_history_imported": false,
   "actual_corpora_included": false,
   "synthetic_examples_only": true,
   "license_status": "NOT_SELECTED",
-  "file_count": 344,
+  "file_count": 349,
   "files": [
     {
       "path": ".gitattributes",
@@ -30,8 +30,8 @@
     },
     {
       "path": "README.md",
-      "bytes": 22372,
-      "sha256": "614a9648cd46083ade32c1be1cdd783b20c0d2d8346c3c575f2d0fc4c76d09f5"
+      "bytes": 22707,
+      "sha256": "e7a59ac7a095f06a17a18a0dca288dcd5057604f79dddb803d96aa2cc238d6a3"
     },
     {
       "path": "RIGHTS.md",
@@ -50,8 +50,8 @@
     },
     {
       "path": "VALIDATION.md",
-      "bytes": 1468,
-      "sha256": "de7a0c24eca530d4c880fc96348cfbc467cb1b89b465c763eba47ac0a1a88b92"
+      "bytes": 3202,
+      "sha256": "c87f7a582266885baca69e83074a7d17ce9314ad31bf8a8ccf032ecc64fb08ce"
     },
     {
       "path": "attributed_title.py",
@@ -105,8 +105,8 @@
     },
     {
       "path": "docs/ARCHITECTURE.md",
-      "bytes": 24600,
-      "sha256": "53aade6e086349931dc99ba1b65c18851735e8dd511edb3334be4b6c6a90259d"
+      "bytes": 24992,
+      "sha256": "7ed1f666bee52f54315e7e344ee163392c2b956e6d330d9ff1eb71e7c3f50f49"
     },
     {
       "path": "docs/ARCHIVE_BRANCH.md",
@@ -150,8 +150,8 @@
     },
     {
       "path": "docs/COMMANDS.md",
-      "bytes": 35697,
-      "sha256": "4a48ca23dbbe8bcd9d103f97bf0fe0eef8a11d2d393b2d266ff2f46fa74f06b0"
+      "bytes": 35724,
+      "sha256": "1f24a40bf7a13a007447da703b42a90f1e6a56f77c68a20146a7978648efb4e0"
     },
     {
       "path": "docs/COMMAND_CATALOG.md",
@@ -200,8 +200,8 @@
     },
     {
       "path": "docs/INSTALL.md",
-      "bytes": 8442,
-      "sha256": "ee879f88cc67ad66884b7e0b54551bef6d427f32cd7020f5f1b8903ecd3f0be8"
+      "bytes": 8548,
+      "sha256": "f68806ae67d1b9d1742b0a6ba747e98ab97cc8ce812ddceb44e850551a8d6b02"
     },
     {
       "path": "docs/JSON_ERRORS.md",
@@ -239,6 +239,11 @@
       "sha256": "354c4d9478d1884e0458ebad1be4cf79737d7b96b7232d4a7376f01c1aa30d9e"
     },
     {
+      "path": "docs/PACKAGE_INSTALL.md",
+      "bytes": 3046,
+      "sha256": "b4079b311bc4e6360bd5a4f7172b83cbde24fe21119f61aeb650c0cf034e4e4e"
+    },
+    {
       "path": "docs/PREPARE_WEB_EXPORT.md",
       "bytes": 11957,
       "sha256": "dff1b4d872e651b7d41bc9fc849d48d44045eede2959553c9251ab3de4464508"
@@ -250,8 +255,8 @@
     },
     {
       "path": "docs/README.ko.md",
-      "bytes": 24844,
-      "sha256": "e4ec37a3e3b9ffc9ac3fa25c912c6fd32648e8d1aa45e14b5b577397aafe2d75"
+      "bytes": 25197,
+      "sha256": "93ce52cd16d95bf5d2c518d819411ff1484e7f2ebd0387ca7b92cd197f2e279d"
     },
     {
       "path": "docs/REBUILD_REHEARSAL.md",
@@ -435,8 +440,8 @@
     },
     {
       "path": "docs/VALIDATION_HISTORY.md",
-      "bytes": 216327,
-      "sha256": "8428adae9775a4214d07d1c00100eb010ced3477fd631346e97e26c7b0fbe18f"
+      "bytes": 219368,
+      "sha256": "7310bceb3a75ee62cce347b5457fba6a2de79fff475785e2bb685000c658fa29"
     },
     {
       "path": "docs/WEB_ZIP_INVENTORY.md",
@@ -584,9 +589,14 @@
       "sha256": "101831e65e1198fb24c6cf0ddc0779676ffc50633011bdd1de676f16f8b9d543"
     },
     {
+      "path": "pyproject.toml",
+      "bytes": 391,
+      "sha256": "545953d0491ae5506bda71b8fbc016205306be4ae8c8909c1610fa26f14124fc"
+    },
+    {
       "path": "recap.py",
-      "bytes": 34230,
-      "sha256": "92809400cea4150adbd2dab089ab0640de1b3dc45ff808daf54b3d7f83cbae28"
+      "bytes": 466,
+      "sha256": "87c57e4d8d7d6e953d3d19e8f9ec040b376c0c26e49d3d7ab941c971b28a06af"
     },
     {
       "path": "recap_mcp.py",
@@ -595,8 +605,13 @@
     },
     {
       "path": "recaplib/__init__.py",
-      "bytes": 127,
-      "sha256": "305bb21af7d9ca9a6c99db52c651068e8920f0554fc6ae607a965c367edc3c7f"
+      "bytes": 110,
+      "sha256": "22c4b2ce966a8a0732154f4b107404ef6408438dba361f28d81efd30c302a7ea"
+    },
+    {
+      "path": "recaplib/__main__.py",
+      "bytes": 141,
+      "sha256": "722d1bdb2b2685d1df1de8b0e354309cfb0ccacfde2e1a31ac12ccfec258ef08"
     },
     {
       "path": "recaplib/archive.py",
@@ -622,6 +637,11 @@
       "path": "recaplib/branch_title.py",
       "bytes": 4903,
       "sha256": "7ffb57cdd0ed7e5fbb7506268263f54e3a652ef1870e489156c55e489389839a"
+    },
+    {
+      "path": "recaplib/cli.py",
+      "bytes": 34555,
+      "sha256": "29dbce2aac028d3b14fa1afd3dddcdd6f7dea3919db294c20dcffce8542726da"
     },
     {
       "path": "recaplib/cli_errors.py",
@@ -1252,6 +1272,11 @@
       "path": "tests/test_original_exports.py",
       "bytes": 13898,
       "sha256": "6c2405fa819cd2f68fc765cbf3160d4c23c172e332cda0c49b66473a84068af0"
+    },
+    {
+      "path": "tests/test_package_entrypoint.py",
+      "bytes": 5665,
+      "sha256": "807983ac2b3ada3a009e2441a2e3f0ea6993bbe1a30249a67e786c0bbf47de59"
     },
     {
       "path": "tests/test_prepare_web_export.py",

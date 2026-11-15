@@ -1,6 +1,7 @@
 # Get the code and check your runtime
 
-Recap runs directly from this source checkout. These instructions do not require
+Recap runs directly from this source checkout; optional isolated command installation
+is described in [Package installation](PACKAGE_INSTALL.md). The checkout instructions do not require
 `pip install`, a model, an account or an API key. Downloading Python or the code
 initially needs network access; the local import/search/title workflow does not.
 
@@ -140,7 +141,7 @@ or supply reviewed wording when the first excerpt is too generic.
 ## Report the CLI version
 
 Run `python recap.py --version` with your chosen launcher to print
-`recap-for-everyone 0.100.12`. This reads the bundled numeric identity, not an archive
+`recap-for-everyone 0.100.13`. This reads the bundled numeric identity, not an archive
 or the publication manifest; a missing manifest does not prevent this command.
 A version number is not proof of file integrity, authenticity or API stability.
 Keep using the manifest verification and validation record for their stated scope.

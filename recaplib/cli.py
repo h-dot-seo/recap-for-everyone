@@ -1,0 +1,427 @@
+#!/usr/bin/env python3
+"""Local-only archive import, inspection, search and checked title workflows."""
+from recaplib.cli_errors import safe_diagnostic
+from recaplib import __version__
+from recaplib.input_files import read_document_text
+import argparse
+import json
+import sqlite3
+from pathlib import Path
+# The archive core lives in recaplib/archive.py; these names stay importable from recap.
+from recaplib.archive import SCHEMA, _validate_source, ingest, ingest_bytes, readonly, search, validate_normalized
+
+
+def build_parser(prog=None):
+    from recaplib.title_document_output import add_output_argument
+    p = argparse.ArgumentParser(prog=prog, description=__doc__)
+    p.add_argument('--version', action='version', version='recap-for-everyone '+__version__)
+    p.add_argument('--db')
+    p.add_argument('--json-errors', action='store_true', help='emit structured stderr for caught execution failures only; usage and result failures are unchanged')
+    sub = p.add_subparsers(dest='command', required=True)
+    imp = sub.add_parser('ingest'); imp.add_argument('input'); imp.add_argument('--source', required=True)
+    imp.add_argument('--expected-sha256', help='require the normalized whole-file hash from inspection before writing')
+    find = sub.add_parser('search'); find.add_argument('query'); find.add_argument('--limit', type=int, default=20)
+    stats = sub.add_parser('stats')
+    stats.add_argument('--by-source', action='store_true', help='read-only per-source counts and declared timestamp coverage')
+    ledger_parser=sub.add_parser('ledger',help='read explicit import metadata and unledgered identities')
+    ledger_parser.add_argument('--source'); ledger_parser.add_argument('--limit',type=int,default=50)
+    ledger_parser.add_argument('--offset',type=int,default=0); ledger_parser.add_argument('--text',action='store_true')
+    describe_schema_parser = sub.add_parser('describe-schema', help='inspect a read-only archive metadata snapshot, not validate it')
+    describe_schema_parser.add_argument('--observe-storage', action='store_true', help='observe the main header and sidecar kinds/sizes before SQLite opening; not a copy-safety check')
+    check = sub.add_parser('inspect', help='inspect export coverage without a database')
+    check.add_argument('input'); check.add_argument('--format', choices=['web', 'local', 'local-codex', 'normalized'], required=True)
+    check.add_argument('--conversation', help='inspect an explicit conversation selection without writing')
+    check.add_argument('--expected-export-sha256', help='require the exact original whole-file hash from earlier inspection')
+    inventory = sub.add_parser('list-export', help='list export IDs, titles and selection support without importing')
+    inventory.add_argument('input'); inventory.add_argument('--format', choices=['web', 'local', 'local-codex', 'normalized'], required=True)
+    inventory.add_argument('--limit', type=int, default=50); inventory.add_argument('--offset', type=int, default=0)
+    inventory.add_argument('--expected-export-sha256', help='require the same original whole-file hash as an earlier page')
+    filters = inventory.add_mutually_exclusive_group()
+    filters.add_argument('--contains', help='filter IDs or existing web titles by one literal case-insensitive substring before pagination')
+    filters.add_argument('--text-contains', help='find IDs by one literal substring in extracted message text; return metadata and match counts, not bodies')
+    inventory.add_argument('--text-role', choices=['user', 'assistant', 'system', 'tool'],
+                           help='restrict text matches to one extracted role; requires --text-contains')
+    inventory.add_argument('--canonical-unicode', action='store_true', help='match canonical Unicode equivalents; requires --contains or --text-contains')
+    zip_info = sub.add_parser('inspect-web-zip', help='list conventional conversation JSON member metadata without decompression')
+    zip_info.add_argument('input'); zip_info.add_argument('--limit', type=int, default=50); zip_info.add_argument('--offset', type=int, default=0)
+    zip_info.add_argument('--expected-archive-sha256', help='require the same whole ZIP byte snapshot as an earlier candidate page')
+    zip_info.add_argument('--max-member-bytes', type=int, help='lower the member-byte bound; cannot exceed the fixed safety maximum')
+    prepare = sub.add_parser('prepare-web-export', help='validate one explicit ZIP JSON member and publish a new no-overwrite local file')
+    prepare.add_argument('input'); prepare.add_argument('--member', required=True); prepare.add_argument('--output', required=True)
+    prepare.add_argument('--max-member-bytes', type=int, help='lower the member-byte bound; cannot exceed the fixed safety maximum')
+    prepare.add_argument('--expected-archive-sha256', help='reject a ZIP whose bytes changed since metadata inspection')
+    replay = sub.add_parser('replay-local', help='validate and project a narrow completed-turn text grammar')
+    replay.add_argument('input')
+    branch = sub.add_parser('web-branch', help='read one path from an explicit web export without a database')
+    branch.add_argument('input'); branch.add_argument('--conversation', required=True); branch.add_argument('--node')
+    branch_title = sub.add_parser('suggest-branch-title', help='suggest a local title from an archived export branch')
+    branch_title.add_argument('input'); branch_title.add_argument('--source', required=True)
+    branch_title.add_argument('--conversation', required=True); branch_title.add_argument('--node')
+    branch_title.add_argument('--message', help='use exactly this archived user message inside the verified selected branch')
+    replay_title = sub.add_parser('suggest-replay-title', help='suggest a checked local title from retained projected turns')
+    replay_title.add_argument('input'); replay_title.add_argument('--source', required=True)
+    replay_title.add_argument('--conversation', required=True)
+    replay_title.add_argument('--message', help='use exactly this archived user message inside the verified retained turns, not a projection ID')
+    attributed = sub.add_parser('suggest-attributed-title', help='suggest a title from explicit user-source labels in a verified local-codex export')
+    attributed.add_argument('input'); attributed.add_argument('--source', required=True)
+    attributed.add_argument('--conversation', required=True)
+    attributed.add_argument('--message', help='select one archived user message with explicit user-labeled text')
+    attributed.add_argument('--origin-locator', help='select the exact line:N occurrence of --message in this verified export')
+    for name in ('preview-title', 'apply-title'):
+        command = sub.add_parser(name, help='review a proposal' if name == 'preview-title' else 'apply a reviewed local display title')
+        command.add_argument('input', help='proposal JSON for preview, reviewed preview JSON for apply')
+        if name == 'preview-title':
+            add_output_argument(command)
+            command.add_argument('--with-evidence', action='store_true', help='include bounded raw user-message excerpts and provenance for private review')
+            command.add_argument('--conversation', help='select exactly one READY item from a title review queue')
+            command.add_argument('--title', help='explicit replacement title; reclassified as operator wording')
+    state = sub.add_parser('review-state', help='read or explicitly record a local open/skipped/deferred review decision')
+    state.add_argument('--source', required=True); state.add_argument('--conversation', required=True)
+    state.add_argument('--set', choices=['open', 'skipped', 'deferred'])
+    state.add_argument('--expected-state-revision', type=int); state.add_argument('--expected-title-revision', type=int)
+    state.add_argument('--expected-content-sha256')
+    state.add_argument('--from-queue', help='use the selected saved queue item lease; requires --set and excludes explicit expected flags')
+    queue_view = sub.add_parser('render-queue', help='render one saved title review queue as read-only HTML; no database')
+    queue_view.add_argument('input', metavar='QUEUE.json')
+    queue_view.add_argument('--output', required=True, metavar='NEW_FILE')
+    batch = sub.add_parser('review-titles', help='build a read-only page of local title proposals and collision warnings')
+    batch.add_argument('--source', required=True); batch.add_argument('--limit', type=int, default=20); batch.add_argument('--offset', type=int, default=0)
+    batch.add_argument('--conversation', action='append', help='review only these explicit IDs; repeat, then intersect other filters')
+    batch.add_argument('--since-checkpoint', help='filter changes from an explicit unsigned source checkpoint; not review completion')
+    batch.add_argument('--state', choices=['open', 'skipped', 'deferred'], help='filter by current snapshot-bound review state; scans eligible source content')
+    batch.add_argument('--unrenamed-only', action='store_true', help='exclude conversations with any existing local title history')
+    batch.add_argument('--proposal', action='append', help='explicit proposal JSON object file; repeat to review supplied candidates instead of generating raw excerpts')
+    batch.add_argument('--supplied-only', action='store_true', help='show only supplied candidate identities before pagination; requires --proposal')
+    for command in (batch, branch_title, replay_title, attributed):
+        add_output_argument(command)
+    transfer = sub.add_parser('title-adapter-dry-run', help='validate a mock-only transfer request without executing')
+    transfer.add_argument('input'); transfer.add_argument('plan'); transfer.add_argument('target')
+    simulation = sub.add_parser('title-adapter-simulate', help='simulate an explicitly approved title transfer in memory only')
+    simulation.add_argument('input'); simulation.add_argument('request'); simulation.add_argument('approval'); simulation.add_argument('target')
+    plan = sub.add_parser('export-title-plan', help='export metadata for a manual title change')
+    plan.add_argument('input'); plan.add_argument('--format', choices=['web', 'local', 'local-codex'], required=True)
+    plan.add_argument('--source', required=True); plan.add_argument('--conversation', required=True)
+    check_plan = sub.add_parser('check-title-plan', help='recheck a manual title plan without executing it')
+    check_plan.add_argument('input'); check_plan.add_argument('plan')
+    export = sub.add_parser('import', help='import an explicitly selected web/local export')
+    export.add_argument('input'); export.add_argument('--format', choices=['web', 'local', 'local-codex'], required=True); export.add_argument('--source', required=True)
+    export.add_argument('--conversation', help='import only this explicit conversation after validating the whole file')
+    export.add_argument('--expected-export-sha256', help='require the exact original whole-file hash from earlier inspection')
+    admission = sub.add_parser('check-import', help='diagnose identity conflicts against an existing archive without importing')
+    admission.add_argument('input'); admission.add_argument('--format', choices=['web', 'local', 'local-codex', 'normalized'], required=True)
+    admission.add_argument('--source', required=True); admission.add_argument('--conversation')
+    admission.add_argument('--expected-export-sha256'); admission.add_argument('--limit', type=int, default=20)
+    admission.add_argument('--delta-output', help='exclusive new private file for bounded conversation delta ID samples')
+    normalized = sub.add_parser('export-normalized', help='export private message text as derived normalized JSONL')
+    normalized.add_argument('--source', required=True)
+    normalized.add_argument('--conversation')
+    normalized.add_argument('--output', required=True)
+    provenance = sub.add_parser('export-provenance', help='save one private text-free message locator card')
+    provenance.add_argument('--source', required=True); provenance.add_argument('--conversation', required=True)
+    provenance.add_argument('--message', required=True); provenance.add_argument('--output', required=True)
+    provenance.add_argument('--declared-at'); provenance.add_argument('--text', action='store_true')
+    provenance_check = sub.add_parser('check-provenance', help='compare a saved message locator card with one archive snapshot')
+    provenance_check.add_argument('input'); provenance_check.add_argument('--text', action='store_true')
+    checkpoint = sub.add_parser('declare-review-checkpoint', help='save a private source-wide read snapshot; no review decision')
+    checkpoint.add_argument('--source', required=True); checkpoint.add_argument('--output', required=True)
+    checkpoint.add_argument('--declared-at'); checkpoint.add_argument('--text', action='store_true')
+    cutoff = sub.add_parser('declare-checkpoint', help='declare a private accepted-artifact cutoff; no review decision')
+    cutoff.add_argument('--source', required=True); cutoff.add_argument('--output', required=True)
+    cutoff.add_argument('--declared-at'); cutoff.add_argument('--text', action='store_true')
+    changed = sub.add_parser('changed-since', help='verify a source artifact cutoff and report counts only')
+    changed.add_argument('--source', required=True); changed.add_argument('--checkpoint', required=True)
+    changed.add_argument('--text', action='store_true')
+    declare = sub.add_parser('declare-recovery', help='write a recovery manifest describing the live archive without changing it')
+    declare.add_argument('--output', required=True, help='new manifest JSON path outside the archive; existing paths are refused')
+    declare.add_argument('--manifest-version',type=int,choices=(1,2,3),default=1,help='explicit manifest version; default 1, versions 2/3 declare additional ledgers; version 3 also supports rebuild with an explicit replay plan')
+    declare.add_argument('--declared-at', help='YYYY-MM-DD recorded as supplied text; no clock is read')
+    rehearse = sub.add_parser('rehearse-recovery', help='verify a restored archive copy against a declared manifest and write a receipt')
+    rehearse.add_argument('input', help='recovery manifest JSON written by declare-recovery')
+    rehearse.add_argument('--restored-db', required=True, help='restored SQLite copy; opened read-only and never written')
+    rehearse.add_argument('--output', required=True, help='new receipt JSON path; existing paths are refused')
+    rehearse.add_argument('--objects', help='directory of fetched backup objects to hash for every declared artifact and original export hash')
+    rebuild = sub.add_parser('rebuild-archive', help='replay declared objects into an exclusively new verified database')
+    rebuild.add_argument('input', help='recovery manifest JSON')
+    rebuild.add_argument('--plan', required=True)
+    rebuild.add_argument('--objects', required=True)
+    rebuild.add_argument('--new-db', required=True)
+    rebuild.add_argument('--output', required=True)
+    for command in (declare, rehearse, rebuild):
+        command.add_argument('--text', action='store_true', help='print an ASCII text summary instead of JSON')
+    listing = sub.add_parser('list', help='list conversations and current display titles')
+    listing.add_argument('--source'); listing.add_argument('--limit', type=int, default=50); listing.add_argument('--offset', type=int, default=0)
+    listing.add_argument('--order', choices=['recent', 'oldest'])
+    listing.add_argument('--from', dest='from_date')
+    listing.add_argument('--until', dest='until_date')
+    find = sub.add_parser('find', help='search current titles and conversation text')
+    find.add_argument('query'); find.add_argument('--source'); find.add_argument('--limit', type=int, default=20)
+    find.add_argument('--export-sha256', help='restrict message bodies to one original export provenance hash')
+    find.add_argument('--include-title-history', action='store_true', help='also search prior local display titles; may reveal old private labels')
+    find.add_argument('--canonical-unicode', action='store_true', help='match canonical Unicode equivalents without rewriting evidence')
+    find.add_argument('--text-role', choices=['user', 'assistant', 'system', 'tool'], help='restrict message bodies to one role')
+    find.add_argument('--from', dest='from_date')
+    find.add_argument('--until', dest='until_date')
+    find.add_argument('--cursor', help='continue with the previous search next_cursor and the same query/filters')
+    for name in ('show', 'render', 'suggest-title', 'title', 'title-history'):
+        command = sub.add_parser(name)
+        command.add_argument('--source', required=True); command.add_argument('--conversation', required=True)
+        if name == 'show':
+            command.add_argument('--branch',action='store_true',help='read one recorded web export path')
+            command.add_argument('--node',help='explicit recorded node; requires --branch')
+            command.add_argument('--export-sha256',help='recorded original export SHA-256; requires --branch')
+            command.add_argument('--output', help='save exact show JSON to a new private UTF-8 file; print receipt only')
+        if name == 'suggest-title':
+            add_output_argument(command)
+            command.add_argument('--message', help='use exactly this archived user message for the excerpt; no alternate-message fallback')
+        if name in ('show', 'render'):
+            command.add_argument('--limit', type=int, help='read at most this many messages (1..1000)')
+            command.add_argument('--offset', type=int, default=None if name=='show' else 0, help='message offset; requires --limit')
+            command.add_argument('--message', help='read exactly this message ID; excludes --limit/--offset')
+            command.add_argument('--around-message', help='read bounded raw archive neighbors around this exact message ID')
+            command.add_argument('--before', type=int, help='earlier archive neighbors, 0..50; default 2 with --around-message')
+            command.add_argument('--after', type=int, help='later archive neighbors, 0..50; default 2 with --around-message')
+        if name == 'render':
+            command.add_argument('--format', choices=['html', 'markdown'], required=True)
+            command.add_argument('--output', required=True, metavar='NEW_FILE')
+        if name == 'title':
+            command.add_argument('--set'); command.add_argument('--expected-revision', type=int)
+        if name == 'title-history':
+            command.add_argument('--limit', type=int, default=20)
+            command.add_argument('--offset', type=int, default=0)
+            command.add_argument('--expected-revision', type=int,
+                                 help='reject title history changed since an earlier page')
+    description = sub.add_parser('describe', help='describe command arguments and reviewed local effects without opening an archive')
+    description.add_argument('name', nargs='?', choices=sorted(sub.choices))
+    return p
+
+
+def main(prog=None):
+    return _run(prog, (ingest, search, readonly))
+
+
+def _run(prog, archive_functions):
+    # The checkout shim supplies its live re-exports, preserving caller patches
+    # without mutating module globals or importing the generic root module.
+    ingest, search, readonly = archive_functions
+    from recaplib.title_document_output import save_if_requested
+    from recaplib.command_catalog import needs_db, describe
+    p = build_parser(prog)
+    args = p.parse_args()
+    if needs_db(args.command) == 'required' and not args.db:
+        p.error('--db is required except for inspect, list-export, web-branch, replay-local, prepare-web-export, inspect-web-zip, rehearse-recovery, rebuild-archive, render-queue and describe')
+    if args.command == 'render-queue' and args.db:
+        p.error('render-queue reads a saved JSON file only; do not pass --db')
+    if args.command == 'rebuild-archive' and args.db:
+        p.error('rebuild-archive creates --new-db only; do not pass --db')
+    if args.command == 'rehearse-recovery' and args.db:
+        p.error('rehearse-recovery opens --restored-db only; do not pass --db')
+    if args.command == 'describe':
+        print(json.dumps(describe(p, args.name), ensure_ascii=True, indent=2))
+        return
+    try:
+        if args.command == 'render-queue':
+            from recaplib.render_queue import render_queue
+            result = render_queue(args.input, args.output)
+        elif args.command == 'list-export':
+            from recaplib.export_inventory import list_export
+            result = list_export(args.input, args.format, args.limit, args.offset, args.expected_export_sha256,
+                                 contains=args.contains, canonical_unicode=args.canonical_unicode,
+                                 text_contains=args.text_contains, text_role=args.text_role)
+        elif args.command == 'inspect-web-zip':
+            from recaplib.inspect_web_zip import inspect_web_zip
+            result = inspect_web_zip(args.input, args.limit, args.offset, args.expected_archive_sha256, args.max_member_bytes)
+        elif args.command == 'check-import':
+            from recaplib.import_check import check_import
+            result = check_import(args.db, args.source, args.input, args.format, args.conversation,
+                                  args.expected_export_sha256, args.limit, args.delta_output)
+        elif args.command == 'prepare-web-export':
+            from recaplib.prepare_web_export import prepare_web_export
+            result = prepare_web_export(args.input, args.member, args.output, args.expected_archive_sha256, args.max_member_bytes)
+        elif args.command == 'replay-local':
+            from recaplib.replay_local import reconstruct
+            result = reconstruct(args.input)
+            print(json.dumps(result, ensure_ascii=True, indent=2))
+            if not result['supported']:
+                raise SystemExit(1)
+            return
+        elif args.command == 'review-state':
+            from recaplib.title_review_state import review_state, review_state_from_queue
+            if args.from_queue is not None:
+                if args.set is None or any(value is not None for value in (args.expected_state_revision, args.expected_title_revision, args.expected_content_sha256)):
+                    raise ValueError('--from-queue requires --set and cannot be combined with explicit expected values')
+                from recaplib.title_proposal import read_document
+                queue = read_document(args.from_queue)
+                result = review_state_from_queue(args.db, args.source, args.conversation, args.set, queue)
+            else:
+                result = review_state(args.db, args.source, args.conversation, args.set, args.expected_state_revision, args.expected_title_revision, args.expected_content_sha256)
+        elif args.command == 'review-titles':
+            from recaplib.title_batch import review_queue, load_supplied_proposals
+            supplied = load_supplied_proposals(args.proposal) if args.proposal is not None else None
+            result = review_queue(args.db, args.source, args.limit, args.offset, args.unrenamed_only, args.state, supplied, args.supplied_only, args.conversation, checkpoint=args.since_checkpoint)
+        elif args.command in ('title-adapter-dry-run', 'title-adapter-simulate'):
+            from recaplib.title_transfer import dry_run, simulate, MockTitleAdapter
+            from recaplib.strict_json import loads
+            def document(path):
+                return loads(read_document_text(path))
+            target = document(args.target)
+            if args.command == 'title-adapter-dry-run':
+                result = dry_run(args.db, args.input, document(args.plan), target)
+            else:
+                result = simulate(args.db, args.input, document(args.request), document(args.approval), MockTitleAdapter(target))
+        elif args.command in ('preview-title', 'apply-title'):
+            from recaplib.title_proposal import preview, apply_preview, read_document
+            value = read_document(args.input)
+            if args.command == 'preview-title' and args.conversation is not None:
+                from recaplib.title_batch import select_proposal
+                value = select_proposal(value, args.conversation)
+            result = preview(args.db, value, args.title, args.with_evidence) if args.command == 'preview-title' else apply_preview(args.db, value)
+        elif args.command == 'suggest-replay-title':
+            from recaplib.replay_title import suggest_replay
+            result = suggest_replay(args.db, args.source, args.conversation, args.input, args.message)
+        elif args.command == 'suggest-attributed-title':
+            from recaplib.attributed_title import suggest_attributed
+            result = suggest_attributed(args.db, args.source, args.conversation, args.input, args.message, args.origin_locator)
+        elif args.command == 'export-title-plan':
+            from recaplib.title_plan import make_plan
+            result = make_plan(args.db, args.source, args.conversation, args.input, args.format)
+        elif args.command == 'check-title-plan':
+            from recaplib.title_plan import check_plan
+            from recaplib.strict_json import loads
+            result = check_plan(args.db, args.input, loads(read_document_text(args.plan)))
+        elif args.command == 'suggest-branch-title':
+            from recaplib.branch_title import suggest_branch
+            result = suggest_branch(args.db, args.source, args.conversation, args.input, args.node, args.message)
+        elif args.command == 'web-branch':
+            from recaplib.web_branch import branch_view
+            result = branch_view(args.input, args.conversation, args.node)
+        elif args.command == 'ingest':
+            result = ingest(args.db, args.source, args.input, expected_sha256=args.expected_sha256)
+        elif args.command == 'search':
+            result = search(args.db, args.query, args.limit)
+        elif args.command == 'describe-schema':
+            from recaplib.archive_schema import describe_schema
+            result = describe_schema(args.db, observe_storage=args.observe_storage)
+        elif args.command == 'stats' and args.by_source:
+            from recaplib.time_stats import stats_by_source
+            result = stats_by_source(args.db)
+        elif args.command == 'stats':
+            c = readonly(args.db)
+            try:
+                result = {'messages': c.execute('SELECT count(*) FROM messages').fetchone()[0],
+                          'artifacts': c.execute('SELECT count(*) FROM artifacts').fetchone()[0]}
+            finally:
+                c.close()
+        elif args.command in ('inspect', 'import', 'title'):
+            # Lazy adapter imports keep the core library free of import cycles.
+            from recaplib.session_workflow import inspect_export, import_export, titles
+            if args.command == 'inspect':
+                result = inspect_export(args.input, args.format, args.conversation, args.expected_export_sha256)
+            elif args.command == 'import':
+                result = import_export(args.db, args.source, args.input, args.format, args.conversation, args.expected_export_sha256)
+            else:
+                if args.set is not None and args.expected_revision is None:
+                    raise ValueError('--set requires --expected-revision from a title preview')
+                result = titles(args.db, args.source, args.conversation, args.set, args.expected_revision)
+        elif args.command == 'title-history':
+            from recaplib.title_history import history
+            result = history(args.db, args.source, args.conversation,
+                             args.limit, args.offset, args.expected_revision)
+        elif args.command == 'list':
+            from recaplib.conversation_view import conversations
+            result = conversations(args.db, args.source, args.limit, args.offset,
+                                   order=args.order, from_date=args.from_date, until_date=args.until_date)
+        elif args.command == 'render':
+            from recaplib.render_view import render_conversation
+            result = render_conversation(args.db, args.source, args.conversation, args.output,
+                                         args.limit, args.offset, args.message,
+                                         args.around_message, args.before, args.after, args.format)
+        elif args.command == 'show':
+            from recaplib.conversation_view import conversation, _UNSET_OFFSET
+            if args.offset is None:args.offset=_UNSET_OFFSET
+            if args.output is not None:
+                from recaplib.conversation_document import save_conversation
+                result = save_conversation(args.db, args.source, args.conversation, args.limit, args.offset, args.message,
+                                           args.around_message, args.before, args.after, output=args.output, branch=args.branch, node=args.node, export_sha256=args.export_sha256)
+            else:
+                result = conversation(args.db, args.source, args.conversation, args.limit, args.offset, args.message,
+                                      args.around_message, args.before, args.after, branch=args.branch, node=args.node, export_sha256=args.export_sha256)
+        elif args.command == 'find':
+            from recaplib.conversation_search import find
+            result = find(args.db, args.query, args.source, args.limit, args.include_title_history, args.export_sha256, args.cursor, args.canonical_unicode, args.text_role, args.from_date, args.until_date)
+        elif args.command == 'export-normalized':
+            from recaplib.normalized_export import export_normalized
+            result = export_normalized(args.db, args.source, args.output, args.conversation)
+        elif args.command == 'export-provenance':
+            from recaplib.message_provenance import export_provenance
+            result = export_provenance(args.db, args.source, args.conversation, args.message, args.output, args.declared_at)
+        elif args.command == 'check-provenance':
+            from recaplib.message_provenance import check_provenance
+            result = check_provenance(args.db, args.input)
+        elif args.command == 'declare-review-checkpoint':
+            from recaplib.review_checkpoint import declare_review_checkpoint
+            result = declare_review_checkpoint(args.db, args.source, args.output, args.declared_at)
+        elif args.command == 'declare-checkpoint':
+            from recaplib.import_checkpoint import declare_checkpoint
+            result = declare_checkpoint(args.db, args.source, args.output, args.declared_at)
+        elif args.command == 'changed-since':
+            from recaplib.import_checkpoint import changed_since
+            result = changed_since(args.db, args.source, args.checkpoint)
+        elif args.command == 'ledger':
+            from recaplib.ledger import ledger
+            result=ledger(args.db,args.source,args.limit,args.offset)
+        elif args.command == 'declare-recovery':
+            from recaplib.recovery import declare_recovery
+            result = declare_recovery(args.db, args.output, args.declared_at, manifest_version=args.manifest_version)
+        elif args.command == 'rebuild-archive':
+            from recaplib.rebuild import rebuild_archive
+            result = rebuild_archive(args.input, args.plan, args.objects, args.new_db, args.output)
+        elif args.command == 'rehearse-recovery':
+            from recaplib.recovery import rehearse_recovery
+            result = rehearse_recovery(args.input, args.restored_db, args.output, args.objects)
+        else:
+            from recaplib.title_suggestion import suggest
+            result = suggest(args.db, args.source, args.conversation, args.message)
+        kind = 'queue' if args.command == 'review-titles' else 'preview' if args.command == 'preview-title' else 'proposal'
+        result = save_if_requested(result, args, kind)
+        rendered = None
+        if getattr(args, 'text', False):
+            from recaplib.recovery import render_text
+            if args.command=='ledger':
+                from recaplib.ledger import render_text as ledger_text
+                rendered=ledger_text(result)
+            elif args.command in ('export-provenance', 'check-provenance'):
+                from recaplib.text_summary import summary_text
+                rendered = summary_text('Private message provenance', list(result.items()))
+            elif args.command in ('declare-review-checkpoint', 'declare-checkpoint', 'changed-since'):
+                from recaplib.text_summary import summary_text
+                rendered = summary_text('Review view checkpoint declaration' if args.command == 'declare-review-checkpoint' else 'Accepted-artifact cutoff', list(result.items()))
+            else:
+                rendered = render_text(result)
+    except (OSError, ValueError, KeyError, TypeError, sqlite3.Error) as exc:
+        if args.json_errors:
+            from recaplib.errors import error_document
+            p.exit(1, json.dumps(error_document(exc), ensure_ascii=True) + '\n')
+        p.exit(1, safe_diagnostic(exc) + '\n')
+    # JSON escapes preserve Unicode data even when the terminal is ASCII-only.
+    # In particular, a committed title change must not look failed at print time.
+    # The optional recovery text summary is quoted ASCII for the same reason.
+    if rendered is not None:
+        print(rendered, end='')
+    else:
+        print(json.dumps(result, ensure_ascii=True, indent=2))
+    if args.command == 'describe-schema' and args.observe_storage and result['status'] != 'OBSERVED':
+        raise SystemExit(1)
+    if args.command == 'check-provenance' and result['status'] != 'PASS':
+        raise SystemExit(1)
+    if args.command == 'check-import' and result['conflicts_found']:
+        raise SystemExit(1)
+    if args.command == 'changed-since' and result['status'] != 'CUTOFF_VERIFIED':
+        raise SystemExit(1)
+    if args.command == 'rebuild-archive' and result['status'] != 'REBUILD_REHEARSAL_PASSED':
+        raise SystemExit(1)
+    if args.command == 'rehearse-recovery' and result['status'] != 'RECOVERY_REHEARSAL_PASSED':
+        raise SystemExit(1)
+
+
+if __name__ == '__main__':
+    main()

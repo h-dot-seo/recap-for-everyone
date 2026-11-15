@@ -17,7 +17,8 @@ listed below, `runtime_check.py`, `verify_manifest.py`, `audit_publication.py` a
 standalone script at the root is a thin compatibility entry point that imports `main`
 from the implementation module of the same name in `recaplib/`, so every command in
 this reference runs exactly as written. The implementation lives in the `recaplib/`
-package (the archive core behind `recap.py` is `recaplib/archive.py`, re-exported by
+package (the unified dispatcher is `recaplib/cli.py`; the archive core is
+`recaplib/archive.py`, re-exported by
 `recap.py`), and the synthetic test suite is the `tests/` package. Both are found
 through the repository root, which is why the commands run from there.
 
@@ -757,7 +758,7 @@ example, output boundaries and failure behavior.
 
 ## CLI version identity
 
-`python recap.py --version` prints `recap-for-everyone 0.100.12` and exits without
+`python recap.py --version` prints `recap-for-everyone 0.100.13` and exits without
 opening an archive or reading the publication manifest. It works outside the
 repository working directory and without the manifest. This numeric identity is
 not byte verification, authenticity or a stability guarantee. Use the documented

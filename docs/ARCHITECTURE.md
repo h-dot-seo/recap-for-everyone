@@ -383,3 +383,9 @@ Explicit Python provenance arguments are validated before SQLite connection; see
 [Saved title/plan/manual-transfer inputs](TITLE_DOCUMENT_FILES.md) now have an 8 MiB
 inclusive regular-file admission limit. Existing smaller adapter/batch limits
 remain; stat/read races and total memory usage are not bounded by this preflight.
+
+The unified dispatcher now lives in `recaplib/cli.py`; `recap.py` preserves root
+archive re-exports and delegates with local function bindings, retaining existing
+patch seams without mutating package globals. Optional package installation is
+described in [PACKAGE_INSTALL.md](PACKAGE_INSTALL.md); it does not install root
+audit/manifest utilities or imply stable implementation-import APIs.

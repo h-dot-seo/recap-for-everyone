@@ -1,3 +1,3 @@
-"""Implementation modules behind the recap-for-everyone entry points kept at the repository root."""
+"""Implementation package for the local recap command and checkout entry points."""
 
-__version__ = '0.100.12'
+__version__ = '0.100.13'
