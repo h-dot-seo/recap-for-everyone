@@ -75,6 +75,7 @@ helpers create no temporary/journal files.
 | Command | Trigger | New resource | Global --db policy | Boundary |
 |---|---|---|---|---|
 | `check-import` | `--delta-output` | `--delta-output` | required | Optional private save only; not approval or application. |
+| `changed-since` | `--delta-output` | `--delta-output` | required | Optional private verified-cutoff ID save; not review, advance, or application. |
 | `declare-checkpoint` | default | `--output` | required | Explicit new destination; inspect receipt and partial-publication warnings. |
 | `declare-recovery` | default | `--output` | required | Explicit new destination; inspect receipt and partial-publication warnings. |
 | `declare-review-checkpoint` | default | `--output` | required | Explicit new destination; inspect receipt and partial-publication warnings. |
@@ -478,3 +479,7 @@ See [source file admission](docs/SOURCE_FILE_ADMISSION.md).
 [Normalized inventory](docs/NORMALIZED_INVENTORY.md) supports read-only `list-export --format normalized`,
 with whole-file validation and metadata/filter counts. Normalized selected ingest
 and inspection remain unsupported; inventory does not grant write permission.
+
+[Private cutoff delta files](docs/CHECKPOINT_DELTA.md) optionally expose bounded conversation
+ID samples after verified `changed-since`, for manual follow-up only. Default
+stdout remains counts-only and no checkpoint/review action advances automatically.

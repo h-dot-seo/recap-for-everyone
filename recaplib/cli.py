@@ -129,6 +129,8 @@ def build_parser(prog=None):
     cutoff.add_argument('--source', required=True); cutoff.add_argument('--output', required=True)
     cutoff.add_argument('--declared-at'); cutoff.add_argument('--text', action='store_true')
     changed = sub.add_parser('changed-since', help='verify a source artifact cutoff and report counts only')
+    changed.add_argument('--delta-output', help='exclusive new private file for bounded verified-cutoff conversation ID samples')
+    changed.add_argument('--limit', type=int, default=20, help='ID sample limit per category, 1..1000; used with --delta-output')
     changed.add_argument('--source', required=True); changed.add_argument('--checkpoint', required=True)
     changed.add_argument('--text', action='store_true')
     declare = sub.add_parser('declare-recovery', help='write a recovery manifest describing the live archive without changing it')
@@ -365,7 +367,7 @@ def _run(prog, archive_functions):
             result = declare_checkpoint(args.db, args.source, args.output, args.declared_at)
         elif args.command == 'changed-since':
             from recaplib.import_checkpoint import changed_since
-            result = changed_since(args.db, args.source, args.checkpoint)
+            result = changed_since(args.db, args.source, args.checkpoint, delta_output=args.delta_output, limit=args.limit)
         elif args.command == 'ledger':
             from recaplib.ledger import ledger
             result=ledger(args.db,args.source,args.limit,args.offset)
