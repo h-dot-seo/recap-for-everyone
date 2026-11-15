@@ -24,3 +24,25 @@ def require_source_file(path):
     """
     if not stat.S_ISREG(Path(path).stat().st_mode):
         raise ValueError('source must be an existing regular file')
+
+
+MAX_DOCUMENT_BYTES = 8 * 1024 * 1024
+
+
+def read_document_bytes(path):
+    """Read one admitted title/plan/transfer document, not a memory sandbox.
+
+    Preserve the read_bytes snapshot seam. Growth after stat may allocate more
+    than the budget before the post-read rejection; namespace races are not fixed.
+    """
+    too_large = 'document exceeds the 8 MiB input limit'
+    require_regular_file(path, max_bytes=MAX_DOCUMENT_BYTES, label='document', too_large=too_large)
+    raw = Path(path).read_bytes()
+    if len(raw) > MAX_DOCUMENT_BYTES:
+        raise ValueError(too_large)
+    return raw
+
+
+def read_document_text(path):
+    """Match legacy UTF-8 read_text universal newlines, without removing a BOM."""
+    return read_document_bytes(path).decode('utf-8').replace('\r\n', '\n').replace('\r', '\n')

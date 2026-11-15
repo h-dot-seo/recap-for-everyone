@@ -69,3 +69,7 @@ stat before opening and reject nonregular files. This closes ordinary FIFO/devic
 input paths, not hostile stat/open races. Regular symlinks are followed; no new
 size limit, content trust, SQLite write protection or permission is established.
 Existing bounded ZIP/document and recovery symlink policies are separate.
+
+[Saved title/plan/manual-transfer inputs](docs/TITLE_DOCUMENT_FILES.md) now have an 8 MiB
+inclusive regular-file admission limit. Existing smaller adapter/batch limits
+remain; stat/read races and total memory usage are not bounded by this preflight.

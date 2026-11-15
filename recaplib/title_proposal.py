@@ -14,6 +14,7 @@ from recaplib.title_review import assess_title
 from recaplib.conversation_view import _inventory
 from recaplib.title_evidence import review_evidence
 from recaplib.source_text import decode_source
+from recaplib.input_files import read_document_bytes
 
 
 def _freeze_document(value):
@@ -31,7 +32,7 @@ def _freeze_document(value):
 def read_document(path):
     """Read strict UTF-8 title JSON, tolerating one initial UTF-8 signature."""
     try:
-        return loads(decode_source(Path(path).read_bytes()))
+        return loads(decode_source(read_document_bytes(path)))
     except RecursionError:
         raise ValueError('title document nesting is too deep') from None
 

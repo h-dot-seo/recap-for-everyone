@@ -1,25 +1,24 @@
 # Validation record
 
-Current release: `0.100.11-normalized-inventory`, dated 2026-11-15.
+Current release: `0.100.12-document-admission`, dated 2026-11-15.
 Prior entries remain in [validation history](docs/VALIDATION_HISTORY.md).
 
-## 2026-11-15 Normalized conversation inventory (0.100.11-normalized-inventory):
+## 2026-11-15 Saved document admission (0.100.12-document-admission):
 
-Roadmap #12 adjustment 7/#27: normalized list-export now reuses whole-file
-validate_normalized for DB-free conversation IDs, ordered distinct effective
-titles, occurrence counts, filters and pagination. Repeated identity conflicts
-stay in coverage, not silently merged or rejected. Selection is always false /
-NOT_SUPPORTED; normalized selected ingest, import and title plans stay closed.
-Existing three-format output bytes and shared read/expected-hash seams remain.
-No origin admission, ledger mutation, body output or new byte budget is added.
+Roadmap #23 remaining saved-document slice: regular-file and 8MiB inclusive
+preflight for title documents, plan checks and unified manual transfer inputs.
+One read_bytes snapshot and a post-read length check preserve the shared seam.
+Title BOM acceptance and plan/transfer BOM rejection plus read_text universal
+newline/error positions remain. Existing smaller budgets, approval gates and
+source paths are unchanged. Growth after stat can allocate beyond the ceiling;
+this is not a total memory or hostile namespace guarantee.
 
-New 9 tests and existing core83 passed. Independent 29 tests and actual prior/
-current 12 CLI comparisons across web/local/local-codex passed byte-identically.
-The first full run (1,627 tests /74.648s) found two old normalized-inspection
-oracles that still required list-export to reject normalized input. Only those
-inventory exclusions were removed; shared normalize/import/title-plan and
-selected-inspection rejection assertions remain. New inventory tests assert the
-separate supported read-only behavior and the NOT_SUPPORTED selection boundary.
-Final full suite: 1,627 tests /74.339s PASS (two local environment skips:
-decoder-gap probe and AF_UNIX creation prohibited). Focused31, Python3.10
-grammar/compile, old143 sh blocks, manifest343/audit344 pass.
+Ten new focused tests pass, including real boundary bytes, UTF8, growth, kinds,
+symlinks, encoding and actual FIFO CLI timeouts. An initial new FIFO test used
+nonexistent --plan/--target flags and failed at argparse; corrected to documented
+positional arguments, without changing product code. Core focused78 pass.
+Full suite: 1,637 tests /74.278s PASS (two local environment skips: decoder-gap
+probe and AF_UNIX creation prohibited). Independent core38 tests pass plus real
+prior/current plan CLI 3 valid and 6 negative cases with identical bytes/exit and
+unchanged DB bytes. Independent size/kind/growth/BOM/newline checks pass.
+Python3.10 AST/compile/diff, prior144 sh blocks, manifest344/audit345 pass.

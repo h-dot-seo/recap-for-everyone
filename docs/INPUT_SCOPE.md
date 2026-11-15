@@ -520,3 +520,7 @@ Explicit Python provenance arguments are validated before SQLite connection; see
 [Normalized inventory](NORMALIZED_INVENTORY.md) supports read-only `list-export --format normalized`,
 with whole-file validation and metadata/filter counts. Normalized selected ingest
 and inspection remain unsupported; inventory does not grant write permission.
+
+[Saved title/plan/manual-transfer inputs](TITLE_DOCUMENT_FILES.md) now have an 8 MiB
+inclusive regular-file admission limit. Existing smaller adapter/batch limits
+remain; stat/read races and total memory usage are not bounded by this preflight.

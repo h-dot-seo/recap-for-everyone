@@ -140,3 +140,28 @@ separate recovery restored/object symlink policy. See [security](../SECURITY.md)
 For exact conversation view JSON rather than title documents, use
 `show --output NEW_JSON`; see [saved conversation JSON](SAVED_CONVERSATION_JSON.md).
 It uses a separate document kind and does not make a title approval artifact.
+
+## Input admission for saved title, plan and manual transfer documents
+
+Saved title documents read by `read_document` (including proposals, previews and
+queues), title-plan checks, and the unified manual transfer plan/target/request/
+approval readers now require an existing regular file and at most **8 MiB
+(8 * 1024 * 1024 bytes), inclusive**. This is a new refusal boundary for inputs
+that previously had no byte limit. Existing smaller supplied-proposal aggregate
+and adapter document budgets remain unchanged; no common limit raises them.
+Regular-file symlinks remain allowed and missing paths retain their OS errors.
+
+A stat kind/size check precedes one `Path.read_bytes` snapshot; the actual byte
+length is checked again before decoding or JSON parsing. Sizes count UTF-8 bytes,
+including a BOM, not characters. A file that grows after stat can still allocate
+more than 8 MiB before rejection. This is not a strict allocation bound, memory
+sandbox, immutable filesystem lease, or defense against hostile path replacement.
+Source-export sizes and SQLite opening policies are not changed by this document
+budget. Kind/size errors use fixed diagnostics without supplied path contents.
+
+Title document decoding still accepts one initial UTF-8 BOM. Plans and manual
+transfer documents still reject a BOM; their prior UTF-8 `read_text` universal
+newline conversion is preserved, including JSON error locations. No admission
+check grants approval, authenticates a document, changes title/transfer decision
+rules, contacts a network service, or repairs an archive. Normal valid documents
+retain existing output bytes and side-effect boundaries.
