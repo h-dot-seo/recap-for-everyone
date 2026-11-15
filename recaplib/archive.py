@@ -7,6 +7,7 @@ import json
 import re
 import sqlite3
 from collections import Counter
+from collections.abc import Mapping
 from pathlib import Path
 from recaplib.strict_json import loads
 from recaplib.sqlite_safety import protect_readonly
@@ -316,8 +317,49 @@ def _admit_incoming(candidates):
     return records
 
 
+def _validate_provenance(provenance, records):
+    """Snapshot supplied occurrence fields before SQLite; not authenticate them.
+
+    Preserve iterable order, duplicates, ignored extra members and None versus an
+    empty collection. An occurrence may cover only part of the incoming records.
+    """
+    if provenance is None:
+        return None
+    if isinstance(provenance, (str, bytes, bytearray, Mapping)):
+        raise ValueError('provenance must be an iterable of occurrence mappings')
+    try:
+        entries = iter(provenance)
+    except TypeError:
+        raise ValueError('provenance must be an iterable of occurrence mappings') from None
+    identities = {(row['conversation_id'], row['message_id']) for row, _, _ in records}
+    required = ('conversation_id', 'message_id', 'origin_sha256', 'origin_locator')
+    validated = []
+    for entry in entries:
+        if not isinstance(entry, Mapping) or any(key not in entry for key in required):
+            raise ValueError('provenance occurrence is missing required fields')
+        value = {key: entry[key] for key in required}
+        value['parent_id'] = entry.get('parent_id')
+        if any(not isinstance(value[key], str) or not value[key] for key in required):
+            raise ValueError('provenance occurrence fields must be nonempty text')
+        if not re.fullmatch('[0-9a-f]{64}', value['origin_sha256']):
+            raise ValueError('provenance original hash must be a lowercase SHA-256 digest')
+        if value['parent_id'] is not None and not isinstance(value['parent_id'], str):
+            raise ValueError('provenance parent must be text or null')
+        try:
+            for field in value.values():
+                if field is not None:
+                    field.encode('utf-8')
+        except UnicodeEncodeError:
+            raise ValueError('provenance fields must contain valid Unicode text') from None
+        if (value['conversation_id'], value['message_id']) not in identities:
+            raise ValueError('provenance identity must belong to the incoming records')
+        validated.append(value)
+    return validated
+
+
 def _write_records(db, source, raw, records, provenance, topology=None, origin=None):
     """Shared transaction writer; callers finish validation before entering."""
+    provenance = _validate_provenance(provenance, records)
     digest = hashlib.sha256(raw).hexdigest()
     return _write_record_stream(db, source, digest, len(raw), len(records), raw.startswith(BOM_UTF8),
                                 records, provenance, topology, origin)

@@ -514,3 +514,5 @@ opening them. Regular-file symlinks retain their original parsing label and read
 path. Missing files keep their original error behavior; ordinary read results and
 receipts are unchanged. This does not cap source bytes, prevent path races, change
 byte-only APIs or change recovery symlink policies. See [source file admission](SOURCE_FILE_ADMISSION.md).
+
+Explicit Python provenance arguments are validated before SQLite connection; see [provenance admission](PROVENANCE_ADMISSION.md). This checks shape and current-input identity membership, not origin authenticity.

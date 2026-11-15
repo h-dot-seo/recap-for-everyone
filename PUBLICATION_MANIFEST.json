@@ -1,12 +1,12 @@
 {
   "project": "recap-for-everyone",
-  "release": "0.100.9-source-file-admission",
+  "release": "0.100.10-provenance-admission",
   "date": "2026-11-15",
   "private_history_imported": false,
   "actual_corpora_included": false,
   "synthetic_examples_only": true,
   "license_status": "NOT_SELECTED",
-  "file_count": 339,
+  "file_count": 341,
   "files": [
     {
       "path": ".gitattributes",
@@ -30,8 +30,8 @@
     },
     {
       "path": "README.md",
-      "bytes": 21886,
-      "sha256": "5cfff12aa8337187609cf14252f3de09002da9d7de771d48435b3be218dcc712"
+      "bytes": 22104,
+      "sha256": "0933c3445f501b04bd4e687c82ec5e6248c0e30b7e2d752832825ad0377a260a"
     },
     {
       "path": "RIGHTS.md",
@@ -50,8 +50,8 @@
     },
     {
       "path": "VALIDATION.md",
-      "bytes": 68107,
-      "sha256": "139d21360a47d909726250afed8a709b68c01a198665d7399f36b4eee956b4ce"
+      "bytes": 2100,
+      "sha256": "ee9530911d489604c83bab94f0b964e373a4efab8eaf360e8e63d7ee111bbfc8"
     },
     {
       "path": "attributed_title.py",
@@ -105,8 +105,8 @@
     },
     {
       "path": "docs/ARCHITECTURE.md",
-      "bytes": 24141,
-      "sha256": "81ed261e3b71fe7b06404fcad9a29d53c6861f74d50588e55daf5a1ea599025a"
+      "bytes": 24354,
+      "sha256": "8887f2c23c482e49948516f8fa9375e91a46864f196f76e6bf06eed22e3a5b55"
     },
     {
       "path": "docs/ARCHIVE_BRANCH.md",
@@ -150,8 +150,8 @@
     },
     {
       "path": "docs/COMMANDS.md",
-      "bytes": 35674,
-      "sha256": "4f8255d2173c10dfd6c35825c441e221d22ea723348ede05e21f1036682396fe"
+      "bytes": 35675,
+      "sha256": "790b2db11ffae4ea5121a7dcec691c60ccdde7b6349aeb4c048fd5a3e1d3fa2b"
     },
     {
       "path": "docs/COMMAND_CATALOG.md",
@@ -195,13 +195,13 @@
     },
     {
       "path": "docs/INPUT_SCOPE.md",
-      "bytes": 34019,
-      "sha256": "0f208832a662d869b2fca7c1744e4cfb7d2a300307bdbc10b91310e7769e2740"
+      "bytes": 34232,
+      "sha256": "854b4f282c2c8bac92fc485c9c8fced7ec9f50cb0725c6dee999aef033055ad2"
     },
     {
       "path": "docs/INSTALL.md",
-      "bytes": 8441,
-      "sha256": "e91ffa67e9d434cb5e5a59c91b85990397619c752b7ccf2e7b7afad93a2c3b33"
+      "bytes": 8442,
+      "sha256": "c4ec9052b72756659461c459dfd2fa7824883a8cc2fbe938bedc91676eea5fba"
     },
     {
       "path": "docs/JSON_ERRORS.md",
@@ -237,6 +237,11 @@
       "path": "docs/PREPARE_WEB_EXPORT.md",
       "bytes": 11957,
       "sha256": "dff1b4d872e651b7d41bc9fc849d48d44045eede2959553c9251ab3de4464508"
+    },
+    {
+      "path": "docs/PROVENANCE_ADMISSION.md",
+      "bytes": 2384,
+      "sha256": "0b4ec4531876078176d1be9fca90080089a7dbed4797849afcb8250f9165d385"
     },
     {
       "path": "docs/README.ko.md",
@@ -425,8 +430,8 @@
     },
     {
       "path": "docs/VALIDATION_HISTORY.md",
-      "bytes": 211734,
-      "sha256": "ae6e53ead120e5bb83948ca21b6889c62d2e9e4a9839134bac9e8532d9466a86"
+      "bytes": 213628,
+      "sha256": "159326cda43b529ff24a9f64cc0b6bf150b8606cca525bd90d416a53cf82d876"
     },
     {
       "path": "docs/WEB_ZIP_INVENTORY.md",
@@ -585,13 +590,13 @@
     },
     {
       "path": "recaplib/__init__.py",
-      "bytes": 126,
-      "sha256": "caaa12dc6ab65303eb0514767686c31a0432ff6cd4e1e1bc69942c35c88e97a3"
+      "bytes": 127,
+      "sha256": "fa2f2f2e1f2ccfe8eac9271c0650fd33cb2ac8ece0ff81f4fd3515d4cc9673d2"
     },
     {
       "path": "recaplib/archive.py",
-      "bytes": 23437,
-      "sha256": "5e9d2cc947b51a220d5d72fa353aa3bbc8946d5f58630e73e103d59a66fce3a2"
+      "bytes": 25647,
+      "sha256": "1b7fb0c8a8851a94e56843a807663d1f9c01b8c29ff3daa825399d8c0af6c58f"
     },
     {
       "path": "recaplib/archive_schema.py",
@@ -1242,6 +1247,11 @@
       "path": "tests/test_prepare_web_export.py",
       "bytes": 8551,
       "sha256": "76ba179d9befac6850507f63887b52026099c4ebf4c1bf85394e8b9d91fc43f4"
+    },
+    {
+      "path": "tests/test_provenance_admission.py",
+      "bytes": 6064,
+      "sha256": "8be0616b6399b9629145b176c5e40c7a3af04c7d5016cd5d0040854589946f27"
     },
     {
       "path": "tests/test_queue_decisions.py",

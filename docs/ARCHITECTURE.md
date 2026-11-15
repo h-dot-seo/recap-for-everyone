@@ -377,3 +377,5 @@ Source entry-point admission uses stat (following existing regular symlinks), th
 S_ISREG before the existing reader. Snapshot read_bytes seams and two-pass ingest
 remain unchanged. No open-time inode binding or source byte ceiling is implied;
 the namespace may change after preflight. See [source admission](SOURCE_FILE_ADMISSION.md).
+
+Explicit Python provenance arguments are validated before SQLite connection; see [provenance admission](PROVENANCE_ADMISSION.md). This checks shape and current-input identity membership, not origin authenticity.
