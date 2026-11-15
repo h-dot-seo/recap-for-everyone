@@ -34,8 +34,10 @@ never certifies JSON validity or part completeness, and does not list unrelated
 account-file names. Pass the first page's hash to later candidate pages and preparation
 with `--expected-archive-sha256` to reject a ZIP changed since inspection. Without
 that option each page is independent, so replacement or reordering can repeat or
-skip entries. Pagination still reads the bounded whole ZIP and does not establish
-part completeness. See [candidate selection](WEB_ZIP_INVENTORY.md).
+skip entries. Each successful page hashes the whole ZIP twice in bounded chunks
+through the same open handle; pagination does not avoid those reads or establish
+part completeness. Matching hashes are not an immutable snapshot or protection
+against hostile concurrent rewrites. See [candidate selection](WEB_ZIP_INVENTORY.md).
 
 ### Inspect an export before importing
 

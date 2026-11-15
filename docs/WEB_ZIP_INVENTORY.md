@@ -9,7 +9,7 @@ python recap.py inspect-web-zip ../private-data/export.zip --limit 50 --offset 0
 
 No database is needed; a supplied `--db` is not accessed. The command does not
 extract files, open member payloads, parse JSON or perform a CRC check. It reads
-the bounded **whole ZIP byte snapshot**, including compressed bytes, and inspects
+all ZIP bytes in bounded chunks, including compressed bytes, and inspects
 only the central-directory metadata. Nothing is written or transmitted.
 
 ## Candidate recognition is a heuristic
@@ -55,10 +55,10 @@ Reported ZIP sizes and names are untrusted metadata, not authentication.
 The whole-archive 64 MiB / 1000-entry bounds and bounded end-record/directory
 preflight are shared with preparation. Pagination limits the displayed candidates
 (default 50, maximum 100), not ZIP reading or metadata parsing. `total_candidates`
-and `other_entries_not_listed` describe the whole snapshot. `next_offset` is null at
+and `other_entries_not_listed` describe the whole archive inventory. `next_offset` is null at
 the end. Candidate names can themselves be private; keep the JSON output private.
 
-## Keep candidate pages on one ZIP snapshot
+## Bind candidate pages to the same expected ZIP hash
 
 For a small page, start with:
 
@@ -86,8 +86,9 @@ Invalid hash syntax fails before source-file reading. The expected hash must be
 exactly 64 lowercase hexadecimal characters, as for preparation.
 
 The digest binds **all ZIP bytes**, including unrelated entries and archive comments,
-not just displayed candidates. Every page still reads the full bounded snapshot;
-this is not a streaming cursor or a cached inventory. A matching digest does not
+not just displayed candidates. Every successful page hashes the whole bounded archive
+twice using the same open handle; this is not a cached inventory or a pagination
+cursor that avoids rereading the archive. A matching digest does not
 validate member contents or prove all parts exist. If the file changed, restart at
 offset zero and review the new inventory; do not combine old and new pages or simply
 replace the expected hash while continuing an old offset. Use the original page
@@ -105,8 +106,8 @@ python recap.py prepare-web-export ../private-data/export.zip --member conversat
 
 Replace `ARCHIVE_SHA256` with the reported lowercase digest. The optional expected
 hash is checked before decompression or output staging. If any ZIP bytes changed
-since inspection, the command refuses; inspect and select again. This is a byte
-snapshot check, not proof of who created the ZIP. Omitting the option retains the
+at the initial comparison with inspection, the command refuses; inspect and select
+again. This is a byte-hash comparison, not an immutable snapshot or proof of who created the ZIP. Omitting the option retains the
 previous explicit single-member preparation behavior.
 
 Inspect the preparation receipt and warnings before deliberately importing the
@@ -127,8 +128,8 @@ Successful v1 receipts now include `limits`: `member_bytes` (16777216),
 `ratio` (200), `entries` (1000), `archive_ceiling` (67108864), and
 `operator_supplied` (false). These disclose existing fixed safety bounds; the default ceiling is unchanged. An operator may lower the member bound as
 described below; no limit increase is permitted. Invalid or over-budget archives still
-fail without a successful receipt. Archive bytes are still read once into the
-same bounded immutable in-memory snapshot. This is not streaming support.
+fail without a successful receipt. Archive hashing uses bounded chunks from the same
+open handle before and after processing; no whole-archive byte copy is retained.
 
 Inventory candidates additionally carry `exceeded_limits`, an ordered list of
 `member_bytes` and/or `ratio` derived only from declared metadata. The ratio test
@@ -142,8 +143,8 @@ No candidate is decompressed to produce these diagnostics.
 The entry-budget preflight now walks only the declared central directory after
 checking its end records and byte bounds, before constructing ZipInfo objects.
 Signature-looking bytes in stored attachments no longer count as extra entries.
-The archive still uses one bounded immutable byte snapshot; no streaming or
-new compression format is introduced.
+The directory preflight uses bounded seek/read operations on the same open handle.
+No new compression format is introduced.
 
 ## Lowering the member budget
 
@@ -152,14 +153,14 @@ N must be an integer from 1 through 16777216 (the existing 16 MiB hard maximum).
 Omitting the option retains the previous default. The value is validated before
 archive access. It can reduce the decompressed-member byte budget on a constrained
 computer; it cannot raise any safety bound or make a rejected large member eligible.
-It does not cap total process memory: the ZIP snapshot and decoded JSON also use
-memory. Archive-size, entry-count and 200:1 ratio bounds stay unchanged.
+It does not cap total process memory: central-directory metadata, the selected
+member and decoded JSON also use memory. Archive-size, entry-count and 200:1 ratio bounds stay unchanged.
 
 Repeat the selected value in both commands when carrying a metadata selection to
 preparation. `--expected-archive-sha256` binds archive bytes, not this option.
 Preparation independently rechecks its effective member bound and reads at most
-N+1 bytes before size/CRC/JSON checks and before staging. No streaming or partial
-output is introduced. Successful `limits.member_bytes` echoes N and
+N+1 bytes before size/CRC/JSON checks and before staging. Member extraction is not
+streamed into staging, and no partial output is introduced. Successful `limits.member_bytes` echoes N and
 `operator_supplied` is true even when N equals the default.
 
 ## Bounded directory admission
@@ -176,4 +177,25 @@ CRC or JSON validation. Selected-member validation still occurs before staging.
 
 This removes false entry-limit rejection caused by signatures inside stored
 attachments without changing the accepted member formats or raising budgets.
-The snapshot is not re-read or streamed, and no partial output is published.
+The same open handle is rehashed before a successful result; no partial output is published.
+
+
+## Same-handle streaming boundary
+
+Both commands open the archive once and hash it in chunks of at most 1 MiB. The
+optional expected hash is checked first, followed by bounded EOCD/ZIP64 and
+central-directory preflight, then `ZipFile` on that same handle. Preparation reads
+the chosen member into bounded memory and completes size, CRC and JSON validation;
+inspection does not decompress or validate member content. Before a successful
+result, the same handle is rewound and hashed again, comparing both digest and byte
+count. Preparation starts staging only after this final comparison succeeds.
+
+A detected change raises `SourceChanged` without a successful receipt or prepared
+file. Parsing failures can skip the final hash, but likewise produce no successful
+result or publication. Matching first and last hashes do not prove an immutable
+snapshot and do not defend against hostile concurrent rewrites that restore the
+original bytes. Path replacement and concurrent filesystem changes are not a
+security boundary. The archive/member/entry/ratio limits, lower-only member option,
+CLI arguments and successful receipt fields are unchanged. Whole-archive byte
+copying is removed; central-directory and member/JSON allocations remain bounded
+by the existing byte ceilings, not a whole-process memory guarantee.

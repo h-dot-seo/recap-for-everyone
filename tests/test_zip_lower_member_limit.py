@@ -21,7 +21,7 @@ class LowerMemberLimitTests(unittest.TestCase):
         with zipfile.ZipFile(self.path,'w') as archive: archive.writestr('conversations.json',self.content)
 
     def test_invalid_type_and_range_before_read(self):
-        with patch.object(p,'archive_bytes',side_effect=AssertionError('must validate before read')):
+        with patch.object(p,'checked_archive',side_effect=AssertionError('must validate before read')):
             for value in [True,False,0,-1,1.5,'10',p.MAX_MEMBER_BYTES+1]:
                 for action in [lambda:inspect_web_zip(self.path,max_member_bytes=value),
                                lambda:p.prepare_web_export(self.path,'conversations.json',self.root/'no',max_member_bytes=value)]:

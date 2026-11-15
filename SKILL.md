@@ -449,3 +449,15 @@ Use `declare-recovery --manifest-version 3` only when explicitly choosing the or
 For v3 object replay, use the explicit ordered plan and [REBUILD_V3](docs/REBUILD_V3.md). Source/hash/format/selection must match declared origin rows. Never infer label/newline/order or repair declarations to force a match. A successful receipt excludes title/review histories and keeps full_archive_restored:false.
 
 Before inspecting a copy candidate, `describe-schema --observe-storage` can record bounded header and sidecar-kind/size observations before SQLite opens. It does not approve copying, perform a checkpoint or determine recovery needs. Keep OPEN_ERROR distinct from INVENTORY_ERROR, and inspect pre_open even on failure. SQLite read-only access may change sidecars. See [storage observations](docs/STORAGE_OBSERVATION.md).
+
+
+### ZIP reading and publication boundary
+
+ZIP inspection/preparation uses one open file handle, bounded chunk hashing,
+expected-hash validation, bounded directory preflight, and a final same-handle
+rehash. Preparation completes member CRC/JSON validation before that final check
+and creates staging only afterward. A failed parse may skip the final hash but
+cannot publish a successful result. Equal first/last hashes are not an immutable
+snapshot or protection against hostile concurrent rewriting. Fixed limits and
+explicit member selection still apply; no automatic selection, import or approval
+is added. See [ZIP preparation](docs/PREPARE_WEB_EXPORT.md).

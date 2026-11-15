@@ -97,7 +97,9 @@ usage: recap.py inspect-web-zip [-h] [--limit LIMIT] [--offset OFFSET] [--expect
 ```
 
 List conventionally named conversation JSON members of a downloaded ZIP with
-metadata-only eligibility, without decompression. Guide: [ZIP inventory](WEB_ZIP_INVENTORY.md).
+metadata-only eligibility, without decompression. The same open handle is hashed
+in bounded chunks before and after metadata processing; matching hashes are not an
+immutable snapshot. Guide: [ZIP inventory](WEB_ZIP_INVENTORY.md).
 
 #### `prepare-web-export`
 
@@ -106,7 +108,8 @@ usage: recap.py prepare-web-export [-h] --member MEMBER --output OUTPUT [--max-m
 ```
 
 Validate one explicitly selected ZIP JSON member and copy its bytes to a new local
-file. Guide: [prepare a web export](PREPARE_WEB_EXPORT.md).
+file. Member CRC/JSON validation and the final same-handle hash comparison precede
+staging; no whole-archive byte snapshot is retained. Guide: [prepare a web export](PREPARE_WEB_EXPORT.md).
 
 #### `list-export`
 
@@ -754,7 +757,7 @@ example, output boundaries and failure behavior.
 
 ## CLI version identity
 
-`python recap.py --version` prints `recap-for-everyone 0.100.5` and exits without
+`python recap.py --version` prints `recap-for-everyone 0.100.6` and exits without
 opening an archive or reading the publication manifest. It works outside the
 repository working directory and without the manifest. This numeric identity is
 not byte verification, authenticity or a stability guarantee. Use the documented

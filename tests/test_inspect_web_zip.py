@@ -86,16 +86,16 @@ class InspectWebZipTests(unittest.TestCase):
         with patch.object(preparation,'MAX_ENTRIES',0):
             with self.assertRaises(ValueError):inspect_web_zip(self.path)
 
-    def test_invalid_pagination_precedes_read_and_one_immutable_archive_snapshot(self):
+    def test_invalid_pagination_precedes_read_and_same_handle_two_hashes(self):
         from recaplib import prepare_web_export as preparation
-        with patch.object(preparation,'archive_bytes',side_effect=AssertionError('must validate first')):
+        with patch.object(preparation,'checked_archive',side_effect=AssertionError('must validate first')):
             for limit,offset in ((0,0),(101,0),(True,0),(1,-1),(1,True),(1,2**63)):
                 with self.assertRaises(ValueError):inspect_web_zip(self.path,limit,offset)
-        original=preparation.archive_bytes;raw=self.path.read_bytes();calls=[]
-        def replace_after_read(path):
-            calls.append(path);content=original(path);Path(path).write_bytes(b'changed after snapshot');return content
-        with patch.object(preparation,'archive_bytes',replace_after_read):result=inspect_web_zip(self.path)
-        self.assertEqual(len(calls),1);self.assertEqual(result['archive_sha256'],hashlib.sha256(raw).hexdigest())
+        original=preparation._hash_archive_stream;raw=self.path.read_bytes();calls=[]
+        def observed(stream):calls.append(stream);return original(stream)
+        with patch.object(preparation,'_hash_archive_stream',observed):result=inspect_web_zip(self.path)
+        self.assertEqual(len(calls),2);self.assertIs(calls[0],calls[1]);self.assertTrue(calls[0].closed)
+        self.assertEqual(result['archive_sha256'],hashlib.sha256(raw).hexdigest())
         self.assertEqual(result['total_candidates'],2)
 
     def test_cli_inspect_split_parts_prepare_import_and_review_with_local_sessions(self):

@@ -357,3 +357,14 @@ The optional recovery v3 contract declares the seven-column original_exports led
 V3 replay validates source/hash/format/selection against explicit origin rows and checks all seven fields in the rebuilt ledger. Label, newline and import order remain supplied plan parameters, not inferred metadata. Title/review histories remain excluded; see [v3 replay](REBUILD_V3.md).
 
 Optional storage observation precedes SQLite access: a bounded 100-byte main header and lstat-only fixed sidecar metadata are captured separately from the later read-only inventory. Nonregular main/sidecars are refused before SQLite reads. This is not an atomic snapshot or safe-copy verdict; read-only SQLite may change WAL/SHM files. See [storage observations](STORAGE_OBSERVATION.md).
+
+
+ZIP inspection/preparation now hashes one open archive handle in at most 1 MiB
+chunks, validates the expected hash before bounded EOCD/ZIP64 preflight and
+`ZipFile`, and rehashes the same handle before returning success. Preparation
+finishes bounded in-memory member CRC/JSON validation and the final hash comparison
+before creating staging. It does not retain a whole-archive byte snapshot or stream
+member bytes into staging. First/last hash equality is not an immutable snapshot
+or protection against hostile concurrent rewrites; parsing errors may skip the
+final hash but cannot publish a result. Existing limits, CLI and successful receipt
+fields remain unchanged. See [ZIP preparation](PREPARE_WEB_EXPORT.md).
