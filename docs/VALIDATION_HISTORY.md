@@ -3350,3 +3350,18 @@ selection/byte-admission note is corrected without weakening its privacy boundar
 Full rerun1694 tests in73.141 seconds PASS (two environment-dependent skips).
 All146 prior sh blocks remain unchanged; Python3.10 AST passes. Final independent
 metadata/tree review and hosted six-row CI are required before merge.
+
+Round64 initial hosted CI43684535936: Ubuntu three rows passed; Windows
+3.10/3.12/3.15 each failed only the new executed-guide test (SQLite operation
+failed), so no merge occurred. The harness substituted Windows paths before
+POSIX shlex parsing, which removed backslashes and split spaces. Parse first,
+then substitute argv; the embedded Python Path literal uses repr instead of raw
+interpolation. The actual guide now runs with spaces in its output directory.
+A PureWindowsPath regression covers backslashes, spaces, Korean and an apostrophe,
+including exact argv and parsed Python literal. The first apostrophe probe expected
+unequal tokens but correctly raised an unmatched-quote error; its assertion was
+corrected. Focused16 PASS. Product, guide commands and stored format bytes unchanged.
+New SQLite connections explicitly close; stdout checks parse JSON rather than
+normalizing raw platform newlines. Corrected full rerun1695 tests in72.807 seconds PASS (two environment-dependent
+skips). Independent harness16 tests PASS with separate Windows-path loss/recovery
+probe. Revised hosted six-row CI remains required before merge.

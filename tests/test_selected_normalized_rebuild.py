@@ -11,6 +11,16 @@ from tests import test_selected_normalized_ingest as selected
 from tests import test_streamed_ingest as prior
 
 
+def guide_argv(line, output):
+    import shlex
+    args=shlex.split(line)
+    if args[:2]==['python','-c']:
+        args[2]=args[2].replace("'OUTPUT/plan.json'",repr((output/'plan.json').as_posix()))
+    else:
+        args=[arg.replace('OUTPUT',output.as_posix()) for arg in args]
+    return args
+
+
 class SelectedRebuildTests(unittest.TestCase):
     def setUp(self):
         self.tmp=tempfile.TemporaryDirectory();self.addCleanup(self.tmp.cleanup);self.root=Path(self.tmp.name)
@@ -69,16 +79,31 @@ class SelectedRebuildTests(unittest.TestCase):
         r,db,_=self.run_plan(3,[self.step('a',digest),self.step('a'),self.step('b',digest)],suffix='wrong')
         self.assertEqual(r['status'],rebuild.FAILED);self.assertIn('messages_digest',r['failed_checks']);self.assertFalse(db.exists())
 
+    def test_guide_argv_preserves_windows_paths_and_python_literal(self):
+        import ast,shlex
+        from pathlib import PureWindowsPath
+        out=PureWindowsPath("C:/Users/테스트 User/O'Brien/guide")
+        line='python recap.py --db OUTPUT/archive.sqlite ingest examples/time-sample.jsonl'
+        with self.assertRaises(ValueError):shlex.split(line.replace('OUTPUT',str(out)))
+        simple=PureWindowsPath('C:/Users/테스트 User/guide')
+        self.assertNotEqual(shlex.split(line.replace('OUTPUT',str(simple)))[3],str(simple/'archive.sqlite'))
+        self.assertEqual(guide_argv(line,out)[3],(out/'archive.sqlite').as_posix())
+        code=guide_argv("python -c \"from pathlib import Path; p=Path('OUTPUT/plan.json')\"",out)[2]
+        call=ast.parse(code).body[1].value
+        self.assertEqual(ast.literal_eval(call.args[0]),(out/'plan.json').as_posix())
+
     def test_published_selected_guide_executes_without_source_changes(self):
         import re,shlex,subprocess,sys
-        root=Path(__file__).resolve().parents[1];out=self.root/'guide';out.mkdir()
+        root=Path(__file__).resolve().parents[1];out=self.root/'guide with spaces';out.mkdir()
         source=root/'examples/time-sample.jsonl';before=source.read_bytes()
         blocks=re.findall(r'```sh\n(.*?)```',(root/'docs/SELECTED_NORMALIZED.md').read_text(encoding='utf-8'),re.S)
         self.assertEqual(len(blocks),1);results=[]
         for line in blocks[0].strip().splitlines():
-            args=shlex.split(line.replace('OUTPUT',str(out)));args[0]=sys.executable
+            # Parse the documented shell syntax before inserting a platform path.
+            # Forward slashes also remain literal inside the Python -c string.
+            args=guide_argv(line,out);args[0]=sys.executable
             done=subprocess.run(args,cwd=root,capture_output=True,timeout=30)
-            self.assertEqual(done.returncode,0,done.stderr)
+            self.assertEqual(done.returncode,0,(args,done.stderr))
             if done.stdout:results.append(json.loads(done.stdout))
         self.assertEqual(results[-1]['status'],rebuild.PASSED)
         self.assertEqual(prior.tables(out/'archive.sqlite'),prior.tables(out/'rebuilt.sqlite'))
