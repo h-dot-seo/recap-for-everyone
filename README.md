@@ -304,3 +304,5 @@ rollback, retained snapshot APIs and concurrent-change limits.
 Source file entry points reject FIFOs, devices and other nonregular objects before
 opening them. Regular symlinks remain accepted. See [source file admission](docs/SOURCE_FILE_ADMISSION.md)
 for the exact paths and remaining race/size limits.
+
+Explicit Python provenance arguments are validated before SQLite connection; see [provenance admission](docs/PROVENANCE_ADMISSION.md). This checks shape and current-input identity membership, not origin authenticity.
