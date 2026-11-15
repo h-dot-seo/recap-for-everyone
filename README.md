@@ -300,3 +300,7 @@ variation and unchanged validation requirements.
 Normalized file ingest now validates and replays through one file object without
 retaining the whole input. See [two-pass file ingest](docs/STREAMED_INGEST.md) for
 rollback, retained snapshot APIs and concurrent-change limits.
+
+Source file entry points reject FIFOs, devices and other nonregular objects before
+opening them. Regular symlinks remain accepted. See [source file admission](docs/SOURCE_FILE_ADMISSION.md)
+for the exact paths and remaining race/size limits.

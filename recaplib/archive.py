@@ -1,4 +1,5 @@
 """Archive core shared by recap.py and the recaplib modules: schema, normalized JSONL ingest, read-only connections and FTS search."""
+from recaplib.input_files import require_source_file
 from recaplib.errors import ConflictingIdentity, SourceChanged
 import hashlib
 import io
@@ -184,6 +185,7 @@ def _stream_records(stream, state, defer_errors=False):
 
 def ingest(db, source, path, provenance=None, *, expected_sha256=None):
     _validate_source(source)
+    require_source_file(path)
     if provenance is not None:
         return ingest_bytes(db, source, Path(path).read_bytes(), provenance, expected_sha256=expected_sha256)
     with Path(path).open('rb', buffering=0) as stream:

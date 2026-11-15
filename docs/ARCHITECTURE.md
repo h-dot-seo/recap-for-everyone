@@ -372,3 +372,8 @@ member bytes into staging. First/last hash equality is not an immutable snapshot
 or protection against hostile concurrent rewrites; parsing errors may skip the
 final hash but cannot publish a result. Existing limits, CLI and successful receipt
 fields remain unchanged. See [ZIP preparation](PREPARE_WEB_EXPORT.md).
+
+Source entry-point admission uses stat (following existing regular symlinks), then
+S_ISREG before the existing reader. Snapshot read_bytes seams and two-pass ingest
+remain unchanged. No open-time inode binding or source byte ceiling is implied;
+the namespace may change after preflight. See [source admission](SOURCE_FILE_ADMISSION.md).

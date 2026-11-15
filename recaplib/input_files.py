@@ -14,3 +14,13 @@ def require_regular_file(path, *, max_bytes, label, too_large):
         raise ValueError(label + ' must be an existing regular file')
     if metadata.st_size > max_bytes:
         raise ValueError(too_large)
+
+
+def require_source_file(path):
+    """Admit an unbounded source read, following regular-file symlinks.
+
+    No size bound, immutable lease or protection against namespace races is added.
+    Missing paths retain the stat call's existing FileNotFoundError behavior.
+    """
+    if not stat.S_ISREG(Path(path).stat().st_mode):
+        raise ValueError('source must be an existing regular file')

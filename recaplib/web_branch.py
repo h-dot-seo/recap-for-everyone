@@ -1,4 +1,5 @@
 """Read one explicit web export branch; never open or modify an archive."""
+from recaplib.input_files import require_source_file
 from recaplib.errors import add_json_errors_argument, exit_error
 from recaplib.cli_errors import safe_diagnostic
 import argparse
@@ -16,6 +17,7 @@ def branch_view(path, conversation, node=None):
     if node is not None and (not isinstance(node, str) or not node):
         raise ValueError('node ID must be nonempty text')
     path = Path(path)
+    require_source_file(path)
     raw = path.read_bytes()
     # Both parsing passes use the same immutable bytes, including the original hash.
     rows, coverage = _normalize_bytes(raw, path.name, 'web', include_report=True)

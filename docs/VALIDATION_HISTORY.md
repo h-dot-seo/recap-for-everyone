@@ -3080,3 +3080,26 @@ imports and explicit provenance fallback had identical CLI receipts and DB/FTS
 tables. Actual normalized rebuild comparisons differed only in implementation and
 derived receipt hashes plus separately selected temporary destination paths, not
 checks or DB tables. Grammar/compile, old141 sh blocks, manifest337/audit338 passed.
+
+## 2026-11-15 Source regular-file admission (0.100.9-source-file-admission):
+adds stat/S_ISREG preflight at eight explicit source modules (nine paths including
+file ingest's provenance fallback). FIFO/device/socket/directory inputs fail
+before source open; regular symlinks and original parsing labels remain. Existing
+missing-path and module error handling remain, with replay_local SOURCE_ERROR and
+local parser LocalImportError. No new size limit, snapshot rewrite, byte API,
+document reader, SQLite artifact or recovery symlink policy change is introduced.
+Stat/open races and large regular inputs remain outside this kind-only preflight.
+
+Synthetic prior CLI ingest/web inspect FIFO calls timed out; current calls reject
+within subprocess timeouts without DB creation. New tests cover all entry points,
+options-before-stat, missing paths, devices, symlink paths, unchanged bytes APIs,
+socket metadata and the guide. Actual AF_UNIX socket creation is prohibited in
+the local execution environment, so only that real-socket test skips there; the
+socket metadata check always runs. Its initial broad stat mock also affected the
+DB-existence assertion and was narrowed to the synthetic source path. Independent
+core106 tests passed (one environment skip), with actual prior/current ingest,
+web/local/local-codex import and source inspection/projection/branch CLI bytes and
+DB/FTS parity. Full suite passed all 1,607 tests (two local environment skips:
+decoder-gap probe and prohibited real socket creation). Eleven new tests,
+Python 3.10 grammar/compile/diff, 142 prior sh blocks and guide execution passed;
+manifest339/audit340 passed. No private inputs or real user DB were exercised.

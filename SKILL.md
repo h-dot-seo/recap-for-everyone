@@ -468,3 +468,9 @@ hash precedes commit. Byte/adapter/rebuild inputs and explicit provenance calls
 retain snapshots. A failed second pass can leave a newly initialized empty DB
 schema; do not infer no filesystem changes or retry blindly. See
 [two-pass file ingest](docs/STREAMED_INGEST.md).
+
+Use regular files for explicit export/source paths. Source-backed import, inspection,
+branch/title and local projection paths now stat before opening and refuse
+nonregular objects, preventing ordinary FIFO waits. Regular symlinks remain
+accepted; this is not an atomic filesystem check, byte budget or privacy clearance.
+See [source file admission](docs/SOURCE_FILE_ADMISSION.md).

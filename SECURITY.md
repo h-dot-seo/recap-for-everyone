@@ -61,3 +61,11 @@ are not defended or bounded by this preflight. File contents are never changed.
 
 This change does not cover all export/title/plan readers and does not establish
 universal input admission or a sandbox. It preserves their current behavior.
+
+## Source kind preflight
+
+The source readers listed in [source file admission](docs/SOURCE_FILE_ADMISSION.md)
+stat before opening and reject nonregular files. This closes ordinary FIFO/device
+input paths, not hostile stat/open races. Regular symlinks are followed; no new
+size limit, content trust, SQLite write protection or permission is established.
+Existing bounded ZIP/document and recovery symlink policies are separate.

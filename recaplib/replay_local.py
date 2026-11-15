@@ -1,4 +1,5 @@
 """Fail-closed text-only projection of a narrow, explicit local turn grammar."""
+from recaplib.input_files import require_source_file
 from recaplib.errors import add_json_errors_argument
 import argparse
 import hashlib
@@ -219,8 +220,9 @@ def _project(raw, original_sha256):
 
 def reconstruct(path):
     try:
+        require_source_file(path)
         raw = Path(path).read_bytes()
-    except OSError:
+    except (OSError, ValueError):
         return dict(supported=False, reason_code='SOURCE_ERROR', line=0)
     return reconstruct_bytes(raw)
 

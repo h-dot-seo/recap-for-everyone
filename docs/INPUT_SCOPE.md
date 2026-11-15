@@ -506,3 +506,11 @@ The optional guard checks the first file pass or supplied byte snapshot before
 database access. File ingestion additionally verifies the second pass before commit;
 byte ingestion retains its immutable input contract. Neither shared adapter normalization, list-export nor title
 plans accept normalized input. See [contract and diagnostics](NORMALIZED_JSONL.md).
+
+### Regular source paths
+
+Explicit source readers now reject directories, FIFOs, devices and sockets before
+opening them. Regular-file symlinks retain their original parsing label and read
+path. Missing files keep their original error behavior; ordinary read results and
+receipts are unchanged. This does not cap source bytes, prevent path races, change
+byte-only APIs or change recovery symlink policies. See [source file admission](SOURCE_FILE_ADMISSION.md).

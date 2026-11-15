@@ -1,6 +1,7 @@
 # noqa: SIZE_OK
 from __future__ import annotations
 
+from recaplib.input_files import require_source_file
 import hashlib
 import json
 import math
@@ -195,6 +196,10 @@ def parse_artifact(path: Path, source_relative_path: str, artifact_kind: str = "
         return ParsedArtifact("not_applicable", "accepted_metadata_only", "sqlite_backup", None, (), ())
     if artifact_kind != "jsonl":
         raise LocalImportError(f"unsupported local artifact kind: {artifact_kind}")
+    try:
+        require_source_file(path)
+    except ValueError:
+        raise LocalImportError('source must be an existing regular file') from None
     return _parse_jsonl_records(_records(path.read_bytes(), path), path, source_relative_path, content_profile)
 
 
