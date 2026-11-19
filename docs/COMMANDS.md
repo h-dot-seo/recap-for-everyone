@@ -65,12 +65,15 @@ and [workflows](WORKFLOWS.md#normalized-jsonl-ingest-and-the-generic-session-par
 #### `export-normalized`
 
 ```text
-usage: recap.py export-normalized [-h] --source SOURCE [--conversation CONVERSATION] --output OUTPUT
+usage: recap.py export-normalized [-h] --source SOURCE [--conversation CONVERSATION] [--since-checkpoint SINCE_CHECKPOINT] [--through-checkpoint THROUGH_CHECKPOINT] --output OUTPUT
 ```
 
 Export one source or conversation in global insertion order from one read-only
 snapshot to exclusive UTF-8 LF JSONL. Full private message text, original titles,
-no origin ledger or local title history. Guide: [normalized export](EXPORT_NORMALIZED.md).
+no origin ledger or local title history. Use an import checkpoint to export only
+newly accepted identities or stop at an explicitly declared ending cutoff.
+See [normalized export](EXPORT_NORMALIZED.md) and
+[incremental transfer](INCREMENTAL_EXPORT.md).
 
 #### `search`
 
@@ -166,13 +169,17 @@ and message count. Guide: [message selection](MESSAGE_SELECTION.md).
 #### `find`
 
 ```text
-usage: recap.py find [-h] [--source SOURCE] [--limit LIMIT] [--export-sha256 EXPORT_SHA256] [--include-title-history] [--canonical-unicode] [--text-role {user,assistant,system,tool}] [--from FROM_DATE] [--until UNTIL_DATE] [--cursor CURSOR] query
+usage: recap.py find [-h] [--source SOURCE] [--limit LIMIT] [--export-sha256 EXPORT_SHA256] [--include-title-history] [--canonical-unicode] [--text-role {user,assistant,system,tool}] [--from FROM_DATE] [--until UNTIL_DATE] [--cursor CURSOR] [--conversation CONVERSATION] [--offset OFFSET] query
 ```
 
 Read-only search across current display titles and message text with bounded
 samples and cursor pages. Guides: [search excerpts](SEARCH_EXCERPTS.md),
 [search pagination](SEARCH_PAGINATION.md), [canonical Unicode search](CANONICAL_UNICODE_SEARCH.md),
 [title history search](TITLE_HISTORY_SEARCH.md), [export-scoped search](EXPORT_SCOPED_SEARCH.md).
+
+Supply `--source` and `--conversation` together to return excerpts for bodies
+containing any query term. Follow `next_offset` with `--offset` to page the matches
+in archive insertion order. See [matching message pages](OMITTED_SEARCH_MESSAGES.md).
 
 #### `show`
 
@@ -398,10 +405,11 @@ Guide: [import conflicts](IMPORT_CONFLICTS.md).
 ### `conversation_search.py` (`find`)
 
 ```text
-usage: conversation_search.py [-h] [--json-errors] --db DB [--source SOURCE] [--limit LIMIT] [--include-title-history] [--export-sha256 EXPORT_SHA256] [--text-role {user,assistant,system,tool}] [--cursor CURSOR] [--canonical-unicode] [--from FROM_DATE] [--until UNTIL_DATE] query
+usage: conversation_search.py [-h] [--json-errors] --db DB [--source SOURCE] [--limit LIMIT] [--include-title-history] [--export-sha256 EXPORT_SHA256] [--text-role {user,assistant,system,tool}] [--cursor CURSOR] [--canonical-unicode] [--from FROM_DATE] [--until UNTIL_DATE] [--conversation CONVERSATION] [--offset OFFSET] query
 ```
 
-Guides: [search excerpts](SEARCH_EXCERPTS.md), [search pagination](SEARCH_PAGINATION.md).
+Guides: [search excerpts](SEARCH_EXCERPTS.md), [search pagination](SEARCH_PAGINATION.md),
+[matching message pages](OMITTED_SEARCH_MESSAGES.md).
 
 ### `conversation_view.py` (`list`, `show`)
 
@@ -758,7 +766,7 @@ example, output boundaries and failure behavior.
 
 ## CLI version identity
 
-`python recap.py --version` prints `recap-for-everyone 0.100.19` and exits without
+`python recap.py --version` prints `recap-for-everyone 0.100.20` and exits without
 opening an archive or reading the publication manifest. It works outside the
 repository working directory and without the manifest. This numeric identity is
 not byte verification, authenticity or a stability guarantee. Use the documented

@@ -1,18 +1,42 @@
 # Find useful user evidence beyond the three search samples
 
-`find` returns conversations, with at most three sampled matching messages in each.
+By default, `find` returns conversations, with at most three sampled matching messages in each.
 Those samples can all be assistant messages even when a later user request also
 matches. `message_matches_truncated: true` says matching messages were omitted.
 `next_cursor` only continues **conversations**, not those omitted messages. A null
 cursor and `remaining_matches: 0` do not mean every matching message was displayed.
 Raising `find --limit` increases the conversation count, not the three-message cap.
 
-Use the existing scoped `show --limit ... --offset ...` pages to inspect the rest of
-that conversation. Follow `selection.next_offset` until null, choosing the exact
-source and conversation returned by search. These pages include **all messages**,
-not just matches. Read the role and text before choosing a user message for a title;
-do not treat the first assistant sample as eligible user evidence. Term-coverage
-flags describe query coverage, not human authorship or useful title wording.
+## Page through matching bodies
+
+Copy the exact source and conversation ID from a search result. For the fixture
+below, run `python recap.py --db ../recap-message-review-demo/archive.sqlite find "cobalt orchard" --source demo --conversation synthetic-message-review --limit 20`.
+Repeat with the same query and filters, passing the returned `next_offset` as
+`--offset` until it is null. The fixture returns 66 matches in pages of 20, 20,
+20 and 6. The final page includes the user request `focus-user`. Adding
+`--text-role user` to the first call returns that one matching request directly.
+
+The `recap.matching-messages.v1` result counts each eligible body containing
+**any** folded literal query term once. Terms can appear in different messages.
+Ordinary conversation search also considers titles and requires all terms
+somewhere in the conversation. A title alone contributes zero matching bodies.
+The scoped command also works directly when you already know the IDs. An unknown
+source/conversation pair reports an error. A known pair with zero matching bodies
+returns an empty page.
+
+`message_match_count` counts all matching bodies before paging. `message_matches`
+contains at most `--limit` excerpts (default 20, range 1–1000) in archive insertion
+order. `--offset` counts matching bodies from zero. Excerpts use the original
+text, with code-point offsets, `source_sha256` and `source_line`. Apply the same
+`--canonical-unicode`, `--text-role`, `--from`, `--until` and `--export-sha256`
+options used for the initial search. An export filter also returns up to three
+matching original locators per body. Each call scans the scoped rows in a fresh
+read-only snapshot for its exact count. Imports between calls can change the result.
+Conversation cursors and title-history matching apply only to conversation pages.
+
+To read full text and surrounding messages, use the scoped `show` pages in the
+walkthrough and follow `selection.next_offset`. Read the role and text before
+choosing a user message for a title.
 
 ## Copyable synthetic walkthrough
 
@@ -76,13 +100,11 @@ intact. Nothing is renamed in the source application.
 
 ## Scope and limits
 
-This bridge uses existing commands; it does not add a new search mode or treat
-search samples as exhaustive. The fixture demonstrates raw message paging only;
-it has no completed-turn markers for the narrow replay engine. The legacy
-message-level `search` command has different
-FTS token semantics and is not a continuation token for `find` samples.
+The walkthrough uses full-text `show` pages to review the surrounding conversation.
+The fixture has no completed-turn markers for the narrow replay engine. The legacy
+message-level `search` command uses FTS token semantics.
 
-`show` pages are in raw archive insertion order. They can include assistant/tool
+`show` and scoped `find` pages are in raw archive insertion order. They can include assistant/tool
 messages, alternate web branches, rolled-back local turns and multiple imported
 export versions, depending on the archive. They are not active-branch, retained-turn
 or source-attributed views. For those narrower scopes, use the existing verified
@@ -91,10 +113,8 @@ or source-attributed views. For those narrower scopes, use the existing verified
 role establishes the intended evidence. A selected assistant ID fails title
 suggestion; it is not silently replaced with another message.
 
-Each page is a fresh read-only database snapshot. New imports can affect later
-pages; these offsets are not a cross-call content lease. A page limit bounds the
-number of messages, not their byte size or number of provenance occurrences.
-Full message text is displayed, so this is broader private-text exposure than a
-search excerpt. Keep outputs private and use [exact message or nearby-context
+On `show` pages, a page limit bounds the number of messages, not their byte size
+or number of provenance occurrences. Full message text is displayed, so this is
+broader private-text exposure than a search excerpt. Keep outputs private and use [exact message or nearby-context
 views](MESSAGE_SELECTION.md) when you already know the needed ID. Generation,
 preview and explicit apply retain their separate full-content and revision checks.

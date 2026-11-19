@@ -116,6 +116,8 @@ def build_parser(prog=None):
     normalized = sub.add_parser('export-normalized', help='export private message text as derived normalized JSONL')
     normalized.add_argument('--source', required=True)
     normalized.add_argument('--conversation')
+    normalized.add_argument('--since-checkpoint', help='export only identities accepted after this verified import checkpoint')
+    normalized.add_argument('--through-checkpoint', help='include only identities present at this verified import checkpoint')
     normalized.add_argument('--output', required=True)
     provenance = sub.add_parser('export-provenance', help='save one private text-free message locator card')
     provenance.add_argument('--source', required=True); provenance.add_argument('--conversation', required=True)
@@ -166,6 +168,8 @@ def build_parser(prog=None):
     find.add_argument('--from', dest='from_date')
     find.add_argument('--until', dest='until_date')
     find.add_argument('--cursor', help='continue with the previous search next_cursor and the same query/filters')
+    from recaplib.search_message_page import add_message_page_arguments
+    add_message_page_arguments(find)
     for name in ('show', 'render', 'suggest-title', 'title', 'title-history'):
         command = sub.add_parser(name)
         command.add_argument('--source', required=True); command.add_argument('--conversation', required=True)
@@ -352,10 +356,12 @@ def _run(prog, archive_functions):
                                       args.around_message, args.before, args.after, branch=args.branch, node=args.node, export_sha256=args.export_sha256)
         elif args.command == 'find':
             from recaplib.conversation_search import find
-            result = find(args.db, args.query, args.source, args.limit, args.include_title_history, args.export_sha256, args.cursor, args.canonical_unicode, args.text_role, args.from_date, args.until_date)
+            result = find(args.db, args.query, args.source, args.limit, args.include_title_history, args.export_sha256, args.cursor, args.canonical_unicode, args.text_role, args.from_date, args.until_date,
+                          conversation=args.conversation, offset=args.offset)
         elif args.command == 'export-normalized':
             from recaplib.normalized_export import export_normalized
-            result = export_normalized(args.db, args.source, args.output, args.conversation)
+            result = export_normalized(args.db, args.source, args.output, args.conversation,
+                                       since_checkpoint=args.since_checkpoint, through_checkpoint=args.through_checkpoint)
         elif args.command == 'export-provenance':
             from recaplib.message_provenance import export_provenance
             result = export_provenance(args.db, args.source, args.conversation, args.message, args.output, args.declared_at)

@@ -95,9 +95,8 @@ is separate from evidence freshness and title approval.
 `next_cursor` continues conversations, not the omitted messages indicated by
 `message_matches_truncated`. It can be null while many matching bodies remain
 unsampled. A larger `find --limit` also does not raise the three-message sample cap.
-Use scoped `show --limit ... --offset ...` pages and follow `selection.next_offset`
-to read the remaining raw conversation, then choose useful user evidence explicitly.
-[The synthetic later-message walkthrough](OMITTED_SEARCH_MESSAGES.md) demonstrates
-assistant-only search samples, four existing message pages, and a reviewed title
-from the later user request. Paging is not restricted to matching messages or a
-verified branch/replay scope.
+Supply `--source SOURCE --conversation ID` to the same `find` query and follow
+`next_offset` with `--offset` to page matching body excerpts. Use scoped `show`
+pages to read full messages and their neighbors. Both use raw archive order.
+[The synthetic later-message walkthrough](OMITTED_SEARCH_MESSAGES.md) follows
+assistant-only search samples to a later user request and a reviewed title.

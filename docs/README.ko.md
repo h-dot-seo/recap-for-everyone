@@ -80,6 +80,13 @@ python recap.py --db ../demo.sqlite title --source demo --conversation synthetic
 
 ## 주요 명령
 
+위 예제에서 가져온 대화의 본문만 검색하려면
+`python recap.py --db ../demo.sqlite find orchard --source demo --conversation synthetic-chat --limit 1`을
+실행하세요. `next_offset`이 숫자이면 다음 호출에 `--offset 숫자`를 붙입니다.
+중간에 가져온 메시지만 다른 보관소로 옮기려면 먼저 기준 체크포인트를 만들고,
+이후 `export-normalized --since-checkpoint`로 추가분을 내보냅니다.
+[본문 검색 예제](OMITTED_SEARCH_MESSAGES.md) · [체크포인트 이후 메시지 옮기기](INCREMENTAL_EXPORT.md)
+
 `--db DB`는 하위 명령 앞에 씁니다. `python recap.py describe`는 각 명령의
 DB 필요·무시·거부 여부와 조건부 쓰기를 보여 줍니다. 별도의 복원 DB·새 DB를
 여는 명령도 구분합니다. [명령 카탈로그](COMMAND_CATALOG.md)를 참고하세요.

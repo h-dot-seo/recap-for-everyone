@@ -5,6 +5,11 @@ optionally one exact conversation. It opens the archive read-only and uses one
 explicit snapshot for counts, omitted provenance and every message. Unlike `show`,
 this is a whole-source file export, not a nested conversation view.
 
+For a second transfer, supply `--since-checkpoint FILE` to export newly accepted
+messages. Both v1 artifact and v2 identity checkpoints are supported.
+Add `--through-checkpoint FILE` to fix the end of the transfer or use it alone
+to export a saved baseline. See [incremental transfer](INCREMENTAL_EXPORT.md).
+
 ## Synthetic walkthrough
 
 Create an empty private directory outside the repository and replace `OUTPUT`

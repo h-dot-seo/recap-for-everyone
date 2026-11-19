@@ -1,6 +1,7 @@
 """Unsigned artifact cutoffs for accepted identities, never import completeness."""
 import hashlib
 import json
+from collections import namedtuple
 from pathlib import Path
 
 from recaplib.archive import readonly
@@ -20,15 +21,27 @@ SCOPE = 'one explicit source, all declared artifacts and accepted message identi
 DIGEST_SEMANTICS = ('SHA-256 over compact ASCII JSON arrays [source_id,conversation_id,message_id,role,timestamp,title,text,source_sha256,source_line] followed by LF; ordered by source_id,conversation_id,message_id under SQLite BINARY collation. Local title and review histories are excluded; original message title is included.')
 BOUNDARY = ('Unsigned operator-declared artifact cutoff, not authentication, archive UUID, backup, completeness, approval or review completion. Counts concern accepted identities, not export occurrences or conversations changed in the upstream service. Empty sources are allowed and do not establish source existence. No automatic advance or archive mutation.')
 PRIVACY = 'PRIVATE: the saved checkpoint contains a source label, artifact hashes and a logical message digest; keep it outside shared locations.'
-FIELDS = frozenset(('schema', 'source', 'declared_at', 'artifacts', 'accepted_messages', 'messages_sha256', 'digest_semantics', 'scope', 'boundary', 'archive_mutation', 'remote_mutation', 'contains_message_text'))
-FIELDS_V2 = FIELDS | {'identity_sha256s', 'membership_semantics'}
+FIELD_ORDER = ('schema', 'source', 'declared_at', 'artifacts', 'accepted_messages', 'messages_sha256', 'digest_semantics', 'scope', 'boundary', 'archive_mutation', 'remote_mutation', 'contains_message_text')
+FIELD_ORDER_V2 = FIELD_ORDER + ('membership_semantics', 'identity_sha256s')
+FIELDS = frozenset(FIELD_ORDER)
+FIELDS_V2 = frozenset(FIELD_ORDER_V2)
 BOUNDARY_V2 = ('Unsigned operator-declared accepted-identity membership cutoff, not authentication, archive UUID, backup, completeness, approval or review completion. Counts concern accepted identities, not export occurrences or upstream changes. Empty sources do not establish source existence. Membership hashes are private, guessable and linkable; collision resistance is assumed, not established. Optional provenance, topology, title and review histories are not verified. No automatic advance or archive mutation.')
 PRIVACY_V2 = 'PRIVATE: the saved checkpoint contains a source label, artifact hashes, identity hashes and a logical message digest. Identity hashes can be guessed and linked; keep it outside shared locations.'
-ARTIFACT_FIELDS = frozenset(('sha256', 'bytes', 'record_count'))
+ARTIFACT_FIELD_ORDER = ('sha256', 'bytes', 'record_count')
+ARTIFACT_FIELDS = frozenset(ARTIFACT_FIELD_ORDER)
 
 
 def _encode(value):
     return (json.dumps(value, ensure_ascii=True, allow_nan=False, indent=2) + '\n').encode('ascii')
+
+
+def canonical_checkpoint_bytes(checkpoint):
+    """Serialize a validated checkpoint in the original declaration's field order."""
+    fields = FIELD_ORDER_V2 if checkpoint['schema'] == SCHEMA_V2 else FIELD_ORDER
+    ordered = {field: checkpoint[field] for field in fields}
+    ordered['artifacts'] = [{field: artifact[field] for field in ARTIFACT_FIELD_ORDER}
+                            for artifact in checkpoint['artifacts']]
+    return _encode(ordered)
 
 
 def _identity_sha256(source, conversation, message):
@@ -152,7 +165,7 @@ def declare_checkpoint(db, source, output, declared_at=None, *, checkpoint_versi
         value.update(schema=SCHEMA_V2, boundary=BOUNDARY_V2,
                      membership_semantics=MEMBERSHIP_SEMANTICS, identity_sha256s=sorted(tokens))
     value = validate_checkpoint(value, source)
-    raw = _encode(value)
+    raw = canonical_checkpoint_bytes(value)
     publication = _publish_new_file(output, raw, '.recap-import-checkpoint-')
     result = dict(schema='recap.import-checkpoint-declaration.v1', status='DECLARED', checkpoint_schema=SCHEMA,
                 checkpoint_bytes=len(raw), checkpoint_sha256=hashlib.sha256(raw).hexdigest(),
@@ -165,23 +178,98 @@ def declare_checkpoint(db, source, output, declared_at=None, *, checkpoint_versi
     return result
 
 
-def changed_since(db, source, checkpoint, *, delta_output=None, limit=20):
-    """Verify a saved cutoff then summarize disjoint conversation categories.
+def read_checkpoint(checkpoint, source):
+    """Accept a detached checkpoint document or load one bounded file."""
+    if isinstance(checkpoint, dict):
+        return validate_checkpoint(checkpoint, source)
+    return load_checkpoint(checkpoint, source)
 
-    checkpoint may be a decoded document or a path. A valid document whose
-    declared rows no longer match returns no delta, never guessed change counts.
+
+VerifiedCutoff = namedtuple('VerifiedCutoff', ('delta', 'samples', 'is_after'))
+
+
+def verify_cutoff(connection, checkpoint, *, sample_limit=0):
+    """Verify a validated checkpoint inside the caller's active read transaction.
+
+    The returned predicate selects new rows of this source in this snapshot.
+    Return None on a mismatch, before exposing counts, IDs or a predicate.
     """
+    source = checkpoint['source']
+    v2 = checkpoint['schema'] == SCHEMA_V2
+    declared = {row['sha256']: row for row in checkpoint['artifacts']}
+    current_hashes = set()
+    for row in _artifact_rows(connection, source):
+        sha = row['sha256']
+        current_hashes.add(sha)
+        if sha in declared and row != declared[sha]:
+            return None
+    if not current_hashes.issuperset(declared):
+        return None
+
+    if v2:
+        saved = set(checkpoint['identity_sha256s'])
+        seen_old = set()
+
+        def row_key(conversation, message, artifact):
+            return _identity_sha256(source, conversation, message)
+    else:
+        saved = declared
+
+        def row_key(conversation, message, artifact):
+            return artifact
+
+    digest, count = hashlib.sha256(), 0
+    samples = {name: [] for name in DELTA_CATEGORIES}
+    delta = dict(new_conversations=0, has_new_identities=0, no_new_identities=0, accepted_after_cutoff_messages=0)
+    previous, old, new = None, False, False
+
+    def finish():
+        if previous is not None:
+            key = 'has_new_identities' if old and new else 'no_new_identities' if old else 'new_conversations'
+            delta[key] += 1
+            if len(samples[key]) < sample_limit:
+                samples[key].append(previous)
+
+    for row in _message_rows(connection, source):
+        if row['source_sha256'] not in current_hashes:
+            return None
+        if row['conversation_id'] != previous:
+            finish()
+            previous, old, new = row['conversation_id'], False, False
+        key = row_key(previous, row['message_id'], row['source_sha256'])
+        if key in saved:
+            if v2:
+                if key in seen_old:
+                    return None
+                seen_old.add(key)
+            digest.update(_canonical_line(list(row)))
+            count += 1
+            old = True
+        else:
+            new = True
+            delta['accepted_after_cutoff_messages'] += 1
+    finish()
+    if v2 and seen_old != saved:
+        return None
+    if count != checkpoint['accepted_messages'] or digest.hexdigest() != checkpoint['messages_sha256']:
+        return None
+
+    def is_after(conversation, message, artifact):
+        return row_key(conversation, message, artifact) not in saved
+
+    return VerifiedCutoff(delta, samples, is_after)
+
+
+def changed_since(db, source, checkpoint, *, delta_output=None, limit=20):
+    """Verify a saved cutoff then summarize disjoint conversation categories."""
     if not _identity(source, source=True):
         raise ValueError('explicit nonempty source required')
     if type(limit) is not int or not 1 <= limit <= 1000:
         raise ValueError('limit must be an integer in 1..1000')
     if delta_output is not None:
         _reject_existing(delta_output)
-    checkpoint = validate_checkpoint(checkpoint, source) if isinstance(checkpoint, dict) else load_checkpoint(checkpoint, source)
+    checkpoint = read_checkpoint(checkpoint, source)
     v2 = checkpoint['schema'] == SCHEMA_V2
-    membership = set(checkpoint['identity_sha256s']) if v2 else None
-    seen_old = set() if v2 else None
-    declared = {row['sha256']: row for row in checkpoint['artifacts']}
     result = dict(schema='recap.import-changes.v1', status='CUTOFF_NOT_VERIFIED', delta=None,
                   archive_mutation=False, remote_mutation=False, network_access=False, contains_message_text=False,
                   scope=SCOPE, boundary=BOUNDARY)
@@ -189,58 +277,15 @@ def changed_since(db, source, checkpoint, *, delta_output=None, limit=20):
         result.update(schema='recap.import-changes.v2', checkpoint_schema=SCHEMA_V2,
                       membership_semantics=MEMBERSHIP_SEMANTICS, boundary=BOUNDARY_V2)
     connection = readonly(db)
-    digest, count = hashlib.sha256(), 0
-    samples = {name: [] for name in DELTA_CATEGORIES}
-    delta = dict(new_conversations=0, has_new_identities=0, no_new_identities=0, accepted_after_cutoff_messages=0)
     try:
         connection.execute('BEGIN')
-        unseen = set(declared)
-        current_hashes = set()
-        for row in _artifact_rows(connection, source):
-            current_hashes.add(row['sha256'])
-            if row['sha256'] in declared:
-                if row != declared[row['sha256']]:
-                    return result
-                unseen.discard(row['sha256'])
-        if unseen:
-            return result
-        previous, old, new = None, False, False
-        def finish():
-            if previous is not None:
-                key = 'has_new_identities' if old and new else 'no_new_identities' if old else 'new_conversations'
-                delta[key] += 1
-                if delta_output is not None and len(samples[key]) < limit:
-                    samples[key].append(previous)
-        for row in _message_rows(connection, source):
-            if row['source_sha256'] not in current_hashes:
-                return result
-            if row['conversation_id'] != previous:
-                finish()
-                previous, old, new = row['conversation_id'], False, False
-            if v2:
-                token = _identity_sha256(row['source_id'], row['conversation_id'], row['message_id'])
-                is_old = token in membership
-                if is_old:
-                    if token in seen_old:
-                        return result
-                    seen_old.add(token)
-            else:
-                is_old = row['source_sha256'] in declared
-            if is_old:
-                digest.update(_canonical_line(list(row)))
-                count += 1
-                old = True
-            else:
-                new = True
-                delta['accepted_after_cutoff_messages'] += 1
-        finish()
-        if v2 and seen_old != membership:
-            return result
-        if count != checkpoint['accepted_messages'] or digest.hexdigest() != checkpoint['messages_sha256']:
-            return result
-        result = dict(result, status='CUTOFF_VERIFIED', delta=delta)
+        verified = verify_cutoff(connection, checkpoint, sample_limit=limit if delta_output is not None else 0)
     finally:
         connection.close()
+    if verified is None:
+        return result
+    delta, samples = verified.delta, verified.samples
+    result.update(status='CUTOFF_VERIFIED', delta=delta)
     if delta_output is not None:
         document = dict(schema='recap.import-changes-delta.v1', source=source,
                         status=result['status'], delta=delta, sample_limit_per_category=limit,
