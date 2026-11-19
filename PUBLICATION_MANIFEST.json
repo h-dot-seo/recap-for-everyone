@@ -205,8 +205,8 @@
     },
     {
       "path": "docs/INCREMENTAL_EXPORT.md",
-      "bytes": 5594,
-      "sha256": "d73e78a32d7cae6876930f1f686323459b0c83689380a21d4fabe5f88dca4ba6"
+      "bytes": 6217,
+      "sha256": "5b9d3a409f0a6442587953f963d40f9141a84c3c83a0da2087814ec202450a55"
     },
     {
       "path": "docs/INPUT_SCOPE.md",
@@ -715,8 +715,8 @@
     },
     {
       "path": "recaplib/import_checkpoint.py",
-      "bytes": 16517,
-      "sha256": "e7ce5c2e460393b6e661f6515e586a83a1df33f4df4ebcb6e2f570a0b62ab594"
+      "bytes": 17113,
+      "sha256": "b8600362d3abc670db3e8f8326595f35c30e32016fbbd077a619f4e13b856cd9"
     },
     {
       "path": "recaplib/input_files.py",
@@ -750,8 +750,8 @@
     },
     {
       "path": "recaplib/normalized_export.py",
-      "bytes": 7776,
-      "sha256": "1c558d7d5e6ab3581ef67ba8d83c76b14c846a8acc15ac40f8f15399daf7e943"
+      "bytes": 7918,
+      "sha256": "7a301e7fa830a87be729b6f516f25000c4a1a5df0e77ed9c211ec13ee8a6352b"
     },
     {
       "path": "recaplib/prepare_web_export.py",
@@ -1205,8 +1205,8 @@
     },
     {
       "path": "tests/test_incremental_normalized_export.py",
-      "bytes": 14716,
-      "sha256": "2cd4f10e7a6ccdd3d31ec63f5a9df832f04cbe91e57a477cc9895e00bbdaf0e5"
+      "bytes": 17627,
+      "sha256": "c21b3a053169860827abb6010846350077754bba920bc4785ecbf49adbe20c3e"
     },
     {
       "path": "tests/test_inspect_web_zip.py",

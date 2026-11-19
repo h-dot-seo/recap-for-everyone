@@ -3,7 +3,7 @@ import hashlib
 import json
 
 from recaplib.archive import readonly, _validate_source
-from recaplib.import_checkpoint import read_checkpoint, verify_cutoff
+from recaplib.import_checkpoint import canonical_checkpoint_bytes, read_checkpoint, verify_cutoff
 from recaplib.recovery import _publish_new_chunks, _reject_existing
 
 FIELDS = ('conversation_id', 'message_id', 'role', 'timestamp', 'title', 'text')
@@ -26,6 +26,7 @@ def _checkpoint_filter(connection, source, since, through):
         connection.create_function(function, 3, verified.is_after)
         predicates[name] = function + columns
         receipt[name + '_checkpoint_schema'] = checkpoint['schema']
+        receipt[name + '_checkpoint_sha256'] = hashlib.sha256(canonical_checkpoint_bytes(checkpoint)).hexdigest()
 
     if since is not None and through is not None:
         # Compare the whole source, even when exporting just one conversation.

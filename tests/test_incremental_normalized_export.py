@@ -58,6 +58,8 @@ class IncrementalExportTests(unittest.TestCase):
         original = normalized_export.export_normalized(self.db, SOURCE, base)
         self.assertEqual(original['schema'], 'recap.normalized-export-receipt.v1')
         self.assertNotIn('checkpoint_schema', original)
+        self.assertNotIn('since_checkpoint_sha256', original)
+        self.assertNotIn('through_checkpoint_sha256', original)
         v1 = self.root / 'artifact.json'
         import_checkpoint.declare_checkpoint(self.db, SOURCE, v1)
         self.declare(2)
@@ -71,6 +73,8 @@ class IncrementalExportTests(unittest.TestCase):
                 receipt = normalized_export.export_normalized(self.db, SOURCE, path, since_checkpoint=saved)
                 self.assertEqual(receipt['schema'], 'recap.normalized-export-receipt.v2')
                 self.assertEqual(receipt['since_checkpoint_schema'], f'recap.import-checkpoint.v{version}')
+                self.assertEqual(receipt['since_checkpoint_sha256'], hashlib.sha256(cutoff.read_bytes()).hexdigest())
+                self.assertNotIn('through_checkpoint_sha256', receipt)
                 self.assertEqual(receipt['status'], 'EXPORTED')
                 self.assertTrue(receipt['published'])
                 self.assertEqual((receipt['records'], receipt['conversations']), (4, 3))
@@ -84,6 +88,47 @@ class IncrementalExportTests(unittest.TestCase):
                 self.assertEqual(ingest(moved, 'moved', path)['inserted'], 4)
                 self.assertEqual(ingest(moved, 'moved', path)['inserted'], 0)
         self.assertEqual(self.db.read_bytes(), before)
+
+    def test_each_cutoff_digest_matches_its_declaration_across_reformatting(self):
+        self.seed(record('c', 'private-old'))
+        start_hash = self.declare(2)['checkpoint_sha256']
+        self.seed(record('c', 'private-new'))
+        end = self.root / 'ending.json'
+        end_hash = import_checkpoint.declare_checkpoint(self.db, SOURCE, end, checkpoint_version=2)['checkpoint_sha256']
+        self.assertNotEqual(start_hash, end_hash)
+        self.assertEqual(start_hash, hashlib.sha256(self.cutoff.read_bytes()).hexdigest())
+        self.assertEqual(end_hash, hashlib.sha256(end.read_bytes()).hexdigest())
+
+        # Reorder both the top-level fields and each nested artifact's fields.
+        def reordered(path):
+            return json.loads(json.dumps(json.loads(path.read_bytes()), sort_keys=True))
+
+        start_dict = reordered(self.cutoff)
+        end_dict = reordered(end)
+        reformatted = b'\xef\xbb\xbf' + json.dumps(end_dict, separators=(',', ':')).encode() + b'\r\n'
+        end.write_bytes(reformatted)
+        self.assertNotEqual(hashlib.sha256(reformatted).hexdigest(), end_hash)
+        for index, (lower, upper) in enumerate(((start_dict, end), (self.cutoff, end_dict))):
+            output = self.root / f'interval-{index}.jsonl'
+            result = normalized_export.export_normalized(self.db, SOURCE, output,
+                                                        since_checkpoint=lower, through_checkpoint=upper)
+            self.assertEqual(result['status'], 'EXPORTED')
+            self.assertEqual((result['since_checkpoint_sha256'], result['through_checkpoint_sha256']),
+                             (start_hash, end_hash))
+            serialized = json.dumps(result)
+            for private in [SOURCE, 'private-old', 'private-new', *end_dict['identity_sha256s']]:
+                self.assertNotIn(private, serialized)
+
+        baseline = normalized_export.export_normalized(self.db, SOURCE, self.output, through_checkpoint=end)
+        self.assertEqual(baseline['through_checkpoint_sha256'], end_hash)
+        self.assertNotIn('since_checkpoint_sha256', baseline)
+        no_output = self.root / 'no-additions.jsonl'
+        empty = normalized_export.export_normalized(self.db, SOURCE, no_output,
+                                                   since_checkpoint=end, through_checkpoint=end_dict)
+        self.assertEqual(empty['status'], 'NO_NEW_MESSAGES')
+        self.assertEqual((empty['since_checkpoint_sha256'], empty['through_checkpoint_sha256']),
+                         (end_hash, end_hash))
+        self.assertFalse(no_output.exists())
 
     def test_same_artifact_v2_succeeds_and_v1_fails_before_staging(self):
         rows = [record('old', 'm'), record('new', 'm')]

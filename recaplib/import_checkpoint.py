@@ -21,15 +21,27 @@ SCOPE = 'one explicit source, all declared artifacts and accepted message identi
 DIGEST_SEMANTICS = ('SHA-256 over compact ASCII JSON arrays [source_id,conversation_id,message_id,role,timestamp,title,text,source_sha256,source_line] followed by LF; ordered by source_id,conversation_id,message_id under SQLite BINARY collation. Local title and review histories are excluded; original message title is included.')
 BOUNDARY = ('Unsigned operator-declared artifact cutoff, not authentication, archive UUID, backup, completeness, approval or review completion. Counts concern accepted identities, not export occurrences or conversations changed in the upstream service. Empty sources are allowed and do not establish source existence. No automatic advance or archive mutation.')
 PRIVACY = 'PRIVATE: the saved checkpoint contains a source label, artifact hashes and a logical message digest; keep it outside shared locations.'
-FIELDS = frozenset(('schema', 'source', 'declared_at', 'artifacts', 'accepted_messages', 'messages_sha256', 'digest_semantics', 'scope', 'boundary', 'archive_mutation', 'remote_mutation', 'contains_message_text'))
-FIELDS_V2 = FIELDS | {'identity_sha256s', 'membership_semantics'}
+FIELD_ORDER = ('schema', 'source', 'declared_at', 'artifacts', 'accepted_messages', 'messages_sha256', 'digest_semantics', 'scope', 'boundary', 'archive_mutation', 'remote_mutation', 'contains_message_text')
+FIELD_ORDER_V2 = FIELD_ORDER + ('membership_semantics', 'identity_sha256s')
+FIELDS = frozenset(FIELD_ORDER)
+FIELDS_V2 = frozenset(FIELD_ORDER_V2)
 BOUNDARY_V2 = ('Unsigned operator-declared accepted-identity membership cutoff, not authentication, archive UUID, backup, completeness, approval or review completion. Counts concern accepted identities, not export occurrences or upstream changes. Empty sources do not establish source existence. Membership hashes are private, guessable and linkable; collision resistance is assumed, not established. Optional provenance, topology, title and review histories are not verified. No automatic advance or archive mutation.')
 PRIVACY_V2 = 'PRIVATE: the saved checkpoint contains a source label, artifact hashes, identity hashes and a logical message digest. Identity hashes can be guessed and linked; keep it outside shared locations.'
-ARTIFACT_FIELDS = frozenset(('sha256', 'bytes', 'record_count'))
+ARTIFACT_FIELD_ORDER = ('sha256', 'bytes', 'record_count')
+ARTIFACT_FIELDS = frozenset(ARTIFACT_FIELD_ORDER)
 
 
 def _encode(value):
     return (json.dumps(value, ensure_ascii=True, allow_nan=False, indent=2) + '\n').encode('ascii')
+
+
+def canonical_checkpoint_bytes(checkpoint):
+    """Serialize a validated checkpoint in the original declaration's field order."""
+    fields = FIELD_ORDER_V2 if checkpoint['schema'] == SCHEMA_V2 else FIELD_ORDER
+    ordered = {field: checkpoint[field] for field in fields}
+    ordered['artifacts'] = [{field: artifact[field] for field in ARTIFACT_FIELD_ORDER}
+                            for artifact in checkpoint['artifacts']]
+    return _encode(ordered)
 
 
 def _identity_sha256(source, conversation, message):
@@ -153,7 +165,7 @@ def declare_checkpoint(db, source, output, declared_at=None, *, checkpoint_versi
         value.update(schema=SCHEMA_V2, boundary=BOUNDARY_V2,
                      membership_semantics=MEMBERSHIP_SEMANTICS, identity_sha256s=sorted(tokens))
     value = validate_checkpoint(value, source)
-    raw = _encode(value)
+    raw = canonical_checkpoint_bytes(value)
     publication = _publish_new_file(output, raw, '.recap-import-checkpoint-')
     result = dict(schema='recap.import-checkpoint-declaration.v1', status='DECLARED', checkpoint_schema=SCHEMA,
                 checkpoint_bytes=len(raw), checkpoint_sha256=hashlib.sha256(raw).hexdigest(),

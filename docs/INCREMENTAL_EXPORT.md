@@ -50,7 +50,15 @@ version. Both verification and export see the same archive snapshot.
 
 Either flag selects receipt schema `recap.normalized-export-receipt.v2`.
 The receipt identifies each supplied checkpoint version in
-`since_checkpoint_schema` or `through_checkpoint_schema`.
+`since_checkpoint_schema` or `through_checkpoint_schema`. For each supplied
+cutoff, `since_checkpoint_sha256` or `through_checkpoint_sha256` matches the
+`checkpoint_sha256` in its declaration receipt. These digests identify the
+complete validated document serialized in declaration field order, with ASCII
+JSON, two-space indentation and a final LF. An equivalent API dictionary or a
+file with different whitespace, encoding markers or object key order has the
+same digest. To verify the original bytes of a reformatted file, hash that file
+separately. Both export statuses carry these digests. They can link receipts for
+the same cutoff without disclosing its message identities.
 Check its status before using the output path.
 
 - `EXPORTED` reports `published: true`, the record and conversation counts,
