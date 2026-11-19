@@ -1,6 +1,6 @@
 """Read-only conversation search across current display titles and message text."""
 from recaplib.errors import add_json_errors_argument, exit_error
-from recaplib.errors import Stale
+from recaplib.errors import Stale, UnknownIdentity
 from recaplib.cli_errors import safe_diagnostic
 import argparse
 import base64
@@ -13,7 +13,8 @@ import unicodedata
 from recaplib.unicode_search import canonical_fold, canonical_span
 from recaplib.archive import readonly
 from recaplib.strict_json import loads
-from recaplib.timestamps import RULE, parse_timestamp, validate_options
+from recaplib.timestamps import RULE, validate_options
+from recaplib.search_message_page import add_message_page_arguments, body_rows, message_page, within_window
 
 
 MAX_CURSOR_CHARS = 16384
@@ -134,7 +135,10 @@ def _matching_export_provenance(connection, tables, source, conversation, messag
     return samples,count
 
 
-def find(db, query, source=None, limit=20, include_title_history=False, export_sha256=None, cursor=None, canonical_unicode=False, text_role=None, from_date=None, until_date=None):
+def find(db, query, source=None, limit=20, include_title_history=False, export_sha256=None,
+         cursor=None, canonical_unicode=False, text_role=None, from_date=None, until_date=None,
+         *, conversation=None, offset=None):
+    """Search conversations, or page any-term body matches in an exact conversation."""
     lower, upper = validate_options(None, from_date, until_date)
     window = from_date is not None or until_date is not None
     interpretation_counts = dict(parsed_iso=0, parsed_epoch_seconds=0, unparsed=0)
@@ -154,15 +158,54 @@ def find(db, query, source=None, limit=20, include_title_history=False, export_s
         raise ValueError('provide 1..20 search terms and limit 1..1000')
     # Repeating a query term must not give it extra evidence-sampling weight.
     terms = list(dict.fromkeys(terms))
-    scope = _cursor_scope(terms, source, include_title_history, export_sha256, canonical_unicode, text_role, from_date, until_date)
-    after = _decode_cursor(cursor, scope)
-    position = (after['rank'], after['source'], after['conversation']) if after is not None else None
+    if conversation is not None:
+        if not isinstance(source, str) or not source.strip() or not isinstance(conversation, str) or not conversation:
+            raise ValueError('--conversation requires an exact nonempty --source and conversation ID')
+        if cursor is not None or include_title_history:
+            raise ValueError('--conversation excludes --cursor and --include-title-history')
+        offset = 0 if offset is None else offset
+        if type(offset) is not int or not 0 <= offset <= 2**63 - 1:
+            raise ValueError('message offset must be an integer in 0..9223372036854775807')
+    else:
+        if offset is not None:
+            raise ValueError('--offset requires --conversation and --source')
+        scope = _cursor_scope(terms, source, include_title_history, export_sha256, canonical_unicode, text_role, from_date, until_date)
+        after = _decode_cursor(cursor, scope)
+        position = (after['rank'], after['source'], after['conversation']) if after is not None else None
     c = readonly(db)
     try:
         c.execute('BEGIN')
-        history_exists = c.execute(
-            "SELECT 1 FROM sqlite_master WHERE type='table' AND name='title_history'"
-        ).fetchone()
+        if conversation is None:
+            history_exists = c.execute(
+                "SELECT 1 FROM sqlite_master WHERE type='table' AND name='title_history'"
+            ).fetchone()
+        elif not c.execute('SELECT 1 FROM messages WHERE source_id=? AND conversation_id=? LIMIT 1',
+                           (source, conversation)).fetchone():
+            raise UnknownIdentity('unknown conversation')
+        rows, provenance_tables = body_rows(c, source, conversation, text_role, export_sha256)
+        if window:
+            rows = within_window(rows, lower, upper, interpretation_counts)
+
+        def evidence(row, text, include_excerpt=True):
+            match = dict(message_id=row['message_id'], role=row['role'],
+                         source_sha256=row['source_sha256'], source_line=row['source_line'])
+            if include_excerpt:
+                match.update(_matching_excerpt(row['text'], text, terms, canonical_unicode=canonical_unicode))
+            if export_sha256 is not None:
+                samples, count = _matching_export_provenance(c, provenance_tables, row['source_id'],
+                    row['conversation_id'], row['message_id'], export_sha256)
+                match.update(export_provenance=samples, export_provenance_count=count, export_provenance_truncated=count > 3)
+            return match
+
+        if conversation is not None:
+            result = message_page(rows, terms, fold, evidence, source, conversation, limit, offset)
+            result.update(terms=terms, canonical_unicode=canonical_unicode, text_role=text_role,
+                          export_sha256=export_sha256, from_date=from_date, until_date=until_date)
+            if export_sha256 is not None:
+                result['export_provenance_available'] = bool(provenance_tables)
+            if window:
+                result['timestamp_interpretation'] = dict(rule=RULE, **interpretation_counts)
+            return result
         history_sql = (
             'SELECT h.source,h.conversation,h.title,h.id FROM title_history h JOIN '
             '(SELECT source,conversation,MAX(id) id FROM title_history '
@@ -176,22 +219,6 @@ def find(db, query, source=None, limit=20, include_title_history=False, export_s
                     'ORDER BY source COLLATE BINARY,conversation COLLATE BINARY,id DESC')
         past_rows = iter(c.execute(past_sql, (source,) if source is not None else ())) if include_title_history and history_exists else iter(())
         past_title = next(past_rows, None)
-        sql = 'SELECT * FROM messages'
-        params = []; filters = []; provenance_tables = []
-        if source is not None:
-            filters.append('source_id=?'); params.append(source)
-        if text_role is not None:
-            filters.append('role=?'); params.append(text_role)
-        if export_sha256 is not None:
-            provenance_tables = [table for table in ('export_provenance', 'export_occurrences') if c.execute(
-                "SELECT 1 FROM sqlite_master WHERE type='table' AND name=?", (table,)).fetchone()]
-            checks = ['EXISTS (SELECT 1 FROM '+table+' p WHERE p.source=messages.source_id '
-                      'AND p.conversation=messages.conversation_id AND p.message=messages.message_id '
-                      'AND p.original_hash=?)' for table in provenance_tables]
-            filters.append('('+' OR '.join(checks)+')' if checks else '0')
-            params.extend([export_sha256]*len(checks))
-        if filters: sql += ' WHERE '+' AND '.join(filters)
-        sql += ' ORDER BY source_id COLLATE BINARY,conversation_id COLLATE BINARY,message_pk'
         # Keep only the current conversation's term flags and three body samples.
         # Three bounded buckets preserve title-first ranking without storing all hits.
         title_hits, historical_hits, text_hits = [], [], []
@@ -228,12 +255,7 @@ def find(db, query, source=None, limit=20, include_title_history=False, export_s
             if len(bucket) < limit:
                 bucket.append(item)
 
-        for row in c.execute(sql, params):
-            if window:
-                instant, kind = parse_timestamp(row['timestamp'])
-                interpretation_counts[kind] += 1
-                if instant is None or (lower is not None and instant < lower) or (upper is not None and instant >= upper):
-                    continue
+        for row in rows:
             next_key = (row['source_id'], row['conversation_id'])
             if next_key != key:
                 finish()
@@ -294,19 +316,14 @@ def find(db, query, source=None, limit=20, include_title_history=False, export_s
                 slot = _sample_slot(sample_masks, mask)
                 if slot is None:
                     continue
-                match = dict(message_id=row['message_id'], role=row['role'],
-                             source_sha256=row['source_sha256'], source_line=row['source_line'])
                 rank = 0 if item['matched_title'] else 1 if item.get('matched_historical_title') else 2
                 bucket = title_hits if rank == 0 else historical_hits if rank == 1 else text_hits
                 # Rank is fixed at conversation start. A full rank bucket or a
                 # cursor-preceding identity can never reach the returned page.
                 # Only excerpt construction is skipped: masks, sampling and
                 # provenance queries (including their failures) remain unchanged.
-                if len(bucket) < limit and (position is None or (rank, key[0], key[1]) > position):
-                    match.update(_matching_excerpt(row['text'], text, terms, canonical_unicode=canonical_unicode))
-                if export_sha256 is not None:
-                    samples,count = _matching_export_provenance(c, provenance_tables, key[0], key[1], row['message_id'], export_sha256)
-                    match.update(export_provenance=samples, export_provenance_count=count, export_provenance_truncated=count>3)
+                on_page = len(bucket) < limit and (position is None or (rank, key[0], key[1]) > position)
+                match = evidence(row, text, include_excerpt=on_page)
                 if slot < len(sample_masks):
                     del sample_masks[slot]
                     del item['message_matches'][slot]
@@ -365,8 +382,10 @@ def main():
     p.add_argument('--canonical-unicode', action='store_true', help='match canonical Unicode equivalents without rewriting evidence')
     p.add_argument('--from', dest='from_date')
     p.add_argument('--until', dest='until_date')
+    add_message_page_arguments(p)
     a=p.parse_args()
-    try: result=find(a.db,a.query,a.source,a.limit,a.include_title_history,a.export_sha256,a.cursor,a.canonical_unicode,a.text_role,a.from_date,a.until_date)
+    try: result=find(a.db,a.query,a.source,a.limit,a.include_title_history,a.export_sha256,a.cursor,a.canonical_unicode,a.text_role,a.from_date,a.until_date,
+                     conversation=a.conversation, offset=a.offset)
     except (ValueError,OSError,sqlite3.Error) as e: exit_error(p, a, e)
     print(json.dumps(result,ensure_ascii=True,indent=2))
 

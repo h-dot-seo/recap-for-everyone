@@ -89,6 +89,12 @@ def _effects(name):
         notes.append('--from-queue alone is invalid: it requires --set and excludes explicit expected-value flags.')
     if name=='declare-checkpoint':
         schemas.append(dict(when='with --checkpoint-version 2',schema='recap.import-checkpoint-declaration.v2'))
+    if name=='export-normalized':
+        opens.append(_open('--since-checkpoint','read','with --since-checkpoint'))
+        opens.append(_open('--through-checkpoint','read','with --through-checkpoint'))
+        schemas.append(dict(when='with --since-checkpoint or --through-checkpoint',schema='recap.normalized-export-receipt.v2'))
+        notes.append('With either checkpoint flag, verified cutoffs and at least one selected message '
+                     'are required to publish --output. NO_NEW_MESSAGES leaves the path unused.')
     if name=='changed-since':
         schemas.append(dict(when='input checkpoint schema is recap.import-checkpoint.v2',schema='recap.import-changes.v2'))
         notes.append('A v2 checkpoint uses explicit saved identity membership; its optional delta file is recap.import-changes-delta.v2. Default v1 artifact-cutoff semantics are unchanged.')
@@ -124,6 +130,9 @@ def _effects(name):
     if name=='stats':
         schemas.append(dict(when='with --by-source',schema=None))
         notes.append('--by-source changes the JSON shape to include source/time coverage; neither form declares a schema identifier.')
+    if name=='find':
+        schemas.append(dict(when='with --conversation',schema='recap.matching-messages.v1'))
+        notes.append('--conversation requires --source and pages matching body excerpts. Use --offset with this mode. Conversation cursors and title history are excluded.')
     if name=='describe':
         opens.append(_open('local PUBLICATION_MANIFEST.json','read','best-effort release label only'))
     if writes or conditional:

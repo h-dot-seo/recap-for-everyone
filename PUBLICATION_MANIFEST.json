@@ -1,12 +1,12 @@
 {
   "project": "recap-for-everyone",
-  "release": "0.100.19-membership-checkpoint",
-  "date": "2026-11-15",
+  "release": "0.100.20-archive-search-and-checkpoints",
+  "date": "2026-11-19",
   "private_history_imported": false,
   "actual_corpora_included": false,
   "synthetic_examples_only": true,
   "license_status": "NOT_SELECTED",
-  "file_count": 361,
+  "file_count": 365,
   "files": [
     {
       "path": ".gitattributes",
@@ -30,8 +30,8 @@
     },
     {
       "path": "README.md",
-      "bytes": 23486,
-      "sha256": "e29e0b3381f7d2cc5994e07b688b53480f6168e8165a44e5ad876764561a076f"
+      "bytes": 23618,
+      "sha256": "85ce5f74aff1911d60e229dff4335276bd27d2713d82affc44906e796e1d1699"
     },
     {
       "path": "RIGHTS.md",
@@ -50,8 +50,8 @@
     },
     {
       "path": "VALIDATION.md",
-      "bytes": 2650,
-      "sha256": "206741c15a62d8016ad021e7f9dcaa4710279f37b711f92ced247d127e5b5104"
+      "bytes": 973,
+      "sha256": "d86fae6f92cc01ba5319992261dfee0cf66296089a02e5880bb5b61cafdee60a"
     },
     {
       "path": "attributed_title.py",
@@ -155,8 +155,8 @@
     },
     {
       "path": "docs/COMMANDS.md",
-      "bytes": 35829,
-      "sha256": "c2651924fb1db18cc59349f51cb417d27a1bd2b22ac367d460967a1e048c7534"
+      "bytes": 36470,
+      "sha256": "5dc5d0da70ac508d7789fb99790945b89e3cb53335b99c31e255c9d9c80d82b1"
     },
     {
       "path": "docs/COMMAND_CATALOG.md",
@@ -185,8 +185,8 @@
     },
     {
       "path": "docs/EXPORT_NORMALIZED.md",
-      "bytes": 4427,
-      "sha256": "766ac391cf4b4c16ae758a385c4eb5f2b3dbfec4b9249ed94a823500595a579a"
+      "bytes": 4737,
+      "sha256": "6980fed6c771a88080fd6c8e5a582eac2eb61b5afaed3db5e8361f8a276aab98"
     },
     {
       "path": "docs/EXPORT_SCOPED_SEARCH.md",
@@ -204,6 +204,11 @@
       "sha256": "4ef080860105c1bfa022b99cda6e27481a35a69d2b006d00b793e451900d662b"
     },
     {
+      "path": "docs/INCREMENTAL_EXPORT.md",
+      "bytes": 5594,
+      "sha256": "d73e78a32d7cae6876930f1f686323459b0c83689380a21d4fabe5f88dca4ba6"
+    },
+    {
       "path": "docs/INPUT_SCOPE.md",
       "bytes": 34892,
       "sha256": "a650ef9343db911ec4d97c6607a0d20fbf004812d11a4b3f7fa82fc5adb01f0e"
@@ -211,7 +216,7 @@
     {
       "path": "docs/INSTALL.md",
       "bytes": 8548,
-      "sha256": "fd6ae7fbd6228cea3498252c7479e7610387fee0ee7e1ec371058e01b1ee676d"
+      "sha256": "e318ae613a64c488a48be68a773f97a47289e0bdb73d18cf60e049df0073ba02"
     },
     {
       "path": "docs/JSON_ERRORS.md",
@@ -225,8 +230,8 @@
     },
     {
       "path": "docs/MEMBERSHIP_CHECKPOINT.md",
-      "bytes": 4298,
-      "sha256": "53210cf164ac6bfa69820d84c97186b88d67d5e1401e6ad3fcafbf05bd462f5d"
+      "bytes": 4410,
+      "sha256": "35539763e1d4b29eeb6b21c98bb9dbc47dc4973746664424fd64967ef533c6a1"
     },
     {
       "path": "docs/MESSAGE_PROVENANCE.md",
@@ -250,8 +255,8 @@
     },
     {
       "path": "docs/OMITTED_SEARCH_MESSAGES.md",
-      "bytes": 6206,
-      "sha256": "354c4d9478d1884e0458ebad1be4cf79737d7b96b7232d4a7376f01c1aa30d9e"
+      "bytes": 7516,
+      "sha256": "e9399eec632667b598dc30f7d1a70a4f652d7660d612c01b773af1baf2284d93"
     },
     {
       "path": "docs/PACKAGE_INSTALL.md",
@@ -270,8 +275,8 @@
     },
     {
       "path": "docs/README.ko.md",
-      "bytes": 25197,
-      "sha256": "93ce52cd16d95bf5d2c518d819411ff1484e7f2ebd0387ca7b92cd197f2e279d"
+      "bytes": 25779,
+      "sha256": "f7814295aa0ef1701a9fec06f682ebab748337f817a3b96fe1eb2c228713eb5b"
     },
     {
       "path": "docs/REBUILD_REHEARSAL.md",
@@ -350,13 +355,13 @@
     },
     {
       "path": "docs/SEARCH_EXCERPTS.md",
-      "bytes": 6108,
-      "sha256": "ccb9cc784e95ffead7c66ef8c70ef2c4d3a0bdabc554bae2d39c5a953530a281"
+      "bytes": 6055,
+      "sha256": "6927e02ab3b8de9dfd23bbc8ccccc14aa0131aacec32a2b1efbf3c98c8ea5aba"
     },
     {
       "path": "docs/SEARCH_PAGINATION.md",
-      "bytes": 5971,
-      "sha256": "b91d3b088932f08785c8364b639ca2bb3a6e52dd99e084e5fe93d585aee105fe"
+      "bytes": 6044,
+      "sha256": "a490b3d8722f13574aace7148de02d2ccd5b78f516d07d8bdb6b5b5ecee46fa8"
     },
     {
       "path": "docs/SELECTED_NORMALIZED.md",
@@ -460,8 +465,8 @@
     },
     {
       "path": "docs/VALIDATION_HISTORY.md",
-      "bytes": 232001,
-      "sha256": "cd5fac76f33fc6a54f5eff0c1981068f4064afe3bd2d767f9e743de59c295c54"
+      "bytes": 232801,
+      "sha256": "f044b31b25d93af607ef5c9b013a25b04bacf40ea76408d0ecfdbc153c0002ac"
     },
     {
       "path": "docs/WEB_ZIP_INVENTORY.md",
@@ -626,7 +631,7 @@
     {
       "path": "recaplib/__init__.py",
       "bytes": 110,
-      "sha256": "60474888f5358ec5df076e1a788dc3f1ec51398a1c5982727c600eb6d1db2cd5"
+      "sha256": "3c89257719fe9dcc368ca240b076d81c7af4d45b80b9fd77f9a24274d4dcd8c5"
     },
     {
       "path": "recaplib/__main__.py",
@@ -660,8 +665,8 @@
     },
     {
       "path": "recaplib/cli.py",
-      "bytes": 35597,
-      "sha256": "3b327056e8c7949d55f1b480753e0fcff0f8f53759f200be1162c31aeefcfa20"
+      "bytes": 36162,
+      "sha256": "4c94827adbeac8788f1c45416a00dafe219c529ea2426b5a2455d66d83b214de"
     },
     {
       "path": "recaplib/cli_errors.py",
@@ -670,8 +675,8 @@
     },
     {
       "path": "recaplib/command_catalog.py",
-      "bytes": 15571,
-      "sha256": "6cae937620edb102708f516c49130ed87b51fc2dbe816ef6655443fbf5a594d9"
+      "bytes": 16393,
+      "sha256": "6f8765c3ea2fa397def5f36868797c46789bd9448300ae2702923ede93a70f05"
     },
     {
       "path": "recaplib/conversation_document.py",
@@ -680,8 +685,8 @@
     },
     {
       "path": "recaplib/conversation_search.py",
-      "bytes": 24134,
-      "sha256": "64d9c1c4beb7b517cca2d3fe6b5f7ba507b887f058480780d426047b81a829fe"
+      "bytes": 25094,
+      "sha256": "63e0c251b735c929c2572f7331663f37ce97ee4c93c1be9229fecf08a25eefa1"
     },
     {
       "path": "recaplib/conversation_view.py",
@@ -710,8 +715,8 @@
     },
     {
       "path": "recaplib/import_checkpoint.py",
-      "bytes": 15818,
-      "sha256": "4449ec6f6dd6e2635fe8bf9ddfa6220f84c89549bd77d4790c423b06538a88b9"
+      "bytes": 16517,
+      "sha256": "e7ce5c2e460393b6e661f6515e586a83a1df33f4df4ebcb6e2f570a0b62ab594"
     },
     {
       "path": "recaplib/input_files.py",
@@ -745,8 +750,8 @@
     },
     {
       "path": "recaplib/normalized_export.py",
-      "bytes": 4800,
-      "sha256": "c3785626427b5e4574bfec20211e1b9434986482c0795e6e792dce3852bc77ed"
+      "bytes": 7776,
+      "sha256": "1c558d7d5e6ab3581ef67ba8d83c76b14c846a8acc15ac40f8f15399daf7e943"
     },
     {
       "path": "recaplib/prepare_web_export.py",
@@ -787,6 +792,11 @@
       "path": "recaplib/review_checkpoint.py",
       "bytes": 10693,
       "sha256": "b7e4f721e904e184bcab1896cc50d1d2a04fd7bc1eed9be5516759c77f944507"
+    },
+    {
+      "path": "recaplib/search_message_page.py",
+      "bytes": 2664,
+      "sha256": "caeb2d16a90e4c4cc995de1722f0e3b6ad41fdc60873f69d45f60b861fc9ccf3"
     },
     {
       "path": "recaplib/session_workflow.py",
@@ -1194,6 +1204,11 @@
       "sha256": "fcbcec0ce2159cfabe566fbab9b32976597b8e714c42f8a43fa7d58f87ec4cec"
     },
     {
+      "path": "tests/test_incremental_normalized_export.py",
+      "bytes": 14716,
+      "sha256": "2cd4f10e7a6ccdd3d31ec63f5a9df832f04cbe91e57a477cc9895e00bbdaf0e5"
+    },
+    {
       "path": "tests/test_inspect_web_zip.py",
       "bytes": 8763,
       "sha256": "ed2be7e6e120e040b6954765edece5ddb827953c6f84d994b4f74e9d2643f11c"
@@ -1237,6 +1252,11 @@
       "path": "tests/test_manifest_verification.py",
       "bytes": 4433,
       "sha256": "a556cd2f86d064256a48eb1424611174ff8a0ee9e92a0552d926c83430b4d83e"
+    },
+    {
+      "path": "tests/test_matching_message_pages.py",
+      "bytes": 8760,
+      "sha256": "60d6402112b726616ac8db442c86011b1587b2150e5d980cb2f8b4f9401d1bbc"
     },
     {
       "path": "tests/test_mcp_files.py",
@@ -1385,8 +1405,8 @@
     },
     {
       "path": "tests/test_render_queue.py",
-      "bytes": 11447,
-      "sha256": "9da10d2e4fa69cb2d8f4bae3406cd534bc6983c3bfaef12b2ad4ef56e3f6e7df"
+      "bytes": 11479,
+      "sha256": "581585f92e294be61ea5ba00e053af2af26c444f6cfaf77b9e08b410f9bb00b3"
     },
     {
       "path": "tests/test_render_view.py",

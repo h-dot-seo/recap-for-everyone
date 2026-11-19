@@ -21,8 +21,9 @@ fresh first page. This applies to conversation `find`, not the separate FTS mess
 
 A null conversation cursor can coexist with `message_matches_truncated: true`
 inside a returned conversation. Those omitted body samples are not another cursor
-page. Browse that exact source/conversation with existing `show` message pages;
-[the omitted-message walkthrough](OMITTED_SEARCH_MESSAGES.md) connects this to
+page. Use `find --source SOURCE --conversation ID` with the same query to page
+matching bodies, or use `show` to read all messages in that conversation.
+[The omitted-message walkthrough](OMITTED_SEARCH_MESSAGES.md) connects this to
 selecting user evidence and reviewing a useful local title.
 
 ## Ranking and counts

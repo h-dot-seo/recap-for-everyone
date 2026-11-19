@@ -92,7 +92,7 @@ original application.
 | Choose a part of a downloaded ZIP | `recap.py inspect-web-zip ZIP`, `recap.py prepare-web-export ZIP --member NAME --output NEW_FILE` | [ZIP inventory](docs/WEB_ZIP_INVENTORY.md) |
 | Find IDs and coverage before importing | `recap.py list-export INPUT --format FORMAT`, `recap.py inspect INPUT --format FORMAT` | [Export inventory](docs/EXPORT_INVENTORY.md) |
 | Import an export or normalized JSONL | `recap.py --db DB import INPUT --format FORMAT --source SOURCE`, `ingest`, `check-import` | [Input scope](docs/INPUT_SCOPE.md) |
-| Export portable message text | `recap.py --db DB export-normalized --source SOURCE --output NEW_JSONL` (optional `--conversation ID`) | [Normalized export](docs/EXPORT_NORMALIZED.md) |
+| Export portable message text | `recap.py --db DB export-normalized --source SOURCE --output NEW_JSONL`; optionally select a conversation or bound the transfer with `--since-checkpoint` and `--through-checkpoint` | [Normalized export](docs/EXPORT_NORMALIZED.md) · [Incremental transfer](docs/INCREMENTAL_EXPORT.md) |
 | Read a saved title queue | `recap.py render-queue QUEUE.json --output NEW_FILE` | [Saved queue HTML](docs/RENDER_QUEUE.md) |
 | Save a readable local view | `recap.py --db DB render --source SOURCE --conversation ID --format markdown --output NEW_FILE` (or `--format html`) | [Markdown](docs/RENDER_MARKDOWN.md), [HTML](docs/RENDER_VIEWS.md) |
 | Inspect the current archive layout | `recap.py --db DB describe-schema` | [Schema reference](docs/SCHEMA.md) |

@@ -77,7 +77,7 @@ class QueueViewTests(unittest.TestCase):
         queue = review_queue(self.db, 'synthetic', supplied_proposals=[])
         self.save_input(queue)
         render.render_queue(self.input, self.output)
-        self.assertIn('NO_SUPPLIED_PROPOSAL', self.output.read_text())
+        self.assertIn('NO_SUPPLIED_PROPOSAL', self.output.read_text(encoding='utf-8'))
         item = copy.deepcopy(self.queue['items'][0])
         item['conversation'] = item['proposal']['conversation'] = 'second'
         self.queue['items'].insert(0, item)
@@ -119,7 +119,7 @@ class QueueViewTests(unittest.TestCase):
         self.save_input()
         self.input.write_bytes(b'\xef\xbb\xbf' + self.input.read_bytes())
         render.render_queue(self.input, self.output)
-        self.assertIn(hashlib.sha256(self.input.read_bytes()).hexdigest(), self.output.read_text())
+        self.assertIn(hashlib.sha256(self.input.read_bytes()).hexdigest(), self.output.read_text(encoding='utf-8'))
         for constant in ('MAX_INPUT_BYTES', 'MAX_OUTPUT_BYTES'):
             with patch.object(render, constant, 32), self.assertRaisesRegex(ValueError, '16 MiB'):
                 render.render_queue(self.input, self.root / 'too-big.html')

@@ -63,3 +63,5 @@ python recap.py --db OUTPUT/archive.sqlite changed-since --source synthetic-memb
 
 See [artifact cutoffs](IMPORT_CHECKPOINT.md) for the unchanged default and
 [delta files](CHECKPOINT_DELTA.md) for output privacy and partial-success limits.
+Use [incremental export](INCREMENTAL_EXPORT.md) to transfer the newly accepted
+messages from a verified cutoff.
